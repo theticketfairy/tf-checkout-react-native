@@ -1,26 +1,26 @@
-import * as React from 'react'
-import { Button, NativeModules, StyleSheet, Text, View } from 'react-native'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import * as React from 'react' //Needed to render
+import { LogBox, NativeModules } from 'react-native'
 
-export const addOne = (input: number) => input + 1
+import {
+  BillingInfo,
+  Checkout,
+  PurchaseConfirmation,
+  Tickets,
+} from './containers'
+import { IOnCheckoutSuccess } from './containers/billingInfo/types'
+import { IAddToCartSuccess, ITicketsProps } from './containers/tickets/types'
 
-export const Counter = () => {
-  const [count, setCount] = React.useState(0)
+LogBox.ignoreAllLogs()
 
-  return (
-    <View style={styles.container}>
-      <Text>You pressed {count} times</Text>
-      <Button onPress={() => setCount(addOne(count))} title='Press Me' />
-    </View>
-  )
+export {
+  BillingInfo,
+  Checkout,
+  IAddToCartSuccess,
+  IOnCheckoutSuccess,
+  ITicketsProps,
+  PurchaseConfirmation,
+  Tickets,
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 200,
-  },
-})
 
 export default NativeModules.TFCheckoutRNModule
