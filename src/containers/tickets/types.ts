@@ -5,12 +5,18 @@ import {
   IPromoCodeStyles,
   IPromoCodeTexts,
 } from '../../components/promoCode/types'
-import { ISelectedTicket, ITicket } from '../../types'
+import {
+  IWaitingListStyles,
+  IWaitingListTexts,
+} from '../../components/waitingList/types'
+import { IEvent, ISelectedTicket, ITicket } from '../../types'
 import { ITicketListItemStyles, ITicketListItemTexts } from './components/types'
 
 export interface ITicketsViewProps {
-  isGettingTickets: boolean
-  isBookingTickets: boolean
+  eventId: number
+  isGettingTickets?: boolean
+  isBookingTickets?: boolean
+  isGettingEvent?: boolean
   tickets: ITicket[]
   styles?: ITicketsViewStyles
   onPressGetTickets: () => void
@@ -23,7 +29,13 @@ export interface ITicketsViewProps {
     promoCode?: IPromoCodeTexts
     getTicketsButton?: string
     title?: string
+    waitingList?: IWaitingListTexts
   }
+  event?: IEvent
+  isWaitingListVisible?: boolean
+  isGetTicketsButtonVisible?: boolean
+  isPromoEnabled?: boolean
+  isAccessCodeEnabled?: boolean
 }
 
 export interface IAddToCartSuccess {
@@ -45,6 +57,7 @@ export interface ITicketsViewStyles {
   promoCode?: IPromoCodeStyles
   ticketList?: ITicketListStyles
   loading?: ILoadingStyles
+  waitingList?: IWaitingListStyles
 }
 
 export interface ITicketsViewTexts {
@@ -63,4 +76,7 @@ export interface ITicketsProps {
 
   styles?: ITicketsViewStyles
   texts?: ITicketsViewTexts
+
+  isPromoEnabled?: boolean
+  isAccessCodeEnabled?: boolean
 }

@@ -3,14 +3,16 @@ import _filter from 'lodash/filter'
 import _get from 'lodash/get'
 import _sortBy from 'lodash/sortBy'
 
+import { IWaitingListFields } from '../components/waitingList/types'
 import { getData, LocalStorageKeys, storeData } from '../helpers/LocalStorage'
-import { IUserProfile } from '../types'
+import { IEvent, IUserProfile } from '../types'
 import { ITicket } from '../types/ITicket'
 import Constants from './Constants'
 import {
   IAuthorizeResponse,
   ICheckoutResponse,
   IClientRequest,
+  IEventResponse,
   IFetchTicketsResponse,
   IOrderReview,
   IOrderReviewResponse,
@@ -153,7 +155,7 @@ export const fetchUserProfile = async (accessToken: any) => {
   }
 }
 
-// Register new user
+//#region Register new user
 export const registerNewUser = async (
   data: FormData
 ): Promise<IRegisterNewUserResponse> => {
@@ -192,6 +194,38 @@ export const registerNewUser = async (
 
   return resultData
 }
+//#endregion
+
+//#region Waiting List
+export const addToWaitingList = async (
+  id: number,
+  values: IWaitingListFields
+) => {
+  const requestData = {
+    data: {
+      attributes: values,
+    },
+  }
+  console.log('addToWaitingList - req', requestData)
+  console.log('addToWaitingList - eventID', id)
+
+  let responseError = ''
+  const response: AxiosResponse | void = await Client.post(
+    `/v1/event/${id}/add_to_waiting_list`,
+    requestData
+  ).catch((error: AxiosError) => {
+    console.log('addToWaitingList - error', error.response)
+    responseError = error.response?.data.message
+  })
+
+  console.log('addToWaitingList - data', response?.data)
+
+  return {
+    addToWaitingListError: responseError,
+    addToWaitingListData: response?.data,
+  }
+}
+//#endregion
 
 //#region Tickets
 export const fetchTickets = async (
@@ -280,13 +314,28 @@ export const addToCart = async (id: string | number, data: any) => {
   }
 }
 
-export const getEvent = async (id: string | number) => {
-  const response = Client.get(`v1/event/${id}`, { headers: HEADERS }).catch(
-    (error) => {
-      throw error
-    }
-  )
-  return response
+export const fetchEvent = async (
+  id: string | number
+): Promise<IEventResponse> => {
+  console.log('fetchEvent - ID', id)
+  let responseError: string | undefined
+  let event: IEvent | undefined
+  const response: AxiosResponse | void = await Client.get(`v1/event/${id}`, {
+    headers: HEADERS,
+  }).catch((error: AxiosError) => {
+    console.log('fetchEvent - ERROR', error.response)
+    responseError = error.response?.data.message
+  })
+
+  if (response?.status === 200) {
+    event = response.data.data.attributes
+  }
+  console.log('fetchEvent - Response', response)
+
+  return {
+    eventError: responseError,
+    eventData: event,
+  }
 }
 //#endregion
 

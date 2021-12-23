@@ -44,59 +44,66 @@ const PromoCode = ({
     button: [s.applyButton, styles?.applyButton?.button],
   }
 
-  const isApplyButtonDisabled = promoCode.length === 0
+  console.log('isPromoCodeValid', isPromoCodeValid)
 
-  return isPromoCodeValid ? (
-    <View style={[s.messageContainer, styles?.messageContainer]}>
-      <Text style={styles?.message}>
-        {promoCodeValidationMessage ||
-          'Your promo code was applied successfully.'}
-      </Text>
-    </View>
-  ) : isActive ? (
-    <View style={styles?.rootContainer}>
-      <View style={[s.content, styles?.content]}>
-        <TextInput
-          placeholder={texts?.inputPlaceHolder || 'Promo code'}
-          placeholderTextColor={
-            styles?.inputPlaceholderColor || R.colors.disabled
-          }
-          value={promoCode}
-          style={[s.input, styles?.input]}
-          onChangeText={(text) => setPromoCode(text)}
-          autoCapitalize='none'
-        />
-        <Button
-          text={texts?.apply || 'Apply'}
-          styles={
-            isApplyButtonDisabled
-              ? applyButtonDisabledStyles
-              : applyButtonStyles
-          }
-          onPress={handleOnPressApply}
-          isDisabled={isApplyButtonDisabled}
-        />
-        <Button
-          text={texts?.cancel || 'Cancel'}
-          styles={{
-            container: styles?.cancelButton?.container,
-            text: [s.cancelText, styles?.cancelButton?.text],
-            button: [s.cancelButton, styles?.cancelButton?.button],
-          }}
-          onPress={deactivate}
-        />
+  const successComponent = () =>
+    isPromoCodeValid && (
+      <View style={[s.messageContainer, styles?.messageContainer]}>
+        <Text style={styles?.message}>
+          {promoCodeValidationMessage ||
+            'Your promo code was applied successfully.'}
+        </Text>
       </View>
+    )
+
+  const isApplyButtonDisabled = promoCode.length === 0
+  return (
+    <View style={styles?.rootContainer}>
+      {successComponent()}
+      {isActive ? (
+        <View style={[s.content, styles?.content]}>
+          <TextInput
+            placeholder={texts?.inputPlaceHolder || 'Promo code'}
+            placeholderTextColor={
+              styles?.inputPlaceholderColor || R.colors.disabled
+            }
+            value={promoCode}
+            style={[s.input, styles?.input]}
+            onChangeText={(text) => setPromoCode(text)}
+            autoCapitalize='none'
+          />
+          <Button
+            text={texts?.apply || 'Apply'}
+            styles={
+              isApplyButtonDisabled
+                ? applyButtonDisabledStyles
+                : applyButtonStyles
+            }
+            onPress={handleOnPressApply}
+            isDisabled={isApplyButtonDisabled}
+          />
+          <Button
+            text={texts?.cancel || 'Cancel'}
+            styles={{
+              container: styles?.cancelButton?.container,
+              text: [s.cancelText, styles?.cancelButton?.text],
+              button: [s.cancelButton, styles?.cancelButton?.button],
+            }}
+            onPress={deactivate}
+          />
+        </View>
+      ) : (
+        <Button
+          text={texts?.mainButton || 'Got a promo code? Click here'}
+          onPress={handleOnPressPromoCode}
+          styles={{
+            text: [s.mainButtonText, styles?.mainButton?.text],
+            container: [s.mainButtonContainer, styles?.mainButton?.container],
+            button: styles?.mainButton?.button,
+          }}
+        />
+      )}
     </View>
-  ) : (
-    <Button
-      text={texts?.mainButton || 'Got a promo code? Click here'}
-      onPress={handleOnPressPromoCode}
-      styles={{
-        text: [s.mainButtonText, styles?.mainButton?.text],
-        container: [s.mainButtonContainer, styles?.mainButton?.container],
-        button: styles?.mainButton?.button,
-      }}
-    />
   )
 }
 

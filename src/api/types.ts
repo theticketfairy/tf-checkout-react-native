@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios'
 
-import { ITicket } from '../types'
+import { IEvent, ITicket } from '../types'
 
 export interface IClientRequest extends AxiosInstance {
   setGuestToken: (token: string) => void
@@ -17,6 +17,7 @@ export interface IFetchTicketsResponse {
   error?: any
   promoCodeResult?: IPromoCodeResponse
   isInWaitingList?: boolean
+  isAccessCodeRequired?: boolean
 }
 
 export interface IAuthorizeResponse {
@@ -43,6 +44,12 @@ export interface IAddToCartParams {
       }
     }
   }
+}
+
+// Event types
+export interface IEventResponse {
+  eventError?: string
+  eventData?: IEvent
 }
 
 // Checkout types

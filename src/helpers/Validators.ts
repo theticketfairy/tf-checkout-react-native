@@ -21,7 +21,7 @@ export const validateMinLength = (
     ? `${fieldName} requires at least ${minLength} characters`
     : ''
 
-export const validateEmail = (email: string, equalTo: string) => {
+export const validateEmail = (email: string, equalTo?: string) => {
   let validation = ''
   if (equalTo) {
     validation = email === equalTo ? '' : 'Emails must match'

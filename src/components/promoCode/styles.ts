@@ -47,7 +47,6 @@ export default StyleSheet.create({
     color: R.colors.white,
   },
   messageContainer: {
-    marginVertical: 24,
     padding: 8,
     backgroundColor: 'gainsboro',
     alignItems: 'center',

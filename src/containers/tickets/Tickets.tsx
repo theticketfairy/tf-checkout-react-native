@@ -1,14 +1,14 @@
 import _get from 'lodash/get'
 import _isEmpty from 'lodash/isEmpty'
+import _some from 'lodash/some'
 import React, { useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 
-import { addToCart, fetchTickets } from '../../api/ApiClient'
+import { addToCart, fetchEvent, fetchTickets } from '../../api/ApiClient'
 import { IPromoCodeResponse } from '../../api/types'
-import { ISelectedTicket, ITicket } from '../../types'
+import { IEvent, ISelectedTicket, ITicket } from '../../types'
 import TicketsView from './TicketsView'
 import { ITicketsProps } from './types'
-import WaitingListView from './WaitingListView'
 
 const Tickets = ({
   eventId,
@@ -17,8 +17,12 @@ const Tickets = ({
   onFetchTicketsError,
   styles,
   texts,
+  isAccessCodeEnabled,
+  isPromoEnabled,
 }: ITicketsProps) => {
   const [isGettingTickets, setIsGettingTickets] = useState(false)
+  const [isGettingEvent, setIsGettingEvent] = useState(false)
+  const [event, setEvent] = useState<IEvent>()
   const [isBooking, setIsBooking] = useState(false)
   const [tickets, setTickets] = useState<ITicket[]>([])
   const [isWaitingListVisible, setIsWaitingListVisible] = useState(false)
@@ -31,6 +35,13 @@ const Tickets = ({
   const showError = (error: string) => {
     Alert.alert('', error)
   }
+
+  const isTicketOnSale = _some(
+    tickets,
+    (item) => item.salesStarted && !item.salesEnded && !item.soldOut
+  )
+
+  console.log('isTicketOnSale', isTicketOnSale)
 
   //#region Api calls
   const getTickets = async (promoCode: string = '') => {
@@ -69,6 +80,16 @@ const Tickets = ({
     }
 
     setIsFirstCall(false)
+  }
+
+  const getEventData = async () => {
+    setIsGettingEvent(true)
+    const { eventError, eventData } = await fetchEvent(eventId)
+    if (eventError) {
+      return Alert.alert('', eventError)
+    }
+    setEvent(eventData)
+    setIsGettingEvent(false)
   }
 
   const performBookTickets = async () => {
@@ -126,6 +147,7 @@ const Tickets = ({
   useEffect(() => {
     const fetchInitialData = async () => {
       await getTickets()
+      await getEventData()
     }
     fetchInitialData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -147,10 +169,10 @@ const Tickets = ({
   //#endregion
 
   console.log('PromoCode Response', promoCodeResponse)
-  return isWaitingListVisible ? (
-    <WaitingListView />
-  ) : (
+  console.log('EVENT', event)
+  return (
     <TicketsView
+      eventId={eventId}
       isGettingTickets={isGettingTickets}
       tickets={tickets}
       onPressGetTickets={handleOnPressGetTickets}
@@ -162,6 +184,11 @@ const Tickets = ({
       isBookingTickets={isBooking}
       styles={styles}
       texts={texts}
+      event={event}
+      isWaitingListVisible={isWaitingListVisible}
+      isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
+      isAccessCodeEnabled={isAccessCodeEnabled}
+      isPromoEnabled={isPromoEnabled}
     />
   )
 }

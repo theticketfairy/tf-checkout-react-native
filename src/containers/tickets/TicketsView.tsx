@@ -2,7 +2,7 @@ import React from 'react'
 import { FlatList, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { Loading, PromoCode } from '../../components'
+import { Loading, PromoCode, WaitingList } from '../../components'
 import Button from '../../components/button/Button'
 import Separator from '../../components/separator/Separator'
 import CartListItem from './components/TicketListItem'
@@ -21,6 +21,11 @@ const TicketsView = ({
   selectedTicket,
   isBookingTickets,
   texts,
+  isGettingEvent,
+  event,
+  isWaitingListVisible,
+  isGetTicketsButtonVisible,
+  eventId,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -28,6 +33,8 @@ const TicketsView = ({
     ? 'Get tickets'
     : `Get ${selectedTicket?.selectedOption?.value} tickets`
   const title = texts?.title ? texts.title : 'GET TICKETS'
+
+  console.log('isGetTicketsButtonVisible', isGetTicketsButtonVisible)
 
   return (
     <KeyboardAwareScrollView>
@@ -51,6 +58,13 @@ const TicketsView = ({
           )}
           ItemSeparatorComponent={() => <Separator />}
         />
+        {isWaitingListVisible && event?.salesStarted && (
+          <WaitingList
+            eventId={eventId}
+            styles={styles?.waitingList}
+            texts={texts?.waitingList}
+          />
+        )}
         <PromoCode
           onPressApply={onPressApplyPromoCode}
           promoCodeValidationMessage={promoCodeValidationMessage}
@@ -58,18 +72,20 @@ const TicketsView = ({
           styles={styles?.promoCode}
           texts={texts?.promoCode}
         />
-        <Button
-          text={buttonText}
-          onPress={onPressGetTickets}
-          isUpperCase={true}
-          isLoading={isBookingTickets}
-          isDisabled={isButtonDisabled}
-          styles={{
-            container: styles?.getTicketsButton,
-            text: styles?.getTicketText,
-          }}
-        />
-        {isGettingTickets && <Loading />}
+        {isGetTicketsButtonVisible && (
+          <Button
+            text={buttonText}
+            onPress={onPressGetTickets}
+            isUpperCase={true}
+            isLoading={isBookingTickets}
+            isDisabled={isButtonDisabled}
+            styles={{
+              container: styles?.getTicketsButton,
+              text: styles?.getTicketText,
+            }}
+          />
+        )}
+        {isGettingTickets || (isGettingEvent && <Loading />)}
       </View>
     </KeyboardAwareScrollView>
   )
