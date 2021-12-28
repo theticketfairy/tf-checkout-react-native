@@ -5,9 +5,11 @@ import { IButtonStyles } from '../button/types'
 
 export interface IPromoCodeStyles {
   rootContainer?: StyleProp<ViewStyle>
+  contentWrapper?: StyleProp<ViewStyle>
   content?: StyleProp<ViewStyle>
   input?: TextInputProps['style']
   inputPlaceholderColor?: string
+  title?: StyleProp<TextStyle>
 
   mainButton?: IButtonStyles
   cancelButton?: IButtonStyles
@@ -24,6 +26,7 @@ export interface IPromoCodeTexts {
   apply?: string
   cancel?: string
   mainButton?: string
+  title?: string
 }
 
 export interface IPromoCodeProps {
@@ -32,4 +35,5 @@ export interface IPromoCodeProps {
   isPromoCodeValid?: boolean
   styles?: IPromoCodeStyles
   texts?: IPromoCodeTexts
+  isAccessCodeEnabled?: boolean
 }

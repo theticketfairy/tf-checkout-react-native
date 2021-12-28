@@ -13,6 +13,7 @@ const PromoCode = ({
   isPromoCodeValid,
   styles,
   texts,
+  isAccessCodeEnabled,
 }: IPromoCodeProps) => {
   const [isActive, setIsActive] = useState(false)
   const [promoCode, setPromoCode] = useState('')
@@ -44,8 +45,6 @@ const PromoCode = ({
     button: [s.applyButton, styles?.applyButton?.button],
   }
 
-  console.log('isPromoCodeValid', isPromoCodeValid)
-
   const successComponent = () =>
     isPromoCodeValid && (
       <View style={[s.messageContainer, styles?.messageContainer]}>
@@ -57,40 +56,55 @@ const PromoCode = ({
     )
 
   const isApplyButtonDisabled = promoCode.length === 0
+  const inputPlaceHolder = texts?.title
+    ? texts.title
+    : isAccessCodeEnabled
+    ? 'Enter your access code'
+    : 'Promo Code'
+  const submitButton = texts?.apply
+    ? texts.apply
+    : isAccessCodeEnabled
+    ? 'ENTER'
+    : 'APPLY'
+
   return (
     <View style={styles?.rootContainer}>
       {successComponent()}
-      {isActive ? (
-        <View style={[s.content, styles?.content]}>
-          <TextInput
-            placeholder={texts?.inputPlaceHolder || 'Promo code'}
-            placeholderTextColor={
-              styles?.inputPlaceholderColor || R.colors.disabled
-            }
-            value={promoCode}
-            style={[s.input, styles?.input]}
-            onChangeText={(text) => setPromoCode(text)}
-            autoCapitalize='none'
-          />
-          <Button
-            text={texts?.apply || 'Apply'}
-            styles={
-              isApplyButtonDisabled
-                ? applyButtonDisabledStyles
-                : applyButtonStyles
-            }
-            onPress={handleOnPressApply}
-            isDisabled={isApplyButtonDisabled}
-          />
-          <Button
-            text={texts?.cancel || 'Cancel'}
-            styles={{
-              container: styles?.cancelButton?.container,
-              text: [s.cancelText, styles?.cancelButton?.text],
-              button: [s.cancelButton, styles?.cancelButton?.button],
-            }}
-            onPress={deactivate}
-          />
+
+      {isActive || isAccessCodeEnabled ? (
+        <View style={[s.contentWrapper, styles?.contentWrapper]}>
+          <Text style={[s.title, styles?.title]}>{inputPlaceHolder}</Text>
+          <View style={[s.content, styles?.content]}>
+            <TextInput
+              placeholder={texts?.inputPlaceHolder || inputPlaceHolder}
+              placeholderTextColor={
+                styles?.inputPlaceholderColor || R.colors.disabled
+              }
+              value={promoCode}
+              style={[s.input, styles?.input]}
+              onChangeText={(text) => setPromoCode(text)}
+              autoCapitalize='none'
+            />
+            <Button
+              text={texts?.apply || submitButton}
+              styles={
+                isApplyButtonDisabled
+                  ? applyButtonDisabledStyles
+                  : applyButtonStyles
+              }
+              onPress={handleOnPressApply}
+              isDisabled={isApplyButtonDisabled}
+            />
+            <Button
+              text={texts?.cancel || 'Cancel'}
+              styles={{
+                container: styles?.cancelButton?.container,
+                text: [s.cancelText, styles?.cancelButton?.text],
+                button: [s.cancelButton, styles?.cancelButton?.button],
+              }}
+              onPress={deactivate}
+            />
+          </View>
         </View>
       ) : (
         <Button

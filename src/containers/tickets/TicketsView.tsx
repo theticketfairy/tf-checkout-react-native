@@ -26,6 +26,7 @@ const TicketsView = ({
   isWaitingListVisible,
   isGetTicketsButtonVisible,
   eventId,
+  isAccessCodeEnabled,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -69,6 +70,7 @@ const TicketsView = ({
           onPressApply={onPressApplyPromoCode}
           promoCodeValidationMessage={promoCodeValidationMessage}
           isPromoCodeValid={isPromoCodeValid}
+          isAccessCodeEnabled={isAccessCodeEnabled}
           styles={styles?.promoCode}
           texts={texts?.promoCode}
         />

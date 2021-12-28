@@ -5,7 +5,7 @@ import R from '../../res'
 export default StyleSheet.create({
   content: {
     flexDirection: 'row',
-    marginVertical: 16,
+    marginBottom: 16,
     justifyContent: 'space-between',
   },
   input: {
@@ -51,4 +51,9 @@ export default StyleSheet.create({
     backgroundColor: 'gainsboro',
     alignItems: 'center',
   },
+  title: {
+    marginVertical: 16,
+    fontWeight: '600',
+  },
+  contentWrapper: {},
 })

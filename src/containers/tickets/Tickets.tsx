@@ -17,8 +17,8 @@ const Tickets = ({
   onFetchTicketsError,
   styles,
   texts,
-  isAccessCodeEnabled,
-  isPromoEnabled,
+  isAccessCodeEnabled = false,
+  isPromoEnabled = true,
 }: ITicketsProps) => {
   const [isGettingTickets, setIsGettingTickets] = useState(false)
   const [isGettingEvent, setIsGettingEvent] = useState(false)
@@ -26,6 +26,7 @@ const Tickets = ({
   const [isBooking, setIsBooking] = useState(false)
   const [tickets, setTickets] = useState<ITicket[]>([])
   const [isWaitingListVisible, setIsWaitingListVisible] = useState(false)
+  const [isAccessCode, setIsAccessCode] = useState(false)
   const [selectedTicket, setSelectedTicket] = useState<ISelectedTicket>()
   const [promoCodeResponse, setPromoCodeResponse] = useState<
     IPromoCodeResponse | undefined
@@ -51,6 +52,7 @@ const Tickets = ({
       tickets: responseTickets,
       promoCodeResult,
       isInWaitingList,
+      isAccessCodeRequired,
     } = await fetchTickets(eventId, promoCode)
     setIsGettingTickets(false)
     if (error) {
@@ -69,6 +71,7 @@ const Tickets = ({
     }
 
     setIsWaitingListVisible(!!isInWaitingList)
+    setIsAccessCode(!!isAccessCodeRequired)
 
     if (responseTickets && !_isEmpty(responseTickets)) {
       setTickets(responseTickets)
@@ -187,7 +190,7 @@ const Tickets = ({
       event={event}
       isWaitingListVisible={isWaitingListVisible}
       isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
-      isAccessCodeEnabled={isAccessCodeEnabled}
+      isAccessCodeEnabled={isAccessCodeEnabled || isAccessCode}
       isPromoEnabled={isPromoEnabled}
     />
   )

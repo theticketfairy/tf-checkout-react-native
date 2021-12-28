@@ -276,6 +276,7 @@ export const fetchTickets = async (
     error: responseError,
     promoCodeResult: promoCodeResult,
     isInWaitingList: _get(response, 'data.data.attributes.showWaitingList'),
+    isAccessCodeRequired: _get(response, 'data.data.attributes.is_access_code'),
   }
 }
 
