@@ -145,3 +145,29 @@ export interface IOrderReviewResponse {
   error?: string
   data?: IOrderReview
 }
+
+//#region MyOrders
+export interface IMyOrdersEvent {
+  url_name: string
+  event_name: string
+}
+
+export interface IMyOrdersOrder {
+  id: string
+  date: string
+  currency: string
+  amount: string
+  eventName: string
+  eventUrl: string
+  image: string
+}
+export interface IMyOrdersData {
+  events: IMyOrdersEvent[]
+  orders: IMyOrdersOrder[]
+}
+
+export interface IMyOrdersResponse {
+  myOrdersData?: IMyOrdersData
+  myOrdersError?: string
+}
+//#endregion

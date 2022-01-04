@@ -1,3 +1,4 @@
+import jwtDecode from 'jwt-decode'
 import _get from 'lodash/get'
 import _isEmpty from 'lodash/isEmpty'
 import _some from 'lodash/some'
@@ -6,6 +7,11 @@ import { Alert } from 'react-native'
 
 import { addToCart, fetchEvent, fetchTickets } from '../../api/ApiClient'
 import { IPromoCodeResponse } from '../../api/types'
+import {
+  deleteData,
+  getData,
+  LocalStorageKeys,
+} from '../../helpers/LocalStorage'
 import { IEvent, ISelectedTicket, ITicket } from '../../types'
 import TicketsView from './TicketsView'
 import { ITicketsProps } from './types'
@@ -20,6 +26,8 @@ const Tickets = ({
   isAccessCodeEnabled = false,
   isPromoEnabled = true,
 }: ITicketsProps) => {
+  const [isUserLogged, setIsUserLogged] = useState(false)
+  const [isMyOrdersVisible, setIsMyOrdersVisible] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
   const [isGettingEvent, setIsGettingEvent] = useState(false)
   const [event, setEvent] = useState<IEvent>()
@@ -45,6 +53,22 @@ const Tickets = ({
   console.log('isTicketOnSale', isTicketOnSale)
 
   //#region Api calls
+
+  const retrieveStoredAccessToken = async () => {
+    const token = await getData(LocalStorageKeys.ACCESS_TOKEN)
+    if (!token) {
+      return setIsUserLogged(false)
+    }
+
+    const decodedToken = jwtDecode<{ exp: number }>(token)
+    if (decodedToken && decodedToken.exp < Date.now() / 1000) {
+      deleteData(LocalStorageKeys.ACCESS_TOKEN)
+      deleteData(LocalStorageKeys.USER_DATA)
+      return setIsUserLogged(false)
+    }
+    setIsUserLogged(true)
+  }
+
   const getTickets = async (promoCode: string = '') => {
     setIsGettingTickets(true)
     const {
@@ -149,6 +173,7 @@ const Tickets = ({
   //#region UseEffects
   useEffect(() => {
     const fetchInitialData = async () => {
+      await retrieveStoredAccessToken()
       await getTickets()
       await getEventData()
     }
@@ -168,6 +193,10 @@ const Tickets = ({
 
   const handleOnSelectTicketOption = (ticket: ISelectedTicket) => {
     setSelectedTicket(ticket)
+  }
+
+  const handleOnPressMyOrders = () => {
+    setIsMyOrdersVisible(true)
   }
   //#endregion
 
@@ -192,6 +221,8 @@ const Tickets = ({
       isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
       isAccessCodeEnabled={isAccessCodeEnabled || isAccessCode}
       isPromoEnabled={isPromoEnabled}
+      isMyOrdersVisible={isMyOrdersVisible}
+      isUserLogged={isUserLogged}
     />
   )
 }

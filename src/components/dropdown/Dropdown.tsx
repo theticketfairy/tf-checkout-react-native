@@ -10,6 +10,7 @@ import {
 } from 'react-native'
 
 import R from '../../res'
+import Input from '../input/Input'
 import Separator from '../separator/Separator'
 import DropdownListItem from './DropdownListItem'
 import { DropdownStyles as s } from './styles'
@@ -20,6 +21,8 @@ const Dropdown = ({
   selectedOption,
   onSelectItem,
   styles,
+  label,
+  isMaterial,
 }: IDropdownProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const flatListRef: MutableRefObject<FlatList> = useRef()
@@ -35,6 +38,7 @@ const Dropdown = ({
   }
 
   const onButtonPress = () => {
+    console.log('DROPDOWN - onButtonPress')
     requestAnimationFrame(() => showModal())
   }
 

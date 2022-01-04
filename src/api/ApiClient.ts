@@ -4,7 +4,12 @@ import _get from 'lodash/get'
 import _sortBy from 'lodash/sortBy'
 
 import { IWaitingListFields } from '../components/waitingList/types'
-import { getData, LocalStorageKeys, storeData } from '../helpers/LocalStorage'
+import {
+  deleteAllData,
+  getData,
+  LocalStorageKeys,
+  storeData,
+} from '../helpers/LocalStorage'
 import { IEvent, IUserProfile } from '../types'
 import { ITicket } from '../types/ITicket'
 import Constants from './Constants'
@@ -14,6 +19,8 @@ import {
   IClientRequest,
   IEventResponse,
   IFetchTicketsResponse,
+  IMyOrdersData,
+  IMyOrdersResponse,
   IOrderReview,
   IOrderReviewResponse,
   IPromoCodeResponse,
@@ -54,6 +61,16 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 
   return config
 })
+
+Client.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  (error: AxiosError) => {
+    console.log('Response error', error)
+    if (error?.response?.status === 401) {
+      deleteAllData()
+    }
+  }
+)
 
 Client.setGuestToken = (token: string) =>
   (Client.defaults.headers.common['Authorization-Guest'] = token)
@@ -225,6 +242,43 @@ export const addToWaitingList = async (
     addToWaitingListData: response?.data,
   }
 }
+//#endregion
+
+//#region MyOrders
+export const fetchMyOrders = async (): Promise<IMyOrdersResponse> => {
+  const page = 1
+  const limit = 20
+  const filter = ''
+  const data: IMyOrdersData = {
+    events: [],
+    orders: [],
+  }
+  let responseError = ''
+  const response: AxiosResponse | void = await Client.get(
+    `/v1/account/orders/?page=${page}&limit=${limit}&filter[event]=${filter}`
+  ).catch((error: AxiosError) => {
+    console.log('myorders ERROR', error)
+    responseError = error.response?.data.message || 'Error fetching My Orders'
+  })
+
+  if (response?.data) {
+    data.events = response.data.data.attributes.purchased_events
+    data.orders = response.data.data.attributes.orders
+  }
+
+  console.log('RESPONSE MY ORDERs', response)
+  console.log('RESPONSE MY responseError', responseError)
+
+  return {
+    myOrdersError: responseError,
+    myOrdersData: data,
+  }
+}
+//&filter[brand]=${CONFIGS.BRAND_SLUG}
+
+export const fetchOrderDetails = (orderId: string) =>
+  Client.get(`/v1/account/order/${orderId}`)
+
 //#endregion
 
 //#region Tickets

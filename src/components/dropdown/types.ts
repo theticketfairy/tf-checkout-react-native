@@ -22,4 +22,6 @@ export interface IDropdownProps {
   selectedOption?: IDropdownItem
   onSelectItem: (item: IDropdownItem) => void
   styles?: IDropdownStyles
+  label?: string
+  isMaterial?: boolean
 }

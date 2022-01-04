@@ -44,7 +44,7 @@ import {
 } from './types'
 
 const BillingInfo = ({
-  cartProps: { isAgeRequired, isNameRequired, isBillingRequired },
+  cartProps: { isAgeRequired, isNameRequired },
   onRegisterSuccess,
   onRegisterFail,
   onCheckoutSuccess,

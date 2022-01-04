@@ -36,6 +36,8 @@ export interface ITicketsViewProps {
   isGetTicketsButtonVisible?: boolean
   isPromoEnabled?: boolean
   isAccessCodeEnabled?: boolean
+  isMyOrdersVisible?: boolean
+  isUserLogged?: boolean
 }
 
 export interface IAddToCartSuccess {

@@ -2,7 +2,7 @@ import React from 'react'
 import { FlatList, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { Loading, PromoCode, WaitingList } from '../../components'
+import { Loading, LoggedIn, PromoCode, WaitingList } from '../../components'
 import Button from '../../components/button/Button'
 import Separator from '../../components/separator/Separator'
 import CartListItem from './components/TicketListItem'
@@ -27,6 +27,8 @@ const TicketsView = ({
   isGetTicketsButtonVisible,
   eventId,
   isAccessCodeEnabled,
+  isMyOrdersVisible,
+  isUserLogged,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -87,6 +89,7 @@ const TicketsView = ({
             }}
           />
         )}
+        {isUserLogged && <LoggedIn />}
         {isGettingTickets || (isGettingEvent && <Loading />)}
       </View>
     </KeyboardAwareScrollView>

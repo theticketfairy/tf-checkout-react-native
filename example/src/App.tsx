@@ -11,12 +11,13 @@ import {
 } from 'tf-checkout-react-native'
 import styles from './styles'
 
-const EVENT_ID = 0 // Replace with assigned ID
+const EVENT_ID = 5420 // Replace with assigned ID
 enum ComponentEnum {
   Tickets,
   BillingInfo,
   Checkout,
   PurchaseConfirmation,
+  MyOrders,
 }
 
 const App = () => {
@@ -100,6 +101,7 @@ const App = () => {
             onComplete={handleOnComplete}
           />
         )
+
       default:
         return (
           <Tickets

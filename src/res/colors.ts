@@ -11,6 +11,7 @@ const lightTheme = {
   transparentBlack: 'rgba(0,0,0,0.5)',
   transparent: 'rgba(0,0,0,0)',
   danger: '#D9534F',
+  listBackground: 'rgba(0,0,0,0.1)',
 }
 
 const darkTheme = {
@@ -22,6 +23,7 @@ const darkTheme = {
   transparentBlack: 'rgba(0,0,0,0.5)',
   transparent: 'rgba(0,0,0,0)',
   danger: '#D9534F',
+  listBackground: 'rgba(0,0,0,0.1)',
 }
 
 const currentTheme = isDark ? darkTheme : lightTheme
