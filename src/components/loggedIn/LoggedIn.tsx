@@ -1,7 +1,6 @@
-import React, { FC, useState } from 'react'
+import React, { FC } from 'react'
 import { View } from 'react-native'
 
-import { MyOrders } from '../../containers'
 import { Button } from '..'
 import s from './styles'
 import { ILoggedInProps } from './types'
@@ -15,24 +14,16 @@ const LoggedIn: FC<ILoggedInProps> = ({
   logOutButtonText,
   rootContainerStyle,
 }) => {
-  const [isMyOrdersVisible, setIsMyOrdersVisible] = useState(false)
-
-  console.log('isMyOrdersVisible', isMyOrdersVisible)
   const handleMyOrdersPress = () => {
     if (onPressMyOrders) {
       onPressMyOrders()
     }
-    setIsMyOrdersVisible(true)
   }
 
   const handleLogOutPress = () => {
     if (onPressLogout) {
       onPressLogout()
     }
-  }
-
-  const handleOnDismissMyOrders = () => {
-    setIsMyOrdersVisible(false)
   }
 
   return (
@@ -47,9 +38,6 @@ const LoggedIn: FC<ILoggedInProps> = ({
         onPress={handleLogOutPress}
         styles={logOutButtonStyles}
       />
-      {isMyOrdersVisible && (
-        <MyOrders onDismissMyOrders={handleOnDismissMyOrders} />
-      )}
     </View>
   )
 }

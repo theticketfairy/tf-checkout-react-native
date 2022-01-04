@@ -27,8 +27,8 @@ const TicketsView = ({
   isGetTicketsButtonVisible,
   eventId,
   isAccessCodeEnabled,
-  isMyOrdersVisible,
   isUserLogged,
+  onPressMyOrders,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -89,7 +89,7 @@ const TicketsView = ({
             }}
           />
         )}
-        {isUserLogged && <LoggedIn />}
+        {isUserLogged && <LoggedIn onPressMyOrders={onPressMyOrders} />}
         {isGettingTickets || (isGettingEvent && <Loading />)}
       </View>
     </KeyboardAwareScrollView>

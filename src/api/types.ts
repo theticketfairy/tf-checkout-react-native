@@ -171,3 +171,34 @@ export interface IMyOrdersResponse {
   myOrdersError?: string
 }
 //#endregion
+
+//#region My Order Details
+export interface IMyOrderDetailsItem {
+  name: string
+  currency: string
+  price: string
+  discount: string
+  quantity: string
+  total: string
+}
+
+export interface IMyOrderDetailsTicket {
+  hash: string
+  ticketType: string
+  holderName: string
+  status: string
+  pdfLink: string
+}
+
+export interface IMyOrderDetailsHeader {
+  isReferralDisabled: boolean
+  shareLink: string
+  total: string
+  salesReferred: string
+}
+export interface IMyOrderDetailsResponse {
+  header: IMyOrderDetailsHeader
+  items: IMyOrderDetailsItem[]
+  tickets: IMyOrderDetailsTicket[]
+}
+//#endregion

@@ -36,8 +36,8 @@ export interface ITicketsViewProps {
   isGetTicketsButtonVisible?: boolean
   isPromoEnabled?: boolean
   isAccessCodeEnabled?: boolean
-  isMyOrdersVisible?: boolean
   isUserLogged?: boolean
+  onPressMyOrders: () => void
 }
 
 export interface IAddToCartSuccess {
@@ -81,4 +81,6 @@ export interface ITicketsProps {
 
   isPromoEnabled?: boolean
   isAccessCodeEnabled?: boolean
+
+  onPressMyOrders: () => void
 }

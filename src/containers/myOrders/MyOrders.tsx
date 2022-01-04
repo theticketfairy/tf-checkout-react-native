@@ -3,15 +3,21 @@ import React, { FC, useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 
 import { fetchMyOrders, fetchOrderDetails } from '../../api/ApiClient'
-import { IMyOrdersOrder } from '../../api/types'
+import { IMyOrderDetailsResponse, IMyOrdersOrder } from '../../api/types'
 import { IDropdownItem } from '../../components/dropdown/types'
 import MyOrdersView from './MyOrdersView'
 
 export interface IMyOrdersProps {
   onDismissMyOrders: () => void
+  onSelectOrder: (order: IMyOrderDetailsResponse) => void
+  onFetchOrderDetailsFail?: (error: string) => void
 }
 
-const MyOrders: FC<IMyOrdersProps> = ({ onDismissMyOrders }) => {
+const MyOrders: FC<IMyOrdersProps> = ({
+  onDismissMyOrders,
+  onSelectOrder,
+  onFetchOrderDetailsFail,
+}) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isGettingEventDetails, setIsGettingEventDetails] = useState(false)
   const [myEvents, setMyEvents] = useState<IDropdownItem[]>([])
@@ -46,9 +52,15 @@ const MyOrders: FC<IMyOrdersProps> = ({ onDismissMyOrders }) => {
 
   const handleOnSelectOrder = async (order: IMyOrdersOrder) => {
     setIsGettingEventDetails(true)
-    const orderDetails = await fetchOrderDetails(order.id)
+    const { orderDetailsData, orderDetailsError } = await fetchOrderDetails(
+      order.id
+    )
     setIsGettingEventDetails(false)
-    console.log('Order Details', orderDetails)
+    console.log('Order Details', orderDetailsData)
+    if (!orderDetailsData || orderDetailsError) {
+      return onFetchOrderDetailsFail(orderDetailsError!)
+    }
+    onSelectOrder(orderDetailsData)
   }
   //#endregion
 

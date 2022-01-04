@@ -25,9 +25,9 @@ const Tickets = ({
   texts,
   isAccessCodeEnabled = false,
   isPromoEnabled = true,
+  onPressMyOrders,
 }: ITicketsProps) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
-  const [isMyOrdersVisible, setIsMyOrdersVisible] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
   const [isGettingEvent, setIsGettingEvent] = useState(false)
   const [event, setEvent] = useState<IEvent>()
@@ -221,8 +221,8 @@ const Tickets = ({
       isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
       isAccessCodeEnabled={isAccessCodeEnabled || isAccessCode}
       isPromoEnabled={isPromoEnabled}
-      isMyOrdersVisible={isMyOrdersVisible}
       isUserLogged={isUserLogged}
+      onPressMyOrders={onPressMyOrders}
     />
   )
 }

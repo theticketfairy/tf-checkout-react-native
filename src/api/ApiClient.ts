@@ -1,6 +1,7 @@
 import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import _filter from 'lodash/filter'
 import _get from 'lodash/get'
+import _map from 'lodash/map'
 import _sortBy from 'lodash/sortBy'
 
 import { IWaitingListFields } from '../components/waitingList/types'
@@ -19,6 +20,9 @@ import {
   IClientRequest,
   IEventResponse,
   IFetchTicketsResponse,
+  IMyOrderDetailsItem,
+  IMyOrderDetailsResponse,
+  IMyOrderDetailsTicket,
   IMyOrdersData,
   IMyOrdersResponse,
   IOrderReview,
@@ -276,8 +280,62 @@ export const fetchMyOrders = async (): Promise<IMyOrdersResponse> => {
 }
 //&filter[brand]=${CONFIGS.BRAND_SLUG}
 
-export const fetchOrderDetails = (orderId: string) =>
-  Client.get(`/v1/account/order/${orderId}`)
+export const fetchOrderDetails = async (orderId: string) => {
+  let responseError = ''
+  let responseData: IMyOrderDetailsResponse | undefined
+  const response = await Client.get(`/v1/account/order/${orderId}`).catch(
+    (error: AxiosError) => {
+      responseError =
+        error.response?.data.message || 'Error while fetching order details'
+    }
+  )
+
+  if (!responseError && response) {
+    const { attributes } = response.data.data
+    console.log('RESPONSe', response)
+    const items: IMyOrderDetailsItem[] = _map(
+      attributes.items.ticket_types,
+      (item) => {
+        return {
+          name: item.name,
+          currency: item.currency,
+          price: item.price,
+          discount: item.discount,
+          quantity: item.quantity,
+          total: item.total,
+        }
+      }
+    )
+
+    const tickets: IMyOrderDetailsTicket[] = _map(
+      attributes.tickets,
+      (item) => {
+        return {
+          hash: item.hash,
+          ticketType: item.ticket_type,
+          holderName: item.holder_name,
+          status: item.status,
+          pdfLink: item.pdf_link,
+        }
+      }
+    )
+    responseData = {
+      header: {
+        isReferralDisabled: attributes.disable_referral,
+        shareLink: attributes.personal_share_link,
+        salesReferred: attributes.sales_referred,
+        total: attributes.total,
+      },
+      items: items,
+      tickets: tickets,
+    }
+  }
+
+  return {
+    orderDetailsError: responseError,
+    orderDetailsData: responseData,
+  }
+}
 
 //#endregion
 

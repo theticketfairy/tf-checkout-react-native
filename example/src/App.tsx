@@ -8,7 +8,10 @@ import {
   BillingInfo,
   Checkout,
   PurchaseConfirmation,
+  MyOrderDetails,
 } from 'tf-checkout-react-native'
+import { IMyOrderDetailsResponse, IMyOrdersOrder } from '../../src/api/types'
+import { MyOrders } from '../../src/containers'
 import styles from './styles'
 
 const EVENT_ID = 5420 // Replace with assigned ID
@@ -18,6 +21,7 @@ enum ComponentEnum {
   Checkout,
   PurchaseConfirmation,
   MyOrders,
+  MyOrderDetails,
 }
 
 const App = () => {
@@ -32,7 +36,10 @@ const App = () => {
   >(undefined)
 
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false)
+  const [selectedOrderDetails, setSelectedOrderDetails] =
+    useState<IMyOrderDetailsResponse>()
 
+  //#region Handlers
   const handleOnAddToCartSuccess = (data: IAddToCartSuccess) => {
     setCartProps(data)
   }
@@ -56,6 +63,19 @@ const App = () => {
     console.log('Exit')
   }
 
+  const handleOnSelectOrder = (order: IMyOrderDetailsResponse) => {
+    setSelectedOrderDetails(order)
+  }
+
+  const handleOnPressMyOrders = () => {
+    setComponentToShow(ComponentEnum.MyOrders)
+  }
+
+  const handleOnDismissMyOrders = () => {
+    setComponentToShow(ComponentEnum.Tickets)
+  }
+  //#endregion
+
   useEffect(() => {
     if (cartProps) {
       setComponentToShow(ComponentEnum.BillingInfo)
@@ -73,6 +93,12 @@ const App = () => {
       setComponentToShow(ComponentEnum.PurchaseConfirmation)
     }
   }, [isPaymentSuccess])
+
+  useEffect(() => {
+    if (selectedOrderDetails) {
+      setComponentToShow(ComponentEnum.MyOrderDetails)
+    }
+  }, [selectedOrderDetails])
 
   const RenderComponent = () => {
     switch (componentToShow) {
@@ -102,11 +128,23 @@ const App = () => {
           />
         )
 
+      case ComponentEnum.MyOrders:
+        return (
+          <MyOrders
+            onDismissMyOrders={handleOnDismissMyOrders}
+            onSelectOrder={handleOnSelectOrder}
+          />
+        )
+
+      case ComponentEnum.MyOrderDetails:
+        return <MyOrderDetails data={selectedOrderDetails!} />
+
       default:
         return (
           <Tickets
             eventId={EVENT_ID}
             onAddToCartSuccess={handleOnAddToCartSuccess}
+            onPressMyOrders={handleOnPressMyOrders}
           />
         )
     }

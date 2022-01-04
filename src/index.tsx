@@ -5,6 +5,7 @@ import { LogBox, NativeModules } from 'react-native'
 import {
   BillingInfo,
   Checkout,
+  MyOrderDetails,
   PurchaseConfirmation,
   Tickets,
 } from './containers'
@@ -19,6 +20,7 @@ export {
   IAddToCartSuccess,
   IOnCheckoutSuccess,
   ITicketsProps,
+  MyOrderDetails,
   PurchaseConfirmation,
   Tickets,
 }
