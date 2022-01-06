@@ -11,6 +11,7 @@
     "android",
     "ios",
     "lib",
+    "assets",
     "tf-checkout-react-native.podspec",
     "!android/build",
     "!.DS_Store",
