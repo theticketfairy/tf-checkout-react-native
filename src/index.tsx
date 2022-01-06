@@ -2,10 +2,12 @@
 import * as React from 'react' //Needed to render
 import { LogBox, NativeModules } from 'react-native'
 
+import { IMyOrderDetailsResponse, IMyOrdersOrder } from './api/types'
 import {
   BillingInfo,
   Checkout,
   MyOrderDetails,
+  MyOrders,
   PurchaseConfirmation,
   Tickets,
 } from './containers'
@@ -18,9 +20,12 @@ export {
   BillingInfo,
   Checkout,
   IAddToCartSuccess,
+  IMyOrderDetailsResponse,
+  IMyOrdersOrder,
   IOnCheckoutSuccess,
   ITicketsProps,
   MyOrderDetails,
+  MyOrders,
   PurchaseConfirmation,
   Tickets,
 }

@@ -20,7 +20,6 @@ import { ILoginProps } from './types'
 
 const Login = ({
   onLoginSuccessful,
-  onLoginFailure,
   isLoginDialogVisible,
   showLoginDialog,
   hideLoginDialog,
@@ -74,7 +73,7 @@ const Login = ({
       accessToken
     )
 
-    if (userProfileError) {
+    if (userProfileError || !userProfile) {
       setIsLoading(false)
       return Alert.alert('', userProfileError)
     }

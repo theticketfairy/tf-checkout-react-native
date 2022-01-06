@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react'
 import {
   FlatList,

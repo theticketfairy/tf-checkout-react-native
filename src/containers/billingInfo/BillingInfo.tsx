@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _get from 'lodash/get'

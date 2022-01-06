@@ -9,9 +9,10 @@ import {
   Checkout,
   PurchaseConfirmation,
   MyOrderDetails,
+  IMyOrderDetailsResponse,
+  IMyOrdersOrder,
+  MyOrders
 } from 'tf-checkout-react-native'
-import { IMyOrderDetailsResponse, IMyOrdersOrder } from '../../src/api/types'
-import { MyOrders } from '../../src/containers'
 import styles from './styles'
 
 const EVENT_ID = 0 // Replace with assigned ID

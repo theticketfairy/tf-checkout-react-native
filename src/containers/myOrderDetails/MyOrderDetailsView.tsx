@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import _map from 'lodash/map'
 import React, { FC } from 'react'
 import { SectionList, SectionListProps, Text, View } from 'react-native'

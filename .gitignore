@@ -938,3 +938,4 @@ obj/
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/reactnative,macos,windows,linux,visualstudiocode,xcode,cocoapods,android,androidstudio,java,react,maven,node,gradle,fastlane,intellij+all,intellij,intellij+iml,buck
+lib

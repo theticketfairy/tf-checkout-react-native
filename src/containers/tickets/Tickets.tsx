@@ -1,3 +1,4 @@
+//@ts-nocheck
 import jwtDecode from 'jwt-decode'
 import _get from 'lodash/get'
 import _isEmpty from 'lodash/isEmpty'
@@ -195,9 +196,6 @@ const Tickets = ({
     setSelectedTicket(ticket)
   }
 
-  const handleOnPressMyOrders = () => {
-    setIsMyOrdersVisible(true)
-  }
   //#endregion
 
   console.log('PromoCode Response', promoCodeResponse)

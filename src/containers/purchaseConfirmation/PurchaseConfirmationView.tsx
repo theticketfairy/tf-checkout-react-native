@@ -1,16 +1,14 @@
 import React from 'react'
-import { Image, Text, TouchableOpacity, View } from 'react-native'
+import { Text, View } from 'react-native'
 
 import { Button } from '../../components'
-import R from '../../res'
 import s from './styles'
 import { IPurchaseConfirmationProps } from './types'
 
 const PurchaseConfirmationView = ({
   texts,
   styles,
-  referralLink,
-  onExit,
+  onComplete,
 }: IPurchaseConfirmationProps) => (
   <View style={[s.rootContainer, styles?.rootContainer]}>
     <Text style={[s.title, styles?.title]}>
@@ -70,7 +68,7 @@ const PurchaseConfirmationView = ({
         </TouchableOpacity>
       </View>
     </View> */}
-    <Button text='Exit' onPress={onExit} />
+    <Button text='Exit' onPress={onComplete} />
   </View>
 )
 

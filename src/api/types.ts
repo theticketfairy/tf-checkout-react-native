@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { AxiosInstance } from 'axios'
 
 import { IEvent, ITicket } from '../types'

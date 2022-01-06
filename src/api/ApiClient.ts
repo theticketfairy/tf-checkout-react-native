@@ -353,7 +353,9 @@ export const fetchTickets = async (
   let responseError
 
   if (!promoCode) {
+    //@ts-ignore
     delete headers['Promotion-Event']
+    //@ts-ignore
     delete headers['Promotion-Code']
   }
 
@@ -560,8 +562,8 @@ export const fetchEventConditions = async (eventId: string) => {
 
 export const fetchOrderReview = async (
   hash: string
-): Promise<IOrderReviewResponse | void> => {
-  let responseError
+): Promise<IOrderReviewResponse> => {
+  let responseError = ''
   console.log(`Fetching Order Review with hash ${hash}`)
   const response: AxiosResponse | void = await Client.get(
     `v1/order/${hash}/review/`

@@ -57,10 +57,12 @@ const MyOrders: FC<IMyOrdersProps> = ({
     )
     setIsGettingEventDetails(false)
     console.log('Order Details', orderDetailsData)
-    if (!orderDetailsData || orderDetailsError) {
+    if ((!orderDetailsData || orderDetailsError) && onFetchOrderDetailsFail) {
       return onFetchOrderDetailsFail(orderDetailsError!)
     }
-    onSelectOrder(orderDetailsData)
+    if (orderDetailsData) {
+      onSelectOrder(orderDetailsData)
+    }
   }
   //#endregion
 
