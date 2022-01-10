@@ -45,6 +45,9 @@ const MyOrdersView = ({
             selectedOption={selectedEvent}
             styles={{
               container: s.eventsDropdownContainer,
+              label: {
+                maxWidth: '80%',
+              },
               ...styles?.eventsDropdown,
             }}
           />

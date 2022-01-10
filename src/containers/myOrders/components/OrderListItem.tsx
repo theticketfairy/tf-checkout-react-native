@@ -36,7 +36,12 @@ const OrderListItem: FC<IOrderListItemProps> = ({
               <View
                 style={[s.infoBottomContainer, styles?.infoBottomContainer]}
               >
-                <Text style={styles?.eventName}>{order.eventName}</Text>
+                <Text
+                  style={[s.eventName, styles?.eventName]}
+                  numberOfLines={2}
+                >
+                  {order.eventName}
+                </Text>
                 <View style={[s.priceContainer, styles?.priceContainer]}>
                   <Text style={styles?.currency}>{order.currency} </Text>
                   <Text style={styles?.price}>{order.amount}</Text>

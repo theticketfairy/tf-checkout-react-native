@@ -9,7 +9,7 @@ export const MyOrdersViewStyles = StyleSheet.create({
   },
   eventsDropdownContainer: {
     height: 45,
-    width: '50%',
+    width: '55%',
   },
   safeArea: {
     flex: 1,

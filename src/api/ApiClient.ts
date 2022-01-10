@@ -249,10 +249,11 @@ export const addToWaitingList = async (
 //#endregion
 
 //#region MyOrders
-export const fetchMyOrders = async (): Promise<IMyOrdersResponse> => {
+export const fetchMyOrders = async (
+  filter: string = ''
+): Promise<IMyOrdersResponse> => {
   const page = 1
   const limit = 20
-  const filter = ''
   const data: IMyOrdersData = {
     events: [],
     orders: [],

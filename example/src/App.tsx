@@ -11,11 +11,11 @@ import {
   MyOrderDetails,
   IMyOrderDetailsResponse,
   IMyOrdersOrder,
-  MyOrders
+  MyOrders,
 } from 'tf-checkout-react-native'
 import styles from './styles'
 
-const EVENT_ID = 0 // Replace with assigned ID
+const EVENT_ID = 5420 // Replace with assigned ID
 enum ComponentEnum {
   Tickets,
   BillingInfo,

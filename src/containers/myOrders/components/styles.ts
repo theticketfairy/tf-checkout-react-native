@@ -33,6 +33,7 @@ export const OrderListItemStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: 8,
+    alignItems: 'flex-end',
   },
   iconNext: {
     height: 24,
@@ -47,5 +48,8 @@ export const OrderListItemStyles = StyleSheet.create({
   },
   priceContainer: {
     flexDirection: 'row',
+  },
+  eventName: {
+    width: '65%',
   },
 })

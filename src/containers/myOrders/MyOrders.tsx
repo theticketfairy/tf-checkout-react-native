@@ -24,9 +24,13 @@ const MyOrders: FC<IMyOrdersProps> = ({
   const [selectedEvent, setSelectedEvent] = useState<IDropdownItem>()
   const [myOrders, setMyOrders] = useState<IMyOrdersOrder[]>([])
 
+  console.log('myEvents', myEvents)
+
   const getMyOrdersAsync = async () => {
     setIsLoading(true)
-    const { myOrdersData, myOrdersError } = await fetchMyOrders()
+    const { myOrdersData, myOrdersError } = await fetchMyOrders(
+      selectedEvent?.value
+    )
     console.log('MyOrdersData', myOrdersData)
     console.log('myOrdersError', myOrdersError)
     if (myOrdersError || !myOrdersData) {
@@ -71,9 +75,14 @@ const MyOrders: FC<IMyOrdersProps> = ({
     const fetchData = async () => {
       await getMyOrdersAsync()
     }
-
     fetchData()
   }, [])
+
+  useEffect(() => {
+    if (selectedEvent?.value) {
+      getMyOrdersAsync()
+    }
+  }, [selectedEvent])
 
   useEffect(() => {
     if (myEvents.length > 0) {

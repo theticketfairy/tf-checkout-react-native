@@ -11,11 +11,12 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "1.15.14",
+    "@react-native-clipboard/clipboard": "1.8.5",
+    "@stripe/stripe-react-native": "^0.2.3",
     "react": "17.0.2",
     "react-native": "0.66.3",
-    
-    "@react-native-async-storage/async-storage": "1.15.14",
-    "@stripe/stripe-react-native": "^0.2.3"
+    "react-native-fs": "2.18.0"
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
