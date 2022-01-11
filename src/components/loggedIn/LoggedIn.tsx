@@ -1,20 +1,21 @@
 import React, { FC } from 'react'
-import { View } from 'react-native'
+import { Alert, View } from 'react-native'
 
 import { Button } from '..'
 import s from './styles'
 import { ILoggedInProps } from './types'
 
 const LoggedIn: FC<ILoggedInProps> = ({
-  myOrdersButtonStyles,
-  myOrderButtonText,
+  styles,
+  texts,
   onPressMyOrders,
   onPressLogout,
-  logOutButtonStyles,
-  logOutButtonText,
-  rootContainerStyle,
 }) => {
-  const handleMyOrdersPress = () => {
+  const { rootContainerStyle, myOrdersButtonStyles, logOutButtonStyles } = {
+    ...styles,
+  }
+  const { logoutDialog, myOrderButtonText, logOutButtonText } = { ...texts }
+  const handleMyOrdersPress = async () => {
     if (onPressMyOrders) {
       onPressMyOrders()
     }
@@ -22,6 +23,21 @@ const LoggedIn: FC<ILoggedInProps> = ({
 
   const handleLogOutPress = () => {
     if (onPressLogout) {
+      Alert.alert(
+        logoutDialog?.title || 'Do you want to logout?',
+        logoutDialog?.message ||
+          'You will need to enter your credentials again to purchase tickets',
+        [
+          {
+            text: logoutDialog?.confirmButton || 'Yes, logout',
+            style: 'destructive',
+            onPress: onPressLogout,
+          },
+          {
+            text: logoutDialog?.cancelButton || 'No',
+          },
+        ]
+      )
       onPressLogout()
     }
   }

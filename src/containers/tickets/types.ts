@@ -3,6 +3,10 @@ import { TextStyle, ViewStyle } from 'react-native'
 import { IButtonStyles } from '../../components/button/types'
 import { ILoadingStyles } from '../../components/loading/types'
 import {
+  ILoggedInStyles,
+  ILoggedInTexts,
+} from '../../components/loggedIn/types'
+import {
   IPromoCodeStyles,
   IPromoCodeTexts,
 } from '../../components/promoCode/types'
@@ -31,6 +35,7 @@ export interface ITicketsViewProps {
     getTicketsButton?: string
     title?: string
     waitingList?: IWaitingListTexts
+    loggedIn?: ILoggedInTexts
   }
   event?: IEvent
   isWaitingListVisible?: boolean
@@ -39,6 +44,7 @@ export interface ITicketsViewProps {
   isAccessCodeEnabled?: boolean
   isUserLogged?: boolean
   onPressMyOrders: () => void
+  onPressLogout: () => void
 }
 
 export interface IAddToCartSuccess {
@@ -61,8 +67,7 @@ export interface ITicketsViewStyles {
   ticketList?: ITicketListStyles
   loading?: ILoadingStyles
   waitingList?: IWaitingListStyles
-  myOrdersButton?: IButtonStyles
-  logoutButton?: IButtonStyles
+  loggedIn?: ILoggedInStyles
 }
 
 export interface ITicketsViewTexts {
@@ -70,6 +75,7 @@ export interface ITicketsViewTexts {
   getTicketsButton?: string
   title?: string
   item?: ITicketListItemTexts
+  loggedInTexts?: ILoggedInTexts
 }
 
 export interface ITicketsProps {
@@ -86,4 +92,5 @@ export interface ITicketsProps {
   isAccessCodeEnabled?: boolean
 
   onPressMyOrders: () => void
+  onPressLogout: () => void
 }

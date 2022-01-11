@@ -72,6 +72,10 @@ const App = () => {
     setComponentToShow(ComponentEnum.MyOrders)
   }
 
+  const handleOnPressLogout = () => {
+    console.log('Logout')
+  }
+
   const handleOnDismissMyOrders = () => {
     setComponentToShow(ComponentEnum.Tickets)
   }
@@ -146,6 +150,7 @@ const App = () => {
             eventId={EVENT_ID}
             onAddToCartSuccess={handleOnAddToCartSuccess}
             onPressMyOrders={handleOnPressMyOrders}
+            onPressLogout={handleOnPressLogout}
           />
         )
     }

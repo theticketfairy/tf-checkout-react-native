@@ -9,6 +9,7 @@ import { Alert } from 'react-native'
 import { addToCart, fetchEvent, fetchTickets } from '../../api/ApiClient'
 import { IPromoCodeResponse } from '../../api/types'
 import {
+  deleteAllData,
   deleteData,
   getData,
   LocalStorageKeys,
@@ -27,6 +28,7 @@ const Tickets = ({
   isAccessCodeEnabled = false,
   isPromoEnabled = true,
   onPressMyOrders,
+  onPressLogout,
 }: ITicketsProps) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
@@ -196,6 +198,11 @@ const Tickets = ({
     setSelectedTicket(ticket)
   }
 
+  const handleOnLogout = async () => {
+    await deleteAllData()
+    setIsUserLogged(false)
+    onPressLogout()
+  }
   //#endregion
 
   console.log('PromoCode Response', promoCodeResponse)
@@ -221,6 +228,7 @@ const Tickets = ({
       isPromoEnabled={isPromoEnabled}
       isUserLogged={isUserLogged}
       onPressMyOrders={onPressMyOrders}
+      onPressLogout={handleOnLogout}
     />
   )
 }

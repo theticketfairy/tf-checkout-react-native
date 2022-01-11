@@ -29,6 +29,7 @@ const TicketsView = ({
   isAccessCodeEnabled,
   isUserLogged,
   onPressMyOrders,
+  onPressLogout,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -92,8 +93,9 @@ const TicketsView = ({
         {isUserLogged && (
           <LoggedIn
             onPressMyOrders={onPressMyOrders}
-            myOrdersButtonStyles={styles?.myOrdersButton}
-            logOutButtonStyles={styles?.logoutButton}
+            styles={styles?.loggedIn}
+            texts={texts?.loggedIn}
+            onPressLogout={onPressLogout}
           />
         )}
         {isGettingTickets || (isGettingEvent && <Loading />)}
