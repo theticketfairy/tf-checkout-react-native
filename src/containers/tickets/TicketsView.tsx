@@ -84,12 +84,18 @@ const TicketsView = ({
             isLoading={isBookingTickets}
             isDisabled={isButtonDisabled}
             styles={{
-              container: styles?.getTicketsButton,
+              button: styles?.getTicketsButton,
               text: styles?.getTicketText,
             }}
           />
         )}
-        {isUserLogged && <LoggedIn onPressMyOrders={onPressMyOrders} />}
+        {isUserLogged && (
+          <LoggedIn
+            onPressMyOrders={onPressMyOrders}
+            myOrdersButtonStyles={styles?.myOrdersButton}
+            logOutButtonStyles={styles?.logoutButton}
+          />
+        )}
         {isGettingTickets || (isGettingEvent && <Loading />)}
       </View>
     </KeyboardAwareScrollView>

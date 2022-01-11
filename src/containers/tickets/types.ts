@@ -1,5 +1,6 @@
 import { TextStyle, ViewStyle } from 'react-native'
 
+import { IButtonStyles } from '../../components/button/types'
 import { ILoadingStyles } from '../../components/loading/types'
 import {
   IPromoCodeStyles,
@@ -60,6 +61,8 @@ export interface ITicketsViewStyles {
   ticketList?: ITicketListStyles
   loading?: ILoadingStyles
   waitingList?: IWaitingListStyles
+  myOrdersButton?: IButtonStyles
+  logoutButton?: IButtonStyles
 }
 
 export interface ITicketsViewTexts {

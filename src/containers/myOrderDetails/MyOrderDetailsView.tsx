@@ -103,11 +103,13 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
       title: 'Items',
       data: parsedItems,
       renderItem: ({ item }) => renderItemComp(item),
+      id: 0,
     },
     {
       title: 'Your Tickets',
       data: parsedTickets,
       renderItem: ({ item }) => renderTicketComp(item),
+      id: 1,
     },
   ]
 
@@ -214,7 +216,8 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
         sections={[...itemsData]}
         renderSectionHeader={({ section }) => <Text>{section.title}</Text>}
         renderSectionFooter={({ section }) => {
-          if (section === 0) {
+          console.log('Section', section)
+          if (section.id === 0) {
             return (
               <View
                 style={{
