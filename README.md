@@ -166,3 +166,12 @@ Add it to the render function.
 `orderHash` the `hash` returned in the `BillingInfo` component.
 
 `onComplete` to handle the completion of the flow. Here you can handle the unmount of the component or navigate to another screen.
+
+## MyOrders
+
+## MyOrderDetails
+
+To be able to open the downloaded file in iOS, you will need to add 2 flags in the info.plist file of your xCode folder.
+
+- UIFileSharingEnabled: Application supports iTunes file sharing
+- LSSupportsOpeningDocumentsInPlace: Supports opening documents in place

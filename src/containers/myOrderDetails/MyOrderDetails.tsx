@@ -1,7 +1,6 @@
 import React, { FC, useState } from 'react'
 import {
   DocumentDirectoryPath,
-  DownloadDirectoryPath,
   downloadFile,
   DownloadFileOptions,
 } from 'react-native-fs'
@@ -15,11 +14,6 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
   styles,
   texts,
 }) => {
-  const { header, items, tickets } = data
-  console.log('header', header)
-  console.log('tickets', tickets)
-  console.log('items', items)
-
   const [isLinkCopied, setIsLinkCopied] = useState(false)
   const [isDownloadingTicket, setIsDownloadingTicket] = useState(false)
 
@@ -38,7 +32,7 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
     }
 
     //Define path to store file along with the extension
-    const path = `${DownloadDirectoryPath}/${hash}.pdf`
+    const path = `${DocumentDirectoryPath}/${hash}.pdf`
     const headers = {
       Accept: 'application/pdf',
       'Content-Type': 'application/pdf',
