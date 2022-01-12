@@ -58,7 +58,6 @@ const BillingInfo = ({
   onFetchCartError,
   styles,
   texts,
-  customCheckboxText,
   privacyPolicyLinkStyle,
 }: IBillingInfoProps) => {
   //#region Declare state variables
@@ -115,17 +114,14 @@ const BillingInfo = ({
   const hideLoginDialog = () => setIsLoginDialogVisible(false)
 
   const setInputData = (id: string, value: string) => {
-    console.log(`Setting InputData for ID ${id} with value ${value}`)
     setFormData({ ...formData, [id]: value })
   }
 
   const setDatePickerData = (date: Date) => {
-    console.log(`Setting DATEPICKER DATA  ${date}`)
     setFormData({ ...formData, birthday: date })
   }
 
   const setTicketHolderData = (index: number, id: string, value: string) => {
-    console.log('setTicketHolderData', value)
     const newData = { ...formData }
     const holder = newData.ticketHoldersFields[index]
     holder[`${id}`] = value
@@ -133,12 +129,10 @@ const BillingInfo = ({
   }
 
   const setDropdownData = (id: string, value: IDropdownItem) => {
-    console.log(`Setting DROPDOWN DATA for ID ${id} with value ${value}`)
     setFormData({ ...formData, [id]: value })
   }
 
   const setCheckboxData = (id: string) => {
-    console.log(`Setting setCheckboxData DATA for ID ${id}`)
     setFormData({ ...formData, [id]: !_get(formData, id) })
   }
   //#endregion
@@ -206,6 +200,7 @@ const BillingInfo = ({
         {
           fieldType: 'header',
           title: 'Ticket Holders',
+          headerStyle: styles?.headers,
         },
       ]
       for (let i = 0; i < ticketHoldersFields.length; i++) {
@@ -213,6 +208,7 @@ const BillingInfo = ({
           {
             fieldType: 'title',
             title: `Ticket holder ${i + 1}`,
+            titleStyle: styles?.titles,
           },
           {
             id: 'firstName',
@@ -221,6 +217,7 @@ const BillingInfo = ({
               value: ticketHoldersFields[i].firstName,
               onTextChanged: (key, value) => setTicketHolderData(i, key, value),
               label: 'First Name',
+              styles: styles?.inputStyles,
             },
           },
           {
@@ -230,6 +227,7 @@ const BillingInfo = ({
               value: ticketHoldersFields[i].lastName,
               onTextChanged: (key, value) => setTicketHolderData(i, key, value),
               label: 'Last Name',
+              styles: styles?.inputStyles,
             },
           },
           {
@@ -240,6 +238,7 @@ const BillingInfo = ({
               onTextChanged: (key, value) => setTicketHolderData(i, key, value),
               keyboardType: 'email-address',
               label: 'Email Address (optional)',
+              styles: styles?.inputStyles,
             },
           },
           {
@@ -250,6 +249,7 @@ const BillingInfo = ({
               onTextChanged: (key, value) => setTicketHolderData(i, key, value),
               keyboardType: 'phone-pad',
               label: 'Phone (optional)',
+              styles: styles?.inputStyles,
             },
           }
         )
@@ -261,6 +261,7 @@ const BillingInfo = ({
       {
         fieldType: 'title',
         title: 'Get Your Tickets',
+        titleStyle: styles?.titles,
       },
       {
         fieldType: 'input',
@@ -270,6 +271,7 @@ const BillingInfo = ({
           onTextChanged: setInputData,
           label: 'First Name',
           error: firstNameError,
+          styles: styles?.inputStyles,
         },
       },
       {
@@ -280,6 +282,7 @@ const BillingInfo = ({
           onTextChanged: setInputData,
           label: 'Last Name',
           error: lastNameError,
+          styles: styles?.inputStyles,
         },
       },
       {
@@ -287,6 +290,7 @@ const BillingInfo = ({
         id: 'notice-email',
         title:
           "IMPORTANT: Please double check that your email address is correct. It's where we send your confirmation and e-tickets to!",
+        textStyle: styles.texts,
       },
       {
         fieldType: 'input',
@@ -299,6 +303,7 @@ const BillingInfo = ({
           autoCapitalize: 'none',
           autoCorrect: false,
           error: emailError,
+          styles: styles?.inputStyles,
         },
       },
       {
@@ -312,6 +317,7 @@ const BillingInfo = ({
           autoCapitalize: 'none',
           autoCorrect: false,
           error: confirmEmailError,
+          styles: styles?.inputStyles,
         },
       },
       ...getPasswordsFields(),
@@ -324,6 +330,7 @@ const BillingInfo = ({
           value: phone,
           keyboardType: 'phone-pad',
           error: phoneError,
+          styles: styles?.inputStyles,
         },
       },
       {
@@ -334,6 +341,7 @@ const BillingInfo = ({
           label: 'Billing Street Address',
           value: street,
           error: streetError,
+          styles: styles?.inputStyles,
         },
       },
       {
@@ -344,6 +352,7 @@ const BillingInfo = ({
           label: 'City/Suburb',
           value: city,
           error: cityError,
+          styles: styles?.inputStyles,
         },
       },
       {
@@ -353,6 +362,7 @@ const BillingInfo = ({
           options: countries,
           selectedOption: country,
           onSelectOption: setDropdownData,
+          style: styles?.dropdownStyles,
         },
       },
       {
@@ -364,6 +374,7 @@ const BillingInfo = ({
           label: 'Post Code/Zip',
           keyboardType: 'number-pad',
           error: zipCodeError,
+          styles: styles?.inputStyles,
         },
       },
       {
@@ -373,6 +384,7 @@ const BillingInfo = ({
           options: states,
           selectedOption: formData.state,
           onSelectOption: setDropdownData,
+          style: styles?.dropdownStyles,
         },
       },
       ...getBirthdayField(),
@@ -384,6 +396,7 @@ const BillingInfo = ({
           text: 'I would like to be updated on House of X news, events and offers.',
           isActive: isSubToNewsletter,
           onPress: setCheckboxData,
+          styles: styles?.checkboxStyles,
         },
       },
       {
@@ -393,8 +406,9 @@ const BillingInfo = ({
           text: 'I agree that The Ticket Fairy may use the personal data that I have provided for marketing purposes, such as recommending events that I might be interested in, in accordance with its Privacy Policy.',
           isActive: isSubToMarketing,
           onPress: setCheckboxData,
+          styles: styles?.checkboxStyles,
           customTextComp: (
-            <Text style={[s.customCheckboxText, customCheckboxText]}>
+            <Text style={[s.customCheckboxText, styles?.customCheckbox?.text]}>
               I agree that The Ticket Fairy may use the personal data that I
               have provided for marketing purposes, such as recommending events
               that I might be interested in, in accordance with its{' '}
@@ -414,17 +428,12 @@ const BillingInfo = ({
 
   // Sets a Country either from User's Profile Data or from Countries list
   const setSelectedCountry = () => {
-    console.log('setSelectedCountry COUNTRIES LENGTH', countries.length)
     if (countries.length === 0) {
-      console.log('Not setting country X')
       return
     }
 
     const countryId = userData?.country ? userData.country : countries[0].value
     const sCountryItem = _find(countries, (item) => item.value === countryId)
-
-    console.log('countryId', countryId)
-    console.log('sCountryItem', sCountryItem)
 
     if (sCountryItem) {
       setFormData({ ...formData, country: sCountryItem! })
@@ -432,16 +441,14 @@ const BillingInfo = ({
   }
 
   const setSelectedState = useCallback(() => {
-    console.log('setSelectedState', states)
     if (states.length === 0) {
       return
     }
 
     const foundId = userData?.stateId ? userData.stateId : states[0].value
-    console.log('foundId state', foundId)
 
     const sStateItem = _find(states, (item) => item.value === foundId)
-    console.log('sStateItem', sStateItem)
+
     if (sStateItem) {
       setFormData({ ...formData, state: sStateItem! })
     }
@@ -499,7 +506,6 @@ const BillingInfo = ({
     setIsLoading(true)
     const { data: countriesData, error: countriesError } =
       await fetchCountries()
-    console.log('fetchCountriesAsync countriesResponse', countriesData)
     setIsLoading(false)
     if (countriesError) {
       return
@@ -539,10 +545,11 @@ const BillingInfo = ({
     const fetchInitialData = async () => {
       setIsLoading(true)
       const tkn = await getData(LocalStorageKeys.ACCESS_TOKEN)
-      console.log('tkn', tkn)
+
       if (tkn) {
         setStoredToken(tkn)
       }
+
       await fetchCartAsync()
       setIsLoading(false)
     }
@@ -553,7 +560,6 @@ const BillingInfo = ({
   // Fetch userData
   useEffect(() => {
     const fetchUserData = async () => {
-      console.log('.fetchUserData.')
       setIsLoading(true)
       await fetchUserDataAsync(storedToken)
       setIsLoading(false)
@@ -579,16 +585,13 @@ const BillingInfo = ({
 
   //Once Countries is fullfilled, useEffect to set Country item.
   useEffect(() => {
-    console.log('USE COUNTRIES', countries)
     setSelectedCountry()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countries])
 
   // Fetch States list.
   useEffect(() => {
-    console.log('COUNTRY WAS SET TO: ', country)
     if (country?.value) {
-      console.log('Gona FETCH States')
       fetchStatesAsync(country.value as string)
     }
   }, [country, userData])
@@ -596,8 +599,6 @@ const BillingInfo = ({
   // Set State item.
   useEffect(() => {
     if (countries.length > 0 && states && states.length > 1) {
-      console.log('Gonna set STATE', states)
-
       setSelectedState()
     }
   }, [countries, states, setSelectedState, userData])
@@ -611,16 +612,12 @@ const BillingInfo = ({
     }
   }
   const handleOnFetchUserDataSuccess = (userProfile: IUserProfile) => {
-    console.log('handleOnFetchUserDataSuccess', userProfile)
-
     if (onFetchUserProfileSuccess) {
       onFetchUserProfileSuccess(userProfile)
     }
 
     setUserData(userProfile)
-    console.log('formData.ticketHoldersFields', ticketHoldersFields)
     const newTicketHolderFields = [...ticketHoldersFields]
-    console.log('******* newTicketHolderFields ****', newTicketHolderFields)
     newTicketHolderFields[0] = {
       email: userProfile.email,
       firstName: userProfile.firstName,
@@ -654,10 +651,6 @@ const BillingInfo = ({
     userProfile: IUserProfile,
     accessToken: string
   ) => {
-    console.log(
-      '\x1b[34m%s\x1b[0m',
-      'BillingInfo.tsx line:609 handleOnLoginSuccessful'
-    )
     setStoredToken(accessToken)
     onLoginSuccess({
       accessToken: accessToken,
@@ -680,14 +673,12 @@ const BillingInfo = ({
 
   const handleOnSubmit = async () => {
     setIsSubmitLoading(true)
-    console.log('UserData', userData)
     const checkoutBody: ICheckoutBody = getCheckoutBody(
       formData,
       userData,
       isAgeRequired
     )
 
-    console.log('CheckoutBody', checkoutBody)
     if (userData && storedToken) {
       await performCheckout(checkoutBody)
     } else {
@@ -733,15 +724,10 @@ const BillingInfo = ({
     checkoutBody: ICheckoutBody,
     pToken?: string
   ) => {
-    console.log('performCheckout - with storedToken', storedToken)
-    console.log('performCheckout - with pToken', pToken)
     const { error: checkoutError, data: checkoutData } = await checkoutOrder(
       checkoutBody,
       pToken || storedToken
     )
-
-    console.log('performCheckout Error', checkoutError)
-    console.log('performCheckout Data', checkoutData)
 
     if (checkoutError) {
       Alert.alert('', checkoutError)
@@ -763,9 +749,7 @@ const BillingInfo = ({
   }
 
   const performNewUserRegister = async (checkoutBody: ICheckoutBody) => {
-    console.log('performNewUserRegister', checkoutBody)
     const registerForm = getRegisterFormData(checkoutBody)
-    console.log('registerForm', registerForm)
     const { data: registerResponseData, error: registerResponseError } =
       await registerNewUser(registerForm)
 
@@ -794,8 +778,6 @@ const BillingInfo = ({
     if (onRegisterSuccess) {
       onRegisterSuccess(tokens)
     }
-
-    console.log('Tokens', tokens)
 
     performCheckout(checkoutBody, tokens.accessToken)
   }

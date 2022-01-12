@@ -52,8 +52,9 @@ const BillingInfoView = ({
           isDisabled={!isDataValid}
           isLoading={isSubmitLoading}
           styles={{
-            ...styles?.loginButton,
-            container: [s.submitButton, styles?.loginButton?.container],
+            container: [s.submitButton, styles?.checkoutButton?.container],
+            text: styles?.checkoutButton?.text,
+            button: styles?.checkoutButton?.button,
           }}
         />
         {isLoading && <Loading />}

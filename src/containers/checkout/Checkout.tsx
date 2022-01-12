@@ -34,6 +34,9 @@ const Checkout = ({
   onPaymentError,
   onPaymentSuccess,
   onStripeInitializeError,
+  texts,
+  styles,
+  onPressExit,
 }: ICheckoutProps) => {
   const { confirmPayment, loading } = useConfirmPayment()
   const [isLoading, setIsLoading] = useState(true)
@@ -43,6 +46,7 @@ const Checkout = ({
   const [orderInfo, setOrderInfo] = useState<IOrderItem[]>(orderReviewItems)
   const [paymentInfo, setPaymentInfo] = useState<CardFormView.Details>()
   const [isStripeReady, setIsStripeReady] = useState<boolean>(false)
+  const [isStripeConfigMissing, setIsStripeConfigMissing] = useState(false)
 
   //#region Handlers
   const handleOnChangePaymentInfo = (details: CardFormView.Details) => {
@@ -129,7 +133,6 @@ const Checkout = ({
         await fetchEventConditions(eventId.toString())
 
       if (conditionsError) {
-        console.log('conditionsError', conditionsError)
         Alert.alert('', conditionsError)
         if (onFetchEventConditionsFail) {
           onFetchEventConditionsFail(conditionsError)
@@ -151,6 +154,8 @@ const Checkout = ({
       console.log('orderReviewResponse - error', orderReviewError)
 
       if (orderReviewError || !orderReviewData) {
+        setIsStripeConfigMissing(true)
+        setIsLoading(false)
         Alert.alert('', orderReviewError)
         if (onFetchOrderReviewFail) {
           onFetchOrderReviewFail(
@@ -178,7 +183,8 @@ const Checkout = ({
 
       console.log('Order Review Data', orderReviewData.paymentData)
 
-      if (!orderReviewData.paymentData.stripePublishableKey) {
+      if (!orderReviewData.paymentData?.stripePublishableKey) {
+        console.log('Stripe not config')
         if (onStripeInitializeError) {
           onStripeInitializeError('Stripe is not configured for this event')
         }
@@ -195,6 +201,7 @@ const Checkout = ({
         })
         setIsStripeReady(true)
       } catch (stripeError) {
+        console.log('Stripe Error')
         if (onStripeInitializeError) {
           onStripeInitializeError('Error initializing Stripe')
         }
@@ -218,6 +225,9 @@ const Checkout = ({
     return paymentValid && _every(conditionsValues, (item) => item === true)
   }
 
+  console.log('isLoading:', isLoading)
+  console.log('stripe loading:', loading)
+
   return (
     <CheckoutView
       orderReviewDataItems={orderInfo}
@@ -227,6 +237,10 @@ const Checkout = ({
       isLoading={isLoading || loading}
       isDataValid={!getIsDataValid()}
       isStripeReady={isStripeReady}
+      isStripeConfigMissing={isStripeConfigMissing}
+      styles={styles}
+      texts={texts}
+      onPressExit={onPressExit}
     />
   )
 }

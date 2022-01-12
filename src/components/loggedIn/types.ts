@@ -14,9 +14,9 @@ export interface ILoggedInTexts {
 }
 
 export interface ILoggedInStyles {
-  rootContainerStyle?: StyleProp<ViewStyle>
-  myOrdersButtonStyles?: IButtonStyles
-  logOutButtonStyles?: IButtonStyles
+  rootContainer?: StyleProp<ViewStyle>
+  myOrdersButton?: IButtonStyles
+  logOutButton?: IButtonStyles
 }
 
 export interface ILoggedInProps {

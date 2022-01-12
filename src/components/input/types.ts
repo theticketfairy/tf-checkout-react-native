@@ -14,6 +14,7 @@ export interface IInputStyles {
   input?: StyleProp<TextStyle>
   lineWidth?: number
   activeLineWidth?: number
+  baseColor?: ColorValue
 }
 
 export interface IInputProps extends TextInputProps {

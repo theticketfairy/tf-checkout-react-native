@@ -113,9 +113,9 @@ export interface ICheckoutResponse {
 export interface IPaymentConfig {
   id: string
   name: string
-  stripeClientSecret: string
+  stripeClientSecret?: string
   stripeConnectedAccount?: string
-  stripePublishableKey: string
+  stripePublishableKey?: string
 }
 
 export interface IPaymentAddress {

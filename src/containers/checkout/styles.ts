@@ -28,4 +28,16 @@ export default StyleSheet.create({
     padding: 8,
     alignSelf: 'center',
   },
+  missingStripeContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  missingStripeMessage: {
+    fontSize: 16,
+    color: R.colors.white,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
 })

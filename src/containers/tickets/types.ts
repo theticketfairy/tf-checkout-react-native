@@ -59,10 +59,11 @@ export interface ITicketListStyles {
 }
 
 export interface ITicketsViewStyles {
+  rootContainer?: ViewStyle
   container?: ViewStyle
   title?: TextStyle
-  getTicketsButton?: ViewStyle
-  getTicketText?: TextStyle
+  getTicketsButtonDisabled?: IButtonStyles
+  getTicketsButtonActive?: IButtonStyles
   promoCode?: IPromoCodeStyles
   ticketList?: ITicketListStyles
   loading?: ILoadingStyles

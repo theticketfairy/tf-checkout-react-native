@@ -1,6 +1,7 @@
 import { CardFormView } from '@stripe/stripe-react-native'
-import { ViewStyle } from 'react-native'
+import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
+import { IButtonStyles } from '../../components/button/types'
 import { IFormFieldProps } from '../../components/formField/types'
 
 export interface ICheckoutProps {
@@ -21,6 +22,21 @@ export interface ICheckoutProps {
   onPaymentError?: (error: string) => void
 
   onStripeInitializeError?: (error: string) => void
+
+  onPressExit?: () => void
+
+  texts?: {
+    title?: string
+    subTitle?: string
+    missingStripeConfigMessage?: string
+    exitButton?: string
+  }
+  styles?: {
+    rootStyle?: ViewStyle
+    missingStripeConfigContainer?: StyleProp<ViewStyle>
+    missingStripeConfigMessage?: StyleProp<TextStyle>
+    exitButton?: IButtonStyles
+  }
 }
 
 // Components
@@ -39,9 +55,14 @@ export interface ICheckoutViewProps {
   texts?: {
     title?: string
     subTitle?: string
+    missingStripeConfigMessage?: string
+    exitButton?: string
   }
   styles?: {
-    rootStyle: ViewStyle
+    rootStyle?: ViewStyle
+    missingStripeConfigContainer?: StyleProp<ViewStyle>
+    missingStripeConfigMessage?: StyleProp<TextStyle>
+    exitButton?: IButtonStyles
   }
   orderReviewDataItems: IOrderItem[]
   onPressPay: () => void
@@ -51,4 +72,6 @@ export interface ICheckoutViewProps {
   isLoading?: boolean
 
   isStripeReady?: boolean
+  isStripeConfigMissing?: boolean
+  onPressExit?: () => void
 }

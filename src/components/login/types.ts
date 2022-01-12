@@ -31,6 +31,13 @@ export interface ILoginViewStyles {
     title?: StyleProp<TextStyle>
     logo?: StyleProp<ImageStyle>
   }
+  loggedIn?: {
+    container?: StyleProp<ViewStyle>
+    placeholder?: StyleProp<TextStyle>
+    value?: StyleProp<TextStyle>
+    button?: IButtonStyles
+    message?: StyleProp<TextStyle>
+  }
 }
 
 export interface ILoginViewTexts {

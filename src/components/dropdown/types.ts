@@ -1,4 +1,4 @@
-import { ImageStyle, TextStyle, ViewStyle } from 'react-native'
+import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
 export interface IDropdownItem {
   label: string
   value: string | number
@@ -11,10 +11,10 @@ export interface IDropdownListItemProps {
 }
 
 export interface IDropdownStyles {
-  container?: ViewStyle
-  button?: ViewStyle
-  icon?: ImageStyle
-  label?: TextStyle
+  container?: StyleProp<ViewStyle>
+  button?: StyleProp<ViewStyle>
+  icon?: StyleProp<ImageStyle>
+  label?: StyleProp<TextStyle>
 }
 
 export interface IDropdownProps {

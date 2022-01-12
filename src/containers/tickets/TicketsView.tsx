@@ -41,7 +41,7 @@ const TicketsView = ({
   console.log('isGetTicketsButtonVisible', isGetTicketsButtonVisible)
 
   return (
-    <KeyboardAwareScrollView>
+    <KeyboardAwareScrollView style={[s.container, styles?.rootContainer]}>
       <View style={[s.container, styles?.container]}>
         <View style={s.header}>
           <Text style={[s.headerText, styles?.title]}>{title}</Text>
@@ -84,10 +84,11 @@ const TicketsView = ({
             isUpperCase={true}
             isLoading={isBookingTickets}
             isDisabled={isButtonDisabled}
-            styles={{
-              button: styles?.getTicketsButton,
-              text: styles?.getTicketText,
-            }}
+            styles={
+              isButtonDisabled
+                ? styles?.getTicketsButtonDisabled
+                : styles?.getTicketsButtonActive
+            }
           />
         )}
         {isUserLogged && (

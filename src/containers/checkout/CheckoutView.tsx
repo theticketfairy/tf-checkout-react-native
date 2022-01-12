@@ -19,6 +19,8 @@ const CheckoutView = ({
   isDataValid,
   isLoading,
   isStripeReady,
+  isStripeConfigMissing,
+  onPressExit,
 }: ICheckoutViewProps) => {
   const title = texts?.title ? texts.title : 'GET YOUR TICKETS'
   const subTitle = texts?.subTitle ? texts.subTitle : 'Order review'
@@ -31,9 +33,32 @@ const CheckoutView = ({
     onFormComplete(cardDetails)
   }
 
+  const handleOnPressExit = () => {
+    if (onPressExit) {
+      onPressExit()
+    }
+  }
+
   console.log('Is stripe Ready', isStripeReady)
 
-  return (
+  return isStripeConfigMissing ? (
+    <View
+      style={[s.missingStripeContainer, styles?.missingStripeConfigContainer]}
+    >
+      <Text
+        style={[s.missingStripeMessage, styles?.missingStripeConfigMessage]}
+      >
+        {texts?.missingStripeConfigMessage ||
+          'Payment handler is missing, please contact support'}
+      </Text>
+
+      <Button
+        styles={styles?.exitButton}
+        text={texts?.exitButton || 'Exit'}
+        onPress={handleOnPressExit}
+      />
+    </View>
+  ) : (
     <KeyboardAwareScrollView extraScrollHeight={32}>
       <View>
         <View>

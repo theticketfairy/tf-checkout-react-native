@@ -1,8 +1,9 @@
 import { ReactNode } from 'react'
-import { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import { StyleProp, TextStyle } from 'react-native'
 
+import { ICheckboxStyles } from '../checkbox/types'
 import { IDatePickerProps } from '../datePicker/types'
-import { IDropdownItem } from '../dropdown/types'
+import { IDropdownItem, IDropdownStyles } from '../dropdown/types'
 import { IInputProps } from '../input/types'
 
 export type FieldType =
@@ -29,12 +30,13 @@ export interface IFormFieldProps {
     selectedOption?: IDropdownItem
     options: IDropdownItem[]
     onSelectOption: (id: string, item: IDropdownItem) => void
+    style?: IDropdownStyles
   }
   checkboxProps?: {
     isActive: boolean
     text: string
     onPress: (id: string) => void
-    containerStyle?: StyleProp<ViewStyle>
+    styles?: ICheckboxStyles
     customTextComp?: ReactNode
   }
   title?: string

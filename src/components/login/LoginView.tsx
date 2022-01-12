@@ -129,13 +129,16 @@ const LoginView = ({
   }
 
   const LoggedComponent = () => (
-    <View>
-      <Text>Logged in as: {userProfile?.firstName}</Text>
-      <Text>Not you?</Text>
+    <View style={styles?.loggedIn?.container}>
+      <Text style={styles?.loggedIn?.placeholder}>
+        Logged in as:{' '}
+        <Text style={styles?.loggedIn?.value}>{userProfile?.firstName}</Text>
+      </Text>
+      <Text style={styles?.loggedIn?.message}>Not you?</Text>
       <Button
         text={texts?.logoutButton || 'LOGOUT'}
         onPress={handleOnPressLogout}
-        styles={{ container: s.button }}
+        styles={{ container: s.button, ...styles?.loggedIn?.button }}
       />
     </View>
   )

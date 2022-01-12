@@ -13,6 +13,7 @@ import {
   IMyOrdersOrder,
   MyOrders,
 } from 'tf-checkout-react-native'
+import Color from './Colors'
 import styles from './styles'
 
 const EVENT_ID = 5420 // Replace with assigned ID
@@ -79,6 +80,10 @@ const App = () => {
   const handleOnDismissMyOrders = () => {
     setComponentToShow(ComponentEnum.Tickets)
   }
+
+  const handleStripeError = () => {
+    setComponentToShow(ComponentEnum.Tickets)
+  }
   //#endregion
 
   useEffect(() => {
@@ -114,6 +119,85 @@ const App = () => {
             onLoginSuccess={handleOnLoginSuccess}
             onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}
             onCheckoutSuccess={handleOnCheckoutSuccess}
+            privacyPolicyLinkStyle={{
+              color: Color.primary,
+            }}
+            styles={{
+              customCheckbox: {
+                text: {
+                  color: Color.textMain,
+                },
+              },
+
+              checkboxStyles: {
+                text: {
+                  color: Color.textMain,
+                },
+                indicator: {
+                  borderColor: Color.white,
+                  backgroundColor: Color.white,
+                },
+                indicatorDisabled: {
+                  borderColor: Color.white,
+                },
+                icon: {
+                  tintColor: Color.validationGreen,
+                },
+              },
+
+              checkoutButton: {
+                button: {
+                  backgroundColor: Color.primary,
+                  borderRadius: 2,
+                },
+              },
+              headers: {
+                color: Color.textMain,
+              },
+              texts: {
+                color: Color.textMain,
+              },
+              dropdownStyles: {
+                button: {
+                  borderColor: Color.white,
+                },
+                label: {
+                  color: Color.textMain,
+                },
+                icon: {
+                  tintColor: Color.white,
+                },
+              },
+              titles: {
+                color: Color.textMain,
+              },
+              inputStyles: {
+                input: {
+                  color: Color.textMain,
+                },
+                baseColor: Color.white,
+              },
+              loginStyles: {
+                loggedIn: {
+                  placeholder: {
+                    color: Color.textMain,
+                    fontSize: 16,
+                  },
+                  value: {
+                    fontWeight: '800',
+                  },
+                  message: {
+                    color: Color.textMain,
+                  },
+                  button: {
+                    button: {
+                      backgroundColor: Color.danger,
+                      borderRadius: 2,
+                    },
+                  },
+                },
+              },
+            }}
           />
         )
       case ComponentEnum.Checkout:
@@ -123,6 +207,18 @@ const App = () => {
             hash={checkoutProps!.hash}
             total={checkoutProps!.total}
             onPaymentSuccess={handleOnPaymentSuccess}
+            onPressExit={handleStripeError}
+            styles={{
+              exitButton: {
+                container: {
+                  width: '100%',
+                },
+                button: {
+                  backgroundColor: Color.primary,
+                  borderRadius: 2,
+                },
+              },
+            }}
           />
         )
       case ComponentEnum.PurchaseConfirmation:
@@ -151,6 +247,91 @@ const App = () => {
             onAddToCartSuccess={handleOnAddToCartSuccess}
             onPressMyOrders={handleOnPressMyOrders}
             onPressLogout={handleOnPressLogout}
+            styles={{
+              container: {
+                backgroundColor: Color.backgroundMain,
+                padding: 16,
+              },
+
+              title: {
+                color: Color.textMain,
+              },
+              getTicketsButtonActive: {
+                button: {
+                  backgroundColor: Color.primary,
+                  borderRadius: 2,
+                },
+              },
+              loggedIn: {
+                rootContainer: {
+                  marginTop: 64,
+                },
+                myOrdersButton: {
+                  button: {
+                    backgroundColor: Color.notificationSuccess,
+                    borderRadius: 2,
+                  },
+                },
+                logOutButton: {
+                  button: {
+                    backgroundColor: Color.danger,
+                    borderRadius: 2,
+                  },
+                },
+              },
+              promoCode: {
+                inputPlaceholderColor: Color.textMain,
+                input: {
+                  borderColor: Color.textMainOff,
+                  color: Color.white,
+                },
+                title: {
+                  color: Color.textMain,
+                  fontSize: 18,
+                },
+                cancelButton: {
+                  text: {
+                    color: Color.textMain,
+                  },
+                  button: {
+                    borderRadius: 2,
+                  },
+                },
+                applyButton: {
+                  button: {
+                    backgroundColor: Color.primary,
+                    borderRadius: 2,
+                  },
+                  text: {
+                    fontWeight: '800',
+                  },
+                },
+              },
+              ticketList: {
+                item: {
+                  ticketName: {
+                    color: Color.textMain,
+                  },
+                  price: {
+                    color: Color.textMain,
+                  },
+                  fees: {
+                    color: Color.textMainOff,
+                  },
+                  dropdown: {
+                    button: {
+                      borderColor: Color.white,
+                    },
+                    label: {
+                      color: Color.textMain,
+                    },
+                    icon: {
+                      tintColor: Color.textMain,
+                    },
+                  },
+                },
+              },
+            }}
           />
         )
     }

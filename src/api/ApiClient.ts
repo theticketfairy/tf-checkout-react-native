@@ -580,39 +580,44 @@ export const fetchOrderReview = async (
     console.log('fetch order review - Data', response)
     const attributes = _get(response, 'data.data.attributes')
     const { cart, order_details, payment_method, billing_info } = attributes
-    const {
-      tickets: [ticket],
-    } = order_details
 
-    resData = {
-      reviewData: {
-        event: cart[0]?.product_name,
-        price: ticket?.price,
-        ticketType: ticket?.name,
-        total: order_details?.total,
-        numberOfTickets: ticket?.quantity,
-        currency: order_details?.currency,
-      },
-      paymentData: {
-        id: payment_method.id,
-        name: payment_method.name,
-        stripeClientSecret: payment_method.stripe_client_secret,
-        stripeConnectedAccount:
-          payment_method.stripe_connected_account.length > 0
-            ? payment_method.stripe_connected_account
-            : undefined,
-        stripePublishableKey: payment_method.stripe_publishable_key,
-      },
-      addressData: {
-        city: billing_info.city,
-        line1: billing_info.street_address,
-        state: billing_info?.state || '',
-        postalCode: billing_info.zip,
-      },
-      billingData: {
-        firstName: billing_info.first_name,
-        lastName: billing_info.last_name,
-      },
+    if (!payment_method.stripe_connected_account) {
+      responseError = 'Stripe is not configured'
+    } else {
+      const {
+        tickets: [ticket],
+      } = order_details
+
+      resData = {
+        reviewData: {
+          event: cart[0]?.product_name,
+          price: ticket?.price,
+          ticketType: ticket?.name,
+          total: order_details?.total,
+          numberOfTickets: ticket?.quantity,
+          currency: order_details?.currency,
+        },
+        paymentData: {
+          id: payment_method.id,
+          name: payment_method.name,
+          stripeClientSecret: payment_method.stripe_client_secret,
+          stripeConnectedAccount:
+            payment_method.stripe_connected_account.length > 0
+              ? payment_method.stripe_connected_account
+              : undefined,
+          stripePublishableKey: payment_method.stripe_publishable_key,
+        },
+        addressData: {
+          city: billing_info.city,
+          line1: billing_info.street_address,
+          state: billing_info?.state || '',
+          postalCode: billing_info.zip,
+        },
+        billingData: {
+          firstName: billing_info.first_name,
+          lastName: billing_info.last_name,
+        },
+      }
     }
   }
   return {

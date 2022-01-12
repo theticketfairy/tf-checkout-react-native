@@ -42,9 +42,13 @@ const FormField = ({
           selectedOption={dropdownProps?.selectedOption}
           onSelectItem={(item) => dropdownProps!.onSelectOption(id!, item)}
           styles={{
-            container: styles.dropdownContainer,
-            button: styles.dropdownButton,
-            label: styles.dropdownLabel,
+            container: [
+              styles.dropdownContainer,
+              dropdownProps?.style?.container,
+            ],
+            button: [styles.dropdownButton, dropdownProps?.style?.button],
+            label: [styles.dropdownLabel, dropdownProps?.style?.label],
+            icon: dropdownProps?.style?.icon,
           }}
         />
       )
@@ -66,9 +70,7 @@ const FormField = ({
           onPress={() => {
             checkboxProps!.onPress(id!)
           }}
-          styles={{
-            container: checkboxProps?.containerStyle,
-          }}
+          styles={checkboxProps?.styles}
           customTextComp={checkboxProps?.customTextComp}
         />
       )

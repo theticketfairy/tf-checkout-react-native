@@ -11,7 +11,7 @@ const LoggedIn: FC<ILoggedInProps> = ({
   onPressMyOrders,
   onPressLogout,
 }) => {
-  const { rootContainerStyle, myOrdersButtonStyles, logOutButtonStyles } = {
+  const { rootContainer, myOrdersButton, logOutButton } = {
     ...styles,
   }
   const { logoutDialog, myOrderButtonText, logOutButtonText } = { ...texts }
@@ -43,16 +43,16 @@ const LoggedIn: FC<ILoggedInProps> = ({
   }
 
   return (
-    <View style={[s.rootContainer, rootContainerStyle]}>
+    <View style={[s.rootContainer, rootContainer]}>
       <Button
         text={myOrderButtonText || 'MY ORDERS'}
         onPress={handleMyOrdersPress}
-        styles={myOrdersButtonStyles}
+        styles={myOrdersButton}
       />
       <Button
         text={logOutButtonText || 'LOG OUT'}
         onPress={handleLogOutPress}
-        styles={logOutButtonStyles}
+        styles={logOutButton}
       />
     </View>
   )

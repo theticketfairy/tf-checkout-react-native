@@ -40,7 +40,6 @@ export interface IBillingInfoProps {
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
 
-  customCheckboxText?: StyleProp<TextStyle>
   privacyPolicyLinkStyle?: StyleProp<TextStyle>
 }
 
@@ -85,7 +84,7 @@ export interface IBillingInfoFormData {
 
 export interface IBillingInfoViewStyles {
   loginStyles?: ILoginViewStyles
-  loginButton?: IButtonStyles
+  checkoutButton?: IButtonStyles
 
   inputStyles?: IInputStyles
   dropdownStyles?: IDropdownStyles
@@ -94,6 +93,7 @@ export interface IBillingInfoViewStyles {
   titles?: StyleProp<TextStyle>
   headers?: StyleProp<TextStyle>
   texts?: StyleProp<TextStyle>
+  customCheckbox?: ICheckboxStyles
 }
 
 export interface IBillingInfoViewTexts {

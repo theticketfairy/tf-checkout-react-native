@@ -9,7 +9,9 @@ import { IInputProps } from './types'
 const Input = (props: IInputProps) => {
   const { id, value, onTextChanged, onChangeText, reference, label, styles } =
     props
-  const mainColor = styles?.color || R.colors.black
+  const mainColor = styles?.baseColor
+    ? styles.baseColor
+    : styles?.color || R.colors.black
 
   return (
     <View style={[s.container, styles?.container]}>
