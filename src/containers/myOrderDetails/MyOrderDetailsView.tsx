@@ -13,6 +13,7 @@ import {
 import { IMyOrderDetailsTicket } from '../../api/types'
 import { Button } from '../../components'
 import R from '../../res'
+import s from './styles'
 import { IMyOrderDetailsView } from './types'
 
 const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
@@ -38,49 +39,65 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
   }
   //#endregion
 
+  const copyIconTint = styles?.header?.shareLink?.copyIconTint || R.colors.black
+  const copyIconTintActive =
+    styles?.header?.shareLink?.copyIconTintActive || R.colors.validGreen
+  const title = texts?.title || 'ORDER DETAILS'
+  const subTitle = texts?.subTitle || 'ORDER SUMMARY'
+  const referralLink =
+    texts?.referralLink || 'Your personal share link for this event is:'
+  const itemsTotal = texts?.listItem?.total || 'Total'
+  const itemsTicketType = texts?.listItem?.ticketType || 'Ticket Type: '
+  const itemsPrice = texts?.listItem?.price || 'Price: '
+  const itemsQuantity = texts?.listItem?.quantity || 'Quantity: '
+
+  const ticketsTitle = texts?.ticketItem?.title || 'Your Tickets: '
+  const ticketsId = texts?.ticketItem?.ticketId || 'Ticket ID: '
+  const ticketsType = texts?.ticketItem?.ticketType || 'Ticket Type: '
+  const ticketsHolderName =
+    texts?.ticketItem?.ticketHolder || 'Ticket Holder Name: '
+  const ticketsStatus = texts?.ticketItem?.status || 'Status: '
+  const ticketsDownload = texts?.ticketItem?.download || 'Download'
+
   const renderShareLink = () => (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}
-    >
+    <View style={[s.shareLinkContainer, styles?.header?.shareLink?.container]}>
       <Text numberOfLines={1} ellipsizeMode='head'>
         {header.shareLink}
       </Text>
       <TouchableOpacity
-        style={{
-          alignItems: 'center',
-          borderWidth: 1,
-          padding: 4,
-          justifyContent: 'center',
-          flexDirection: 'row',
-        }}
+        style={[s.copyContainer, styles?.header?.shareLink?.copyContainer]}
         onPress={onCopyLinkHandler}
       >
-        <Text style={{ fontSize: 11 }}>{isLinkCopied ? 'Copied' : 'Copy'}</Text>
+        <Text style={[s.copyText, styles?.header?.shareLink?.copyText]}>
+          {isLinkCopied ? 'Copied' : 'Copy'}
+        </Text>
         <Image
           source={isLinkCopied ? R.icons.check : R.icons.copy}
-          style={{
-            height: 16,
-            width: 16,
-            marginLeft: 4,
-            resizeMode: 'contain',
-            tintColor: isLinkCopied ? R.colors.validGreen : R.colors.black,
-          }}
+          style={[
+            s.copyIcon,
+            styles?.header?.shareLink?.copyIcon,
+            {
+              tintColor: isLinkCopied ? copyIconTintActive : copyIconTint,
+            },
+          ]}
         />
       </TouchableOpacity>
     </View>
   )
 
   const renderHeader = () => (
-    <View>
-      <Text>ORDER DETAILS</Text>
-      <Text>ORDER SUMMARY</Text>
-      <Text>Your personal share link for this event is: </Text>
+    <View style={styles?.header?.container}>
+      <Text style={styles?.header?.title}>{title}</Text>
+      <Text style={styles?.header?.subTitle}>{subTitle}</Text>
+      <Text style={styles?.header?.shareLink?.message}>{referralLink} </Text>
       {renderShareLink()}
-      <Text>So far, you've referred {header.salesReferred} tickets.</Text>
+      <Text style={styles?.header?.shareLink?.referrals}>
+        So far, you've referred{' '}
+        <Text style={styles?.header?.shareLink?.referralValue}>
+          {header.salesReferred}
+        </Text>{' '}
+        tickets.
+      </Text>
     </View>
   )
 
@@ -100,141 +117,133 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
 
   const itemsData: SectionListProps = [
     {
-      title: 'Items',
+      title: texts?.listItem?.title || 'Items',
       data: parsedItems,
       renderItem: ({ item }) => renderItemComp(item),
       id: 0,
     },
     {
-      title: 'Your Tickets',
+      title: ticketsTitle,
       data: parsedTickets,
       renderItem: ({ item }) => renderTicketComp(item),
       id: 1,
     },
   ]
 
-  const renderItemComp = ({ item }) => {
-    console.log('Item', item)
-
-    return (
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          borderWidth: 2,
-          marginVertical: 8,
-        }}
-      >
-        <View>
-          <Text>Ticket Type: {item.name}</Text>
-          <View style={{ flexDirection: 'row' }}>
-            <Text>Price: </Text>
-            <Text>
-              {item.currency}
-              {item.price}
-            </Text>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <Text>Quantity: </Text>
-            <Text>{item.quantity}</Text>
-          </View>
-        </View>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'flex-end',
-          }}
-        >
-          <Text>Total</Text>
-          <Text>
+  const renderItemComp = ({ item }) => (
+    <View style={[s.listItemContainer, styles?.listItem?.container]}>
+      <View style={styles?.listItem?.innerLeftContainer}>
+        <Text style={styles?.listItem?.rowPlaceholder}>
+          {itemsTicketType}{' '}
+          <Text style={styles?.listItem?.rowValue}>{item.name}</Text>
+        </Text>
+        <View style={s.rowContainer}>
+          <Text style={styles?.listItem?.rowPlaceholder}>{itemsPrice}</Text>
+          <Text style={styles?.listItem?.rowValue}>
             {item.currency}
-            {item.total}
+            {item.price}
           </Text>
         </View>
+        <View style={s.rowContainer}>
+          <Text style={styles?.listItem?.rowPlaceholder}>{itemsQuantity}</Text>
+          <Text style={styles?.listItem?.rowValue}>{item.quantity}</Text>
+        </View>
       </View>
-    )
-  }
-
-  const renderTicketComp = ({ item }: { item: IMyOrderDetailsTicket }) => {
-    console.log('TICKET Item', item)
-
-    return (
       <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          borderWidth: 2,
-          marginVertical: 8,
-        }}
+        style={[
+          s.listItemInnerRightContainer,
+          styles?.listItem?.innerRightContainer,
+        ]}
       >
-        <View>
-          <Text>Ticket ID: {item.hash}</Text>
-          <View style={{ flexDirection: 'row' }}>
-            <Text>Ticket Type: </Text>
-            <Text>{item.ticketType}</Text>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <Text>Ticket Holder Name: </Text>
-            <Text>{item.holderName}</Text>
-          </View>
-        </View>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'flex-end',
-          }}
-        >
-          <Text>
-            Status: <Text>{item.status}</Text>
-          </Text>
+        <Text style={styles?.listItem?.rowPlaceholder}>{itemsTotal}</Text>
+        <Text style={styles?.listItem?.rowValue}>
+          {item.currency}
+          {item.total}
+        </Text>
+      </View>
+    </View>
+  )
 
-          <Button
-            isLoading={isDownloadingTicket}
-            text='Download'
-            styles={{
-              text: {
-                fontSize: 12,
-              },
-              button: {
-                height: 30,
-                marginVertical: 8,
-              },
-            }}
-            onPress={() => onPressTicketDownload(item.pdfLink, item.hash)}
-          />
+  const renderTicketComp = ({ item }: { item: IMyOrderDetailsTicket }) => (
+    <View style={[s.ticketItemContainer, styles?.ticketItem?.container]}>
+      <View style={styles?.ticketItem?.innerLeftContainer}>
+        <View style={s.rowContainer}>
+          <Text style={styles?.ticketItem?.rowPlaceholder}>{ticketsId}</Text>
+          <Text style={styles?.ticketItem?.rowValue}>{item.hash}</Text>
+        </View>
+        <View style={s.rowContainer}>
+          <Text style={styles?.ticketItem?.rowPlaceholder}>{ticketsType}</Text>
+          <Text style={styles?.ticketItem?.rowValue}>{item.ticketType}</Text>
+        </View>
+        <View style={s.rowContainer}>
+          <Text style={styles?.ticketItem?.rowPlaceholder}>
+            {ticketsHolderName}
+          </Text>
+          <Text style={styles?.ticketItem?.rowValue}>{item.holderName}</Text>
         </View>
       </View>
-    )
-  }
 
-  console.log('Parsed Items', parsedItems)
+      <View
+        style={[
+          s.ticketItemInnerRightContainer,
+          styles?.ticketItem?.innerRightContainer,
+        ]}
+      >
+        <Text style={styles?.ticketItem?.rowPlaceholder}>
+          {ticketsStatus}
+          <Text style={styles?.ticketItem?.rowValue}>{item.status}</Text>
+        </Text>
+
+        <Button
+          isLoading={isDownloadingTicket}
+          text={ticketsDownload}
+          styles={{
+            text: {
+              fontSize: 12,
+            },
+            button: {
+              height: 30,
+              marginVertical: 8,
+            },
+            ...styles?.downloadButton,
+          }}
+          onPress={() => onPressTicketDownload(item.pdfLink, item.hash)}
+        />
+      </View>
+    </View>
+  )
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={[s.rootContainer, styles?.rootContainer]}>
       <SectionList
         ListHeaderComponent={renderHeader}
         sections={[...itemsData]}
-        renderSectionHeader={({ section }) => <Text>{section.title}</Text>}
+        renderSectionHeader={({ section }) => (
+          <Text style={styles?.sectionHeader}>{section.title}</Text>
+        )}
         renderSectionFooter={({ section }) => {
-          console.log('Section', section)
           if (section.id === 0) {
             return (
               <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}
+                style={[
+                  s.sectionFooterContainer,
+                  styles?.section0Footer?.container,
+                ]}
               >
-                <Text>Total</Text>
-                <Text>{header.total}</Text>
+                <Text style={styles?.section0Footer?.label}>{itemsTotal}</Text>
+                <Text style={styles?.section0Footer?.value}>
+                  {header.total}
+                </Text>
               </View>
             )
           }
         }}
       />
-      <View>
-        <Button text='Go Back' onPress={onGoBackHandler} />
-      </View>
+      <Button
+        text={texts?.goBackButton || 'Go Back'}
+        onPress={onGoBackHandler}
+        styles={styles?.goBackButton}
+      />
     </View>
   )
 }

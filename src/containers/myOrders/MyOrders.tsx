@@ -1,5 +1,5 @@
 import _map from 'lodash/map'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useCallback, useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 
 import { fetchMyOrders, fetchOrderDetails } from '../../api/ApiClient'
@@ -26,10 +26,10 @@ const MyOrders: FC<IMyOrdersProps> = ({
 
   console.log('myEvents', myEvents)
 
-  const getMyOrdersAsync = async () => {
+  const getMyOrdersAsync = useCallback(async () => {
     setIsLoading(true)
     const { myOrdersData, myOrdersError } = await fetchMyOrders(
-      selectedEvent?.value
+      selectedEvent?.value.toString()
     )
     console.log('MyOrdersData', myOrdersData)
     console.log('myOrdersError', myOrdersError)
@@ -47,7 +47,7 @@ const MyOrders: FC<IMyOrdersProps> = ({
     setMyOrders(myOrdersData.orders)
     setMyEvents(events)
     setIsLoading(false)
-  }
+  }, [selectedEvent])
 
   //#region Handlers
   const handleOnChangeEvent = (event: IDropdownItem) => {
@@ -76,13 +76,14 @@ const MyOrders: FC<IMyOrdersProps> = ({
       await getMyOrdersAsync()
     }
     fetchData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (selectedEvent?.value) {
       getMyOrdersAsync()
     }
-  }, [selectedEvent])
+  }, [getMyOrdersAsync, selectedEvent])
 
   useEffect(() => {
     if (myEvents.length > 0) {
