@@ -7,23 +7,23 @@ export const orderReviewItems: IOrderItem[] = [
     value: '',
   },
   {
-    id: 'price',
-    title: 'PRICE PER TICKET',
-    value: '',
-  },
-  {
     id: 'ticketType',
     title: 'TICKET TYPE',
     value: 'First RELEASE',
   },
   {
-    id: 'total',
-    title: 'TOTAL',
+    id: 'numberOfTickets',
+    title: 'NUMBER OF TICKETS',
     value: '',
   },
   {
-    id: 'numberOfTickets',
-    title: 'NUMBER OF TICKETS',
+    id: 'price',
+    title: 'PRICE PER TICKET',
+    value: '',
+  },
+  {
+    id: 'total',
+    title: 'TOTAL',
     value: '',
   },
 ]

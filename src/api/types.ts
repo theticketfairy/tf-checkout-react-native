@@ -53,7 +53,7 @@ export interface IEventResponse {
   eventData?: IEvent
 }
 
-// Checkout types
+//#region Checkout
 export interface ICheckoutTicketHolder {
   email: string
   first_name: string
@@ -82,6 +82,19 @@ export interface ICheckoutBody {
     dob_year?: number
   }
 }
+
+export interface IFreeRegistrationData {
+  id: string
+  customerId: string
+  total: string
+  currency: string
+  orderHash: string
+}
+export interface IFreeRegistrationResponse {
+  freeRegistrationError?: string
+  freeRegistrationData?: IFreeRegistrationData
+}
+//#endregion
 
 // Register New User
 export interface IRegisterNewUserResponse {

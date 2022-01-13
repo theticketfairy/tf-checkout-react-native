@@ -16,10 +16,10 @@ const PurchaseConfirmationView = ({
     </Text>
 
     <View style={[s.messagesContainer, styles?.message?.container]}>
-      <Text>
+      <Text style={styles?.message?.line1}>
         {texts?.message?.line1 || 'YOUR TICKETS HAVE BEEN EMAILED TO YOU \n'}
       </Text>
-      <Text>
+      <Text style={styles?.message?.line2}>
         {texts?.message?.line2 || 'PLEASE BRING THEM WITH YOU TO THE EVENT'}
       </Text>
     </View>
@@ -68,7 +68,11 @@ const PurchaseConfirmationView = ({
         </TouchableOpacity>
       </View>
     </View> */}
-    <Button text='Exit' onPress={onComplete} />
+    <Button
+      text={texts?.exitButton || 'Exit'}
+      styles={styles?.exitButton}
+      onPress={onComplete}
+    />
   </View>
 )
 

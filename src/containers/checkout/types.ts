@@ -66,6 +66,7 @@ export interface ICheckoutViewProps {
   }
   orderReviewDataItems: IOrderItem[]
   onPressPay: () => void
+  onPressFreeRegistration: () => void
   conditions: IFormFieldProps[]
   onFormComplete: (cardDetails: CardFormView.Details) => void
   isDataValid?: boolean
@@ -74,4 +75,6 @@ export interface ICheckoutViewProps {
   isStripeReady?: boolean
   isStripeConfigMissing?: boolean
   onPressExit?: () => void
+  isPaymentRequired?: boolean
+  isLoadingFreeRegistration?: boolean
 }

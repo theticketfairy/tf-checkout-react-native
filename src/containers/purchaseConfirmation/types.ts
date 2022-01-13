@@ -1,8 +1,11 @@
 import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
+import { IButtonStyles } from '../../components/button/types'
+
 export interface IPurchaseConfirmationProps {
   orderHash: string
   onComplete: () => void
+  styles?: IPurchaseConfirmationStyles
 }
 
 export interface IPurchaseConfirmationTexts {
@@ -20,6 +23,7 @@ export interface IPurchaseConfirmationTexts {
     title?: string
     message?: string
   }
+  exitButton?: string
 }
 
 export interface IPurchaseConfirmationStyles {
@@ -50,6 +54,7 @@ export interface IPurchaseConfirmationStyles {
     copyIcon?: StyleProp<ImageStyle>
     copyButton?: StyleProp<ViewStyle>
   }
+  exitButton?: IButtonStyles
 }
 
 export interface IPurchaseConfirmationProps {

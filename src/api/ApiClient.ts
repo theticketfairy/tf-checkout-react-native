@@ -20,6 +20,8 @@ import {
   IClientRequest,
   IEventResponse,
   IFetchTicketsResponse,
+  IFreeRegistrationData,
+  IFreeRegistrationResponse,
   IMyOrderDetailsItem,
   IMyOrderDetailsResponse,
   IMyOrderDetailsTicket,
@@ -69,7 +71,6 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 Client.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
-    console.log('Response error', error)
     if (error?.response?.status === 401) {
       deleteAllData()
     }
@@ -131,15 +132,11 @@ export const authorize = async (
 
 export const fetchAccessToken = async (data: FormData) => {
   let responseError
-
-  console.log('fetchAccessToken', data)
   const response = await Client.post('/v1/oauth/access_token', data).catch(
     (error: Error) => {
       responseError = error.message
     }
   )
-  console.log('fetchAccessToken response', response)
-  console.log('fetchAccessToken error', responseError)
 
   return {
     error: responseError,
@@ -408,12 +405,6 @@ export const addToCart = async (id: string | number, data: any) => {
     responseError = error.message
   })
 
-  console.log(
-    '%cApiClient.ts line:254 response',
-    'color: white; background-color: #00FF01;',
-    response
-  )
-
   if (!responseError) {
     setCustomHeader(response)
     responseData = {
@@ -581,7 +572,10 @@ export const fetchOrderReview = async (
     const attributes = _get(response, 'data.data.attributes')
     const { cart, order_details, payment_method, billing_info } = attributes
 
-    if (!payment_method.stripe_connected_account) {
+    if (
+      !payment_method.stripe_client_secret &&
+      order_details.total !== '0.00'
+    ) {
       responseError = 'Stripe is not configured'
     } else {
       const {
@@ -602,7 +596,7 @@ export const fetchOrderReview = async (
           name: payment_method.name,
           stripeClientSecret: payment_method.stripe_client_secret,
           stripeConnectedAccount:
-            payment_method.stripe_connected_account.length > 0
+            payment_method.stripe_connected_account?.length > 0
               ? payment_method.stripe_connected_account
               : undefined,
           stripePublishableKey: payment_method.stripe_publishable_key,
@@ -642,6 +636,34 @@ export const postOnPaymentSuccess = async (orderHash: string) => {
   return {
     error: responseError,
     data: response?.data,
+  }
+}
+
+export const postOnFreeRegistration = async (
+  orderHash: string
+): Promise<IFreeRegistrationResponse> => {
+  let responseError = ''
+  let responseData: IFreeRegistrationData
+  const res: AxiosResponse | void = await Client.post(
+    `v1/order/${orderHash}/complete_free_registration`
+  ).catch((error: AxiosError) => {
+    responseError = error.response?.data.message
+  })
+  console.log('postOnFreeRegistration', res)
+
+  if (res?.data) {
+    const orderDetails = res.data.data.attributes.order_details
+    responseData = {
+      id: orderDetails.id,
+      customerId: orderDetails.customer_id,
+      total: orderDetails.total,
+      currency: orderDetails.currency,
+      orderHash: orderDetails.order_hash,
+    }
+  }
+  return {
+    freeRegistrationError: responseError,
+    freeRegistrationData: responseData,
   }
 }
 //#endregion

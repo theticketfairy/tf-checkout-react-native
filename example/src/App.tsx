@@ -62,6 +62,7 @@ const App = () => {
   }
 
   const handleOnComplete = () => {
+    setComponentToShow(ComponentEnum.Tickets)
     console.log('Exit')
   }
 
@@ -128,7 +129,9 @@ const App = () => {
                   color: Color.textMain,
                 },
               },
-
+              passwordTitle: {
+                color: Color.textMain,
+              },
               checkboxStyles: {
                 text: {
                   color: Color.textMain,
@@ -178,6 +181,40 @@ const App = () => {
                 baseColor: Color.white,
               },
               loginStyles: {
+                guest: {
+                  line1: {
+                    color: Color.textMain,
+                  },
+                  line2: {
+                    color: Color.textMain,
+                  },
+                  loginButton: {
+                    button: {
+                      backgroundColor: Color.primary,
+                      borderRadius: 2,
+                    },
+                  },
+                },
+                dialog: {
+                  container: {
+                    backgroundColor: Color.backgroundMain,
+                  },
+                  title: {
+                    color: Color.textMain,
+                  },
+                  logo: {
+                    tintColor: Color.textMain,
+                  },
+                  input: {
+                    baseColor: Color.textMain,
+                  },
+                  loginButton: {
+                    button: {
+                      backgroundColor: Color.primary,
+                    },
+                  },
+                },
+
                 loggedIn: {
                   placeholder: {
                     color: Color.textMain,
@@ -226,6 +263,33 @@ const App = () => {
           <PurchaseConfirmation
             orderHash={checkoutProps!.hash}
             onComplete={handleOnComplete}
+            styles={{
+              rootContainer: {
+                backgroundColor: Color.backgroundMain,
+              },
+              title: {
+                color: Color.textMain,
+              },
+              message: {
+                container: {
+                  backgroundColor: Color.blueGray,
+                },
+                line1: {
+                  fontSize: 16,
+                  textAlign: 'center',
+                },
+                line2: {
+                  fontSize: 15,
+                  textAlign: 'center',
+                },
+              },
+              exitButton: {
+                button: {
+                  backgroundColor: Color.primary,
+                  borderRadius: 2,
+                },
+              },
+            }}
           />
         )
 

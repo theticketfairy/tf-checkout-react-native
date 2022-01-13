@@ -13,6 +13,7 @@ import { Alert } from 'react-native'
 import {
   fetchEventConditions,
   fetchOrderReview,
+  postOnFreeRegistration,
   postOnPaymentSuccess,
 } from '../../api/ApiClient'
 import { IOrderReview } from '../../api/types'
@@ -47,6 +48,9 @@ const Checkout = ({
   const [paymentInfo, setPaymentInfo] = useState<CardFormView.Details>()
   const [isStripeReady, setIsStripeReady] = useState<boolean>(false)
   const [isStripeConfigMissing, setIsStripeConfigMissing] = useState(false)
+  const [isPaymentRequired, setIsPaymentRequired] = useState(false)
+  const [isLoadingFreeRegistration, setIsLoadingFreeRegistration] =
+    useState(false)
 
   //#region Handlers
   const handleOnChangePaymentInfo = (details: CardFormView.Details) => {
@@ -60,15 +64,31 @@ const Checkout = ({
     setConditionsValues(tConditionsValues)
   }
 
+  const handleOnPressFreeRegistration = async () => {
+    setIsLoadingFreeRegistration(true)
+    const { freeRegistrationData, freeRegistrationError } =
+      await postOnFreeRegistration(hash)
+    setIsLoadingFreeRegistration(false)
+    if (freeRegistrationError) {
+      if (onPaymentError) onPaymentError(freeRegistrationError)
+      return Alert.alert('', freeRegistrationError)
+    }
+
+    if (onPaymentSuccess) {
+      return onPaymentSuccess(freeRegistrationData)
+    }
+  }
+
   const handleOnPressPay = async () => {
     if (!orderReview || !paymentInfo) {
       return
     }
+    console.log('handleOnPressPay')
 
     const { addressData } = orderReview
 
     const { error: confirmPaymentError, paymentIntent } = await confirmPayment(
-      orderReview.paymentData.stripeClientSecret,
+      orderReview.paymentData!.stripeClientSecret!,
       {
         type: 'Card',
         billingDetails: {
@@ -178,16 +198,23 @@ const Checkout = ({
           }
         })
       })
+
       setOrderInfo(tOrderInfo)
       setOrderReview(orderReviewData)
 
-      console.log('Order Review Data', orderReviewData.paymentData)
+      console.log('Order Review Data', orderReviewData.reviewData)
+      console.log('orderReviewData.paymentData', orderReviewData.paymentData)
+
+      if (orderReview?.reviewData.total !== '0.00') {
+        return setIsPaymentRequired(false)
+      }
 
       if (!orderReviewData.paymentData?.stripePublishableKey) {
-        console.log('Stripe not config')
         if (onStripeInitializeError) {
           onStripeInitializeError('Stripe is not configured for this event')
         }
+        setIsPaymentRequired(false)
+
         return Alert.alert(
           'Stripe is not configured for this event',
           'Please contact support.'
@@ -225,13 +252,11 @@ const Checkout = ({
     return paymentValid && _every(conditionsValues, (item) => item === true)
   }
 
-  console.log('isLoading:', isLoading)
-  console.log('stripe loading:', loading)
-
   return (
     <CheckoutView
       orderReviewDataItems={orderInfo}
       onPressPay={handleOnPressPay}
+      onPressFreeRegistration={handleOnPressFreeRegistration}
       conditions={getConditions()}
       onFormComplete={handleOnChangePaymentInfo}
       isLoading={isLoading || loading}
@@ -241,6 +266,8 @@ const Checkout = ({
       styles={styles}
       texts={texts}
       onPressExit={onPressExit}
+      isPaymentRequired={isPaymentRequired}
+      isLoadingFreeRegistration={isLoadingFreeRegistration}
     />
   )
 }

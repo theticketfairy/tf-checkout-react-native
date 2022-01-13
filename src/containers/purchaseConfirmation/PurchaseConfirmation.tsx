@@ -7,6 +7,7 @@ import { IPurchaseConfirmationProps } from './types'
 const PurchaseConfirmation = ({
   orderHash,
   onComplete,
+  styles,
 }: IPurchaseConfirmationProps) => {
   useEffect(() => {
     const getInitialData = async () => {
@@ -21,7 +22,11 @@ const PurchaseConfirmation = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return (
-    <PurchaseConfirmationView orderHash={orderHash} onComplete={onComplete} />
+    <PurchaseConfirmationView
+      orderHash={orderHash}
+      onComplete={onComplete}
+      styles={styles}
+    />
   )
 }
 

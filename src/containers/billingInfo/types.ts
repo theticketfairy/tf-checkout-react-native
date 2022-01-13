@@ -85,6 +85,7 @@ export interface IBillingInfoFormData {
 export interface IBillingInfoViewStyles {
   loginStyles?: ILoginViewStyles
   checkoutButton?: IButtonStyles
+  passwordTitle?: StyleProp<TextStyle>
 
   inputStyles?: IInputStyles
   dropdownStyles?: IDropdownStyles
@@ -100,6 +101,7 @@ export interface IBillingInfoViewTexts {
   loginTexts?: ILoginViewTexts
   loginButton?: string
   checkoutButton?: string
+  passwordTitle?: string
 }
 
 export interface IBillingInfoViewProps {

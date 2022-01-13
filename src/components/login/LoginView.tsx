@@ -77,7 +77,11 @@ const LoginView = ({
 
   const renderFormFields = useCallback(() => {
     return _map(formFields, (item, index) => (
-      <FormField {...item} key={`loginModal.${index}.${item.id}`} />
+      <FormField
+        {...item}
+        key={`loginModal.${index}.${item.id}`}
+        inputProps={{ styles: styles?.dialog?.input }}
+      />
     ))
   }, [formFields])
 
@@ -148,13 +152,13 @@ const LoginView = ({
       {message ? (
         <Text>{message}</Text>
       ) : (
-        <>
-          <Text>{line1}</Text>
-          <Text>{line2}</Text>
-        </>
+        <View style={styles?.guest?.linesContainer}>
+          <Text style={styles?.guest?.line1}>{line1}</Text>
+          <Text style={styles?.guest?.line2}>{line2}</Text>
+        </View>
       )}
       <Button
-        styles={{ container: s.button }}
+        styles={{ container: s.button, ...styles?.guest?.loginButton }}
         text={texts?.loginButton || 'LOGIN'}
         onPress={showDialog}
       />
@@ -182,7 +186,7 @@ const LoginView = ({
                   {renderFormFields()}
                   <Button
                     styles={{
-                      container: [s.loginButton, styles?.loginButton?.button],
+                      container: [s.loginButton],
                       ...styles?.dialog?.loginButton,
                     }}
                     text={texts?.loginButton || 'LOGIN'}

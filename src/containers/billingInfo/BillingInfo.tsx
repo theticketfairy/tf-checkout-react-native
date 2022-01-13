@@ -161,8 +161,10 @@ const BillingInfo = ({
         : [
             {
               fieldType: 'title',
-              title: 'Choose a password for your new TICKETFAIRY account',
-              titleStyle: {},
+              title:
+                texts?.passwordTitle ||
+                'Choose a password for your new TICKETFAIRY account',
+              titleStyle: styles?.passwordTitle,
             },
             {
               id: 'password',
@@ -174,6 +176,7 @@ const BillingInfo = ({
                 secureTextEntry: true,
                 value: password,
                 error: passwordError,
+                styles: styles?.inputStyles,
               },
             },
             {
@@ -186,6 +189,7 @@ const BillingInfo = ({
                 secureTextEntry: true,
                 value: confirmPassword,
                 error: confirmPasswordError,
+                styles: styles?.inputStyles,
               },
             },
           ]

@@ -5,6 +5,7 @@ import { StyleProp, ViewStyle } from 'react-native'
 import { IUserProfile } from '../../types'
 import { IButtonStyles } from '../button/types'
 import { IFormField } from '../formField/types'
+import { IInputStyles } from '../input/types'
 
 export interface ILoginProps {
   onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
@@ -23,11 +24,17 @@ export interface ILoginProps {
 }
 
 export interface ILoginViewStyles {
-  loginButton?: IButtonStyles
+  message?: StyleProp<TextStyle>
+  guest?: {
+    loginButton?: IButtonStyles
+    linesContainer?: StyleProp<ViewStyle>
+    line1?: StyleProp<TextStyle>
+    line2?: StyleProp<TextStyle>
+  }
   dialog?: {
     container?: StyleProp<ViewStyle>
     loginButton?: IButtonStyles
-    input?: TextInputProps['style']
+    input?: IInputStyles
     title?: StyleProp<TextStyle>
     logo?: StyleProp<ImageStyle>
   }

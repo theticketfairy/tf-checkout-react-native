@@ -21,6 +21,9 @@ const CheckoutView = ({
   isStripeReady,
   isStripeConfigMissing,
   onPressExit,
+  isPaymentRequired,
+  onPressFreeRegistration,
+  isLoadingFreeRegistration,
 }: ICheckoutViewProps) => {
   const title = texts?.title ? texts.title : 'GET YOUR TICKETS'
   const subTitle = texts?.subTitle ? texts.subTitle : 'Order review'
@@ -40,6 +43,7 @@ const CheckoutView = ({
   }
 
   console.log('Is stripe Ready', isStripeReady)
+  console.log('Is payment req', isPaymentRequired)
 
   return isStripeConfigMissing ? (
     <View
@@ -66,19 +70,30 @@ const CheckoutView = ({
           <Text>{subTitle}</Text>
         </View>
         <OrderReview orderItems={orderReviewDataItems} />
-        <Text>Please provide your payment information</Text>
-        {isStripeReady && (
-          <CardForm onFormComplete={handleOnFormComplete} style={s.card} />
+        {isStripeReady && isPaymentRequired && (
+          <View>
+            <Text>Please provide your payment information</Text>
+            <CardForm onFormComplete={handleOnFormComplete} style={s.card} />
+          </View>
         )}
         <Conditions {...conditions} />
-        <Button
-          text='PAY'
-          onPress={handleOnPressPay}
-          isDisabled={isDataValid}
-          styles={{
-            container: s.payButton,
-          }}
-        />
+        {isStripeReady && isPaymentRequired && (
+          <Button
+            text='PAY'
+            onPress={handleOnPressPay}
+            isDisabled={isDataValid}
+            styles={{
+              container: s.payButton,
+            }}
+          />
+        )}
+        {!isPaymentRequired && (
+          <Button
+            text='COMPLETE REGISTRATION'
+            onPress={onPressFreeRegistration}
+            isLoading={isLoadingFreeRegistration}
+          />
+        )}
       </View>
       {isLoading && <Loading />}
     </KeyboardAwareScrollView>
