@@ -183,10 +183,14 @@ const LoginView = ({
                   {!!message && <Text style={s.message}>{message}</Text>}
                   {renderFormFields()}
                   <Button
-                    styles={{
-                      container: [s.loginButton],
-                      ...styles?.dialog?.loginButton,
-                    }}
+                    styles={
+                      !checkIsDataValid()
+                        ? styles?.dialog?.loginButtonDisabled
+                        : {
+                            container: [s.loginButton],
+                            ...styles?.dialog?.loginButton,
+                          }
+                    }
                     text={texts?.loginButton || 'LOGIN'}
                     onPress={handleOnPressLogin}
                     isLoading={isLoading}

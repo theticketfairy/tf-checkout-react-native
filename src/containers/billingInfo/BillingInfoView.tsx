@@ -51,11 +51,18 @@ const BillingInfoView = ({
           text={texts?.checkoutButton || 'CHECKOUT'}
           isDisabled={!isDataValid}
           isLoading={isSubmitLoading}
-          styles={{
-            container: [s.submitButton, styles?.checkoutButton?.container],
-            text: styles?.checkoutButton?.text,
-            button: styles?.checkoutButton?.button,
-          }}
+          styles={
+            !isDataValid
+              ? styles?.checkoutButtonDisabled
+              : {
+                  container: [
+                    s.submitButton,
+                    styles?.checkoutButton?.container,
+                  ],
+                  text: styles?.checkoutButton?.text,
+                  button: styles?.checkoutButton?.button,
+                }
+          }
         />
         {isLoading && <Loading />}
       </View>

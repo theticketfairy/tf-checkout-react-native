@@ -201,7 +201,9 @@ const Tickets = ({
   const handleOnLogout = async () => {
     await deleteAllData()
     setIsUserLogged(false)
-    onPressLogout()
+    if (onPressLogout) {
+      onPressLogout()
+    }
   }
   //#endregion
 

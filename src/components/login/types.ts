@@ -34,6 +34,7 @@ export interface ILoginViewStyles {
   dialog?: {
     container?: StyleProp<ViewStyle>
     loginButton?: IButtonStyles
+    loginButtonDisabled?: IButtonStyles
     input?: IInputStyles
     title?: StyleProp<TextStyle>
     logo?: StyleProp<ImageStyle>

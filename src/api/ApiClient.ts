@@ -71,9 +71,11 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 Client.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
+    console.log('Interceptor error', error.response)
     if (error?.response?.status === 401) {
       deleteAllData()
     }
+    return Promise.reject(error)
   }
 )
 
@@ -117,7 +119,7 @@ export const authorize = async (
     }`,
     data
   ).catch((error: AxiosError) => {
-    console.log('SUPER ERROR', error?.response?.data.message)
+    console.log('SUPER ERROR', error)
     responseError = error?.response?.data.message
   })
 

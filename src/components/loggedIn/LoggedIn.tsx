@@ -38,7 +38,6 @@ const LoggedIn: FC<ILoggedInProps> = ({
           },
         ]
       )
-      onPressLogout()
     }
   }
 

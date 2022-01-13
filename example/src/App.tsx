@@ -154,6 +154,12 @@ const App = () => {
                   borderRadius: 2,
                 },
               },
+              checkoutButtonDisabled: {
+                button: {
+                  backgroundColor: Color.blueGray,
+                  borderRadius: 2,
+                },
+              },
               headers: {
                 color: Color.textMain,
               },
@@ -207,10 +213,23 @@ const App = () => {
                   },
                   input: {
                     baseColor: Color.textMain,
+                    input: {
+                      color: Color.textMain,
+                    },
                   },
                   loginButton: {
                     button: {
                       backgroundColor: Color.primary,
+                      borderRadius: 2,
+                    },
+                  },
+                  loginButtonDisabled: {
+                    button: {
+                      backgroundColor: Color.blueGray,
+                      borderRadius: 2,
+                    },
+                    container: {
+                      width: '100%',
                     },
                   },
                 },
