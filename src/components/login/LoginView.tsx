@@ -58,6 +58,7 @@ const LoginView = ({
           label: 'Email',
           keyboardType: 'email-address',
           autoCapitalize: 'none',
+          styles: styles?.dialog?.input,
         },
       },
       {
@@ -68,6 +69,7 @@ const LoginView = ({
           onTextChanged: setInputData,
           label: 'Password',
           secureTextEntry: true,
+          styles: styles?.dialog?.input,
         },
       },
     ]
@@ -77,11 +79,7 @@ const LoginView = ({
 
   const renderFormFields = useCallback(() => {
     return _map(formFields, (item, index) => (
-      <FormField
-        {...item}
-        key={`loginModal.${index}.${item.id}`}
-        inputProps={{ styles: styles?.dialog?.input }}
-      />
+      <FormField {...item} key={`loginModal.${index}.${item.id}`} />
     ))
   }, [formFields])
 
