@@ -20,20 +20,16 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
   data: { header, items, tickets },
   styles,
   texts,
-  onGoBack,
   isLinkCopied,
   onPressCopyLink,
   onPressTicketDownload,
   isDownloadingTicket,
 }) => {
   //#region Handlers
-  const onGoBackHandler = () => {
-    if (onGoBack) {
-      onGoBack()
-    }
-  }
-
   const onCopyLinkHandler = () => {
+    if (isLinkCopied) {
+      return
+    }
     Clipboard.setString(header.shareLink)
     onPressCopyLink()
   }
@@ -61,7 +57,11 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
 
   const renderShareLink = () => (
     <View style={[s.shareLinkContainer, styles?.header?.shareLink?.container]}>
-      <Text numberOfLines={1} ellipsizeMode='head'>
+      <Text
+        numberOfLines={1}
+        ellipsizeMode='head'
+        style={styles?.header?.shareLink?.link}
+      >
         {header.shareLink}
       </Text>
       <TouchableOpacity
@@ -238,11 +238,6 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
             )
           }
         }}
-      />
-      <Button
-        text={texts?.goBackButton || 'Go Back'}
-        onPress={onGoBackHandler}
-        styles={styles?.goBackButton}
       />
     </View>
   )

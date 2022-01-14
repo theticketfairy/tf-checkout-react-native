@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { SafeAreaView } from 'react-native'
+import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 
 import {
   Tickets,
@@ -84,6 +84,10 @@ const App = () => {
 
   const handleStripeError = () => {
     setComponentToShow(ComponentEnum.Tickets)
+  }
+
+  const handleGoBackFromOrderDetails = () => {
+    setComponentToShow(ComponentEnum.MyOrders)
   }
   //#endregion
 
@@ -265,13 +269,43 @@ const App = () => {
             onPaymentSuccess={handleOnPaymentSuccess}
             onPressExit={handleStripeError}
             styles={{
-              exitButton: {
-                container: {
-                  width: '100%',
+              rootStyle: {
+                paddingHorizontal: 16,
+              },
+              missingStripeConfig: {
+                exitButton: {
+                  container: {
+                    width: '100%',
+                  },
+                  button: {
+                    backgroundColor: Color.primary,
+                    borderRadius: 2,
+                  },
                 },
+              },
+              title: {
+                color: Color.textMain,
+              },
+              subTitle: {
+                color: Color.textMain,
+              },
+              freeRegistrationButton: {
                 button: {
                   backgroundColor: Color.primary,
                   borderRadius: 2,
+                },
+              },
+              orderReview: {
+                item: {
+                  title: {
+                    color: Color.textMainOff,
+                  },
+                  value: {
+                    color: Color.textMain,
+                  },
+                  container: {
+                    marginBottom: 4,
+                  },
                 },
               },
             }}
@@ -314,14 +348,201 @@ const App = () => {
 
       case ComponentEnum.MyOrders:
         return (
-          <MyOrders
-            onDismissMyOrders={handleOnDismissMyOrders}
-            onSelectOrder={handleOnSelectOrder}
-          />
+          <View style={{ flex: 1 }}>
+            <MyOrders
+              onSelectOrder={handleOnSelectOrder}
+              styles={{
+                eventsTitle: {
+                  color: Color.textMain,
+                  fontWeight: '800',
+                  fontSize: 18,
+                },
+                eventsContainer: {
+                  paddingHorizontal: 16,
+                },
+                eventsDropdown: {
+                  button: {
+                    borderColor: Color.white,
+                  },
+                  label: {
+                    color: Color.textMain,
+                  },
+                  icon: {
+                    tintColor: Color.textMain,
+                  },
+                },
+                orderListItem: {
+                  rootContainer: {
+                    backgroundColor: Color.gray80,
+                  },
+                  orderId: {
+                    color: Color.textMain,
+                  },
+                  orderDate: {
+                    color: Color.textMain,
+                  },
+                  eventName: {
+                    color: Color.textMain,
+                  },
+                  price: {
+                    color: Color.textMain,
+                    fontWeight: '800',
+                    fontSize: 14,
+                  },
+                  currency: {
+                    color: Color.textMain,
+                  },
+                  iconNext: {
+                    tintColor: Color.white,
+                  },
+                  contentContainer: {
+                    paddingLeft: 16,
+                    paddingRight: 8,
+                  },
+                },
+              }}
+            />
+            <TouchableOpacity
+              onPress={handleOnDismissMyOrders}
+              style={{
+                backgroundColor: Color.blueGray,
+                height: 40,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Text>Back</Text>
+            </TouchableOpacity>
+          </View>
         )
 
       case ComponentEnum.MyOrderDetails:
-        return <MyOrderDetails data={selectedOrderDetails!} />
+        return (
+          <View style={{ flex: 1 }}>
+            <MyOrderDetails
+              data={selectedOrderDetails!}
+              styles={{
+                downloadButton: {
+                  button: {
+                    backgroundColor: Color.primary,
+                    height: 30,
+                    borderRadius: 2,
+                    marginTop: 4,
+                  },
+                  container: {
+                    height: 45,
+                  },
+                },
+                listItem: {
+                  container: {
+                    paddingHorizontal: 8,
+                    borderWidth: 0,
+                    backgroundColor: Color.gray80,
+                    marginHorizontal: 16,
+                    paddingVertical: 8,
+                  },
+                  rowPlaceholder: {
+                    color: Color.textMainOff,
+                    marginVertical: 2,
+                  },
+                  rowValue: {
+                    color: Color.textMain,
+                    marginVertical: 2,
+                    fontWeight: '600',
+                  },
+                },
+                ticketItem: {
+                  container: {
+                    paddingHorizontal: 8,
+                    borderWidth: 0,
+                    backgroundColor: Color.gray80,
+                    marginHorizontal: 16,
+                    paddingVertical: 8,
+                  },
+                  rowPlaceholder: {
+                    color: Color.textMainOff,
+                    marginVertical: 2,
+                  },
+                  rowValue: {
+                    color: Color.textMain,
+                    marginVertical: 2,
+                    fontWeight: '600',
+                  },
+                },
+                sectionHeader: {
+                  color: Color.textMain,
+                  fontSize: 16,
+                  fontWeight: '700',
+                  marginLeft: 16,
+                },
+                section0Footer: {
+                  container: {
+                    marginBottom: 16,
+                    marginHorizontal: 16,
+                  },
+                  label: {
+                    color: Color.textMain,
+                  },
+                  value: {
+                    color: Color.textMain,
+                    fontWeight: '700',
+                    fontSize: 16,
+                  },
+                },
+                header: {
+                  container: {
+                    paddingHorizontal: 16,
+                    marginVertical: 16,
+                  },
+                  title: {
+                    color: Color.textMain,
+                    marginBottom: 16,
+                    fontSize: 18,
+                    fontWeight: '700',
+                  },
+                  subTitle: {
+                    color: Color.textMain,
+                    fontSize: 16,
+                    fontWeight: '600',
+                    marginBottom: 8,
+                  },
+                  shareLink: {
+                    message: {
+                      color: Color.textMain,
+                    },
+                    link: {
+                      color: Color.notificationPrimary,
+                    },
+                    copyIconTint: Color.textMain,
+                    copyText: {
+                      color: Color.textMain,
+                    },
+                    copyContainer: {
+                      borderColor: Color.textMain,
+                    },
+                    referrals: {
+                      color: Color.textMain,
+                    },
+                    referralValue: {
+                      fontWeight: '700',
+                    },
+                  },
+                },
+              }}
+            />
+            <TouchableOpacity
+              onPress={handleGoBackFromOrderDetails}
+              style={{
+                backgroundColor: Color.blueGray,
+                height: 40,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Text>Back</Text>
+            </TouchableOpacity>
+          </View>
+        )
 
       default:
         return (
@@ -339,6 +560,7 @@ const App = () => {
               title: {
                 color: Color.textMain,
               },
+
               getTicketsButtonActive: {
                 button: {
                   backgroundColor: Color.primary,

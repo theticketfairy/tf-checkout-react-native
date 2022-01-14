@@ -3,20 +3,15 @@ import React, { FC, useCallback, useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 
 import { fetchMyOrders, fetchOrderDetails } from '../../api/ApiClient'
-import { IMyOrderDetailsResponse, IMyOrdersOrder } from '../../api/types'
+import { IMyOrdersOrder } from '../../api/types'
 import { IDropdownItem } from '../../components/dropdown/types'
 import MyOrdersView from './MyOrdersView'
-
-export interface IMyOrdersProps {
-  onDismissMyOrders: () => void
-  onSelectOrder: (order: IMyOrderDetailsResponse) => void
-  onFetchOrderDetailsFail?: (error: string) => void
-}
+import { IMyOrdersProps } from './types'
 
 const MyOrders: FC<IMyOrdersProps> = ({
-  onDismissMyOrders,
   onSelectOrder,
   onFetchOrderDetailsFail,
+  styles,
 }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isGettingEventDetails, setIsGettingEventDetails] = useState(false)
@@ -100,8 +95,8 @@ const MyOrders: FC<IMyOrdersProps> = ({
       onSelectOrder={handleOnSelectOrder}
       onRefresh={getMyOrdersAsync}
       isLoading={isLoading}
-      onGoBack={onDismissMyOrders}
       isGettingEventDetails={isGettingEventDetails}
+      styles={styles}
     />
   )
 }

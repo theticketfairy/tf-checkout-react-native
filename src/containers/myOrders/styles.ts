@@ -20,4 +20,7 @@ export const MyOrdersViewStyles = StyleSheet.create({
   backButtonContainer: {
     marginBottom: 24,
   },
+  rootContainer: {
+    flex: 1,
+  },
 })

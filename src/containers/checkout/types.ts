@@ -4,6 +4,20 @@ import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 import { IButtonStyles } from '../../components/button/types'
 import { IFormFieldProps } from '../../components/formField/types'
 
+export interface ICheckoutStyles {
+  rootStyle?: ViewStyle
+  title?: StyleProp<TextStyle>
+  subTitle?: StyleProp<TextStyle>
+  missingStripeConfig?: {
+    container?: StyleProp<ViewStyle>
+    message?: StyleProp<TextStyle>
+    exitButton?: IButtonStyles
+  }
+  payButton?: IButtonStyles
+  payButtonDisabled?: IButtonStyles
+  freeRegistrationButton?: IButtonStyles
+  orderReview?: IOrderReviewStyles
+}
 export interface ICheckoutProps {
   eventId: number
   hash: string
@@ -24,19 +38,14 @@ export interface ICheckoutProps {
   onStripeInitializeError?: (error: string) => void
 
   onPressExit?: () => void
-
   texts?: {
     title?: string
     subTitle?: string
     missingStripeConfigMessage?: string
     exitButton?: string
   }
-  styles?: {
-    rootStyle?: ViewStyle
-    missingStripeConfigContainer?: StyleProp<ViewStyle>
-    missingStripeConfigMessage?: StyleProp<TextStyle>
-    exitButton?: IButtonStyles
-  }
+
+  styles?: ICheckoutStyles
 }
 
 // Components
@@ -44,10 +53,23 @@ export interface IOrderItem {
   id: string
   title: string
   value: string
+  styles?: IOrderItemStyles
+}
+
+export interface IOrderItemStyles {
+  title?: StyleProp<TextStyle>
+  value?: StyleProp<TextStyle>
+  container?: StyleProp<ViewStyle>
+}
+
+interface IOrderReviewStyles {
+  item?: IOrderItemStyles
+  rootContainer?: StyleProp<ViewStyle>
 }
 
 export interface IOrderReviewProps {
   orderItems: IOrderItem[]
+  styles?: IOrderReviewStyles
 }
 
 // View
@@ -58,12 +80,7 @@ export interface ICheckoutViewProps {
     missingStripeConfigMessage?: string
     exitButton?: string
   }
-  styles?: {
-    rootStyle?: ViewStyle
-    missingStripeConfigContainer?: StyleProp<ViewStyle>
-    missingStripeConfigMessage?: StyleProp<TextStyle>
-    exitButton?: IButtonStyles
-  }
+  styles?: ICheckoutStyles
   orderReviewDataItems: IOrderItem[]
   onPressPay: () => void
   onPressFreeRegistration: () => void

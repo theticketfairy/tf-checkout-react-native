@@ -21,6 +21,7 @@ export interface IMyOrderDetailsProps {
       shareLink?: {
         container?: StyleProp<ViewStyle>
         text?: StyleProp<TextStyle>
+        link?: StyleProp<TextStyle>
         copyContainer?: StyleProp<ViewStyle>
         copyText?: StyleProp<TextStyle>
         copyIcon?: StyleProp<ImageStyle>
@@ -37,7 +38,6 @@ export interface IMyOrderDetailsProps {
       value?: StyleProp<TextStyle>
     }
     sectionHeader?: StyleProp<TextStyle>
-    goBackButton?: IButtonStyles
 
     listItem?: {
       container?: StyleProp<ViewStyle>
@@ -59,7 +59,6 @@ export interface IMyOrderDetailsProps {
     title?: string
     subTitle?: string
     referralLink?: string
-    goBackButton?: string
     listItem?: {
       title?: string
       ticketType?: string
@@ -76,7 +75,6 @@ export interface IMyOrderDetailsProps {
       download?: string
     }
   }
-  onGoBack?: () => void
 }
 
 export interface IMyOrderDetailsView extends IMyOrderDetailsProps {

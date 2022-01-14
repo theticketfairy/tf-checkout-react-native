@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   FlatList,
-  Modal,
   RefreshControl,
   SafeAreaView,
   Text,
@@ -24,8 +23,6 @@ const MyOrdersView = ({
   styles,
   isLoading,
   onRefresh,
-  onGoBack,
-  goBackButtonText,
   isGettingEventDetails,
 }: IMyOrdersViewProps) => {
   const handleOnSelectOrder = (order: IMyOrdersOrder) => {
@@ -35,7 +32,7 @@ const MyOrdersView = ({
   }
 
   return (
-    <Modal>
+    <View style={[s.rootContainer, styles?.rootContainer]}>
       <SafeAreaView style={[s.safeArea, styles?.safeArea]}>
         <View style={[s.eventsContainer, styles?.eventsContainer]}>
           <Text style={[s.eventsTitle, styles?.eventsTitle]}>Events</Text>
@@ -70,18 +67,10 @@ const MyOrdersView = ({
               />
             }
           />
-          <Button
-            text={goBackButtonText || 'Go back'}
-            onPress={onGoBack}
-            styles={{
-              container: s.backButtonContainer,
-              ...styles?.goBackButton,
-            }}
-          />
         </View>
         {isGettingEventDetails && <Loading />}
       </SafeAreaView>
-    </Modal>
+    </View>
   )
 }
 

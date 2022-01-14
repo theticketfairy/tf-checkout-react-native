@@ -47,29 +47,32 @@ const CheckoutView = ({
 
   return isStripeConfigMissing ? (
     <View
-      style={[s.missingStripeContainer, styles?.missingStripeConfigContainer]}
+      style={[s.missingStripeContainer, styles?.missingStripeConfig?.container]}
     >
       <Text
-        style={[s.missingStripeMessage, styles?.missingStripeConfigMessage]}
+        style={[s.missingStripeMessage, styles?.missingStripeConfig?.message]}
       >
         {texts?.missingStripeConfigMessage ||
           'Payment handler is missing, please contact support'}
       </Text>
 
       <Button
-        styles={styles?.exitButton}
+        styles={styles?.missingStripeConfig?.exitButton}
         text={texts?.exitButton || 'Exit'}
         onPress={handleOnPressExit}
       />
     </View>
   ) : (
     <KeyboardAwareScrollView extraScrollHeight={32}>
-      <View>
+      <View style={styles?.rootStyle}>
         <View>
-          <Text style={[s.title]}>{title}</Text>
-          <Text>{subTitle}</Text>
+          <Text style={[s.title, styles?.title]}>{title}</Text>
+          <Text style={[styles?.subTitle]}>{subTitle}</Text>
         </View>
-        <OrderReview orderItems={orderReviewDataItems} />
+        <OrderReview
+          orderItems={orderReviewDataItems}
+          styles={styles?.orderReview}
+        />
         {isStripeReady && isPaymentRequired && (
           <View>
             <Text>Please provide your payment information</Text>
@@ -92,6 +95,7 @@ const CheckoutView = ({
             text='COMPLETE REGISTRATION'
             onPress={onPressFreeRegistration}
             isLoading={isLoadingFreeRegistration}
+            styles={styles?.freeRegistrationButton}
           />
         )}
       </View>
