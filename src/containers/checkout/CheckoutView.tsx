@@ -18,7 +18,6 @@ const CheckoutView = ({
   onFormComplete,
   isDataValid,
   isLoading,
-  isStripeReady,
   isStripeConfigMissing,
   onPressExit,
   isPaymentRequired,
@@ -42,8 +41,12 @@ const CheckoutView = ({
     }
   }
 
-  console.log('Is stripe Ready', isStripeReady)
+  console.log('isStripeConfigMissing', isStripeConfigMissing)
   console.log('Is payment req', isPaymentRequired)
+
+  const payButtonStyle = isDataValid
+    ? styles?.payment?.buttonDisabled
+    : styles?.payment?.button
 
   return isStripeConfigMissing ? (
     <View
@@ -73,20 +76,27 @@ const CheckoutView = ({
           orderItems={orderReviewDataItems}
           styles={styles?.orderReview}
         />
-        {isStripeReady && isPaymentRequired && (
-          <View>
-            <Text>Please provide your payment information</Text>
-            <CardForm onFormComplete={handleOnFormComplete} style={s.card} />
+        {isPaymentRequired && !isStripeConfigMissing && (
+          <View style={styles?.payment?.container}>
+            <Text style={styles?.payment?.title}>
+              Please provide your payment information
+            </Text>
+            <CardForm
+              onFormComplete={handleOnFormComplete}
+              style={[s.card, styles?.payment?.cardContainer]}
+              cardStyle={styles?.payment?.cardBackgroundColor}
+            />
           </View>
         )}
         <Conditions {...conditions} />
-        {isStripeReady && isPaymentRequired && (
+        {isPaymentRequired && !isStripeConfigMissing && (
           <Button
             text='PAY'
             onPress={handleOnPressPay}
             isDisabled={isDataValid}
             styles={{
               container: s.payButton,
+              ...payButtonStyle,
             }}
           />
         )}

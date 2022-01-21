@@ -8,12 +8,7 @@ import {
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import MyOrderDetailsView from './MyOrderDetailsView'
 import { IMyOrderDetailsProps } from './types'
-const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
-  data,
-  onGoBack,
-  styles,
-  texts,
-}) => {
+const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
   const [isLinkCopied, setIsLinkCopied] = useState(false)
   const [isDownloadingTicket, setIsDownloadingTicket] = useState(false)
 
@@ -60,7 +55,6 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
       data={data}
       styles={styles}
       texts={texts}
-      onGoBack={onGoBack}
       isLinkCopied={isLinkCopied}
       onPressCopyLink={handleOnPressCopyLink}
       onPressTicketDownload={handleOnPressTicketDownload}

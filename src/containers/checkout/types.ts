@@ -1,5 +1,5 @@
 import { CardFormView } from '@stripe/stripe-react-native'
-import { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 import { IButtonStyles } from '../../components/button/types'
 import { IFormFieldProps } from '../../components/formField/types'
@@ -13,10 +13,16 @@ export interface ICheckoutStyles {
     message?: StyleProp<TextStyle>
     exitButton?: IButtonStyles
   }
-  payButton?: IButtonStyles
-  payButtonDisabled?: IButtonStyles
   freeRegistrationButton?: IButtonStyles
   orderReview?: IOrderReviewStyles
+  payment?: {
+    container?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+    cardBackgroundColor?: StyleProp<ViewStyle> // Only set the background color of the card
+    cardContainer?: StyleProp<ViewStyle>
+    button?: IButtonStyles
+    buttonDisabled?: IButtonStyles
+  }
 }
 export interface ICheckoutProps {
   eventId: number
@@ -89,7 +95,6 @@ export interface ICheckoutViewProps {
   isDataValid?: boolean
   isLoading?: boolean
 
-  isStripeReady?: boolean
   isStripeConfigMissing?: boolean
   onPressExit?: () => void
   isPaymentRequired?: boolean

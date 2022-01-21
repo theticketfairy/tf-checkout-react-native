@@ -308,6 +308,23 @@ const App = () => {
                   },
                 },
               },
+              payment: {
+                title: {
+                  color: Color.textMain,
+                },
+                cardContainer: {
+                  backgroundColor: Color.gray10,
+                  borderRadius: 5,
+                },
+                cardBackgroundColor: {
+                  backgroundColor: Color.gray10,
+                },
+                button: {
+                  button: {
+                    backgroundColor: Color.primary,
+                  },
+                },
+              },
             }}
           />
         )

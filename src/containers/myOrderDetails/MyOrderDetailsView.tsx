@@ -1,3 +1,4 @@
+//@ts-nocheck
 import Clipboard from '@react-native-clipboard/clipboard'
 import _map from 'lodash/map'
 import React, { FC } from 'react'
@@ -237,6 +238,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
               </View>
             )
           }
+          return null
         }}
       />
     </View>

@@ -39,14 +39,13 @@ const Checkout = ({
   styles,
   onPressExit,
 }: ICheckoutProps) => {
-  const { confirmPayment, loading } = useConfirmPayment()
+  const { confirmPayment, loading: isStripeLoading } = useConfirmPayment()
   const [isLoading, setIsLoading] = useState(true)
   const [orderReview, setOrderReview] = useState<IOrderReview>()
   const [conditionsTexts, setConditionsTexts] = useState<string[]>([])
   const [conditionsValues, setConditionsValues] = useState<boolean[]>([])
   const [orderInfo, setOrderInfo] = useState<IOrderItem[]>(orderReviewItems)
   const [paymentInfo, setPaymentInfo] = useState<CardFormView.Details>()
-  const [isStripeReady, setIsStripeReady] = useState<boolean>(false)
   const [isStripeConfigMissing, setIsStripeConfigMissing] = useState(false)
   const [isPaymentRequired, setIsPaymentRequired] = useState(false)
   const [isLoadingFreeRegistration, setIsLoadingFreeRegistration] =
@@ -83,7 +82,6 @@ const Checkout = ({
     if (!orderReview || !paymentInfo) {
       return
     }
-    console.log('handleOnPressPay')
 
     const { addressData } = orderReview
 
@@ -172,10 +170,10 @@ const Checkout = ({
         await fetchOrderReview(hash)
       console.log('orderReviewResponse - data', orderReviewData)
       console.log('orderReviewResponse - error', orderReviewError)
+      setIsLoading(false)
 
       if (orderReviewError || !orderReviewData) {
         setIsStripeConfigMissing(true)
-        setIsLoading(false)
         Alert.alert('', orderReviewError)
         if (onFetchOrderReviewFail) {
           onFetchOrderReviewFail(
@@ -206,7 +204,7 @@ const Checkout = ({
       console.log('orderReviewData.paymentData', orderReviewData.paymentData)
 
       if (orderReview?.reviewData.total !== '0.00') {
-        return setIsPaymentRequired(false)
+        return setIsPaymentRequired(true)
       }
 
       if (!orderReviewData.paymentData?.stripePublishableKey) {
@@ -226,7 +224,6 @@ const Checkout = ({
           publishableKey: orderReviewData.paymentData.stripePublishableKey,
           stripeAccountId: orderReviewData.paymentData.stripeConnectedAccount,
         })
-        setIsStripeReady(true)
       } catch (stripeError) {
         console.log('Stripe Error')
         if (onStripeInitializeError) {
@@ -252,6 +249,13 @@ const Checkout = ({
     return paymentValid && _every(conditionsValues, (item) => item === true)
   }
 
+  console.log(
+    '%cCheckout.tsx line:254 loading',
+    'color: #007acc;',
+    isStripeLoading
+  )
+  console.log('%cCheckout.tsx line:254 isLoading', 'color: #00FFcc;', isLoading)
+
   return (
     <CheckoutView
       orderReviewDataItems={orderInfo}
@@ -259,9 +263,8 @@ const Checkout = ({
       onPressFreeRegistration={handleOnPressFreeRegistration}
       conditions={getConditions()}
       onFormComplete={handleOnChangePaymentInfo}
-      isLoading={isLoading || loading}
+      isLoading={isLoading || isStripeLoading}
       isDataValid={!getIsDataValid()}
-      isStripeReady={isStripeReady}
       isStripeConfigMissing={isStripeConfigMissing}
       styles={styles}
       texts={texts}
