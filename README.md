@@ -6,15 +6,26 @@ React Native library for Ticket Fairy checkout
 
 Configure [ReactNative environment](https://reactnative.dev/docs/environment-setup) for desired platforms (iOS, Android or both).
 
-# Installation [🚧 WIP 🚧]
+### Android
 
-These are not the REAL library names.
+- Android 5.0 (API level 21) and above
+- Android gradle plugin 4.x and above
 
-`yarn add theticketfairy/tf-checkout-react-native`
+### iOS
+
+- Compatible with apps targeting iOS 11 or above.
+
+# Installation
+
+```
+yarn add tf-checkout-react-native
+```
 
 or
 
-`npm install theticketfairy/tf-checkout-react-native`
+```
+npm install tf-checkout-react-native
+```
 
 # Run the example app
 
@@ -26,7 +37,23 @@ or
 5. Run `yarn ios` or `npm run ios` to initialize and run in the iPhone simulator.
 6. If running on Android, run `yarn android` or `npm run android` to run it in the Android emulator or connected physical device.
 
-# Features
+## Android
+
+Add below dependency to your `app/build.gradle` file with specified version (in our example we are using `1.4.0`).
+
+```
+implementation 'com.google.android.material:material:<version>'
+```
+
+Set appropriate style in your styles.xml file.
+
+```
+<style name="Theme.MyApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <!-- ... -->
+</style>
+```
+
+# Features [🚧 WIP 🚧]
 
 This library exports 4 main components:
 
