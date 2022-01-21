@@ -204,31 +204,35 @@ const Checkout = ({
       console.log('orderReviewData.paymentData', orderReviewData.paymentData)
 
       if (orderReview?.reviewData.total !== '0.00') {
-        return setIsPaymentRequired(true)
-      }
+        console.log('orderReview?.reviewData.total !== 000')
 
-      if (!orderReviewData.paymentData?.stripePublishableKey) {
-        if (onStripeInitializeError) {
-          onStripeInitializeError('Stripe is not configured for this event')
+        if (!orderReviewData.paymentData?.stripePublishableKey) {
+          console.log('No stripe key for this event')
+          if (onStripeInitializeError) {
+            onStripeInitializeError('Stripe is not configured for this event')
+          }
+
+          return Alert.alert(
+            'Stripe is not configured for this event',
+            'Please contact support.'
+          )
         }
+
+        setIsPaymentRequired(true)
+
+        try {
+          await initStripe({
+            publishableKey: orderReviewData.paymentData.stripePublishableKey,
+            stripeAccountId: orderReviewData.paymentData.stripeConnectedAccount,
+          })
+        } catch (stripeError) {
+          console.log('Stripe Error')
+          if (onStripeInitializeError) {
+            onStripeInitializeError('Error initializing Stripe')
+          }
+        }
+      } else {
         setIsPaymentRequired(false)
-
-        return Alert.alert(
-          'Stripe is not configured for this event',
-          'Please contact support.'
-        )
-      }
-
-      try {
-        await initStripe({
-          publishableKey: orderReviewData.paymentData.stripePublishableKey,
-          stripeAccountId: orderReviewData.paymentData.stripeConnectedAccount,
-        })
-      } catch (stripeError) {
-        console.log('Stripe Error')
-        if (onStripeInitializeError) {
-          onStripeInitializeError('Error initializing Stripe')
-        }
       }
     }
 
@@ -249,11 +253,6 @@ const Checkout = ({
     return paymentValid && _every(conditionsValues, (item) => item === true)
   }
 
-  console.log(
-    '%cCheckout.tsx line:254 loading',
-    'color: #007acc;',
-    isStripeLoading
-  )
   console.log('%cCheckout.tsx line:254 isLoading', 'color: #00FFcc;', isLoading)
 
   return (

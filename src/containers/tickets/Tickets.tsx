@@ -83,12 +83,6 @@ const Tickets = ({
     } = await fetchTickets(eventId, promoCode)
     setIsGettingTickets(false)
     if (error) {
-      console.log(
-        '%cTickets.tsx line:45 Tickets error',
-        'color: #007acc;',
-        error
-      )
-
       if (onFetchTicketsError) {
         onFetchTicketsError(error)
       }

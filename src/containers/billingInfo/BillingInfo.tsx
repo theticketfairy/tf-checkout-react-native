@@ -465,8 +465,11 @@ const BillingInfo = ({
     if (!accessToken) {
       return
     }
+    setIsLoading(true)
     const { userProfile: userProfileData, error: userDataError } =
       await fetchUserProfile(accessToken)
+    setIsLoading(false)
+
     if (userDataError) {
       await deleteAllData()
       handleOnFetchUserDataFail(userDataError)
@@ -479,7 +482,10 @@ const BillingInfo = ({
   }
 
   const fetchCartAsync = async () => {
+    setIsLoading(true)
     const { data: cartData, error: cartError } = await fetchCart()
+    setIsLoading(false)
+
     if (cartError) {
       Alert.alert('', cartError)
       if (onFetchCartError) {
@@ -549,13 +555,12 @@ const BillingInfo = ({
     const fetchInitialData = async () => {
       setIsLoading(true)
       const tkn = await getData(LocalStorageKeys.ACCESS_TOKEN)
+      setIsLoading(false)
 
       if (tkn) {
         setStoredToken(tkn)
       }
-
       await fetchCartAsync()
-      setIsLoading(false)
     }
     fetchInitialData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -564,9 +569,7 @@ const BillingInfo = ({
   // Fetch userData
   useEffect(() => {
     const fetchUserData = async () => {
-      setIsLoading(true)
       await fetchUserDataAsync(storedToken)
-      setIsLoading(false)
     }
 
     if (ticketHoldersFields.length > 0 && storedToken && !userData) {
@@ -682,13 +685,13 @@ const BillingInfo = ({
       userData,
       isAgeRequired
     )
+    setIsSubmitLoading(false)
 
     if (userData && storedToken) {
       await performCheckout(checkoutBody)
     } else {
       await performNewUserRegister(checkoutBody)
     }
-    setIsSubmitLoading(false)
   }
   //#endregion
 
@@ -728,10 +731,12 @@ const BillingInfo = ({
     checkoutBody: ICheckoutBody,
     pToken?: string
   ) => {
+    setIsLoading(true)
     const { error: checkoutError, data: checkoutData } = await checkoutOrder(
       checkoutBody,
       pToken || storedToken
     )
+    setIsLoading(false)
 
     if (checkoutError) {
       Alert.alert('', checkoutError)
@@ -754,8 +759,10 @@ const BillingInfo = ({
 
   const performNewUserRegister = async (checkoutBody: ICheckoutBody) => {
     const registerForm = getRegisterFormData(checkoutBody)
+    setIsLoading(true)
     const { data: registerResponseData, error: registerResponseError } =
       await registerNewUser(registerForm)
+    setIsLoading(false)
 
     if (registerResponseError) {
       if (registerResponseError.isAlreadyRegistered) {

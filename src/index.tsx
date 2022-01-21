@@ -15,7 +15,6 @@ import { IOnCheckoutSuccess } from './containers/billingInfo/types'
 import { IAddToCartSuccess, ITicketsProps } from './containers/tickets/types'
 
 LogBox.ignoreAllLogs()
-console.reportErrorsAsExceptions = false
 
 export {
   BillingInfo,

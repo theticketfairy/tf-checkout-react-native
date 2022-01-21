@@ -645,7 +645,7 @@ export const postOnFreeRegistration = async (
   orderHash: string
 ): Promise<IFreeRegistrationResponse> => {
   let responseError = ''
-  let responseData: IFreeRegistrationData
+  let responseData: IFreeRegistrationData | undefined
   const res: AxiosResponse | void = await Client.post(
     `v1/order/${orderHash}/complete_free_registration`
   ).catch((error: AxiosError) => {
