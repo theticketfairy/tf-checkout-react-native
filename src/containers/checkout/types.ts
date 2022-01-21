@@ -1,5 +1,5 @@
 import { CardFormView } from '@stripe/stripe-react-native'
-import { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 import { IButtonStyles } from '../../components/button/types'
 import { IFormFieldProps } from '../../components/formField/types'
@@ -18,7 +18,7 @@ export interface ICheckoutStyles {
   payment?: {
     container?: StyleProp<ViewStyle>
     title?: StyleProp<TextStyle>
-    cardBackgroundColor?: StyleProp<ViewStyle> // Only set the background color of the card
+    cardBackgroundColor?: string
     cardContainer?: StyleProp<ViewStyle>
     button?: IButtonStyles
     buttonDisabled?: IButtonStyles

@@ -84,7 +84,9 @@ const CheckoutView = ({
             <CardForm
               onFormComplete={handleOnFormComplete}
               style={[s.card, styles?.payment?.cardContainer]}
-              cardStyle={styles?.payment?.cardBackgroundColor}
+              cardStyle={{
+                backgroundColor: styles?.payment?.cardBackgroundColor,
+              }}
             />
           </View>
         )}
