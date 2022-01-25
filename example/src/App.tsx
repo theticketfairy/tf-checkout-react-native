@@ -1,30 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
-
 import {
-  Tickets,
-  IAddToCartSuccess,
-  IOnCheckoutSuccess,
   BillingInfo,
   Checkout,
-  PurchaseConfirmation,
-  MyOrderDetails,
+  IAddToCartSuccess,
   IMyOrderDetailsResponse,
-  IMyOrdersOrder,
+  IOnCheckoutSuccess,
+  MyOrderDetails,
   MyOrders,
+  PurchaseConfirmation,
+  Tickets,
 } from 'tf-checkout-react-native'
+
 import Color from './Colors'
+import { ComponentEnum } from './enums'
 import styles from './styles'
 
 const EVENT_ID = 5420 // Replace with assigned ID
-enum ComponentEnum {
-  Tickets,
-  BillingInfo,
-  Checkout,
-  PurchaseConfirmation,
-  MyOrders,
-  MyOrderDetails,
-}
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -91,6 +83,7 @@ const App = () => {
   }
   //#endregion
 
+  //#region effects
   useEffect(() => {
     if (cartProps) {
       setComponentToShow(ComponentEnum.BillingInfo)
@@ -114,6 +107,7 @@ const App = () => {
       setComponentToShow(ComponentEnum.MyOrderDetails)
     }
   }, [selectedOrderDetails])
+  //#endregion
 
   const RenderComponent = () => {
     switch (componentToShow) {
