@@ -91,6 +91,7 @@ This is shown once the payment is successfully completed, could show components 
 # Usage [🚧 WIP 🚧]
 
 ## Tickets
+![image](https://user-images.githubusercontent.com/66479719/151049068-450a52d9-dfc8-40bf-b12a-f2555a832c8d.png)
 
 Import the component from the library
 
@@ -214,6 +215,8 @@ Add it to the render function.
 ---
 
 ## MyOrders
+![image](https://user-images.githubusercontent.com/66479719/151049211-5faebe6b-df3b-4785-ac0d-3adb7a3d6699.png)
+
 
 If there is a valid session, there will appear a button to access `MyOrders` in the `Tickets` component.
 
@@ -268,6 +271,8 @@ order: {
 ---
 
 ## MyOrderDetails
+![image](https://user-images.githubusercontent.com/66479719/151049265-ebaabb75-58b1-4b22-bf99-83b1375b1a70.png)
+
 
 When user selects an order from the `MyOrders`component, will show it details.
 
