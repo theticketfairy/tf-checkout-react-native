@@ -1,16 +1,25 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
+import { PermissionsAndroid, Platform } from 'react-native'
 import {
   DocumentDirectoryPath,
+  DownloadDirectoryPath,
   downloadFile,
   DownloadFileOptions,
 } from 'react-native-fs'
 
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import MyOrderDetailsView from './MyOrderDetailsView'
-import { IMyOrderDetailsProps } from './types'
+import { DownloadStatus, IMyOrderDetailsProps } from './types'
+
 const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
+  const [isWriteStorageEnabled, setIsWriteStorageEnabled] = useState<
+    boolean | undefined
+  >(undefined)
   const [isLinkCopied, setIsLinkCopied] = useState(false)
   const [isDownloadingTicket, setIsDownloadingTicket] = useState(false)
+  const [downloadStatus, setDownloadStatus] = useState<
+    DownloadStatus | undefined
+  >(undefined)
 
   const handleOnPressCopyLink = () => {
     setIsLinkCopied(true)
@@ -21,13 +30,16 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
 
   const handleOnPressTicketDownload = async (link: string, hash: string) => {
     const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
-    console.log('handleOnPressTicketDownload - accessToken', accessToken)
     if (!accessToken) {
       return setIsDownloadingTicket(false)
     }
 
     //Define path to store file along with the extension
-    const path = `${DocumentDirectoryPath}/${hash}.pdf`
+    const path =
+      Platform.OS === 'ios'
+        ? `${DocumentDirectoryPath}/${hash}.pdf`
+        : `${DownloadDirectoryPath}/${hash}.pdf`
+
     const headers = {
       Accept: 'application/pdf',
       'Content-Type': 'application/pdf',
@@ -39,16 +51,43 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
       toFile: path,
       headers: headers,
     }
-    const response = await downloadFile(options)
-    return response.promise.then(async (res) => {
-      //Transform response
-      if (res && res.statusCode === 200 && res.bytesWritten > 0) {
-        setIsDownloadingTicket(false)
-      } else {
-        setIsDownloadingTicket(false)
-      }
-    })
+    setIsDownloadingTicket(true)
+    setDownloadStatus('downloading')
+    const response = await downloadFile(options).promise
+
+    setIsDownloadingTicket(false)
+    if (response.statusCode === 200) {
+      setDownloadStatus('downloaded')
+    } else {
+      setDownloadStatus('failed')
+    }
+
+    setTimeout(() => {
+      setDownloadStatus(undefined)
+    }, 5000)
   }
+
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      return
+    }
+
+    PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+    ).then((result) => {
+      setIsWriteStorageEnabled(result)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (isWriteStorageEnabled === false && Platform.OS === 'android') {
+      PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+      ).then((result) => {
+        setIsWriteStorageEnabled(result === 'granted')
+      })
+    }
+  }, [isWriteStorageEnabled])
 
   return (
     <MyOrderDetailsView
@@ -58,7 +97,7 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
       isLinkCopied={isLinkCopied}
       onPressCopyLink={handleOnPressCopyLink}
       onPressTicketDownload={handleOnPressTicketDownload}
-      isDownloadingTicket={isDownloadingTicket}
+      downloadStatus={downloadStatus}
     />
   )
 }

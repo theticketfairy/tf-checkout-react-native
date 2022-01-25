@@ -14,6 +14,7 @@ import {
 import { IMyOrderDetailsTicket } from '../../api/types'
 import { Button } from '../../components'
 import R from '../../res'
+import Notification from './components/Notification'
 import s from './styles'
 import { IMyOrderDetailsView } from './types'
 
@@ -24,7 +25,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
   isLinkCopied,
   onPressCopyLink,
   onPressTicketDownload,
-  isDownloadingTicket,
+  downloadStatus,
 }) => {
   //#region Handlers
   const onCopyLinkHandler = () => {
@@ -196,7 +197,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
         </Text>
 
         <Button
-          isLoading={isDownloadingTicket}
+          isLoading={downloadStatus === 'downloading'}
           text={ticketsDownload}
           styles={{
             text: {
@@ -241,6 +242,9 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
           return null
         }}
       />
+      {(downloadStatus === 'downloaded' || downloadStatus === 'failed') && (
+        <Notification isSuccess={downloadStatus === 'downloaded'} />
+      )}
     </View>
   )
 }

@@ -77,9 +77,11 @@ export interface IMyOrderDetailsProps {
   }
 }
 
+export type DownloadStatus = 'downloading' | 'downloaded' | 'failed'
+
 export interface IMyOrderDetailsView extends IMyOrderDetailsProps {
   isLinkCopied?: boolean
   onPressCopyLink: () => void
   onPressTicketDownload: (link: string, hash: string) => void
-  isDownloadingTicket?: boolean
+  downloadStatus?: DownloadStatus
 }
