@@ -11,19 +11,30 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 - Android 5.0 (API level 21) and above
 - Android gradle plugin 4.x and above
 
+To download the PDFs, add the `WRITE_EXTERNAL_STORAGE` permission to the Android's Manifest file.
+
+```xml
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+```
+
 ### iOS
 
 - Compatible with apps targeting iOS 11 or above.
 
+To download the PDFs, add the following flags to `Info.plist` file:
+
+- UIFileSharingEnabled: Application supports iTunes file sharing
+- LSSupportsOpeningDocumentsInPlace: Supports opening documents in place
+
 # Installation
 
-```
+```node
 yarn add tf-checkout-react-native
 ```
 
 or
 
-```
+```node
 npm install tf-checkout-react-native
 ```
 
@@ -41,13 +52,13 @@ npm install tf-checkout-react-native
 
 Add below dependency to your `app/build.gradle` file with specified version (in our example we are using `1.4.0`).
 
-```
+```java
 implementation 'com.google.android.material:material:<version>'
 ```
 
 Set appropriate style in your styles.xml file.
 
-```
+```xml
 <style name="Theme.MyApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
     <!-- ... -->
 </style>
@@ -106,6 +117,8 @@ Then add it to the render function.
 
 You can then call the `BillingInfo` component and pass them as props in the `cartProps` prop.
 
+---
+
 ## BillingInfo
 
 Import the component from the library
@@ -146,6 +159,8 @@ Add it to the render function.
 
 `hash` and `total` will be used in the `Checkout` component.
 
+---
+
 ## Checkout
 
 Import the component from the library
@@ -173,6 +188,8 @@ Add it to the render function.
 
 `onPaymentSuccess` will handle the success in the payment process. Will return the `hash`.
 
+---
+
 ## PurchaseConfirmation
 
 Import the component from the library
@@ -194,11 +211,130 @@ Add it to the render function.
 
 `onComplete` to handle the completion of the flow. Here you can handle the unmount of the component or navigate to another screen.
 
+---
+
 ## MyOrders
+
+If there is a valid session, there will appear a button to access `MyOrders` in the `Tickets` component.
+
+Import the component from the library.
+
+```js
+import { MyOrders } from 'tf-checkout-react-native'
+```
+
+There is no need to pass any data prop to it.
+
+### Props
+
+`onSelectOrder` handler to know which order the user has selected. Will return an object with following structure:
+
+```js
+order: {
+  header: {
+    isReferralDisabled: boolean
+    shareLink: string
+    total: string
+    salesReferred: string
+  },
+  items: [
+    {
+      name: string
+      currency: string
+      price: string
+      discount: string
+      quantity: string
+      total: string
+    },
+    {...}
+  ],
+  tickets: [
+    {
+      hash: string
+      ticketType: string
+      holderName: string
+      status: string
+      pdfLink: string
+    },
+    {...}
+  ]
+}
+```
+
+`styles` to customize the component look & feel.
+
+`onFetchOrderDetailsFail` if the fetching fails, you can use this to know what happened.
+
+---
 
 ## MyOrderDetails
 
-To be able to open the downloaded file in iOS, you will need to add 2 flags in the info.plist file of your xCode folder.
+When user selects an order from the `MyOrders`component, will show it details.
 
-- UIFileSharingEnabled: Application supports iTunes file sharing
-- LSSupportsOpeningDocumentsInPlace: Supports opening documents in place
+Import the component from the library.
+
+```js
+import { MyOrderDetails } from 'tf-checkout-react-native'
+```
+
+### Props
+
+`data` receives same data as the one of the object received from the `onSelectOrder` handler in `MyOrders`component:
+
+```js
+order: {
+  header: {
+    isReferralDisabled: boolean
+    shareLink: string
+    total: string
+    salesReferred: string
+  },
+  items: [
+    {
+      name: string
+      currency: string
+      price: string
+      discount: string
+      quantity: string
+      total: string
+    },
+    {...}
+  ],
+  tickets: [
+    {
+      hash: string
+      ticketType: string
+      holderName: string
+      status: string
+      pdfLink: string
+    },
+    {...}
+  ]
+}
+```
+
+`styles` optional, to customize the component look & feel.
+`texts` optional, to customize the texts that shows on the labels.
+
+```js
+texts?: {
+  title?: string
+  subTitle?: string
+  referralLink?: string
+  listItem?: {
+    title?: string
+    ticketType?: string
+    price?: string
+    quantity?: string
+    total?: string
+  }
+  ticketItem?: {
+    title?: string
+    ticketId?: string
+    ticketType?: string
+    ticketHolder?: string
+    status?: string
+    download?: string
+  }
+}
+```
