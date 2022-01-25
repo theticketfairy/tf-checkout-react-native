@@ -18,22 +18,22 @@ const Button = ({
 
   return (
     <>
-      {isLoading ? (
-        <View style={[s.button, styles?.container]}>
-          <ActivityIndicator color={R.colors.white} />
-        </View>
-      ) : (
-        <View style={[s.container, styles?.container]}>
-          <TouchableOpacity
-            onPress={onPress}
-            activeOpacity={0.8}
-            style={[isDisabled ? s.buttonDisabled : s.button, styles?.button]}
-            disabled={isDisabled || isLoading}
-          >
+      <View style={[s.container, styles?.container]}>
+        <TouchableOpacity
+          onPress={onPress}
+          activeOpacity={0.8}
+          style={[isDisabled ? s.buttonDisabled : s.button, styles?.button]}
+          disabled={isDisabled || isLoading}
+        >
+          {isLoading ? (
+            <View>
+              <ActivityIndicator color={R.colors.white} size={'small'} />
+            </View>
+          ) : (
             <Text style={[s.text, styles?.text]}>{formatText}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+          )}
+        </TouchableOpacity>
+      </View>
     </>
   )
 }
