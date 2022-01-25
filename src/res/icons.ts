@@ -3,4 +3,5 @@ export default {
   check: require('../../assets/icons/ic_check.png'),
   copy: require('../../assets/icons/ic_copy.png'),
   next: require('../../assets/icons/ic_next.png'),
+  error: require('../../assets/icons/ic_error.png'),
 }
