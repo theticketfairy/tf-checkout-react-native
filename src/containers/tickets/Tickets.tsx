@@ -29,6 +29,7 @@ const Tickets = ({
   isPromoEnabled = true,
   onPressMyOrders,
   onPressLogout,
+  onFetchEventError,
 }: ITicketsProps) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
@@ -54,7 +55,6 @@ const Tickets = ({
   )
 
   //#region Api calls
-
   const retrieveStoredAccessToken = async () => {
     const token = await getData(LocalStorageKeys.ACCESS_TOKEN)
     if (!token) {
@@ -63,8 +63,8 @@ const Tickets = ({
 
     const decodedToken = jwtDecode<{ exp: number }>(token)
     if (decodedToken && decodedToken.exp < Date.now() / 1000) {
-      deleteData(LocalStorageKeys.ACCESS_TOKEN)
-      deleteData(LocalStorageKeys.USER_DATA)
+      await deleteData(LocalStorageKeys.ACCESS_TOKEN)
+      await deleteData(LocalStorageKeys.USER_DATA)
       return setIsUserLogged(false)
     }
     setIsUserLogged(true)
@@ -80,13 +80,12 @@ const Tickets = ({
       isAccessCodeRequired,
     } = await fetchTickets(eventId, promoCode)
     setIsGettingTickets(false)
+
     if (error) {
       if (onFetchTicketsError) {
         onFetchTicketsError(error)
       }
-
-      showError('Error while getting tickets, please try again')
-      return
+      return showError('Error while getting tickets, please try again')
     }
 
     setIsWaitingListVisible(!!isInWaitingList)
@@ -107,11 +106,17 @@ const Tickets = ({
   const getEventData = async () => {
     setIsGettingEvent(true)
     const { eventError, eventData } = await fetchEvent(eventId)
+    setIsGettingEvent(false)
+
     if (eventError) {
+      if (onFetchEventError) {
+        onFetchEventError(
+          eventError || 'There was an error while fetching event'
+        )
+      }
       return Alert.alert('', eventError)
     }
     setEvent(eventData)
-    setIsGettingEvent(false)
   }
 
   const performBookTickets = async () => {
@@ -145,7 +150,6 @@ const Tickets = ({
       eventId,
       data
     )
-
     setIsBooking(false)
 
     if (result) {
@@ -153,11 +157,10 @@ const Tickets = ({
     }
 
     if (addToCartError) {
-      Alert.alert('', addToCartError)
       if (onAddToCartError) {
         onAddToCartError(addToCartError)
       }
-      return
+      return Alert.alert('', addToCartError)
     }
   }
   //#endregion
@@ -209,6 +212,7 @@ const Tickets = ({
       selectedTicket={selectedTicket}
       isBookingTickets={isBooking}
       styles={styles}
+      isGettingEvent={isGettingEvent}
       texts={texts}
       event={event}
       isWaitingListVisible={isWaitingListVisible}

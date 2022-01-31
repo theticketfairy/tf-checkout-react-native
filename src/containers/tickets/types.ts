@@ -85,6 +85,7 @@ export interface ITicketsProps {
   onAddToCartSuccess: (data: IAddToCartSuccess) => void
   onAddToCartError?: (error: any) => void
   onFetchTicketsError?: (error: any) => void
+  onFetchEventError?: (error: string) => void
 
   styles?: ITicketsViewStyles
   texts?: ITicketsViewTexts

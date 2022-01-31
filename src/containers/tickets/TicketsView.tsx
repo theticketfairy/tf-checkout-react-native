@@ -97,7 +97,7 @@ const TicketsView = ({
             onPressLogout={onPressLogout}
           />
         )}
-        {isGettingTickets || (isGettingEvent && <Loading />)}
+        {(isGettingTickets || isGettingEvent) && <Loading />}
       </View>
     </KeyboardAwareScrollView>
   )
