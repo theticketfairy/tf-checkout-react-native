@@ -38,8 +38,6 @@ const TicketsView = ({
     : `Get ${selectedTicket?.selectedOption?.value} tickets`
   const title = texts?.title ? texts.title : 'GET TICKETS'
 
-  console.log('isGetTicketsButtonVisible', isGetTicketsButtonVisible)
-
   return (
     <KeyboardAwareScrollView style={[s.container, styles?.rootContainer]}>
       <View style={[s.container, styles?.container]}>

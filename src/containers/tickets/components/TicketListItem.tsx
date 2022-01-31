@@ -16,7 +16,6 @@ const TicketListItem = ({
   styles,
   texts,
 }: ITicketListItemProps) => {
-  console.log('TICKET', ticket)
   const isSoldOut = ticket.sold_out || !ticket.displayTicket || ticket.soldOut
   const isSalesClosed =
     !ticket.salesStarted || ticket.salesEnded || !_has(ticket, 'maxQuantity')

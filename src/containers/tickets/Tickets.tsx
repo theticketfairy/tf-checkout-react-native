@@ -53,8 +53,6 @@ const Tickets = ({
     (item) => item.salesStarted && !item.salesEnded && !item.soldOut
   )
 
-  console.log('isTicketOnSale', isTicketOnSale)
-
   //#region Api calls
 
   const retrieveStoredAccessToken = async () => {
@@ -148,9 +146,6 @@ const Tickets = ({
       data
     )
 
-    console.log('Add to Cart data', result)
-    console.log('Add to Cart error', addToCartError)
-
     setIsBooking(false)
 
     if (result) {
@@ -201,8 +196,6 @@ const Tickets = ({
   }
   //#endregion
 
-  console.log('PromoCode Response', promoCodeResponse)
-  console.log('EVENT', event)
   return (
     <TicketsView
       eventId={eventId}

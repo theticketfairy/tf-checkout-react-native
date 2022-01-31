@@ -1,24 +1,31 @@
 import React from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 
-import { DropdownListItemStyles as styles } from './styles'
+import { DropdownListItemStyles as s } from './styles'
 import { IDropdownListItemProps } from './types'
 
 const DropdownListItem = ({
   item,
   onSelectItem,
   selectedOption,
+  styles,
 }: IDropdownListItemProps) => {
   const handleOnSelectItem = () => onSelectItem(item)
   const isSelected = !!selectedOption && selectedOption.value === item.value
+  const selectedStyles = [s.buttonSelected, styles?.buttonSelected]
+
+  const buttonStyles = [s.button, styles?.button]
 
   return (
-    <View style={styles.rootContainer}>
+    <View style={[s.rootContainer, styles?.container]}>
       <TouchableOpacity
         onPress={handleOnSelectItem}
-        style={isSelected ? styles.buttonSelected : styles.button}
+        style={isSelected ? selectedStyles : buttonStyles}
       >
-        <Text style={styles.text} numberOfLines={2}>
+        <Text
+          style={[s.text, isSelected ? styles?.textSelected : styles?.text]}
+          numberOfLines={2}
+        >
           {item.label}
         </Text>
       </TouchableOpacity>

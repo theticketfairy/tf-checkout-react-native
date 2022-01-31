@@ -1,6 +1,14 @@
-import { StyleSheet } from 'react-native'
+import { Dimensions, StyleSheet } from 'react-native'
 
 import R from '../../res'
+
+const { width: sWidth, height: sHeight } = Dimensions.get('window')
+
+const DIALOG = {
+  width: sWidth * 0.8,
+  maxHeight: sHeight * 0.5,
+  minHeight: sHeight * 0.2,
+}
 
 export const DropdownStyles = StyleSheet.create({
   rootContainer: {
@@ -38,11 +46,22 @@ export const DropdownStyles = StyleSheet.create({
   dialog: {
     backgroundColor: R.colors.white,
     paddingVertical: 16,
-    minWidth: '40%',
-    maxWidth: '70%',
+    borderRadius: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    maxHeight: '40%',
+    width: DIALOG.width,
+    maxHeight: DIALOG.maxHeight,
+    minHeight: DIALOG.minHeight,
+    shadowColor: R.colors.black,
+    shadowOffset: {
+      width: 3,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
+  flatListContainer: {
+    width: DIALOG.width,
   },
 })
 

@@ -635,14 +635,34 @@ const App = () => {
                     color: Color.textMainOff,
                   },
                   dropdown: {
+                    dialog: {
+                      backgroundColor: Color.backgroundMain,
+                      paddingHorizontal: 0,
+                    },
                     button: {
                       borderColor: Color.white,
+                      backgroundColor: Color.backgroundMain,
                     },
                     label: {
                       color: Color.textMain,
                     },
                     icon: {
                       tintColor: Color.textMain,
+                    },
+                    listItem: {
+                      button: {
+                        width: 100,
+                        backgroundColor: Color.backgroundMain,
+                      },
+                      buttonSelected: {
+                        backgroundColor: Color.white,
+                      },
+                      text: {
+                        color: Color.textMain,
+                      },
+                      textSelected: {
+                        color: Color.backgroundMain,
+                      },
                     },
                   },
                 },
