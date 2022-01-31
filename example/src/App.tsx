@@ -561,7 +561,6 @@ const App = () => {
             eventId={EVENT_ID}
             onAddToCartSuccess={handleOnAddToCartSuccess}
             onPressMyOrders={handleOnPressMyOrders}
-            onPressLogout={handleOnPressLogout}
             styles={{
               container: {
                 backgroundColor: Color.backgroundMain,

@@ -94,5 +94,5 @@ export interface ITicketsProps {
   isAccessCodeEnabled?: boolean
 
   onPressMyOrders: () => void
-  onPressLogout: () => void
+  onPressLogout?: () => void
 }
