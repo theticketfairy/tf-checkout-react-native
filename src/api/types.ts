@@ -9,7 +9,7 @@ export interface IClientRequest extends AxiosInstance {
 }
 
 export interface IPromoCodeResponse {
-  isValid: boolean
+  isValid: boolean | number
   message: string
 }
 

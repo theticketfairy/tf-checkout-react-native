@@ -95,7 +95,10 @@ const Tickets = ({
       setTickets(responseTickets)
       setPromoCodeResponse(promoCodeResult)
 
-      if (!isFirstCall && !promoCodeResult?.isValid) {
+      if (
+        !isFirstCall &&
+        (!promoCodeResult?.isValid || promoCodeResult.isValid === 0)
+      ) {
         Alert.alert('', promoCodeResult?.message)
       }
     }

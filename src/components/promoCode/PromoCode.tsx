@@ -45,8 +45,16 @@ const PromoCode = ({
     button: [s.applyButton, styles?.applyButton?.button],
   }
 
+  const isCodeValid = () => {
+    if (typeof isPromoCodeValid === 'boolean') {
+      return isPromoCodeValid
+    } else if (typeof isPromoCodeValid === 'number') {
+      return isPromoCodeValid > 0
+    }
+  }
+
   const successComponent = () =>
-    isPromoCodeValid && (
+    isCodeValid() && (
       <View style={[s.messageContainer, styles?.messageContainer]}>
         <Text style={styles?.message}>
           {promoCodeValidationMessage ||
