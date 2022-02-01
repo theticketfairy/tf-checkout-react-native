@@ -41,9 +41,6 @@ const CheckoutView = ({
     }
   }
 
-  console.log('isStripeConfigMissing', isStripeConfigMissing)
-  console.log('Is payment req', isPaymentRequired)
-
   const payButtonStyle = isDataValid
     ? styles?.payment?.buttonDisabled
     : styles?.payment?.button
@@ -84,9 +81,6 @@ const CheckoutView = ({
             <CardForm
               onFormComplete={handleOnFormComplete}
               style={[s.card, styles?.payment?.cardContainer]}
-              cardStyle={{
-                backgroundColor: styles?.payment?.cardBackgroundColor,
-              }}
             />
           </View>
         )}

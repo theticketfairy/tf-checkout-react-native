@@ -21,7 +21,8 @@ export default StyleSheet.create({
   },
   card: {
     marginTop: 24,
-    height: 180,
+    minHeight: 250,
+    maxHeight: 350,
     width: '80%',
     borderRadius: 10,
     borderWidth: 2,
