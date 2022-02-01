@@ -307,11 +307,8 @@ const App = () => {
                   color: Color.textMain,
                 },
                 cardContainer: {
-                  backgroundColor: Color.gray10,
+                  backgroundColor: Color.darkGray,
                   borderRadius: 5,
-                },
-                cardBackgroundColor: {
-                  backgroundColor: Color.gray10,
                 },
                 button: {
                   button: {
