@@ -16,7 +16,6 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
     boolean | undefined
   >(undefined)
   const [isLinkCopied, setIsLinkCopied] = useState(false)
-  const [isDownloadingTicket, setIsDownloadingTicket] = useState(false)
   const [downloadStatus, setDownloadStatus] = useState<
     DownloadStatus | undefined
   >(undefined)
@@ -31,7 +30,7 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
   const handleOnPressTicketDownload = async (link: string, hash: string) => {
     const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
     if (!accessToken) {
-      return setIsDownloadingTicket(false)
+      return setDownloadStatus(undefined)
     }
 
     //Define path to store file along with the extension
@@ -51,11 +50,9 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
       toFile: path,
       headers: headers,
     }
-    setIsDownloadingTicket(true)
     setDownloadStatus('downloading')
     const response = await downloadFile(options).promise
 
-    setIsDownloadingTicket(false)
     if (response.statusCode === 200) {
       setDownloadStatus('downloaded')
     } else {
