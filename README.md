@@ -14,7 +14,7 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 To download the PDFs, add the `WRITE_EXTERNAL_STORAGE` permission to the Android's Manifest file.
 
 ```xml
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 ```
 
 ### iOS
@@ -38,17 +38,7 @@ or
 npm install tf-checkout-react-native
 ```
 
-# Run the example app
-
-1. Clone this repo.
-2. In the App.tsx file, update the `EVENT_ID` const with the assigned ID to be able to retrieve data from the server.
-3. cd into the project folder and `yarn` or `npm install`.
-4. cd into the example folder and `yarn` or `npm install`.
-   - If running on iOS, cd into ios folder and `pod install && cd ..`.
-5. Run `yarn ios` or `npm run ios` to initialize and run in the iPhone simulator.
-6. If running on Android, run `yarn android` or `npm run android` to run it in the Android emulator or connected physical device.
-
-## Android
+## Required for Android
 
 Add below dependency to your `app/build.gradle` file with specified version (in our example we are using `1.4.0`).
 
@@ -64,9 +54,19 @@ Set appropriate style in your styles.xml file.
 </style>
 ```
 
+# Run the example app
+
+1. Clone this repo.
+2. In the App.tsx file, update the `EVENT_ID` const with the assigned ID to be able to retrieve data from the server.
+3. cd into the project folder and `yarn` or `npm install`.
+4. cd into the example folder and `yarn` or `npm install`.
+   - If running on iOS, cd into ios folder and `pod install && cd ..`.
+5. Run `yarn ios` or `npm run ios` to initialize and run in the iPhone simulator.
+6. If running on Android, run `yarn android` or `npm run android` to run it in the Android emulator or connected physical device.
+
 # Features [🚧 WIP 🚧]
 
-This library exports 4 main components:
+This library exports the following components:
 
 ## Tickets
 
@@ -88,9 +88,18 @@ TicketFairy doesn't store any card related data, we use [Stripe](https://stripe.
 
 This is shown once the payment is successfully completed, could show components to share the purchase in social media or refer it with friends to get discounts on the purchase.
 
+## My Orders
+
+Will show the purchased orders for the logged user.
+
+## My Order details
+
+Will show the details for the selected Order, it also allows the user to download the Ticket PDF.
+
 # Usage [🚧 WIP 🚧]
 
 ## Tickets
+
 ![image](https://user-images.githubusercontent.com/66479719/151049068-450a52d9-dfc8-40bf-b12a-f2555a832c8d.png)
 
 Import the component from the library
@@ -215,8 +224,8 @@ Add it to the render function.
 ---
 
 ## MyOrders
-![image](https://user-images.githubusercontent.com/66479719/151049211-5faebe6b-df3b-4785-ac0d-3adb7a3d6699.png)
 
+![image](https://user-images.githubusercontent.com/66479719/151049211-5faebe6b-df3b-4785-ac0d-3adb7a3d6699.png)
 
 If there is a valid session, there will appear a button to access `MyOrders` in the `Tickets` component.
 
@@ -271,8 +280,8 @@ order: {
 ---
 
 ## MyOrderDetails
-![image](https://user-images.githubusercontent.com/66479719/151049265-ebaabb75-58b1-4b22-bf99-83b1375b1a70.png)
 
+![image](https://user-images.githubusercontent.com/66479719/151049265-ebaabb75-58b1-4b22-bf99-83b1375b1a70.png)
 
 When user selects an order from the `MyOrders`component, will show it details.
 
