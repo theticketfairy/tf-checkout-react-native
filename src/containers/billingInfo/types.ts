@@ -41,6 +41,9 @@ export interface IBillingInfoProps {
   texts?: IBillingInfoViewTexts
 
   privacyPolicyLinkStyle?: StyleProp<TextStyle>
+
+  onFetchUserProfileFailure?: (error: string) => void
+  onFetchAccessTokenFailure?: (error: string) => void
 }
 
 export interface ITicketHolderField {
@@ -110,7 +113,6 @@ export interface IBillingInfoViewProps {
   isLoading: boolean
   onSubmit: () => void
   onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
-  onLoginFail?: (error: string) => void
   isDataValid: boolean
   isLoginDialogVisible: boolean
   showLoginDialog: () => void
@@ -122,4 +124,8 @@ export interface IBillingInfoViewProps {
 
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
+
+  onLoginFail?: (error: string) => void
+  onFetchUserProfileFailure?: (error: string) => void
+  onFetchAccessTokenFailure?: (error: string) => void
 }

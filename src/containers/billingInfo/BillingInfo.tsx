@@ -59,6 +59,8 @@ const BillingInfo = ({
   styles,
   texts,
   privacyPolicyLinkStyle,
+  onFetchAccessTokenFailure,
+  onFetchUserProfileFailure,
 }: IBillingInfoProps) => {
   //#region Declare state variables
   const [isLoading, setIsLoading] = useState(false)
@@ -670,12 +672,21 @@ const BillingInfo = ({
     if (onLoginFail) {
       onLoginFail(error)
     }
+    return Alert.alert('', error || 'Login failed')
+  }
+
+  const handleOnFetchAccessTokenFailure = (error: string) => {
+    if (onFetchAccessTokenFailure) {
+      onFetchAccessTokenFailure(error)
+    }
+    return Alert.alert('', error || 'Error fetching access token')
   }
 
   const handleOnFetchUserDataFail = (error: string) => {
     if (onFetchUserProfileFail) {
       onFetchUserProfileFail(error)
     }
+    return Alert.alert('', error || 'Error fetching user data')
   }
 
   const handleOnSubmit = async () => {
@@ -685,7 +696,6 @@ const BillingInfo = ({
       userData,
       isAgeRequired
     )
-    setIsSubmitLoading(false)
 
     if (userData && storedToken) {
       await performCheckout(checkoutBody)
@@ -731,12 +741,11 @@ const BillingInfo = ({
     checkoutBody: ICheckoutBody,
     pToken?: string
   ) => {
-    setIsLoading(true)
     const { error: checkoutError, data: checkoutData } = await checkoutOrder(
       checkoutBody,
       pToken || storedToken
     )
-    setIsLoading(false)
+    setIsSubmitLoading(false)
 
     if (checkoutError) {
       Alert.alert('', checkoutError)
@@ -759,10 +768,9 @@ const BillingInfo = ({
 
   const performNewUserRegister = async (checkoutBody: ICheckoutBody) => {
     const registerForm = getRegisterFormData(checkoutBody)
-    setIsLoading(true)
     const { data: registerResponseData, error: registerResponseError } =
       await registerNewUser(registerForm)
-    setIsLoading(false)
+    setIsSubmitLoading(false)
 
     if (registerResponseError) {
       if (registerResponseError.isAlreadyRegistered) {
@@ -812,6 +820,8 @@ const BillingInfo = ({
       onLogoutSuccess={handleOnLogoutSuccess}
       styles={styles}
       texts={texts}
+      onFetchAccessTokenFailure={handleOnFetchAccessTokenFailure}
+      onFetchUserProfileFailure={handleOnFetchUserDataFail}
     />
   )
 }

@@ -53,7 +53,6 @@ const Checkout = ({
 
   //#region Handlers
   const handleOnChangePaymentInfo = (details: CardFormView.Details) => {
-    console.log('handleOnChangePaymentInfo', details)
     setPaymentInfo(details)
   }
 
@@ -98,9 +97,6 @@ const Checkout = ({
         },
       }
     )
-
-    console.log('Payment intent - Data', paymentIntent)
-    console.log('Payment intent - Error', confirmPaymentError)
 
     if (confirmPaymentError || !paymentInfo) {
       if (onCheckoutCompletedFail) {
@@ -168,19 +164,23 @@ const Checkout = ({
     const fetchOrderReviewAsync = async () => {
       const { data: orderReviewData, error: orderReviewError } =
         await fetchOrderReview(hash)
-      console.log('orderReviewResponse - data', orderReviewData)
-      console.log('orderReviewResponse - error', orderReviewError)
       setIsLoading(false)
 
       if (orderReviewError || !orderReviewData) {
         setIsStripeConfigMissing(true)
-        Alert.alert('', orderReviewError)
         if (onFetchOrderReviewFail) {
           onFetchOrderReviewFail(
             orderReviewError || 'Error while getting Order Review'
           )
         }
-        return
+        return Alert.alert(
+          '',
+          orderReviewError || 'Error while getting Order Review'
+        )
+      }
+
+      if (onFetchOrderReviewSuccess) {
+        onFetchOrderReviewSuccess(orderReviewData)
       }
 
       const tOrderInfo = [...orderInfo]
@@ -200,14 +200,8 @@ const Checkout = ({
       setOrderInfo(tOrderInfo)
       setOrderReview(orderReviewData)
 
-      console.log('Order Review Data', orderReviewData.reviewData)
-      console.log('orderReviewData.paymentData', orderReviewData.paymentData)
-
       if (orderReview?.reviewData.total !== '0.00') {
-        console.log('orderReview?.reviewData.total !== 000')
-
         if (!orderReviewData.paymentData?.stripePublishableKey) {
-          console.log('No stripe key for this event')
           if (onStripeInitializeError) {
             onStripeInitializeError('Stripe is not configured for this event')
           }
@@ -226,7 +220,6 @@ const Checkout = ({
             stripeAccountId: orderReviewData.paymentData.stripeConnectedAccount,
           })
         } catch (stripeError) {
-          console.log('Stripe Error')
           if (onStripeInitializeError) {
             onStripeInitializeError('Error initializing Stripe')
           }
@@ -252,8 +245,6 @@ const Checkout = ({
     const paymentValid = paymentInfo?.complete
     return paymentValid && _every(conditionsValues, (item) => item === true)
   }
-
-  console.log('%cCheckout.tsx line:254 isLoading', 'color: #00FFcc;', isLoading)
 
   return (
     <CheckoutView

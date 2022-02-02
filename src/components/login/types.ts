@@ -1,5 +1,5 @@
 import { ImageStyle } from 'react-native'
-import { TextInputProps, TextStyle } from 'react-native'
+import { TextStyle } from 'react-native'
 import { StyleProp, ViewStyle } from 'react-native'
 
 import { IUserProfile } from '../../types'
@@ -9,7 +9,9 @@ import { IInputStyles } from '../input/types'
 
 export interface ILoginProps {
   onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
-  onLoginFailure: () => void
+  onLoginFailure?: (error: string) => void
+  onFetchUserProfileFailure?: (error: string) => void
+  onFetchAccessTokenFailure?: (error: string) => void
   message?: string
   isLoginDialogVisible: boolean
   showLoginDialog: () => void

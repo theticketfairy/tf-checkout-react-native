@@ -23,6 +23,8 @@ const BillingInfoView = ({
   onLogoutSuccess,
   texts,
   styles,
+  onFetchAccessTokenFailure,
+  onFetchUserProfileFailure,
 }: IBillingInfoViewProps) => {
   const renderFormFields = useCallback(() => {
     return _map(formFields, (item, index) => (
@@ -35,7 +37,7 @@ const BillingInfoView = ({
       <View style={s.container}>
         <Login
           onLoginSuccessful={onLoginSuccessful}
-          onLoginFailure={() => {}}
+          onLoginFailure={onLoginFail}
           isLoginDialogVisible={isLoginDialogVisible}
           showLoginDialog={showLoginDialog}
           hideLoginDialog={hideLoginDialog}
@@ -44,6 +46,8 @@ const BillingInfoView = ({
           onLogoutSuccess={onLogoutSuccess}
           texts={texts?.loginTexts}
           styles={styles?.loginStyles}
+          onFetchAccessTokenFailure={onFetchAccessTokenFailure}
+          onFetchUserProfileFailure={onFetchUserProfileFailure}
         />
         {renderFormFields()}
         <Button

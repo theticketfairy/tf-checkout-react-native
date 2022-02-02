@@ -28,6 +28,9 @@ const Login = ({
   onLogoutSuccess,
   texts,
   styles,
+  onLoginFailure,
+  onFetchAccessTokenFailure,
+  onFetchUserProfileFailure,
 }: ILoginProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [userProfileData, setUserProfileData] = useState<IUserProfile>()
@@ -41,7 +44,9 @@ const Login = ({
     const { code, error } = await authorize(bodyFormData)
     if (error || !code) {
       setIsLoading(false)
-      return Alert.alert('', error)
+      if (onLoginFailure) {
+        return onLoginFailure(error || 'Auth error')
+      }
     }
 
     const bodyFormDataToken = new FormData()
@@ -64,7 +69,9 @@ const Login = ({
 
     if (tokenError) {
       setIsLoading(false)
-      return Alert.alert('', tokenError)
+      if (onFetchAccessTokenFailure) {
+        return onFetchAccessTokenFailure(tokenError)
+      }
     }
 
     setAccessTokenHandler(accessToken)
@@ -75,14 +82,18 @@ const Login = ({
 
     if (userProfileError || !userProfile) {
       setIsLoading(false)
-      return Alert.alert('', userProfileError)
+      if (onFetchUserProfileFailure) {
+        return onFetchUserProfileFailure(
+          userProfileError || 'Error fetching user profile'
+        )
+      }
     }
 
     const storedUserData: IStoredUserData = {
-      id: userProfile.id,
-      firstName: userProfile.firstName,
-      lastName: userProfile.lastName,
-      email: userProfile.email,
+      id: userProfile!.id,
+      firstName: userProfile!.firstName,
+      lastName: userProfile!.lastName,
+      email: userProfile!.email,
     }
 
     await storeData(LocalStorageKeys.USER_DATA, JSON.stringify(storedUserData))
