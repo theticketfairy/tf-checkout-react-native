@@ -6,6 +6,8 @@ import { IEvent, ITicket } from '../types'
 export interface IClientRequest extends AxiosInstance {
   setGuestToken: (token: string) => void
   setAccessToken: (token: string) => void
+  setBaseUrl: (baseUrl: string) => void
+  setTimeOut: (timeOut: number) => void
 }
 
 export interface IPromoCodeResponse {

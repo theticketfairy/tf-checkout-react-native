@@ -41,6 +41,7 @@ const HEADERS: { [key: string]: any } = {
 export const Client: IClientRequest = Axios.create({
   baseURL: Constants.BASE_URL,
   headers: HEADERS,
+  timeout: Constants.TIMEOUT,
 }) as IClientRequest
 
 Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
@@ -70,10 +71,9 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 
 Client.interceptors.response.use(
   (response: AxiosResponse) => response,
-  (error: AxiosError) => {
-    console.log('Interceptor error', error.response)
+  async (error: AxiosError) => {
     if (error?.response?.status === 401) {
-      deleteAllData()
+      await deleteAllData()
     }
     return Promise.reject(error)
   }
@@ -84,6 +84,11 @@ Client.setGuestToken = (token: string) =>
 
 Client.setAccessToken = (token: string) =>
   (Client.defaults.headers.common.Authorization = token)
+
+Client.setBaseUrl = (baseUrl: string) =>
+  (Client.defaults.baseURL = baseUrl + '/api')
+
+Client.setTimeOut = (timeOut: number) => (Client.defaults.timeout = timeOut)
 
 export const setCustomHeader = (response: any) => {
   const guestHeaderResponseValue = _get(response, 'headers.authorization-guest')
@@ -110,21 +115,15 @@ export const setAccessTokenHandler = async (accessToken: string) => {
 export const authorize = async (
   data: FormData
 ): Promise<IAuthorizeResponse> => {
-  console.log('Authorize data', data)
   let responseError: string = ''
-  console.log('Authorize', data)
   const response = await Client.post(
     `/v1/oauth/authorize-rn?client_id=${
       Constants.CLIENT_ID || '4792a61f2fcb49197ab4c2d2f44df570'
     }`,
     data
   ).catch((error: AxiosError) => {
-    console.log('SUPER ERROR', error)
     responseError = error?.response?.data.message
   })
-
-  console.log('authorize response', response)
-  console.log('authorize responseError', responseError)
 
   return {
     error: responseError,
@@ -147,7 +146,6 @@ export const fetchAccessToken = async (data: FormData) => {
 }
 
 export const fetchUserProfile = async (accessToken: any) => {
-  console.log('fetchUserProfile', accessToken)
   let responseError
   let userProfile: IUserProfile | undefined
 
@@ -160,11 +158,9 @@ export const fetchUserProfile = async (accessToken: any) => {
       },
     }
   ).catch((error: AxiosError) => {
-    console.log('fetchUserProfile ERROR', error.response)
     responseError = error.message
   })
 
-  console.log('fetchUserProfile - response', response)
   if (!responseError && response) {
     userProfile = response.data.data
   }
@@ -188,7 +184,6 @@ export const registerNewUser = async (
     '/v1/oauth/register-rn',
     data
   ).catch((error: AxiosError) => {
-    console.log('Register new user Error', error.response)
     resultData.error = error.response?.data.message
 
     if (error.response?.data.message.email) {
@@ -201,11 +196,8 @@ export const registerNewUser = async (
     }
   })
 
-  console.log('registerNewUser data', res)
-
   if (res?.status === 200) {
     resultData.data = res.data.data.attributes
-    console.log('registerNewUser resultData', resultData.data)
 
     if (resultData.data?.access_token) {
       await setAccessTokenHandler(resultData.data.access_token)
@@ -226,19 +218,14 @@ export const addToWaitingList = async (
       attributes: values,
     },
   }
-  console.log('addToWaitingList - req', requestData)
-  console.log('addToWaitingList - eventID', id)
 
   let responseError = ''
   const response: AxiosResponse | void = await Client.post(
     `/v1/event/${id}/add_to_waiting_list`,
     requestData
   ).catch((error: AxiosError) => {
-    console.log('addToWaitingList - error', error.response)
     responseError = error.response?.data.message
   })
-
-  console.log('addToWaitingList - data', response?.data)
 
   return {
     addToWaitingListError: responseError,
@@ -261,7 +248,6 @@ export const fetchMyOrders = async (
   const response: AxiosResponse | void = await Client.get(
     `/v1/account/orders/?page=${page}&limit=${limit}&filter[event]=${filter}`
   ).catch((error: AxiosError) => {
-    console.log('myorders ERROR', error)
     responseError = error.response?.data.message || 'Error fetching My Orders'
   })
 
@@ -269,9 +255,6 @@ export const fetchMyOrders = async (
     data.events = response.data.data.attributes.purchased_events
     data.orders = response.data.data.attributes.orders
   }
-
-  console.log('RESPONSE MY ORDERs', response)
-  console.log('RESPONSE MY responseError', responseError)
 
   return {
     myOrdersError: responseError,
@@ -292,7 +275,6 @@ export const fetchOrderDetails = async (orderId: string) => {
 
   if (!responseError && response) {
     const { attributes } = response.data.data
-    console.log('RESPONSe', response)
     const items: IMyOrderDetailsItem[] = _map(
       attributes.items.ticket_types,
       (item) => {
@@ -349,7 +331,6 @@ export const fetchTickets = async (
     'Promotion-Code': promoCode,
   }
 
-  console.log('Fetch tickets promocode', promoCode)
   let responseError
 
   if (!promoCode) {
@@ -359,15 +340,17 @@ export const fetchTickets = async (
     delete headers['Promotion-Code']
   }
 
-  console.log('Fetch tickets headers', headers)
-
   const response = await Client.get(`v1/event/${id}/tickets/`, {
     headers: headers,
   }).catch((error: AxiosError) => {
+    console.log('isFetchTicketsResponse errr', error.response)
+
     responseError = error.response?.data.message
   })
 
-  console.log('Tickets response', response)
+  console.log('isFetchTicketsResponse', response)
+
+  console.log('Response tickets', response)
 
   const attributes = _get(response, 'data.data.attributes.tickets')
   const ticketsAttributes = _filter(
@@ -378,6 +361,8 @@ export const fetchTickets = async (
     message: _get(response, 'data.data.attributes.PromoCodeValidationMessage'),
     isValid: _get(response, 'data.data.attributes.ValidPromoCode'),
   }
+
+  console.log('Tickets promoCodeResult', promoCodeResult)
 
   const tickets = (Object.values(ticketsAttributes) || []) as ITicket[]
   const guestHeaderValue = _get(response, 'headers.authorization-guest')
@@ -395,7 +380,6 @@ export const fetchTickets = async (
 }
 
 export const addToCart = async (id: string | number, data: any) => {
-  console.log('Add to cart with data', data)
   let responseError
   let responseData
   const response: AxiosResponse | void = await Client.post(
@@ -426,7 +410,6 @@ export const addToCart = async (id: string | number, data: any) => {
 export const fetchEvent = async (
   id: string | number
 ): Promise<IEventResponse> => {
-  console.log('fetchEvent - ID', id)
   let responseError: string | undefined
   let event: IEvent | undefined
   const response: AxiosResponse | void = await Client.get(`v1/event/${id}`, {
@@ -436,10 +419,11 @@ export const fetchEvent = async (
     responseError = error.response?.data.message
   })
 
+  console.log('isFetchEVENT Response', response)
+
   if (response?.status === 200) {
     event = response.data.data.attributes
   }
-  console.log('fetchEvent - Response', response)
 
   return {
     eventError: responseError,
@@ -562,7 +546,6 @@ export const fetchOrderReview = async (
   const response: AxiosResponse | void = await Client.get(
     `v1/order/${hash}/review/`
   ).catch((error: AxiosError) => {
-    console.log('Fetching Order Review Error', error)
     responseError = error.response?.data.message
   })
 
@@ -651,7 +634,6 @@ export const postOnFreeRegistration = async (
   ).catch((error: AxiosError) => {
     responseError = error.response?.data.message
   })
-  console.log('postOnFreeRegistration', res)
 
   if (res?.data) {
     const orderDetails = res.data.data.attributes.order_details

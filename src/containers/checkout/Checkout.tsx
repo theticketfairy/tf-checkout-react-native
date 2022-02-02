@@ -68,8 +68,10 @@ const Checkout = ({
       await postOnFreeRegistration(hash)
     setIsLoadingFreeRegistration(false)
     if (freeRegistrationError) {
-      if (onPaymentError) onPaymentError(freeRegistrationError)
-      return Alert.alert('', freeRegistrationError)
+      if (onPaymentError) {
+        onPaymentError(freeRegistrationError || 'Error while registering')
+      }
+      return Alert.alert('', freeRegistrationError || 'Error while registering')
     }
 
     if (onPaymentSuccess) {
@@ -118,7 +120,10 @@ const Checkout = ({
       if (onPaymentError) {
         onPaymentError(onPaymentSuccessError)
       }
-      return Alert.alert('', onPaymentSuccessError)
+      return Alert.alert(
+        '',
+        onPaymentSuccessError || 'Error while performing payment'
+      )
     }
 
     if (onPaymentSuccess) {
@@ -147,11 +152,13 @@ const Checkout = ({
         await fetchEventConditions(eventId.toString())
 
       if (conditionsError) {
-        Alert.alert('', conditionsError)
         if (onFetchEventConditionsFail) {
           onFetchEventConditionsFail(conditionsError)
         }
-        return
+        return Alert.alert(
+          '',
+          conditionsError || 'Error while fetching conditions'
+        )
       }
 
       setConditionsValues(_map(conditionsData, () => false))
