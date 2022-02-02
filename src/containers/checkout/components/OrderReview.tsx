@@ -21,6 +21,7 @@ const OrderReview = ({ orderItems, styles }: IOrderReviewProps) => (
   <View style={[s.rootContainer, styles?.rootContainer]}>
     {_map(orderItems, (item) => (
       <OrderItem
+        key={`orderReview.${item.id}`}
         id={item.id}
         title={item.title}
         value={item.value}
