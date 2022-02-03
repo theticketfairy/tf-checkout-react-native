@@ -306,10 +306,6 @@ const App = () => {
                 title: {
                   color: Color.textMain,
                 },
-                cardContainer: {
-                  backgroundColor: Color.darkGray,
-                  borderRadius: 5,
-                },
                 button: {
                   button: {
                     backgroundColor: Color.primary,
@@ -555,6 +551,9 @@ const App = () => {
       default:
         return (
           <Tickets
+            config={{
+              DOMAIN: 'https://houseofx.nyc',
+            }}
             eventId={EVENT_ID}
             onAddToCartSuccess={handleOnAddToCartSuccess}
             onPressMyOrders={handleOnPressMyOrders}

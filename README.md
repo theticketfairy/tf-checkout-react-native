@@ -114,6 +114,8 @@ Then add it to the render function.
 <Tickets eventId={EVENT_ID} onAddToCartSuccess={handleOnAddToCartSuccess} />
 ```
 
+## Props
+
 `eventId` is required in order to fetch the tickets from this event.
 `onAddToCartSuccess` is called after the Add to Cart was completed successfully, it will return the following data:
 
@@ -126,6 +128,25 @@ Then add it to the render function.
 ```
 
 You can then call the `BillingInfo` component and pass them as props in the `cartProps` prop.
+
+`config` set your event's configuration, with the following options:
+
+```js
+{
+  DOMAIN?: string
+  BASE_URL?: string
+  CLIENT_ID?: string
+  TIMEOUT?: number
+}
+```
+
+`DOMAIN` Specify your domains name example: `https://google.com` this is important to maintain cart session active and prevent it from expiring when user login in the BillingInfo component.
+
+`BASE_URL` If our dev team gives you a custom BASE_URL.
+
+`CLIENT_ID` Set your CLIENT_ID.
+
+`TIMEOUT` Set custom timeout for the APIs requests.
 
 ---
 
@@ -156,7 +177,7 @@ Add it to the render function.
 }
 ```
 
-`onCheckoutSuccess` will be called when the user completes all the data required in the form. Will return the following data:
+`onCheckoutSuccess` will be called when the user completes all the data required in the form and taps on the button. Will return the following data:
 
 ```js
 {

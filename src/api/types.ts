@@ -8,6 +8,7 @@ export interface IClientRequest extends AxiosInstance {
   setAccessToken: (token: string) => void
   setBaseUrl: (baseUrl: string) => void
   setTimeOut: (timeOut: number) => void
+  setDomain: (domain: string) => void
 }
 
 export interface IPromoCodeResponse {

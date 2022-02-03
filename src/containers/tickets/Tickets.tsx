@@ -8,6 +8,7 @@ import { Alert } from 'react-native'
 
 import { addToCart, fetchEvent, fetchTickets } from '../../api/ApiClient'
 import { IPromoCodeResponse } from '../../api/types'
+import { Wrapper } from '../../components'
 import {
   deleteAllData,
   deleteData,
@@ -30,6 +31,7 @@ const Tickets = ({
   onPressMyOrders,
   onPressLogout,
   onFetchEventError,
+  config,
 }: ITicketsProps) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
@@ -203,29 +205,31 @@ const Tickets = ({
   //#endregion
 
   return (
-    <TicketsView
-      eventId={eventId}
-      isGettingTickets={isGettingTickets}
-      tickets={tickets}
-      onPressGetTickets={handleOnPressGetTickets}
-      onPressApplyPromoCode={handleOnPressApplyPromoCode}
-      promoCodeValidationMessage={promoCodeResponse?.message}
-      isPromoCodeValid={promoCodeResponse?.isValid}
-      onSelectTicketOption={handleOnSelectTicketOption}
-      selectedTicket={selectedTicket}
-      isBookingTickets={isBooking}
-      styles={styles}
-      isGettingEvent={isGettingEvent}
-      texts={texts}
-      event={event}
-      isWaitingListVisible={isWaitingListVisible}
-      isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
-      isAccessCodeEnabled={isAccessCodeEnabled || isAccessCode}
-      isPromoEnabled={isPromoEnabled}
-      isUserLogged={isUserLogged}
-      onPressMyOrders={onPressMyOrders}
-      onPressLogout={handleOnLogout}
-    />
+    <Wrapper config={config}>
+      <TicketsView
+        eventId={eventId}
+        isGettingTickets={isGettingTickets}
+        tickets={tickets}
+        onPressGetTickets={handleOnPressGetTickets}
+        onPressApplyPromoCode={handleOnPressApplyPromoCode}
+        promoCodeValidationMessage={promoCodeResponse?.message}
+        isPromoCodeValid={promoCodeResponse?.isValid}
+        onSelectTicketOption={handleOnSelectTicketOption}
+        selectedTicket={selectedTicket}
+        isBookingTickets={isBooking}
+        styles={styles}
+        isGettingEvent={isGettingEvent}
+        texts={texts}
+        event={event}
+        isWaitingListVisible={isWaitingListVisible}
+        isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
+        isAccessCodeEnabled={isAccessCodeEnabled || isAccessCode}
+        isPromoEnabled={isPromoEnabled}
+        isUserLogged={isUserLogged}
+        onPressMyOrders={onPressMyOrders}
+        onPressLogout={handleOnLogout}
+      />
+    </Wrapper>
   )
 }
 

@@ -25,7 +25,6 @@ export default StyleSheet.create({
     maxHeight: 350,
     width: '80%',
     borderRadius: 10,
-    borderWidth: 2,
     padding: 8,
     alignSelf: 'center',
   },

@@ -2,22 +2,37 @@ import _forEach from 'lodash/forEach'
 
 import { Client } from '../api/ApiClient'
 
-interface IConfig {
-  BASE_URL: string
-  CLIENT_ID: string
-  CLIENT_SECRET: string
-  STRIPE_PUBLISHABLE_KEY: string
-  TIMEOUT: number
+export interface IConfig {
+  DOMAIN?: string
+  BASE_URL?: string
+  CLIENT_ID?: string
+  TIMEOUT?: number
 
-  [key: string]: string | number
+  [key: string]: string | number | undefined
 }
 
-export const CONFIGS: IConfig = {} as IConfig
+export const Config: IConfig = {} as IConfig
 
-export const setConfig = (configs: IConfig) => {
+export const setConfig = (configs: IConfig): string | undefined => {
   _forEach(configs, (value, key) => {
-    CONFIGS[key] = value
+    Config[key] = value
   })
 
-  Client.setBaseUrl(CONFIGS.BASE_URL)
+  if (Config.BASE_URL) {
+    Client.setBaseUrl(Config.BASE_URL)
+  }
+
+  if (Config.TIMEOUT) {
+    Client.setTimeOut(Config.TIMEOUT)
+  }
+
+  if (Config.DOMAIN) {
+    Client.setDomain(Config.DOMAIN)
+  }
+
+  if (Config.CLIENT_ID) {
+    Client.setDomain(Config.CLIENT_ID)
+  }
+
+  return undefined
 }

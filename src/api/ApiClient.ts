@@ -5,6 +5,7 @@ import _map from 'lodash/map'
 import _sortBy from 'lodash/sortBy'
 
 import { IWaitingListFields } from '../components/waitingList/types'
+import { Config } from '../helpers/Config'
 import {
   deleteAllData,
   getData,
@@ -66,6 +67,18 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
     config.headers = updatedHeaders
   }
 
+  if (Config.DOMAIN) {
+    const updatedHeaders = {
+      ...config.headers,
+      origin: Config.DOMAIN,
+    }
+    config.headers = updatedHeaders
+  }
+
+  if (Config.BASE_URL) {
+    config.baseURL = Config.BASE_URL + '/api'
+  }
+
   return config
 })
 
@@ -74,6 +87,7 @@ Client.interceptors.response.use(
   async (error: AxiosError) => {
     if (error?.response?.status === 401) {
       await deleteAllData()
+      error.message = error.response.data.error_description
     }
     return Promise.reject(error)
   }
@@ -90,6 +104,12 @@ Client.setBaseUrl = (baseUrl: string) =>
 
 Client.setTimeOut = (timeOut: number) => (Client.defaults.timeout = timeOut)
 
+Client.setDomain = (domain: string) =>
+  (Client.defaults.headers = {
+    ...Client.defaults.headers,
+    origin: domain,
+  })
+
 export const setCustomHeader = (response: any) => {
   const guestHeaderResponseValue = _get(response, 'headers.authorization-guest')
 
@@ -101,7 +121,7 @@ export const setCustomHeader = (response: any) => {
   const guestHeader = guestHeaderResponseValue || guestHeaderExistingValue
 
   if (guestHeader) {
-    storeData(LocalStorageKeys.AUTH_GUEST_TOKEN, guestHeaderResponseValue)
+    storeData(LocalStorageKeys.AUTH_GUEST_TOKEN, guestHeader)
     Client.setGuestToken(guestHeader)
   }
 }
@@ -343,14 +363,8 @@ export const fetchTickets = async (
   const response = await Client.get(`v1/event/${id}/tickets/`, {
     headers: headers,
   }).catch((error: AxiosError) => {
-    console.log('isFetchTicketsResponse errr', error.response)
-
     responseError = error.response?.data.message
   })
-
-  console.log('isFetchTicketsResponse', response)
-
-  console.log('Response tickets', response)
 
   const attributes = _get(response, 'data.data.attributes.tickets')
   const ticketsAttributes = _filter(
@@ -361,8 +375,6 @@ export const fetchTickets = async (
     message: _get(response, 'data.data.attributes.PromoCodeValidationMessage'),
     isValid: _get(response, 'data.data.attributes.ValidPromoCode'),
   }
-
-  console.log('Tickets promoCodeResult', promoCodeResult)
 
   const tickets = (Object.values(ticketsAttributes) || []) as ITicket[]
   const guestHeaderValue = _get(response, 'headers.authorization-guest')
@@ -415,11 +427,8 @@ export const fetchEvent = async (
   const response: AxiosResponse | void = await Client.get(`v1/event/${id}`, {
     headers: HEADERS,
   }).catch((error: AxiosError) => {
-    console.log('fetchEvent - ERROR', error.response)
     responseError = error.response?.data.message
   })
-
-  console.log('isFetchEVENT Response', response)
 
   if (response?.status === 200) {
     event = response.data.data.attributes
@@ -440,9 +449,6 @@ export const fetchCountries = async () => {
       responseError = error.response?.data.message
     }
   )
-
-  console.log('fetchCountries - res', response)
-  console.log('fetchCountries - error', responseError)
 
   if (response?.status === 200) {
     setCustomHeader(response)
@@ -466,9 +472,6 @@ export const fetchStates = async (countryId: string) => {
     setCustomHeader(response)
   }
 
-  console.log('fetchStates - res', response)
-  console.log('fetchStates - error', responseError)
-
   return {
     error: responseError,
     data: response?.data?.data,
@@ -483,8 +486,6 @@ export const fetchCart = async () => {
     }
   )
 
-  console.log('fetchCart - error', responseError)
-  console.log('fetchCart - response', res)
   return {
     error: responseError,
     data: res?.data.data.attributes.cart[0],
@@ -495,8 +496,6 @@ export const checkoutOrder = async (
   data: any,
   accessToken: string
 ): Promise<ICheckoutResponse> => {
-  console.log('Checkout Order Data', data)
-  console.log('Checkout Order Access Token', accessToken)
   let responseError = ''
   const res: AxiosResponse | void = await Client.post(
     'v1/on-checkout/',
@@ -508,11 +507,8 @@ export const checkoutOrder = async (
       },
     }
   ).catch((error: AxiosError) => {
-    console.log('Checkout Order Error', error.response)
     responseError = error.response?.data.message
   })
-
-  console.log('Checkout Order Response', res)
 
   return {
     error: responseError,
@@ -530,8 +526,6 @@ export const fetchEventConditions = async (eventId: string) => {
     responseError = error.response?.data
   })
 
-  console.log('getConditions response', response)
-
   return {
     error: responseError,
     data: response?.data?.data.attributes,
@@ -542,7 +536,7 @@ export const fetchOrderReview = async (
   hash: string
 ): Promise<IOrderReviewResponse> => {
   let responseError = ''
-  console.log(`Fetching Order Review with hash ${hash}`)
+
   const response: AxiosResponse | void = await Client.get(
     `v1/order/${hash}/review/`
   ).catch((error: AxiosError) => {
@@ -552,8 +546,6 @@ export const fetchOrderReview = async (
   let resData: IOrderReview | undefined
 
   if (!responseError) {
-    console.log('fetch order review - Error', responseError)
-    console.log('fetch order review - Data', response)
     const attributes = _get(response, 'data.data.attributes')
     const { cart, order_details, payment_method, billing_info } = attributes
 
@@ -606,17 +598,13 @@ export const fetchOrderReview = async (
 }
 
 export const postOnPaymentSuccess = async (orderHash: string) => {
-  console.log('postOnPaymentSuccess - HASH', orderHash)
   let responseError: string = ''
   const response: AxiosResponse | void = await Client.post(
     `v1/order/${orderHash}/success`
   ).catch((error: AxiosError) => {
-    console.log('postOnPaymentSuccess - ERROR RAW', error)
     responseError =
       error.response?.data.message || 'Error while notifying Payment Success'
   })
-  console.log('postOnPaymentSuccess - ERROR', responseError)
-  console.log('postOnPaymentSuccess - DATA', response)
 
   return {
     error: responseError,
@@ -654,16 +642,12 @@ export const postOnFreeRegistration = async (
 
 //#region Purchase Confirmation
 export const fetchPurchaseConfirmation = async (orderHash: string) => {
-  console.log('fetchPurchaseConfirmation with hash', orderHash)
   let responseError
   const response: AxiosResponse | void = await Client.get(
     `/v1/order/${orderHash}/payment/complete`
   ).catch((error: AxiosError) => {
     responseError = error.response?.data.message
   })
-
-  console.log('fetchPurchaseConfirmation - responseError', responseError)
-  console.log('fetchPurchaseConfirmation - response', response)
 
   return {
     error: responseError,
