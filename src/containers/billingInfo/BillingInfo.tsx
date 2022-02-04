@@ -457,6 +457,8 @@ const BillingInfo = ({
 
     if (sStateItem) {
       setFormData({ ...formData, state: sStateItem! })
+    } else {
+      setFormData({ ...formData, state: states[0] })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [states, userData?.state])
@@ -547,6 +549,9 @@ const BillingInfo = ({
     const parsedStates: IDropdownItem[] = _map(statesData, (item, index) => {
       return { label: item, value: index }
     })
+
+    parsedStates.unshift({ label: 'State / County', value: '-1' })
+
     setStates(parsedStates)
   }
   //#endregion
@@ -592,7 +597,7 @@ const BillingInfo = ({
     }
   }, [userData, countries])
 
-  //Once Countries is fullfilled, useEffect to set Country item.
+  //Once Countries is fulfilled, useEffect to set Country item.
   useEffect(() => {
     setSelectedCountry()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -645,6 +650,7 @@ const BillingInfo = ({
       zipCode: userProfile.zipCode,
       city: userProfile.city,
       ticketHoldersFields: newTicketHolderFields,
+      isSubToMarketing: true,
     })
   }
 
@@ -714,7 +720,8 @@ const BillingInfo = ({
       validateEmpty(street) ||
       validateEmpty(phone) ||
       validateEmpty(city) ||
-      validateEmpty(zipCode)
+      validateEmpty(zipCode) ||
+      !isSubToMarketing
     ) {
       return false
     }
