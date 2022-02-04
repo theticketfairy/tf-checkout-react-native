@@ -98,7 +98,9 @@ const App = () => {
 
   useEffect(() => {
     if (isPaymentSuccess) {
-      setComponentToShow(ComponentEnum.PurchaseConfirmation)
+      setTimeout(() => {
+        setComponentToShow(ComponentEnum.PurchaseConfirmation)
+      }, 250)
     }
   }, [isPaymentSuccess])
 
