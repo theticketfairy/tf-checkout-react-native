@@ -1,4 +1,6 @@
+// ts-nocheck
 import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
+import axiosRetry from 'axios-retry'
 import _filter from 'lodash/filter'
 import _get from 'lodash/get'
 import _map from 'lodash/map'
@@ -44,6 +46,8 @@ export const Client: IClientRequest = Axios.create({
   headers: HEADERS,
   timeout: Constants.TIMEOUT,
 }) as IClientRequest
+
+axiosRetry(Client, { retries: 3 })
 
 Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
   const guestToken = await getData(LocalStorageKeys.AUTH_GUEST_TOKEN)
