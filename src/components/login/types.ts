@@ -16,13 +16,14 @@ export interface ILoginProps {
   isLoginDialogVisible: boolean
   showLoginDialog: () => void
   hideLoginDialog: () => void
-  userProfileProp?: IUserProfile
 
   onLogoutSuccess?: () => void
   onLogoutFail?: () => void
 
   styles?: ILoginViewStyles
   texts?: ILoginViewTexts
+
+  userFirstName?: string
 }
 
 export interface ILoginViewStyles {
@@ -81,6 +82,9 @@ export interface ILoginViewProps {
 
   styles?: ILoginViewStyles
   texts?: ILoginViewTexts
+
+  loginError?: string
+  userFirstName?: string
 }
 
 export interface ILoginViewState {

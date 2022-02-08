@@ -21,6 +21,31 @@ export interface IOnCheckoutSuccess {
   status: string
 }
 
+export interface IBillingProps {
+  cartProps: IAddToCartSuccess
+  onRegisterSuccess?: (tokens: ITokens) => void
+  onRegisterFail?: (error: string) => void
+
+  onCheckoutSuccess: (data: IOnCheckoutSuccess) => void
+  onCheckoutFail?: (error: string) => void
+
+  onLoginSuccess: (data: any) => void
+  onLoginFail?: (error: string) => void
+
+  onFetchUserProfileSuccess?: (data: any) => void
+  onFetchUserProfileFail?: (error: any) => void
+
+  onFetchCartError?: (error: string) => void
+
+  privacyPolicyLinkStyle?: StyleProp<TextStyle>
+
+  onFetchUserProfileFailure?: (error: string) => void
+  onFetchAccessTokenFailure?: (error: string) => void
+
+  styles?: IBillingInfoViewStyles
+  texts?: IBillingInfoViewTexts
+}
+
 export interface IBillingInfoProps {
   cartProps: IAddToCartSuccess
   onRegisterSuccess?: (tokens: ITokens) => void

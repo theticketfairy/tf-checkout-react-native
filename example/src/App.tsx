@@ -10,13 +10,14 @@ import {
   MyOrders,
   PurchaseConfirmation,
   Tickets,
+  Billing,
 } from 'tf-checkout-react-native'
 
 import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles from './styles'
 
-const EVENT_ID = 5420 // Replace with assigned ID
+const EVENT_ID = 10690 // Replace with assigned ID
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -114,7 +115,9 @@ const App = () => {
   const RenderComponent = () => {
     switch (componentToShow) {
       case ComponentEnum.BillingInfo:
-        return (
+        return 1 === 1 ? (
+          <Billing />
+        ) : (
           <BillingInfo
             cartProps={cartProps!}
             onLoginSuccess={handleOnLoginSuccess}

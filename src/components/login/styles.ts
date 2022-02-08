@@ -38,6 +38,7 @@ export default StyleSheet.create({
   loginButton: {
     height: 45,
     width: '100%',
+    marginTop: 16,
   },
   brand: {
     width: '80%',
@@ -48,5 +49,9 @@ export default StyleSheet.create({
   message: {
     marginBottom: 24,
     marginTop: -8,
+  },
+  error: {
+    color: R.colors.danger,
+    fontWeight: '600',
   },
 })
