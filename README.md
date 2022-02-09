@@ -219,6 +219,8 @@ Add it to the render function.
 
 `onPaymentSuccess` will handle the success in the payment process. Will return the `hash`.
 
+If the you need to modify the card container, use the `styles.payment.cardContainer` prop. Useful if the card is to short and the zip code is not visible.
+
 ---
 
 ## PurchaseConfirmation

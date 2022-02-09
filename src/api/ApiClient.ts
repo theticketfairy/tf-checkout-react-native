@@ -51,10 +51,9 @@ axiosRetry(Client, { retries: 3 })
 
 Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
   const guestToken = await getData(LocalStorageKeys.AUTH_GUEST_TOKEN)
-  const userData = await getData(LocalStorageKeys.USER_DATA)
   const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
 
-  if (userData && accessToken) {
+  if (accessToken) {
     const updatedHeaders = {
       ...config.headers,
       Authorization: `Bearer ${accessToken}`,

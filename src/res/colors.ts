@@ -13,6 +13,7 @@ const lightTheme = {
   danger: '#D9534F',
   listBackground: 'rgba(0,0,0,0.1)',
   validGreen: '#139679',
+  fff: '#fff',
 }
 
 const darkTheme = {
@@ -26,6 +27,7 @@ const darkTheme = {
   danger: '#D9534F',
   listBackground: 'rgba(0,0,0,0.1)',
   validGreen: '#139679',
+  fff: '#fff',
 }
 
 const currentTheme = isDark ? darkTheme : lightTheme

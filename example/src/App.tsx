@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
-  BillingInfo,
   Checkout,
   IAddToCartSuccess,
   IMyOrderDetailsResponse,
@@ -10,7 +9,7 @@ import {
   MyOrders,
   PurchaseConfirmation,
   Tickets,
-  Billing,
+  BillingInfo,
 } from 'tf-checkout-react-native'
 
 import Color from './Colors'
@@ -46,6 +45,7 @@ const App = () => {
   const handleOnFetchUserProfileSuccess = () => {}
 
   const handleOnCheckoutSuccess = (data: IOnCheckoutSuccess) => {
+    console.log('handleOnCheckoutSuccess', handleOnCheckoutSuccess)
     setCheckOutProps(data)
   }
 
@@ -115,27 +115,35 @@ const App = () => {
   const RenderComponent = () => {
     switch (componentToShow) {
       case ComponentEnum.BillingInfo:
-        return 1 === 1 ? (
-          <Billing />
-        ) : (
+        return (
           <BillingInfo
-            cartProps={cartProps!}
-            onLoginSuccess={handleOnLoginSuccess}
-            onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}
-            onCheckoutSuccess={handleOnCheckoutSuccess}
             privacyPolicyLinkStyle={{
               color: Color.primary,
             }}
             styles={{
+              rootContainer: {
+                marginHorizontal: 24,
+                marginBottom: 50,
+              },
               customCheckbox: {
                 text: {
+                  flex: 1,
                   color: Color.textMain,
+                },
+                container: {
+                  width: '100%',
                 },
               },
               passwordTitle: {
                 color: Color.textMain,
+                fontSize: 20,
+                fontWeight: '700',
+                marginBottom: 16,
               },
               checkboxStyles: {
+                container: {
+                  width: '100%',
+                },
                 text: {
                   color: Color.textMain,
                 },
@@ -164,14 +172,27 @@ const App = () => {
                 },
               },
               headers: {
+                fontSize: 28,
+                fontWeight: '800',
+                marginBottom: 16,
                 color: Color.textMain,
               },
               texts: {
                 color: Color.textMain,
+                fontSize: 14,
+                marginBottom: 16,
               },
               dropdownStyles: {
+                container: {
+                  width: '100%',
+                  marginBottom: 32,
+                },
                 button: {
                   borderColor: Color.white,
+                  width: '100%',
+                  height: 50,
+                  borderRadius: 5,
+                  borderWidth: 1,
                 },
                 label: {
                   color: Color.textMain,
@@ -182,6 +203,9 @@ const App = () => {
               },
               titles: {
                 color: Color.textMain,
+                fontSize: 20,
+                fontWeight: '700',
+                marginBottom: 16,
               },
               inputStyles: {
                 input: {
@@ -190,6 +214,9 @@ const App = () => {
                 baseColor: Color.white,
               },
               loginStyles: {
+                message: {
+                  color: Color.textMain,
+                },
                 guest: {
                   line1: {
                     color: Color.textMain,
@@ -257,6 +284,10 @@ const App = () => {
                 },
               },
             }}
+            cartProps={cartProps!}
+            onCheckoutSuccess={handleOnCheckoutSuccess}
+            onLoginSuccess={handleOnLoginSuccess}
+            onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}
           />
         )
       case ComponentEnum.Checkout:

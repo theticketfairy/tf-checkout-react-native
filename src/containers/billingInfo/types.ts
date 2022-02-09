@@ -1,4 +1,4 @@
-import { StyleProp, TextStyle } from 'react-native'
+import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 import { IButtonStyles } from '../../components/button/types'
 import { ICheckboxStyles } from '../../components/checkbox/types'
@@ -78,6 +78,11 @@ export interface ITicketHolderField {
   phone: string
 }
 
+export interface ITicketHolderFieldError {
+  firstNameError?: string
+  lastNameError?: string
+}
+
 export interface IBillingInfoFormData {
   firstName: string
   lastName: string
@@ -111,6 +116,7 @@ export interface IBillingInfoFormData {
 }
 
 export interface IBillingInfoViewStyles {
+  rootContainer?: StyleProp<ViewStyle>
   loginStyles?: ILoginViewStyles
   checkoutButton?: IButtonStyles
   checkoutButtonDisabled?: IButtonStyles

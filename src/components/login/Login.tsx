@@ -119,10 +119,6 @@ const Login = ({
     }
   }
 
-  const handleOnClearLoginError = () => {
-    setLoginError('')
-  }
-
   return (
     <LoginView
       showDialog={showLoginDialog}
@@ -137,7 +133,6 @@ const Login = ({
       styles={styles}
       userFirstName={userFirstName}
       loginError={loginError}
-      onClearLoginError={handleOnClearLoginError}
     />
   )
 }

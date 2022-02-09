@@ -1,5 +1,4 @@
-export { default as Billing } from './billingInfo/Billing'
-export { default as BillingInfo } from './billingInfo/BillingInfo'
+export { default as BillingInfo } from './billingInfo/Billing'
 export { default as Checkout } from './checkout/Checkout'
 export { default as MyOrderDetails } from './myOrderDetails/MyOrderDetails'
 export { default as MyOrders } from './myOrders/MyOrders'

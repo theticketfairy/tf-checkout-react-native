@@ -156,7 +156,7 @@ const LoginView = ({
   const GuestComponent = () => (
     <>
       {message ? (
-        <Text>{message}</Text>
+        <Text style={styles?.message}>{message}</Text>
       ) : (
         <View style={styles?.guest?.linesContainer}>
           <Text style={styles?.guest?.line1}>{line1}</Text>
@@ -188,7 +188,9 @@ const LoginView = ({
                     source={R.images.brand}
                     style={[s.brand, styles?.dialog?.logo]}
                   />
-                  {!!message && <Text style={s.message}>{message}</Text>}
+                  {!!message && (
+                    <Text style={[s.message, styles?.message]}>{message}</Text>
+                  )}
                   {renderFormFields()}
                   {!!loginError && <Text style={[s.error]}>{loginError}</Text>}
                   <Button

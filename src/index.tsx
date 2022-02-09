@@ -4,7 +4,6 @@ import { LogBox, NativeModules } from 'react-native'
 
 import { IMyOrderDetailsResponse, IMyOrdersOrder } from './api/types'
 import {
-  Billing,
   BillingInfo,
   Checkout,
   MyOrderDetails,
@@ -19,7 +18,6 @@ LogBox.ignoreAllLogs()
 console.reportErrorsAsExceptions = false
 
 export {
-  Billing,
   BillingInfo,
   Checkout,
   IAddToCartSuccess,

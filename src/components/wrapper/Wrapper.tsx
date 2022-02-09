@@ -1,15 +1,22 @@
-import React, { useEffect, useState } from 'react'
-import { Alert, View } from 'react-native'
+import React, { ReactNode, useEffect, useState } from 'react'
+import { Alert, StyleSheet, View } from 'react-native'
 
 import { IConfig, setConfig } from '../../helpers/Config'
 
 export interface IWrapperProps {
-  children: React.ReactNode
+  children: ReactNode
   config: IConfig
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+})
+
 const Wrapper = ({ config, children }: IWrapperProps) => {
   const [isConfigFinished, setIsConfigFinished] = useState(false)
+  const { container } = styles
   const handleConfig = () => {
     const configResult = setConfig(config)
 
@@ -25,12 +32,11 @@ const Wrapper = ({ config, children }: IWrapperProps) => {
   }
 
   useEffect(() => {
-    console.log('Use Callback', config)
     handleConfig()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <View style={{ flex: 1 }}>{isConfigFinished && children}</View>
+  return <View style={container}>{isConfigFinished && children}</View>
 }
 
 export default Wrapper

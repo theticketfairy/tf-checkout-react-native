@@ -1,36 +1,59 @@
 import _every from 'lodash/every'
 import _find from 'lodash/find'
+import _forEach from 'lodash/forEach'
 import _map from 'lodash/map'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert, Linking, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {
+  checkoutOrder,
   fetchCart,
   fetchCountries,
   fetchStates,
   fetchUserProfile,
+  registerNewUser,
 } from '../../api/ApiClient'
 import Constants from '../../api/Constants'
-import { Button, Checkbox, Dropdown, Input, Login } from '../../components'
+import { ICheckoutBody, ICheckoutTicketHolder } from '../../api/types'
+import {
+  Button,
+  Checkbox,
+  Dropdown,
+  Input,
+  Loading,
+  Login,
+} from '../../components'
 import { IDropdownItem } from '../../components/dropdown/types'
+import { Config } from '../../helpers/Config'
+import { useDebounced } from '../../helpers/Debounced'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
-import { validateEmail, validateEmpty } from '../../helpers/Validators'
+import {
+  validateEmail,
+  validateEmpty,
+  validatePasswords,
+} from '../../helpers/Validators'
 import { IUserProfile } from '../../types'
-import { IBillingProps, ITicketHolderField } from './types'
+import s from './styles'
+import {
+  IBillingProps,
+  IOnCheckoutSuccess,
+  ITicketHolderField,
+  ITicketHolderFieldError,
+} from './types'
 
 const Billing = (props: IBillingProps) => {
   const { styles, texts } = props
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isSubmittingData, setIsSubmittingData] = useState<boolean>(false)
   const [loggedUserFirstName, setLoggedUserFirstName] = useState<string>('')
+  const [loginMessage, setLoginMessage] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [emailConfirmation, setEmailConfirmation] = useState('')
-
   const [password, setPassword] = useState('')
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
-
   const [isSubToMarketing, setIsSubToMarketing] = useState(false)
   const [isSubToNewsletter, setIsSubToNewsletter] = useState(false)
   const [phone, setPhone] = useState('')
@@ -58,9 +81,30 @@ const Billing = (props: IBillingProps) => {
     { value: '-1', label: 'State/County' },
   ])
 
-  const storedToken = useRef()
-
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
+
+  // Errors state
+  const firstNameError = useDebounced(firstName, validateEmpty)
+  const lastNameError = useDebounced(lastName, validateEmpty)
+  const emailError = useDebounced(email, () =>
+    validateEmail(email, emailConfirmation)
+  )
+  const confirmEmailError = useDebounced(emailConfirmation, () =>
+    validateEmail(emailConfirmation, email)
+  )
+  const passwordError = useDebounced(password, () =>
+    validatePasswords(password, passwordConfirmation)
+  )
+  const confirmPasswordError = useDebounced(passwordConfirmation, () =>
+    validatePasswords(passwordConfirmation, password)
+  )
+  const phoneError = useDebounced(phone, validateEmpty)
+  const streetError = useDebounced(street, validateEmpty)
+  const cityError = useDebounced(city, validateEmpty)
+  const postalCodeError = useDebounced(postalCode, validateEmpty)
+  // End of errors state
+
+  const storedToken = useRef('')
 
   const showLoginDialog = () => setIsLoginDialogVisible(true)
   const hideLoginDialog = () => setIsLoginDialogVisible(false)
@@ -161,42 +205,179 @@ const Billing = (props: IBillingProps) => {
     setTicketHoldersData(thData)
   }
 
-  // const isDataValid = (): boolean => {
-  //   if (
-  //     validateEmpty(firstName) ||
-  //     validateEmpty(lastName) ||
-  //     validateEmail(email, emailConfirmation) ||
-  //     validateEmail(emailConfirmation, email) ||
-  //     validateEmpty(street) ||
-  //     validateEmpty(phone) ||
-  //     validateEmpty(city) ||
-  //     validateEmpty(postalCode) ||
-  //     !isSubToMarketing
-  //   ) {
-  //     return false
-  //   }
+  const checkBasicDataValid = (): boolean => {
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !emailConfirmation ||
+      !street ||
+      !phone ||
+      !city ||
+      !postalCode
+    ) {
+      return false
+    }
 
-  //   console.log('isDataValid - userData', userData)
-  //   console.log('isDataValid - formDAta', userData)
-  //   if (firstName) {
-  //     if (selectedState?.value === '-1') {
-  //       return false
-  //     }
-  //   }
+    if (loggedUserFirstName) {
+      if (selectedState?.value === '-1') {
+        return false
+      }
+    }
 
-  //   if (isAgeRequired && !birthday) {
-  //     return false
-  //   }
+    return true
+  }
 
-  //   const thValid = _map(
-  //     ticketHoldersData,
-  //     (th) => validateEmpty(th.firstName) || validateEmpty(th.lastName)
-  //   )
+  const checkExtraDataValid = (): string => {
+    return _every(
+      _map(
+        ticketHoldersData,
+        (th) => validateEmpty(th.firstName) || validateEmpty(th.lastName)
+      ),
+      (itm) => itm === ''
+    )
+      ? ''
+      : 'You must fill all Ticket Holder required fields'
+  }
 
-  //   return _every(thValid, (itm) => itm === '')
-  // }
+  //#region Submit form
+  const handleOnRegisterFail = (rawError: any) => {
+    if (props.onRegisterFail) {
+      props.onRegisterFail(rawError)
+    }
+  }
 
-  const onSubmit = () => {}
+  const performCheckout = async (
+    checkoutBody: ICheckoutBody,
+    pToken: string
+  ) => {
+    setIsSubmittingData(true)
+    const { error: checkoutError, data: checkoutData } = await checkoutOrder(
+      checkoutBody,
+      pToken
+    )
+    setIsSubmittingData(false)
+
+    if (checkoutError) {
+      if (props.onCheckoutFail) {
+        props.onCheckoutFail(checkoutError)
+      }
+      return Alert.alert('', checkoutError)
+    }
+
+    const checkoutResponseData: IOnCheckoutSuccess = {
+      id: checkoutData.data.data.attributes.id,
+      hash: checkoutData.data.data.attributes.hash,
+      total: checkoutData.data.data.attributes.total,
+      status: checkoutData.data.data.attributes.status,
+    }
+    if (props.onCheckoutSuccess) {
+      props.onCheckoutSuccess(checkoutResponseData)
+    }
+  }
+
+  const getRegisterFormData = (checkoutBody: ICheckoutBody): FormData => {
+    const bodyFormData = new FormData()
+    _forEach(checkoutBody.attributes, (item: any, key: string) => {
+      bodyFormData.append(key, item)
+    })
+
+    bodyFormData.append(
+      'password_confirmation',
+      checkoutBody.attributes.password
+    )
+    bodyFormData.append(
+      'client_id',
+      Config.CLIENT_ID || 'e9d8f8922797b4621e562255afe90dbf'
+    )
+    bodyFormData.append(
+      'client_secret',
+      Config.CLIENT_SECRET || 'b89c191eff22fdcf84ac9bfd88d005355a151ec2c83b26b9'
+    )
+
+    return bodyFormData
+  }
+
+  const performNewUserRegister = async (checkoutBody: ICheckoutBody) => {
+    const registerForm = getRegisterFormData(checkoutBody)
+    setIsSubmittingData(true)
+    const { data: registerResponseData, error: registerResponseError } =
+      await registerNewUser(registerForm)
+
+    if (registerResponseError) {
+      setIsSubmittingData(false)
+      if (registerResponseError.isAlreadyRegistered) {
+        setLoginMessage(registerResponseError.message!)
+        showLoginDialog()
+        return handleOnRegisterFail(registerResponseError.raw)
+      }
+      handleOnRegisterFail(registerResponseError.raw)
+      return Alert.alert('', registerResponseError.message)
+    }
+
+    if (!registerResponseData) {
+      setIsSubmittingData(false)
+      handleOnRegisterFail('Register returned no data')
+      return Alert.alert('', 'Register returned no data')
+    }
+
+    const tokens = {
+      accessToken: registerResponseData.access_token,
+      refreshToken: registerResponseData.refresh_token,
+    }
+
+    storedToken.current = tokens.accessToken
+
+    if (props.onRegisterSuccess) {
+      props.onRegisterSuccess(tokens)
+    }
+
+    await performCheckout(checkoutBody, tokens.accessToken)
+  }
+
+  const onSubmit = async () => {
+    const isExtraDataValid = checkExtraDataValid()
+    if (isExtraDataValid) {
+      return Alert.alert('', isExtraDataValid)
+    }
+
+    const parsedTicketHolders: ICheckoutTicketHolder[] = ticketHoldersData.map(
+      (th) => {
+        return {
+          email: th.email,
+          first_name: th.firstName,
+          last_name: th.lastName,
+          phone: th.phone,
+        }
+      }
+    )
+
+    const checkoutBody: ICheckoutBody = {
+      attributes: {
+        city: city,
+        confirm_email: emailConfirmation,
+        country: parseInt(selectedCountry!.value as string, 10),
+        email: email,
+        first_name: firstName,
+        last_name: lastName,
+        password: password,
+        phone: phone,
+        state: parseInt(selectedState!.value as string, 10),
+        street_address: street,
+        zip: postalCode,
+        ticket_holders: parsedTicketHolders,
+        ttf_opt_in: isSubToNewsletter,
+        brand_opt_in: isSubToMarketing,
+      },
+    }
+
+    if (loggedUserFirstName && storedToken.current) {
+      await performCheckout(checkoutBody, storedToken.current)
+    } else {
+      await performNewUserRegister(checkoutBody)
+    }
+  }
+  //#endregion
 
   const fetchData = async () => {
     setIsLoading(true)
@@ -207,6 +388,7 @@ const Billing = (props: IBillingProps) => {
       await fetchCountries()
 
     if (countriesError) {
+      setIsLoading(false)
       return Alert.alert('', countriesError || 'Error fetching countries')
     }
 
@@ -224,7 +406,6 @@ const Billing = (props: IBillingProps) => {
 
       if (userProfileError || !userProfileResponse) {
         setIsLoading(false)
-
         return Alert.alert(
           '',
           userProfileError || 'Error fetching user profile'
@@ -264,6 +445,7 @@ const Billing = (props: IBillingProps) => {
 
     setCountries(parsedCountries)
     setTicketHoldersData(tHolders)
+    setIsLoading(false)
   }
 
   //#region Use effects
@@ -310,6 +492,21 @@ const Billing = (props: IBillingProps) => {
     }
   }, [stateId, states])
 
+  const initTicketHoldersErrors = useCallback(() => {
+    if (ticketHoldersData.length > 1) {
+      const tHolders: ITicketHolderFieldError[] = []
+
+      for (let i = 0; i < ticketHoldersData.length; i++) {
+        tHolders.push({
+          firstNameError: '',
+          lastNameError: '',
+        })
+      }
+    }
+  }, [ticketHoldersData])
+
+  initTicketHoldersErrors()
+
   useEffect(() => {
     fetchData()
   }, [])
@@ -320,7 +517,7 @@ const Billing = (props: IBillingProps) => {
     for (let i = 0; i < numberOfTicketHolders; i++) {
       tHolders.push(
         <View key={`ticketHolder.${i}`}>
-          <Text>Ticket holder {i + 1}</Text>
+          <Text style={styles?.titles}>Ticket holder {i + 1}</Text>
           <Input
             label='First name'
             value={ticketHoldersData[i].firstName}
@@ -329,6 +526,7 @@ const Billing = (props: IBillingProps) => {
               copyTicketHolders[i].firstName = text
               setTicketHoldersData(copyTicketHolders)
             }}
+            styles={styles?.inputStyles}
           />
           <Input
             label='Last name'
@@ -338,6 +536,7 @@ const Billing = (props: IBillingProps) => {
               copyTicketHolders[i].lastName = text
               setTicketHoldersData(copyTicketHolders)
             }}
+            styles={styles?.inputStyles}
           />
           <Input
             label='Email Address (optional)'
@@ -348,6 +547,8 @@ const Billing = (props: IBillingProps) => {
               setTicketHoldersData(copyTicketHolders)
             }}
             keyboardType='email-address'
+            styles={styles?.inputStyles}
+            autoCapitalize='none'
           />
           <Input
             label='Phone (optional)'
@@ -358,6 +559,7 @@ const Billing = (props: IBillingProps) => {
               setTicketHoldersData(copyTicketHolders)
             }}
             keyboardType='phone-pad'
+            styles={styles?.inputStyles}
           />
         </View>
       )
@@ -366,10 +568,11 @@ const Billing = (props: IBillingProps) => {
     return tHolders
   }
 
+  const isDataValid = checkBasicDataValid()
+
   return (
     <KeyboardAwareScrollView extraScrollHeight={32}>
-      <View>
-        <Text>Get Your Tickets</Text>
+      <View style={styles?.rootContainer}>
         <Login
           onLoginSuccessful={handleOnLoginSuccess}
           onLogoutSuccess={handleOnLogoutSuccess}
@@ -378,17 +581,29 @@ const Billing = (props: IBillingProps) => {
           hideLoginDialog={hideLoginDialog}
           userFirstName={loggedUserFirstName}
           onLoginFailure={handleOnLoginFail}
+          message={loginMessage}
+          styles={styles?.loginStyles}
         />
+        <Text style={styles?.titles}>Get Your Tickets</Text>
+
         <Input
           label='First name'
           value={firstName}
           onChangeText={setFirstName}
+          error={firstNameError}
+          styles={styles?.inputStyles}
         />
-        <Input label='Last name' value={lastName} onChangeText={setLastName} />
+        <Input
+          label='Last name'
+          value={lastName}
+          onChangeText={setLastName}
+          error={lastNameError}
+          styles={styles?.inputStyles}
+        />
 
-        <Text>
-          "IMPORTANT: Please double check that your email address is correct.
-          It's where we send your confirmation and e-tickets to!"
+        <Text style={styles?.texts}>
+          IMPORTANT: Please double check that your email address is correct.
+          It's where we send your confirmation and e-tickets to!
         </Text>
 
         <Input
@@ -396,21 +611,41 @@ const Billing = (props: IBillingProps) => {
           value={email}
           onChangeText={setEmail}
           keyboardType='email-address'
+          error={emailError}
+          styles={styles?.inputStyles}
+          autoCapitalize='none'
         />
         <Input
           label='Confirm Email'
           value={emailConfirmation}
           onChangeText={setEmailConfirmation}
           keyboardType='email-address'
+          error={confirmEmailError}
+          styles={styles?.inputStyles}
+          autoCapitalize='none'
         />
         {!loggedUserFirstName && (
           <>
-            <Text>Choose a password for your new TICKETFAIRY account</Text>
-            <Input label='Password' isSecure onChangeText={setPassword} />
+            <Text style={styles?.passwordTitle}>
+              Choose a password for your new TICKETFAIRY account
+            </Text>
+            <Input
+              label='Password'
+              isSecure
+              onChangeText={setPassword}
+              error={passwordError}
+              styles={styles?.inputStyles}
+              autoCapitalize='none'
+              secureTextEntry={true}
+            />
             <Input
               label='Confirm Password'
               isSecure
               onChangeText={setPasswordConfirmation}
+              error={confirmPasswordError}
+              styles={styles?.inputStyles}
+              autoCapitalize='none'
+              secureTextEntry={true}
             />
           </>
         )}
@@ -419,37 +654,41 @@ const Billing = (props: IBillingProps) => {
           value={phone}
           onChangeText={setPhone}
           keyboardType='phone-pad'
+          error={phoneError}
+          styles={styles?.inputStyles}
         />
         <Input
           label='Billing Street Address'
           value={street}
           onChangeText={setStreet}
+          error={streetError}
+          styles={styles?.inputStyles}
         />
-        <Input label='City' value={city} onChangeText={setCity} />
+        <Input
+          label='City'
+          value={city}
+          onChangeText={setCity}
+          error={cityError}
+          styles={styles?.inputStyles}
+        />
         <Dropdown
           items={countries}
           onSelectItem={setSelectedCountry}
           selectedOption={selectedCountry}
-          styles={{
-            container: {
-              width: '100%',
-            },
-          }}
+          styles={styles?.dropdownStyles}
         />
         <Input
           label='Postal Code / Zip Code'
           value={postalCode}
           onChangeText={setPostalCode}
+          error={postalCodeError}
+          styles={styles?.inputStyles}
         />
         <Dropdown
           items={states}
           onSelectItem={setSelectedState}
           selectedOption={selectedState}
-          styles={{
-            container: {
-              width: '100%',
-            },
-          }}
+          styles={styles?.dropdownStyles}
         />
 
         <Checkbox
@@ -458,48 +697,58 @@ const Billing = (props: IBillingProps) => {
             'I would like to be updated on House of X news, events and offers.'
           }
           isActive={isSubToNewsletter}
+          styles={styles?.checkboxStyles}
         />
 
         <Checkbox
           onPress={handleIsSubToMarketingToggle}
           isActive={isSubToMarketing}
           customTextComp={
-            <Text>
+            <Text style={styles?.customCheckbox?.text}>
               I agree that The Ticket Fairy may use the personal data that I
               have provided for marketing purposes, such as recommending events
               that I might be interested in, in accordance with its{' '}
-              <Text onPress={handleOpenPrivacyLink}>Privacy Policy.</Text>
+              <Text
+                style={props.privacyPolicyLinkStyle}
+                onPress={handleOpenPrivacyLink}
+              >
+                Privacy Policy.
+              </Text>
             </Text>
           }
+          styles={styles?.checkboxStyles}
         />
 
         {ticketHoldersData.length > 0 && (
           <>
-            <Text>Ticket Holders</Text>
+            <Text style={styles?.headers}> Ticket Holders</Text>
             {renderTicketHolders()}
           </>
         )}
 
         <Button
           onPress={onSubmit}
-          text={'CHECKOUT'}
-          // text={texts?.checkoutButton || 'CHECKOUT'}
-          // isDisabled={!isDataValid}
-          // isLoading={isSubmitLoading}
-          // styles={
-          //   !isDataValid
-          //     ? styles?.checkoutButtonDisabled
-          //     : {
-          //         container: [
-          //           s.submitButton,
-          //           styles?.checkoutButton?.container,
-          //         ],
-          //         text: styles?.checkoutButton?.text,
-          //         button: styles?.checkoutButton?.button,
-          //       }
-          // }
+          text={texts?.checkoutButton || 'CHECKOUT'}
+          isDisabled={!isDataValid}
+          isLoading={isSubmittingData}
+          styles={
+            !isDataValid
+              ? {
+                  button: s.submitButtonDisabled,
+                  ...styles?.checkoutButtonDisabled,
+                }
+              : {
+                  container: [
+                    s.submitButton,
+                    styles?.checkoutButton?.container,
+                  ],
+                  text: styles?.checkoutButton?.text,
+                  button: styles?.checkoutButton?.button,
+                }
+          }
         />
       </View>
+      {isLoading && <Loading />}
     </KeyboardAwareScrollView>
   )
 }
