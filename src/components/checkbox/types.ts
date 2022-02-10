@@ -12,7 +12,7 @@ export interface ICheckboxStyles {
 }
 export interface ICheckboxProps {
   onPress: () => void
-  text: string
+  text?: string
   isActive: boolean
   styles?: ICheckboxStyles
   customTextComp?: ReactNode

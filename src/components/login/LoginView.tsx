@@ -36,10 +36,11 @@ const LoginView = ({
   onPressLogin,
   isLoading,
   message,
-  userProfile,
   onPressLogout,
   styles,
   texts,
+  userFirstName,
+  loginError,
 }: ILoginViewProps) => {
   const [data, setData] = useState<ILoginViewState>(initialState)
   const { email, password } = data
@@ -117,11 +118,18 @@ const LoginView = ({
 
   const line2 = texts?.line2 || 'Login & skip ahead:'
 
+  const handleLogout = () => {
+    setData(initialState)
+    if (onPressLogout) {
+      onPressLogout()
+    }
+  }
+
   const handleOnPressLogout = () => {
     Alert.alert(logoutTitle, logoutMessage, [
       {
         text: logoutConfirm,
-        onPress: onPressLogout,
+        onPress: handleLogout,
         style: 'destructive',
       },
       {
@@ -134,7 +142,7 @@ const LoginView = ({
     <View style={styles?.loggedIn?.container}>
       <Text style={styles?.loggedIn?.placeholder}>
         Logged in as:{' '}
-        <Text style={styles?.loggedIn?.value}>{userProfile?.firstName}</Text>
+        <Text style={styles?.loggedIn?.value}>{userFirstName}</Text>
       </Text>
       <Text style={styles?.loggedIn?.message}>Not you?</Text>
       <Button
@@ -148,7 +156,7 @@ const LoginView = ({
   const GuestComponent = () => (
     <>
       {message ? (
-        <Text>{message}</Text>
+        <Text style={styles?.message}>{message}</Text>
       ) : (
         <View style={styles?.guest?.linesContainer}>
           <Text style={styles?.guest?.line1}>{line1}</Text>
@@ -165,7 +173,7 @@ const LoginView = ({
 
   return (
     <View style={s.rootContainer}>
-      {userProfile ? LoggedComponent() : GuestComponent()}
+      {userFirstName ? LoggedComponent() : GuestComponent()}
 
       {isDialogVisible && (
         <Modal transparent={true} presentationStyle='overFullScreen'>
@@ -180,8 +188,11 @@ const LoginView = ({
                     source={R.images.brand}
                     style={[s.brand, styles?.dialog?.logo]}
                   />
-                  {!!message && <Text style={s.message}>{message}</Text>}
+                  {!!message && (
+                    <Text style={[s.message, styles?.message]}>{message}</Text>
+                  )}
                   {renderFormFields()}
+                  {!!loginError && <Text style={[s.error]}>{loginError}</Text>}
                   <Button
                     styles={
                       !checkIsDataValid()

@@ -6,6 +6,7 @@ export interface IConfig {
   DOMAIN?: string
   BASE_URL?: string
   CLIENT_ID?: string
+  CLIENT_SECRET?: string
   TIMEOUT?: number
 
   [key: string]: string | number | undefined

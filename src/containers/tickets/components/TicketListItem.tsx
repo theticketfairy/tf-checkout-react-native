@@ -1,4 +1,6 @@
 import _has from 'lodash/has'
+import _maxBy from 'lodash/maxBy'
+import _reduce from 'lodash/reduce'
 import React from 'react'
 import { Text, View } from 'react-native'
 
@@ -17,12 +19,17 @@ const TicketListItem = ({
   texts,
 }: ITicketListItemProps) => {
   const isSoldOut = ticket.sold_out || !ticket.displayTicket || ticket.soldOut
-  const isSalesClosed =
-    !ticket.salesStarted || ticket.salesEnded || !_has(ticket, 'maxQuantity')
+
+  const isSalesClosed = !ticket.salesStarted || ticket.salesEnded
+
   const customSoldOutMessage = texts?.soldOut ? texts.soldOut : 'SOLD OUT'
   const soldOutMessage = ticket.soldOutMessage
     ? `${ticket.soldOutMessage}`.toUpperCase()
     : customSoldOutMessage
+
+  const ticketsClosedMessage = !ticket.salesStarted
+    ? 'Sales not started'
+    : 'Sales Ended'
 
   const getSelectOptions = (
     maxCount: number = 10,
@@ -35,6 +42,12 @@ const TicketListItem = ({
     }
     return options
   }
+
+  const dropdownOptions = getSelectOptions(
+    ticket.maxQuantity,
+    ticket.minQuantity,
+    ticket.multiplier
+  )
 
   const handleOnSelectItem = (item: IDropdownItem) => {
     onSelectTicketItem({ ...ticket, selectedOption: item })
@@ -51,6 +64,37 @@ const TicketListItem = ({
     ticket.feeText || ticket.feeIncluded ? '(incl. Fees)' : '(excl. Fees)'
 
   const showOldPrice = ticket.price !== ticket.oldPrice
+  const isTicketFree = (+ticket.cost || +ticket.price) === 0
+  const ticketPrice = isSoldOut
+    ? 'SOLD OUT'
+    : isTicketFree
+    ? 'FREE'
+    : priceWithCurrency(
+        (+ticket.cost || +ticket.price).toFixed(2).toString(),
+        ticket.priceSymbol
+      )
+
+  const maximumOption = _maxBy(dropdownOptions, (o) => o.value)?.value
+
+  let rightContent = <></>
+
+  if (ticket.soldOut || ticket.sold_out || !ticket.displayTicket) {
+    rightContent = <Text>{soldOutMessage}</Text>
+  }
+  if (ticket.displayTicket) {
+    rightContent = isSalesClosed ? (
+      <Text>{ticketsClosedMessage}</Text>
+    ) : maximumOption && maximumOption > 0 ? (
+      <Dropdown
+        items={dropdownOptions}
+        selectedOption={selectedOption}
+        onSelectItem={handleOnSelectItem}
+        styles={styles?.dropdown}
+      />
+    ) : (
+      <></>
+    )
+  }
 
   return (
     <View style={[s.container, styles?.container]}>
@@ -75,27 +119,14 @@ const TicketListItem = ({
                   )}
                 </Text>
               )}
-              <Text style={[s.price, styles?.price]}>
-                {priceWithCurrency(ticket.price.toString(), ticket.priceSymbol)}
-              </Text>
+              <Text style={[s.price, styles?.price]}>{ticketPrice}</Text>
             </View>
             <Text style={[s.tax, styles?.fees]}>{taxText.toUpperCase()}</Text>
           </>
         )}
       </View>
       {!isSalesClosed && !isSoldOut && (
-        <View style={s.rightContainer}>
-          <Dropdown
-            items={getSelectOptions(
-              ticket.maxQuantity,
-              ticket.minQuantity,
-              ticket.multiplier
-            )}
-            selectedOption={selectedOption}
-            onSelectItem={handleOnSelectItem}
-            styles={styles?.dropdown}
-          />
-        </View>
+        <View style={s.rightContainer}>{rightContent}</View>
       )}
     </View>
   )

@@ -63,7 +63,10 @@ const CheckoutView = ({
       />
     </View>
   ) : (
-    <KeyboardAwareScrollView extraScrollHeight={32}>
+    <KeyboardAwareScrollView
+      extraScrollHeight={32}
+      keyboardDismissMode='on-drag'
+    >
       <View style={styles?.rootStyle}>
         <View>
           <Text style={[s.title, styles?.title]}>{title}</Text>
@@ -81,7 +84,7 @@ const CheckoutView = ({
             <CardForm
               onFormComplete={handleOnFormComplete}
               style={[s.card, styles?.payment?.cardContainer]}
-              cardStyle={{ backgroundColor: '#fff' }}
+              cardStyle={s.cardStyle}
             />
           </View>
         )}

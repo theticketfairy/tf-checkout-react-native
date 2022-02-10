@@ -32,7 +32,6 @@ export const getData = async (key: string) => {
       return value
     }
   } catch (ex) {
-    console.log('Local Storage GetData Error', ex)
     return undefined
   }
 }
@@ -44,7 +43,6 @@ export const deleteData = async (key: string) => {
       return value
     }
   } catch (ex) {
-    console.log('Local Storage GetData Error', ex)
     return undefined
   }
 }
@@ -55,12 +53,26 @@ export const deleteAllData = async () => {
       LocalStorageKeys.ACCESS_TOKEN,
       LocalStorageKeys.AUTH_GUEST_TOKEN,
       LocalStorageKeys.USER_DATA,
+      LocalStorageKeys.CHECKOUT_DATA,
     ])
     if (value !== null) {
       return value
     }
   } catch (ex) {
-    console.log('Local Storage GetData Error', ex)
     return undefined
+  }
+}
+
+export const checkStoredData = async () => {
+  try {
+    const values = await AsyncStorage.multiGet([
+      LocalStorageKeys.ACCESS_TOKEN,
+      LocalStorageKeys.AUTH_GUEST_TOKEN,
+      LocalStorageKeys.USER_DATA,
+      LocalStorageKeys.CHECKOUT_DATA,
+    ])
+    console.log('checkStoredData', values)
+  } catch (ex) {
+    console.log('Local Storage GetData Error - checkStoredData', ex)
   }
 }

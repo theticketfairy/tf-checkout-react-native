@@ -152,6 +152,7 @@ const Checkout = ({
         await fetchEventConditions(eventId.toString())
 
       if (conditionsError) {
+        setIsLoadingFreeRegistration(false)
         if (onFetchEventConditionsFail) {
           onFetchEventConditionsFail(conditionsError)
         }
@@ -164,6 +165,7 @@ const Checkout = ({
       setConditionsValues(_map(conditionsData, () => false))
       setConditionsTexts(conditionsData)
       if (onFetchEventConditionsSuccess) {
+        setIsLoadingFreeRegistration(false)
         onFetchEventConditionsSuccess(conditionsData)
       }
     }
@@ -174,6 +176,7 @@ const Checkout = ({
       setIsLoading(false)
 
       if (orderReviewError || !orderReviewData) {
+        setIsLoadingFreeRegistration(false)
         setIsStripeConfigMissing(true)
         if (onFetchOrderReviewFail) {
           onFetchOrderReviewFail(
@@ -187,6 +190,7 @@ const Checkout = ({
       }
 
       if (onFetchOrderReviewSuccess) {
+        setIsLoadingFreeRegistration(false)
         onFetchOrderReviewSuccess(orderReviewData)
       }
 

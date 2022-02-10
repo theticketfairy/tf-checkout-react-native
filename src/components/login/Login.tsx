@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Alert, Keyboard } from 'react-native'
+import React, { useState } from 'react'
+import { Keyboard } from 'react-native'
 
 import {
   authorize,
@@ -24,7 +24,7 @@ const Login = ({
   showLoginDialog,
   hideLoginDialog,
   message,
-  userProfileProp,
+  userFirstName,
   onLogoutSuccess,
   texts,
   styles,
@@ -33,9 +33,13 @@ const Login = ({
   onFetchUserProfileFailure,
 }: ILoginProps) => {
   const [isLoading, setIsLoading] = useState(false)
+  const [loginError, setLoginError] = useState('')
   const [userProfileData, setUserProfileData] = useState<IUserProfile>()
 
   const handleOnPressLogin = async (email: string, password: string) => {
+    if (loginError) {
+      setLoginError('')
+    }
     const bodyFormData = new FormData()
     bodyFormData.append('email', email)
     bodyFormData.append('password', password)
@@ -45,6 +49,7 @@ const Login = ({
     if (error || !code) {
       setIsLoading(false)
       if (onLoginFailure) {
+        setLoginError(error || 'Auth error')
         return onLoginFailure(error || 'Auth error')
       }
     }
@@ -114,13 +119,6 @@ const Login = ({
     }
   }
 
-  useEffect(() => {
-    if (!userProfileData && userProfileProp) {
-      setUserProfileData(userProfileProp)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userProfileProp])
-
   return (
     <LoginView
       showDialog={showLoginDialog}
@@ -133,6 +131,8 @@ const Login = ({
       onPressLogout={handleOnPressLogout}
       texts={texts}
       styles={styles}
+      userFirstName={userFirstName}
+      loginError={loginError}
     />
   )
 }

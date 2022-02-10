@@ -1,4 +1,4 @@
-import { StyleProp, TextStyle } from 'react-native'
+import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 import { IButtonStyles } from '../../components/button/types'
 import { ICheckboxStyles } from '../../components/checkbox/types'
@@ -19,6 +19,31 @@ export interface IOnCheckoutSuccess {
   hash: string
   total: string
   status: string
+}
+
+export interface IBillingProps {
+  cartProps: IAddToCartSuccess
+  onRegisterSuccess?: (tokens: ITokens) => void
+  onRegisterFail?: (error: string) => void
+
+  onCheckoutSuccess: (data: IOnCheckoutSuccess) => void
+  onCheckoutFail?: (error: string) => void
+
+  onLoginSuccess: (data: any) => void
+  onLoginFail?: (error: string) => void
+
+  onFetchUserProfileSuccess?: (data: any) => void
+  onFetchUserProfileFail?: (error: any) => void
+
+  onFetchCartError?: (error: string) => void
+
+  privacyPolicyLinkStyle?: StyleProp<TextStyle>
+
+  onFetchUserProfileFailure?: (error: string) => void
+  onFetchAccessTokenFailure?: (error: string) => void
+
+  styles?: IBillingInfoViewStyles
+  texts?: IBillingInfoViewTexts
 }
 
 export interface IBillingInfoProps {
@@ -51,6 +76,11 @@ export interface ITicketHolderField {
   lastName: string
   email: string
   phone: string
+}
+
+export interface ITicketHolderFieldError {
+  firstNameError?: string
+  lastNameError?: string
 }
 
 export interface IBillingInfoFormData {
@@ -86,6 +116,7 @@ export interface IBillingInfoFormData {
 }
 
 export interface IBillingInfoViewStyles {
+  rootContainer?: StyleProp<ViewStyle>
   loginStyles?: ILoginViewStyles
   checkoutButton?: IButtonStyles
   checkoutButtonDisabled?: IButtonStyles
