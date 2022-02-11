@@ -133,10 +133,13 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 
 ```js
 {
-  DOMAIN?: string
-  BASE_URL?: string
-  CLIENT_ID?: string
-  TIMEOUT?: number
+  DOMAIN?: string,
+  BASE_URL?: string,
+  CLIENT_ID?: string,
+  CLIENT_SECRET?: string,
+  TIMEOUT?: number,
+  BRAND?: string,
+  IS_BILLING_STREET_NAME_REQUIRED?: boolean,
 }
 ```
 
@@ -146,7 +149,13 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 
 `CLIENT_ID` Set your CLIENT_ID.
 
+`CLIENT_SECRET` Set your CLIENT_SECRET.
+
+`BRAND`: Set your BRAND so users can only see this brand in their orders.
+
 `TIMEOUT` Set custom timeout for the APIs requests.
+
+`IS_BILLING_STREET_NAME_REQUIRED`: Whether or not the Street name is required in the billing component.
 
 ---
 
