@@ -348,12 +348,12 @@ const Billing = (props: IBillingProps) => {
       }
       setSkippingStatus('success')
       props.onCheckoutSuccess(checkoutResponseData)
-    } catch (x) {
+    } catch (err) {
       setIsSubmittingData(false)
       setSkippingStatus('false')
 
       if (props.onCheckoutFail) {
-        props.onCheckoutFail(x)
+        props.onCheckoutFail('Error while performing checkout')
       }
     }
   }

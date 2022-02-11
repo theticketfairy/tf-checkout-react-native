@@ -39,6 +39,7 @@ export interface ITicket {
   oldPrice?: number
   oldBasePrice?: number
   descriptionRich?: string
+  cost?: number
 }
 
 export interface ISelectedTicket extends ITicket {

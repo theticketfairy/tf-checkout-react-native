@@ -1,6 +1,4 @@
-import _has from 'lodash/has'
 import _maxBy from 'lodash/maxBy'
-import _reduce from 'lodash/reduce'
 import React from 'react'
 import { Text, View } from 'react-native'
 

@@ -15,6 +15,7 @@ import { IOnCheckoutSuccess } from './containers/billingInfo/types'
 import { IAddToCartSuccess, ITicketsProps } from './containers/tickets/types'
 
 LogBox.ignoreAllLogs()
+// @ts-ignore
 console.reportErrorsAsExceptions = false
 
 export {

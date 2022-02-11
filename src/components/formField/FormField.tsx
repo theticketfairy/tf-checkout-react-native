@@ -78,10 +78,10 @@ const FormField = ({
     case 'datePicker':
       return (
         <DatePicker
-          onSelectDate={datePickerProps?.onSelectDate}
+          onSelectDate={datePickerProps!.onSelectDate}
           text={datePickerProps?.text || 'Select date'}
           onCancel={datePickerProps?.onCancel}
-          selectedDate={datePickerProps?.selectedDate}
+          selectedDate={datePickerProps!.selectedDate}
         />
       )
   }

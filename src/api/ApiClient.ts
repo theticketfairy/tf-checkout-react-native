@@ -111,6 +111,7 @@ Client.setTimeOut = (timeOut: number) => (Client.defaults.timeout = timeOut)
 Client.setDomain = (domain: string) =>
   (Client.defaults.headers = {
     ...Client.defaults.headers,
+    //@ts-ignore
     origin: domain,
   })
 
