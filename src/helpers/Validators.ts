@@ -47,3 +47,12 @@ export const validatePasswords = (password: string, equalTo: string) => {
 
   return validateMinLength(password, 6, 'Password')
 }
+
+export const validateAge = (
+  dateOfBirth: Date,
+  minimumAge: number = 18
+): string => {
+  const today = new Date()
+  const age = today.getFullYear() - dateOfBirth.getFullYear()
+  return age < minimumAge ? `You must be at least ${minimumAge} years old` : ''
+}

@@ -1,9 +1,18 @@
-import { ViewStyle } from 'react-native'
+import { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
+
+export interface IDatePickerStyles {
+  container?: StyleProp<ViewStyle>
+  button?: StyleProp<ViewStyle>
+  text?: StyleProp<TextStyle>
+  error?: StyleProp<TextStyle>
+  errorColor?: ColorValue
+}
 
 export interface IDatePickerProps {
-  onSelectDate?: (date: Date) => void
+  onSelectDate: (date: Date) => void
   onCancel?: () => void
-  containerStyle?: ViewStyle
   text: string
-  selectedDate?: Date
+  selectedDate: Date
+  styles?: IDatePickerStyles
+  error?: string
 }

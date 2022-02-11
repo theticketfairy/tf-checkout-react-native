@@ -1,4 +1,10 @@
-import { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import {
+  ColorValue,
+  ImageStyle,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 
 import { IMyOrderDetailsResponse, IMyOrdersOrder } from '../../api/types'
 import { IDropdownItem, IDropdownStyles } from '../../components/dropdown/types'
@@ -13,6 +19,8 @@ export interface IMyOrdersStyles {
   refreshControlColor?: ColorValue
   eventsDropdown?: IDropdownStyles
   rootContainer?: StyleProp<ViewStyle>
+  eventsSelectionContainer?: StyleProp<ViewStyle>
+  clearEventSelectionIcon?: StyleProp<ImageStyle>
 }
 
 export interface IMyOrdersProps {

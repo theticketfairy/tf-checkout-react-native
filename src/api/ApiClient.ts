@@ -19,6 +19,7 @@ import { ITicket } from '../types/ITicket'
 import Constants from './Constants'
 import {
   IAuthorizeResponse,
+  ICartResponse,
   ICheckoutResponse,
   IClientRequest,
   IEventResponse,
@@ -140,9 +141,7 @@ export const authorize = async (
 ): Promise<IAuthorizeResponse> => {
   let responseError: string = ''
   const response = await Client.post(
-    `/v1/oauth/authorize-rn?client_id=${
-      Constants.CLIENT_ID || '4792a61f2fcb49197ab4c2d2f44df570'
-    }`,
+    `/v1/oauth/authorize-rn?client_id=${Config.CLIENT_ID}`,
     data
   ).catch((error: AxiosError) => {
     responseError = error?.response?.data.message
@@ -268,11 +267,15 @@ export const fetchMyOrders = async (
     orders: [],
   }
   let responseError = ''
-  const response: AxiosResponse | void = await Client.get(
-    `/v1/account/orders/?page=${page}&limit=${limit}&filter[event]=${filter}`
-  ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message || 'Error fetching My Orders'
-  })
+  const endpoint =
+    Config.BRAND === undefined
+      ? `/v1/account/orders/?page=${page}&limit=${limit}&filter[event]=${filter}`
+      : `/v1/account/orders/?page=${page}&limit=${limit}&filter[event]=${filter}&filter[brand]=${Config.BRAND}`
+  const response: AxiosResponse | void = await Client.get(endpoint).catch(
+    (error: AxiosError) => {
+      responseError = error.response?.data.message || 'Error fetching My Orders'
+    }
+  )
 
   if (response?.data) {
     data.events = response.data.data.attributes.purchased_events
@@ -413,6 +416,8 @@ export const addToCart = async (id: string | number, data: any) => {
         !response?.data?.data?.attributes?.skip_billing_page ?? true,
       isNameRequired: response?.data?.data?.attributes?.names_required ?? false,
       isAgeRequired: response?.data?.data?.attributes?.age_required ?? false,
+      isPhoneRequired: response?.data?.data?.attributes?.phone_required ?? true,
+      minimumAge: response?.data?.data?.attributes?.minimum_age ?? 18,
     }
   }
 
@@ -483,15 +488,35 @@ export const fetchStates = async (countryId: string) => {
 
 export const fetchCart = async () => {
   let responseError: string = ''
+  let cartData = {} as ICartResponse
   const res: AxiosResponse | void = await Client.get('v1/cart/').catch(
     (error: AxiosError) => {
       responseError = error.response?.data.message
     }
   )
 
+  if (res?.data?.data?.attributes) {
+    const attr = res?.data?.data?.attributes
+    const quantityString = _get(attr, 'cart[0].quantity', '1')
+    const tfOptIn = _get(attr, 'ttfOptIn', false)
+    const isMarketingOptedIn = _get(attr, 'optedIn', false)
+
+    cartData = {
+      quantity: parseInt(quantityString, 10),
+      isMarketingOptedIn:
+        typeof isMarketingOptedIn === 'number'
+          ? isMarketingOptedIn > 0
+          : isMarketingOptedIn,
+      isTfOptInHidden: _get(attr, 'hide_ttf_opt_in', true),
+      isTfOptIn: typeof tfOptIn === 'number' ? tfOptIn > 0 : tfOptIn,
+    }
+  } else {
+    responseError = 'Error fetching cart'
+  }
+
   return {
-    error: responseError,
-    data: res?.data.data.attributes.cart[0],
+    cartError: responseError,
+    cartData: cartData,
   }
 }
 

@@ -133,10 +133,13 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 
 ```js
 {
-  DOMAIN?: string
-  BASE_URL?: string
-  CLIENT_ID?: string
-  TIMEOUT?: number
+  DOMAIN?: string,
+  BASE_URL?: string,
+  CLIENT_ID?: string,
+  CLIENT_SECRET?: string,
+  TIMEOUT?: number,
+  BRAND?: string,
+  IS_BILLING_STREET_NAME_REQUIRED?: boolean,
 }
 ```
 
@@ -146,7 +149,13 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 
 `CLIENT_ID` Set your CLIENT_ID.
 
+`CLIENT_SECRET` Set your CLIENT_SECRET.
+
+`BRAND`: Set your BRAND so users can only see this brand in their orders.
+
 `TIMEOUT` Set custom timeout for the APIs requests.
+
+`IS_BILLING_STREET_NAME_REQUIRED`: Whether or not the Street name is required in the billing component.
 
 ---
 
@@ -177,7 +186,9 @@ Add it to the render function.
 }
 ```
 
-`onCheckoutSuccess` will be called when the user completes all the data required in the form and taps on the button. Will return the following data:
+### onCheckoutSuccess
+
+Will be called when the user completes all the data required in the form and taps on the button. Will return the following data:
 
 ```js
 {
@@ -189,6 +200,14 @@ Add it to the render function.
 ```
 
 `hash` and `total` will be used in the `Checkout` component.
+
+### skipBilling
+
+Will auto-populate the checkout form with the logged user data, perform the order `Checkout` and call the callback `onCheckoutSuccess` so you can call the next component.
+
+### canSkipHolderNames
+
+Will skip the need of holder names information and will be automatically filled with the logged user data.
 
 ---
 

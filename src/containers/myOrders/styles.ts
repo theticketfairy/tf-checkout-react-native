@@ -1,5 +1,7 @@
 import { StyleSheet } from 'react-native'
 
+import R from '../../res'
+
 export const MyOrdersViewStyles = StyleSheet.create({
   eventsContainer: {
     marginVertical: 16,
@@ -8,8 +10,11 @@ export const MyOrdersViewStyles = StyleSheet.create({
     marginBottom: 8,
   },
   eventsDropdownContainer: {
-    height: 45,
-    width: '55%',
+    flex: 1,
+    marginRight: 16,
+  },
+  eventsDropdownButton: {
+    marginBottom: 0,
   },
   safeArea: {
     flex: 1,
@@ -22,5 +27,16 @@ export const MyOrdersViewStyles = StyleSheet.create({
   },
   rootContainer: {
     flex: 1,
+  },
+  eventsSelectionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  clearEventSelectionIcon: {
+    tintColor: R.colors.white,
+    width: 20,
+    height: 20,
   },
 })

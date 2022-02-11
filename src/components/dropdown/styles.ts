@@ -32,6 +32,7 @@ export const DropdownStyles = StyleSheet.create({
   },
   label: {
     color: R.colors.black,
+    fontSize: 16,
   },
   modalContainer: {
     flex: 1,

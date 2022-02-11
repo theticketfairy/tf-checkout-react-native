@@ -2,8 +2,15 @@ import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _forEach from 'lodash/forEach'
 import _map from 'lodash/map'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Alert, Linking, Text, View } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Linking,
+  Text,
+  View,
+} from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {
@@ -15,10 +22,15 @@ import {
   registerNewUser,
 } from '../../api/ApiClient'
 import Constants from '../../api/Constants'
-import { ICheckoutBody, ICheckoutTicketHolder } from '../../api/types'
+import {
+  ICartResponse,
+  ICheckoutBody,
+  ICheckoutTicketHolder,
+} from '../../api/types'
 import {
   Button,
   Checkbox,
+  DatePicker,
   Dropdown,
   Input,
   Loading,
@@ -29,10 +41,12 @@ import { Config } from '../../helpers/Config'
 import { useDebounced } from '../../helpers/Debounced'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import {
+  validateAge,
   validateEmail,
   validateEmpty,
   validatePasswords,
 } from '../../helpers/Validators'
+import R from '../../res'
 import { IUserProfile } from '../../types'
 import s from './styles'
 import {
@@ -43,7 +57,19 @@ import {
 } from './types'
 
 const Billing = (props: IBillingProps) => {
-  const { styles, texts } = props
+  const {
+    styles,
+    texts,
+    cartProps: {
+      isAgeRequired,
+      isNameRequired,
+      isPhoneRequired,
+      minimumAge,
+      isBillingRequired,
+    },
+  } = props
+
+  //#region State
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isSubmittingData, setIsSubmittingData] = useState<boolean>(false)
   const [loggedUserFirstName, setLoggedUserFirstName] = useState<string>('')
@@ -54,14 +80,15 @@ const Billing = (props: IBillingProps) => {
   const [emailConfirmation, setEmailConfirmation] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
-  const [isSubToMarketing, setIsSubToMarketing] = useState(false)
-  const [isSubToNewsletter, setIsSubToNewsletter] = useState(false)
+  const [isSubToTicketFairy, setIsSubToTicketFairy] = useState(false)
+  const [isSubToBrand, setIsSubToBrand] = useState(false)
   const [phone, setPhone] = useState('')
   const [street, setStreet] = useState('')
   const [city, setCity] = useState('')
   const [countryId, setCountryId] = useState('')
   const [stateId, setStateId] = useState('')
   const [postalCode, setPostalCode] = useState('')
+  const [dateOfBirth, setDateOfBirth] = useState(new Date())
   const [selectedCountry, setSelectedCountry] = useState<
     IDropdownItem | undefined
   >(undefined)
@@ -72,7 +99,9 @@ const Billing = (props: IBillingProps) => {
     ITicketHolderField[]
   >([])
 
-  const [numberOfTicketHolders, setNumberOfTicketHolders] = useState(1)
+  const [numberOfTicketHolders, setNumberOfTicketHolders] = useState<
+    number | undefined
+  >()
 
   const [countries, setCountries] = useState<IDropdownItem[]>([
     { value: '-1', label: 'Country' },
@@ -82,6 +111,9 @@ const Billing = (props: IBillingProps) => {
   ])
 
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
+  const [skipping, setSkippingStatus] = useState<
+    'skipping' | 'fail' | 'success' | 'false'
+  >(isBillingRequired ? 'false' : 'skipping')
 
   // Errors state
   const firstNameError = useDebounced(firstName, validateEmpty)
@@ -102,19 +134,25 @@ const Billing = (props: IBillingProps) => {
   const streetError = useDebounced(street, validateEmpty)
   const cityError = useDebounced(city, validateEmpty)
   const postalCodeError = useDebounced(postalCode, validateEmpty)
+  const [dateOfBirthError, setDateOfBirthError] = useState('')
   // End of errors state
+  //#endregion
 
+  //#region Refs
   const storedToken = useRef('')
+  const storedProfileData = useRef({} as IUserProfile)
+  //#endregion
 
+  //#region Handlers
   const showLoginDialog = () => setIsLoginDialogVisible(true)
   const hideLoginDialog = () => setIsLoginDialogVisible(false)
 
-  const handleIsSubToNewsletterToggle = () => {
-    setIsSubToNewsletter(!isSubToNewsletter)
+  const handleIsSubToBrandToggle = () => {
+    setIsSubToBrand(!isSubToBrand)
   }
 
-  const handleIsSubToMarketingToggle = () => {
-    setIsSubToMarketing(!isSubToMarketing)
+  const handleIsSubToTicketFairyToggle = () => {
+    setIsSubToTicketFairy(!isSubToTicketFairy)
   }
 
   const handleOpenPrivacyLink = async () => {
@@ -128,6 +166,7 @@ const Billing = (props: IBillingProps) => {
     userProfile: IUserProfile,
     accessToken?: string
   ) => {
+    storedProfileData.current = userProfile
     setFirstName(userProfile.firstName)
     setLastName(userProfile.lastName)
     setEmail(userProfile.email)
@@ -136,17 +175,17 @@ const Billing = (props: IBillingProps) => {
     setStreet(userProfile.streetAddress)
     setCity(userProfile.city)
     setPostalCode(userProfile.zipCode)
-    setCountryId(userProfile.country)
+    setCountryId(userProfile.countryId)
     setStateId(userProfile.stateId)
     setLoggedUserFirstName(userProfile.firstName)
-    setIsSubToMarketing(true)
+    setIsSubToTicketFairy(true)
 
     const thData = [...ticketHoldersData]
-    thData.forEach((th) => {
-      th.firstName = userProfile.firstName
-      th.lastName = userProfile.lastName
-      th.email = userProfile.email
-      th.phone = userProfile.phone
+    thData.forEach((th, index) => {
+      th.firstName = index === 0 ? userProfile.firstName : ''
+      th.lastName = index === 0 ? userProfile.lastName : ''
+      th.email = index === 0 ? userProfile.email : ''
+      th.phone = index === 0 ? userProfile.phone : ''
     })
     setTicketHoldersData(thData)
 
@@ -155,7 +194,7 @@ const Billing = (props: IBillingProps) => {
     }
   }
 
-  const handleOnLoginSuccess = (
+  const handleOnLoginSuccess = async (
     userProfile: IUserProfile,
     accessToken: string
   ) => {
@@ -166,6 +205,17 @@ const Billing = (props: IBillingProps) => {
       })
     }
 
+    if (!isBillingRequired && skipping === 'fail') {
+      setSkippingStatus('skipping')
+
+      await performCheckout(
+        getCheckoutBodyWhenSkipping({
+          userProfile: userProfile,
+          ticketsQuantity: numberOfTicketHolders || 1,
+        }),
+        accessToken
+      )
+    }
     handleSetFormDataFromUserProfile(userProfile, accessToken)
   }
 
@@ -190,9 +240,9 @@ const Billing = (props: IBillingProps) => {
     setStateId('')
     setSelectedCountry({ value: '-1', label: 'Country' })
     setStates([{ value: '-1', label: 'State/County' }])
-    setIsSubToMarketing(false)
-    setIsSubToNewsletter(false)
-    storedToken.current = undefined
+    setIsSubToTicketFairy(false)
+    setIsSubToBrand(false)
+    storedToken.current = ''
     setLoggedUserFirstName('')
 
     const thData = [...ticketHoldersData]
@@ -205,30 +255,52 @@ const Billing = (props: IBillingProps) => {
     setTicketHoldersData(thData)
   }
 
+  const handleOnSelectDate = (newDate: Date) => {
+    const ageError = validateAge(newDate, minimumAge)
+    setDateOfBirth(newDate)
+    setDateOfBirthError(ageError)
+  }
+  //#endregion
+
+  //#region Form validation
   const checkBasicDataValid = (): boolean => {
     if (
       !firstName ||
       !lastName ||
       !email ||
       !emailConfirmation ||
-      !street ||
-      !phone ||
       !city ||
-      !postalCode
+      !postalCode ||
+      selectedState?.value === '-1' ||
+      selectedCountry?.value === '-1'
     ) {
       return false
     }
 
-    if (loggedUserFirstName) {
-      if (selectedState?.value === '-1') {
-        return false
-      }
+    if (isPhoneRequired && !phone) {
+      return false
+    }
+
+    if (Config.IS_BILLING_STREET_NAME_REQUIRED && !street) {
+      return false
     }
 
     return true
   }
 
   const checkExtraDataValid = (): string => {
+    if (isAgeRequired) {
+      const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
+      if (ageValidationMessage) {
+        setDateOfBirthError(ageValidationMessage)
+        return ageValidationMessage
+      }
+    }
+
+    if (!isNameRequired) {
+      return ''
+    }
+
     return _every(
       _map(
         ticketHoldersData,
@@ -239,6 +311,7 @@ const Billing = (props: IBillingProps) => {
       ? ''
       : 'You must fill all Ticket Holder required fields'
   }
+  //#endregion
 
   //#region Submit form
   const handleOnRegisterFail = (rawError: any) => {
@@ -251,28 +324,37 @@ const Billing = (props: IBillingProps) => {
     checkoutBody: ICheckoutBody,
     pToken: string
   ) => {
-    setIsSubmittingData(true)
-    const { error: checkoutError, data: checkoutData } = await checkoutOrder(
-      checkoutBody,
-      pToken
-    )
-    setIsSubmittingData(false)
+    try {
+      setIsSubmittingData(true)
+      const { error: checkoutError, data: checkoutData } = await checkoutOrder(
+        checkoutBody,
+        pToken
+      )
+      setIsSubmittingData(false)
 
-    if (checkoutError) {
-      if (props.onCheckoutFail) {
-        props.onCheckoutFail(checkoutError)
+      if (checkoutError) {
+        if (props.onCheckoutFail) {
+          props.onCheckoutFail(checkoutError)
+        }
+        setSkippingStatus('false')
+        return Alert.alert('', checkoutError)
       }
-      return Alert.alert('', checkoutError)
-    }
 
-    const checkoutResponseData: IOnCheckoutSuccess = {
-      id: checkoutData.data.data.attributes.id,
-      hash: checkoutData.data.data.attributes.hash,
-      total: checkoutData.data.data.attributes.total,
-      status: checkoutData.data.data.attributes.status,
-    }
-    if (props.onCheckoutSuccess) {
+      const checkoutResponseData: IOnCheckoutSuccess = {
+        id: checkoutData.data.data.attributes.id,
+        hash: checkoutData.data.data.attributes.hash,
+        total: checkoutData.data.data.attributes.total,
+        status: checkoutData.data.data.attributes.status,
+      }
+      setSkippingStatus('success')
       props.onCheckoutSuccess(checkoutResponseData)
+    } catch (x) {
+      setIsSubmittingData(false)
+      setSkippingStatus('false')
+
+      if (props.onCheckoutFail) {
+        props.onCheckoutFail(x)
+      }
     }
   }
 
@@ -286,14 +368,8 @@ const Billing = (props: IBillingProps) => {
       'password_confirmation',
       checkoutBody.attributes.password
     )
-    bodyFormData.append(
-      'client_id',
-      Config.CLIENT_ID || 'e9d8f8922797b4621e562255afe90dbf'
-    )
-    bodyFormData.append(
-      'client_secret',
-      Config.CLIENT_SECRET || 'b89c191eff22fdcf84ac9bfd88d005355a151ec2c83b26b9'
-    )
+    bodyFormData.append('client_id', Config.CLIENT_ID)
+    bodyFormData.append('client_secret', Config.CLIENT_SECRET)
 
     return bodyFormData
   }
@@ -335,22 +411,18 @@ const Billing = (props: IBillingProps) => {
     await performCheckout(checkoutBody, tokens.accessToken)
   }
 
-  const onSubmit = async () => {
-    const isExtraDataValid = checkExtraDataValid()
-    if (isExtraDataValid) {
-      return Alert.alert('', isExtraDataValid)
-    }
+  const getCheckoutBody = (): ICheckoutBody => {
+    let parsedTicketHolders: ICheckoutTicketHolder[] = []
 
-    const parsedTicketHolders: ICheckoutTicketHolder[] = ticketHoldersData.map(
-      (th) => {
-        return {
-          email: th.email,
-          first_name: th.firstName,
-          last_name: th.lastName,
-          phone: th.phone,
-        }
+    for (let i = 0; i <= numberOfTicketHolders! - 1; i++) {
+      const individualHolder = {
+        first_name: ticketHoldersData[i].firstName || '',
+        last_name: ticketHoldersData[i].lastName || '',
+        phone: ticketHoldersData[i].phone || '',
+        email: ticketHoldersData[i].email || '',
       }
-    )
+      parsedTicketHolders.push(individualHolder)
+    }
 
     const checkoutBody: ICheckoutBody = {
       attributes: {
@@ -366,11 +438,80 @@ const Billing = (props: IBillingProps) => {
         street_address: street,
         zip: postalCode,
         ticket_holders: parsedTicketHolders,
-        ttf_opt_in: isSubToNewsletter,
-        brand_opt_in: isSubToMarketing,
+        ttf_opt_in: isSubToTicketFairy,
+        brand_opt_in: isSubToBrand,
       },
     }
 
+    if (isAgeRequired) {
+      checkoutBody.attributes.dob_day = dateOfBirth.getDate()
+      checkoutBody.attributes.dob_month = dateOfBirth.getMonth() + 1
+      checkoutBody.attributes.dob_year = dateOfBirth.getFullYear()
+    }
+
+    return checkoutBody
+  }
+
+  const getCheckoutBodyWhenSkipping = ({
+    userProfile,
+    ticketsQuantity,
+  }: {
+    userProfile: IUserProfile
+    ticketsQuantity: number
+  }): ICheckoutBody => {
+    let parsedTicketHolders: ICheckoutTicketHolder[] = []
+    const hFirstName = userProfile.firstName
+    const hLastName = userProfile.lastName
+    const hPhone = userProfile.phone
+    const hEmail = userProfile.email
+
+    for (let i = 0; i <= ticketsQuantity - 1; i++) {
+      const individualHolder = i
+        ? {
+            first_name: '',
+            last_name: '',
+            phone: '',
+            email: '',
+          }
+        : {
+            first_name: hFirstName,
+            last_name: hLastName,
+            phone: hPhone,
+            email: hEmail,
+          }
+
+      parsedTicketHolders.push(individualHolder)
+    }
+
+    const checkoutBody: ICheckoutBody = {
+      attributes: {
+        city: userProfile.city,
+        confirm_email: userProfile.email,
+        country: parseInt(userProfile.countryId, 10),
+        email: userProfile.email,
+        first_name: userProfile.firstName,
+        last_name: userProfile.lastName,
+        phone: userProfile.phone,
+        state: parseInt(userProfile.stateId, 10),
+        street_address: userProfile.streetAddress,
+        zip: userProfile.zipCode,
+        ticket_holders: parsedTicketHolders,
+        ttf_opt_in: isSubToTicketFairy,
+        brand_opt_in: isSubToBrand,
+        password: password,
+      },
+    }
+
+    return checkoutBody
+  }
+
+  const onSubmit = async () => {
+    const isExtraDataValid = checkExtraDataValid()
+    if (isExtraDataValid) {
+      return Alert.alert('', isExtraDataValid)
+    }
+
+    const checkoutBody = getCheckoutBody()
     if (loggedUserFirstName && storedToken.current) {
       await performCheckout(checkoutBody, storedToken.current)
     } else {
@@ -413,13 +554,12 @@ const Billing = (props: IBillingProps) => {
       }
 
       usrPrfl = userProfileResponse
-      handleSetFormDataFromUserProfile(userProfileResponse)
     } else {
       parsedCountries.unshift({ value: '-1', label: 'Country' })
       setSelectedCountry({ value: '-1', label: 'Country' })
     }
 
-    const { data: cartData, error: cartError } = await fetchCart()
+    const { cartData, cartError } = await fetchCart()
 
     if (cartError) {
       setIsLoading(false)
@@ -430,11 +570,12 @@ const Billing = (props: IBillingProps) => {
       return
     }
 
-    let ticketQuantity = parseInt(cartData.quantity, 10)
-    setNumberOfTicketHolders(ticketQuantity)
+    setNumberOfTicketHolders(cartData.quantity)
+    setIsSubToBrand(cartData.isMarketingOptedIn)
+    setIsSubToTicketFairy(cartData.isTfOptIn)
 
     const tHolders: ITicketHolderField[] = []
-    for (let i = 0; i < ticketQuantity; i++) {
+    for (let i = 0; i < cartData.quantity; i++) {
       tHolders.push({
         firstName: i === 0 && usrPrfl ? usrPrfl.firstName : '',
         lastName: i === 0 && usrPrfl ? usrPrfl.lastName : '',
@@ -443,12 +584,28 @@ const Billing = (props: IBillingProps) => {
       })
     }
 
+    if (!isBillingRequired && usrTkn && usrPrfl && cartData) {
+      const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
+        userProfile: usrPrfl,
+        ticketsQuantity: cartData.quantity,
+      })
+      await performCheckout(checkoutBody, usrTkn)
+    } else {
+      if (skipping === 'skipping') {
+        setSkippingStatus('fail')
+      }
+    }
+
+    if (usrPrfl) {
+      handleSetFormDataFromUserProfile(usrPrfl)
+    }
+
     setCountries(parsedCountries)
     setTicketHoldersData(tHolders)
     setIsLoading(false)
   }
 
-  //#region Use effects
+  //#region Effects
   useEffect(() => {
     if (countries.length > 1 && countryId) {
       const selectedCountryItem = _find(
@@ -509,17 +666,23 @@ const Billing = (props: IBillingProps) => {
 
   useEffect(() => {
     fetchData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   //#endregion
 
+  //#region Render
   const renderTicketHolders = () => {
+    if (!numberOfTicketHolders) {
+      return null
+    }
+
     let tHolders = []
     for (let i = 0; i < numberOfTicketHolders; i++) {
       tHolders.push(
         <View key={`ticketHolder.${i}`}>
           <Text style={styles?.titles}>Ticket holder {i + 1}</Text>
           <Input
-            label='First name'
+            label={isNameRequired ? 'First name' : 'First name (optional)'}
             value={ticketHoldersData[i].firstName}
             onChangeText={(text) => {
               const copyTicketHolders = [...ticketHoldersData]
@@ -529,7 +692,7 @@ const Billing = (props: IBillingProps) => {
             styles={styles?.inputStyles}
           />
           <Input
-            label='Last name'
+            label={isNameRequired ? 'Last name' : 'Last name (optional)'}
             value={ticketHoldersData[i].lastName}
             onChangeText={(text) => {
               const copyTicketHolders = [...ticketHoldersData]
@@ -568,9 +731,47 @@ const Billing = (props: IBillingProps) => {
     return tHolders
   }
 
+  const renderCheckingOut = () => {
+    return (
+      <View
+        style={[s.skippingRootContainer, styles?.skippingDialog?.rootContainer]}
+      >
+        <View
+          style={[
+            s.skippingDialogContainer,
+            styles?.skippingDialog?.dialogContainer,
+          ]}
+        >
+          <Image
+            source={R.images.brand}
+            style={[s.skippingBrandImage, styles?.skippingDialog?.brandImage]}
+          />
+          <Text style={[s.skippingMessage, styles?.skippingDialog?.message]}>
+            {texts?.skippingMessage || 'Checking out...'}
+          </Text>
+          <ActivityIndicator
+            color={styles?.skippingDialog?.spinner?.color || R.colors.black}
+            size={styles?.skippingDialog?.spinner?.size || 'large'}
+          />
+        </View>
+      </View>
+    )
+  }
+
+  const brandCheckBoxText = useMemo(() => {
+    return texts?.brandCheckBox
+      ? texts.brandCheckBox
+      : 'I would like to be updated on news, events and offers.'
+  }, [texts?.brandCheckBox])
+  const phoneLabel = useMemo(
+    () => (isPhoneRequired ? 'Phone' : 'Phone (optional)'),
+    [isPhoneRequired]
+  )
   const isDataValid = checkBasicDataValid()
 
-  return (
+  return skipping === 'skipping' ? (
+    renderCheckingOut()
+  ) : (
     <KeyboardAwareScrollView extraScrollHeight={32}>
       <View style={styles?.rootContainer}>
         <Login
@@ -624,6 +825,15 @@ const Billing = (props: IBillingProps) => {
           styles={styles?.inputStyles}
           autoCapitalize='none'
         />
+        {isAgeRequired && (
+          <DatePicker
+            text={'Date of Birth'}
+            onSelectDate={handleOnSelectDate}
+            selectedDate={dateOfBirth}
+            styles={styles?.datePicker}
+            error={dateOfBirthError}
+          />
+        )}
         {!loggedUserFirstName && (
           <>
             <Text style={styles?.passwordTitle}>
@@ -650,7 +860,7 @@ const Billing = (props: IBillingProps) => {
           </>
         )}
         <Input
-          label='Phone'
+          label={phoneLabel}
           value={phone}
           onChangeText={setPhone}
           keyboardType='phone-pad'
@@ -658,7 +868,11 @@ const Billing = (props: IBillingProps) => {
           styles={styles?.inputStyles}
         />
         <Input
-          label='Billing Street Address'
+          label={
+            Config.IS_BILLING_STREET_NAME_REQUIRED
+              ? 'Billing Street Address'
+              : 'Billing Street Address (optional)'
+          }
           value={street}
           onChangeText={setStreet}
           error={streetError}
@@ -690,19 +904,15 @@ const Billing = (props: IBillingProps) => {
           selectedOption={selectedState}
           styles={styles?.dropdownStyles}
         />
-
         <Checkbox
-          onPress={handleIsSubToNewsletterToggle}
-          text={
-            'I would like to be updated on House of X news, events and offers.'
-          }
-          isActive={isSubToNewsletter}
+          onPress={handleIsSubToBrandToggle}
+          text={brandCheckBoxText}
+          isActive={isSubToBrand}
           styles={styles?.checkboxStyles}
         />
-
         <Checkbox
-          onPress={handleIsSubToMarketingToggle}
-          isActive={isSubToMarketing}
+          onPress={handleIsSubToTicketFairyToggle}
+          isActive={isSubToTicketFairy}
           customTextComp={
             <Text style={styles?.customCheckbox?.text}>
               I agree that The Ticket Fairy may use the personal data that I
@@ -751,6 +961,7 @@ const Billing = (props: IBillingProps) => {
       {isLoading && <Loading />}
     </KeyboardAwareScrollView>
   )
+  //#endregion
 }
 
 export default Billing

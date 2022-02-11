@@ -1,7 +1,14 @@
-import { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import {
+  ColorValue,
+  ImageStyle,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 
 import { IButtonStyles } from '../../components/button/types'
 import { ICheckboxStyles } from '../../components/checkbox/types'
+import { IDatePickerStyles } from '../../components/datePicker/types'
 import { IDropdownItem, IDropdownStyles } from '../../components/dropdown/types'
 import { IFormFieldProps } from '../../components/formField/types'
 import { IInputStyles } from '../../components/input/types'
@@ -130,6 +137,18 @@ export interface IBillingInfoViewStyles {
   headers?: StyleProp<TextStyle>
   texts?: StyleProp<TextStyle>
   customCheckbox?: ICheckboxStyles
+
+  datePicker?: IDatePickerStyles
+  skippingDialog?: {
+    rootContainer?: StyleProp<ViewStyle>
+    dialogContainer?: StyleProp<ViewStyle>
+    brandImage?: StyleProp<ImageStyle>
+    message?: StyleProp<TextStyle>
+    spinner?: {
+      color: ColorValue
+      size: 'large' | 'small'
+    }
+  }
 }
 
 export interface IBillingInfoViewTexts {
@@ -137,6 +156,8 @@ export interface IBillingInfoViewTexts {
   loginButton?: string
   checkoutButton?: string
   passwordTitle?: string
+  brandCheckBox?: string
+  skippingMessage?: string
 }
 
 export interface IBillingInfoViewProps {

@@ -219,3 +219,10 @@ export interface IMyOrderDetailsResponse {
   tickets: IMyOrderDetailsTicket[]
 }
 //#endregion
+
+export interface ICartResponse {
+  quantity: number
+  isTfOptInHidden?: boolean
+  isTfOptIn: boolean // Ticket fairy
+  isMarketingOptedIn: boolean // Brand
+}
