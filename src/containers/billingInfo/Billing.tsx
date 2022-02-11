@@ -734,49 +734,25 @@ const Billing = (props: IBillingProps) => {
   const renderCheckingOut = () => {
     return (
       <View
-        style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          flex: 1,
-        }}
+        style={[s.skippingRootContainer, styles?.skippingDialog?.rootContainer]}
       >
         <View
-          style={{
-            backgroundColor: R.colors.white,
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 24,
-            borderRadius: 5,
-            elevation: 4,
-            shadowColor: R.colors.black,
-            shadowOffset: {
-              width: 2,
-              height: 4,
-            },
-            shadowOpacity: 0.5,
-            shadowRadius: 3,
-          }}
+          style={[
+            s.skippingDialogContainer,
+            styles?.skippingDialog?.dialogContainer,
+          ]}
         >
           <Image
             source={R.images.brand}
-            style={{
-              height: 90,
-              width: 250,
-              resizeMode: 'contain',
-              tintColor: R.colors.black,
-            }}
+            style={[s.skippingBrandImage, styles?.skippingDialog?.brandImage]}
           />
-          <Text
-            style={{
-              fontSize: 20,
-              color: R.colors.black,
-              fontWeight: '700',
-              marginBottom: 24,
-            }}
-          >
-            Checking out...
+          <Text style={[s.skippingMessage, styles?.skippingDialog?.message]}>
+            {texts?.skippingMessage || 'Checking out...'}
           </Text>
-          <ActivityIndicator color={R.colors.black} size='large' />
+          <ActivityIndicator
+            color={styles?.skippingDialog?.spinner?.color || R.colors.black}
+            size={styles?.skippingDialog?.spinner?.size || 'large'}
+          />
         </View>
       </View>
     )

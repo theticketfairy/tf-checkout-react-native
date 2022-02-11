@@ -1,4 +1,10 @@
-import { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import {
+  ColorValue,
+  ImageStyle,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 
 import { IButtonStyles } from '../../components/button/types'
 import { ICheckboxStyles } from '../../components/checkbox/types'
@@ -133,6 +139,16 @@ export interface IBillingInfoViewStyles {
   customCheckbox?: ICheckboxStyles
 
   datePicker?: IDatePickerStyles
+  skippingDialog?: {
+    rootContainer?: StyleProp<ViewStyle>
+    dialogContainer?: StyleProp<ViewStyle>
+    brandImage?: StyleProp<ImageStyle>
+    message?: StyleProp<TextStyle>
+    spinner?: {
+      color: ColorValue
+      size: 'large' | 'small'
+    }
+  }
 }
 
 export interface IBillingInfoViewTexts {
@@ -141,6 +157,7 @@ export interface IBillingInfoViewTexts {
   checkoutButton?: string
   passwordTitle?: string
   brandCheckBox?: string
+  skippingMessage?: string
 }
 
 export interface IBillingInfoViewProps {
