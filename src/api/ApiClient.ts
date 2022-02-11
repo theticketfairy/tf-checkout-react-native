@@ -267,11 +267,15 @@ export const fetchMyOrders = async (
     orders: [],
   }
   let responseError = ''
-  const response: AxiosResponse | void = await Client.get(
-    `/v1/account/orders/?page=${page}&limit=${limit}&filter[event]=${filter}`
-  ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message || 'Error fetching My Orders'
-  })
+  const endpoint =
+    Config.BRAND === undefined
+      ? `/v1/account/orders/?page=${page}&limit=${limit}&filter[event]=${filter}`
+      : `/v1/account/orders/?page=${page}&limit=${limit}&filter[event]=${filter}&filter[brand]=${Config.BRAND}`
+  const response: AxiosResponse | void = await Client.get(endpoint).catch(
+    (error: AxiosError) => {
+      responseError = error.response?.data.message || 'Error fetching My Orders'
+    }
+  )
 
   if (response?.data) {
     data.events = response.data.data.attributes.purchased_events

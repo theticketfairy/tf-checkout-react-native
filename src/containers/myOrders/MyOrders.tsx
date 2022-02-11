@@ -16,18 +16,19 @@ const MyOrders: FC<IMyOrdersProps> = ({
   const [isLoading, setIsLoading] = useState(true)
   const [isGettingEventDetails, setIsGettingEventDetails] = useState(false)
   const [myEvents, setMyEvents] = useState<IDropdownItem[]>([])
-  const [selectedEvent, setSelectedEvent] = useState<IDropdownItem>()
+  const [selectedEvent, setSelectedEvent] = useState<IDropdownItem>({
+    label: 'Select event',
+    value: '-1',
+  })
   const [myOrders, setMyOrders] = useState<IMyOrdersOrder[]>([])
-
-  console.log('myEvents', myEvents)
-
   const getMyOrdersAsync = useCallback(async () => {
     setIsLoading(true)
+    const validSelectedEvent =
+      selectedEvent.value === '-1' ? null : selectedEvent
     const { myOrdersData, myOrdersError } = await fetchMyOrders(
-      selectedEvent?.value.toString()
+      validSelectedEvent?.value.toString()
     )
-    console.log('MyOrdersData', myOrdersData)
-    console.log('myOrdersError', myOrdersError)
+
     if (myOrdersError || !myOrdersData) {
       return Alert.alert('', myOrdersError)
     }
@@ -46,7 +47,9 @@ const MyOrders: FC<IMyOrdersProps> = ({
 
   //#region Handlers
   const handleOnChangeEvent = (event: IDropdownItem) => {
-    setSelectedEvent(event)
+    if (event.value !== selectedEvent.value) {
+      setSelectedEvent(event)
+    }
   }
 
   const handleOnSelectOrder = async (order: IMyOrdersOrder) => {
@@ -66,14 +69,6 @@ const MyOrders: FC<IMyOrdersProps> = ({
   //#endregion
 
   //#region useEffect
-  useEffect(() => {
-    const fetchData = async () => {
-      await getMyOrdersAsync()
-    }
-    fetchData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   useEffect(() => {
     if (selectedEvent?.value) {
       getMyOrdersAsync()
