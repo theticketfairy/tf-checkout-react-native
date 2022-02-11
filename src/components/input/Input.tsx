@@ -31,6 +31,7 @@ const Input = (props: IInputProps) => {
         textContentType={props.isSecure ? 'oneTimeCode' : 'none'}
         autoCorrect={false}
         style={styles?.input}
+        errorColor={styles?.errorColor}
       />
     </View>
   )

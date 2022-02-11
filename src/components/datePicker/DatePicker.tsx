@@ -8,9 +8,10 @@ import { IDatePickerProps } from './types'
 const DatePicker = ({
   onSelectDate,
   onCancel,
-  containerStyle,
+  styles,
   text = 'Select date',
   selectedDate,
+  error,
 }: IDatePickerProps) => {
   const [isVisible, setIsVisible] = useState(false)
   const onButtonPress = () => {
@@ -32,13 +33,16 @@ const DatePicker = ({
   }
 
   return (
-    <View style={[containerStyle]}>
-      <TouchableOpacity onPress={onButtonPress} style={s.button}>
-        <Text
-          style={{
-            fontSize: 16,
-          }}
-        >
+    <View style={[styles?.container]}>
+      <TouchableOpacity
+        onPress={onButtonPress}
+        style={[
+          s.button,
+          styles?.button,
+          !!error && { borderColor: styles?.errorColor },
+        ]}
+      >
+        <Text style={[s.text, styles?.text]}>
           {selectedDate?.toLocaleDateString() || text}
         </Text>
       </TouchableOpacity>
@@ -50,6 +54,7 @@ const DatePicker = ({
           onCancel={handleOnCancel}
         />
       )}
+      {!!error && <Text style={styles?.error}>{error}</Text>}
     </View>
   )
 }

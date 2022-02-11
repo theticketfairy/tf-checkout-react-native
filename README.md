@@ -177,7 +177,9 @@ Add it to the render function.
 }
 ```
 
-`onCheckoutSuccess` will be called when the user completes all the data required in the form and taps on the button. Will return the following data:
+### onCheckoutSuccess
+
+Will be called when the user completes all the data required in the form and taps on the button. Will return the following data:
 
 ```js
 {
@@ -189,6 +191,14 @@ Add it to the render function.
 ```
 
 `hash` and `total` will be used in the `Checkout` component.
+
+### skipBilling
+
+Will auto-populate the checkout form with the logged user data, perform the order `Checkout` and call the callback `onCheckoutSuccess` so you can call the next component.
+
+### canSkipHolderNames
+
+Will skip the need of holder names information and will be automatically filled with the logged user data.
 
 ---
 

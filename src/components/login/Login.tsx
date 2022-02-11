@@ -8,6 +8,7 @@ import {
   setAccessTokenHandler,
 } from '../../api/ApiClient'
 import Constants from '../../api/Constants'
+import { Config } from '../../helpers/Config'
 import {
   deleteAllData,
   IStoredUserData,
@@ -58,15 +59,8 @@ const Login = ({
     bodyFormDataToken.append('code', code)
     bodyFormDataToken.append('scope', 'profile')
     bodyFormDataToken.append('grant_type', 'authorization_code')
-    bodyFormDataToken.append(
-      'client_id',
-      Constants.CLIENT_ID || 'e9d8f8922797b4621e562255afe90dbf'
-    )
-    bodyFormDataToken.append(
-      'client_secret',
-      Constants.CLIENT_SECRET ||
-        'b89c191eff22fdcf84ac9bfd88d005355a151ec2c83b26b9'
-    )
+    bodyFormDataToken.append('client_id', Config.CLIENT_ID)
+    bodyFormDataToken.append('client_secret', Config.CLIENT_SECRET)
 
     const { error: tokenError, accessToken } = await fetchAccessToken(
       bodyFormDataToken

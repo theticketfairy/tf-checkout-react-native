@@ -15,6 +15,7 @@ export interface IInputStyles {
   lineWidth?: number
   activeLineWidth?: number
   baseColor?: ColorValue
+  errorColor?: ColorValue
 }
 
 export interface IInputProps extends TextInputProps {

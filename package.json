@@ -70,7 +70,9 @@
     "@stripe/stripe-react-native": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-fs": "*"
+    "react-native-fs": "*",
+    "react-native-modal-datetime-picker": "*",
+    "@react-native-community/datetimepicker": "*"
   },
   "jest": {
     "preset": "react-native",

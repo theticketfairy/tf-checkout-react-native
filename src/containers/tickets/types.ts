@@ -52,6 +52,8 @@ export interface IAddToCartSuccess {
   isBillingRequired: boolean
   isNameRequired: boolean
   isAgeRequired: boolean
+  isPhoneRequired: boolean
+  minimumAge: number
 }
 
 export interface ITicketListStyles {

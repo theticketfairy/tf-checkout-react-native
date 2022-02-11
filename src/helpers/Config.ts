@@ -1,6 +1,7 @@
 import _forEach from 'lodash/forEach'
 
 import { Client } from '../api/ApiClient'
+import Constants from '../api/Constants'
 
 export interface IConfig {
   DOMAIN?: string
@@ -8,8 +9,10 @@ export interface IConfig {
   CLIENT_ID?: string
   CLIENT_SECRET?: string
   TIMEOUT?: number
+  BRAND?: string
+  IS_BILLING_STREET_NAME_REQUIRED?: boolean
 
-  [key: string]: string | number | undefined
+  [key: string]: string | number | boolean | undefined
 }
 
 export const Config: IConfig = {} as IConfig
@@ -33,6 +36,16 @@ export const setConfig = (configs: IConfig): string | undefined => {
 
   if (Config.CLIENT_ID) {
     Client.setDomain(Config.CLIENT_ID)
+  }
+
+  if (!Config.CLIENT_SECRET) {
+    Config.CLIENT_SECRET = Constants.CLIENT_SECRET
+  }
+  if (!Config.Client_ID) {
+    Config.CLIENT_ID = Constants.CLIENT_ID
+  }
+  if (Config.IS_BILLING_STREET_NAME_REQUIRED === undefined) {
+    Config.IS_BILLING_STREET_NAME_REQUIRED = true
   }
 
   return undefined

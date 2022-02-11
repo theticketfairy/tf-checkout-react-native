@@ -12,7 +12,6 @@ export default StyleSheet.create({
     paddingHorizontal: 8,
     borderColor: R.colors.primary,
     borderRadius: 5,
-    marginBottom: 24,
   },
   text: {
     fontSize: 16,

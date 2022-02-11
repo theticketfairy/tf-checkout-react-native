@@ -16,7 +16,7 @@ import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles from './styles'
 
-const EVENT_ID = 10690 // Replace with assigned ID
+const EVENT_ID = 5420 // Replace with assigned ID
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -87,6 +87,7 @@ const App = () => {
   //#region effects
   useEffect(() => {
     if (cartProps) {
+      console.log('cartProps', cartProps)
       setComponentToShow(ComponentEnum.BillingInfo)
     }
   }, [cartProps])
@@ -120,7 +121,27 @@ const App = () => {
             privacyPolicyLinkStyle={{
               color: Color.primary,
             }}
+            texts={{
+              brandCheckBox: 'This is an injected text for your brand',
+            }}
             styles={{
+              datePicker: {
+                container: { marginBottom: 16 },
+                button: {
+                  borderColor: Color.white,
+                  borderWidth: 2,
+                },
+                text: {
+                  color: Color.textMain,
+                  fontSize: 16,
+                },
+                error: {
+                  color: Color.danger,
+                  fontSize: 14,
+                  marginTop: 4,
+                },
+                errorColor: Color.danger,
+              },
               rootContainer: {
                 marginHorizontal: 24,
                 marginBottom: 50,
@@ -196,6 +217,7 @@ const App = () => {
                 },
                 label: {
                   color: Color.textMain,
+                  fontSize: 16,
                 },
                 icon: {
                   tintColor: Color.white,
@@ -212,6 +234,7 @@ const App = () => {
                   color: Color.textMain,
                 },
                 baseColor: Color.white,
+                errorColor: Color.danger,
               },
               loginStyles: {
                 message: {
@@ -589,6 +612,7 @@ const App = () => {
           <Tickets
             config={{
               DOMAIN: 'https://houseofx.nyc',
+              IS_BILLING_STREET_NAME_REQUIRED: false,
             }}
             eventId={EVENT_ID}
             onAddToCartSuccess={handleOnAddToCartSuccess}
