@@ -1,10 +1,16 @@
 import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _forEach from 'lodash/forEach'
-import _isEmpty from 'lodash/isEmpty'
 import _map from 'lodash/map'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Linking, Text, View } from 'react-native'
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Linking,
+  Text,
+  View,
+} from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {
@@ -16,7 +22,11 @@ import {
   registerNewUser,
 } from '../../api/ApiClient'
 import Constants from '../../api/Constants'
-import { ICheckoutBody, ICheckoutTicketHolder } from '../../api/types'
+import {
+  ICartResponse,
+  ICheckoutBody,
+  ICheckoutTicketHolder,
+} from '../../api/types'
 import {
   Button,
   Checkbox,
@@ -36,6 +46,7 @@ import {
   validateEmpty,
   validatePasswords,
 } from '../../helpers/Validators'
+import R from '../../res'
 import { IUserProfile } from '../../types'
 import s from './styles'
 import {
@@ -88,7 +99,9 @@ const Billing = (props: IBillingProps) => {
     ITicketHolderField[]
   >([])
 
-  const [numberOfTicketHolders, setNumberOfTicketHolders] = useState(1)
+  const [numberOfTicketHolders, setNumberOfTicketHolders] = useState<
+    number | undefined
+  >()
 
   const [countries, setCountries] = useState<IDropdownItem[]>([
     { value: '-1', label: 'Country' },
@@ -98,6 +111,9 @@ const Billing = (props: IBillingProps) => {
   ])
 
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
+  const [skipping, setSkippingStatus] = useState<
+    'skipping' | 'fail' | 'success' | 'false'
+  >(isBillingRequired ? 'false' : 'skipping')
 
   // Errors state
   const firstNameError = useDebounced(firstName, validateEmpty)
@@ -159,17 +175,17 @@ const Billing = (props: IBillingProps) => {
     setStreet(userProfile.streetAddress)
     setCity(userProfile.city)
     setPostalCode(userProfile.zipCode)
-    setCountryId(userProfile.country)
+    setCountryId(userProfile.countryId)
     setStateId(userProfile.stateId)
     setLoggedUserFirstName(userProfile.firstName)
     setIsSubToTicketFairy(true)
 
     const thData = [...ticketHoldersData]
-    thData.forEach((th) => {
-      th.firstName = userProfile.firstName
-      th.lastName = userProfile.lastName
-      th.email = userProfile.email
-      th.phone = userProfile.phone
+    thData.forEach((th, index) => {
+      th.firstName = index === 0 ? userProfile.firstName : ''
+      th.lastName = index === 0 ? userProfile.lastName : ''
+      th.email = index === 0 ? userProfile.email : ''
+      th.phone = index === 0 ? userProfile.phone : ''
     })
     setTicketHoldersData(thData)
 
@@ -178,7 +194,7 @@ const Billing = (props: IBillingProps) => {
     }
   }
 
-  const handleOnLoginSuccess = (
+  const handleOnLoginSuccess = async (
     userProfile: IUserProfile,
     accessToken: string
   ) => {
@@ -189,6 +205,17 @@ const Billing = (props: IBillingProps) => {
       })
     }
 
+    if (!isBillingRequired && skipping === 'fail') {
+      setSkippingStatus('skipping')
+
+      await performCheckout(
+        getCheckoutBodyWhenSkipping({
+          userProfile: userProfile,
+          ticketsQuantity: numberOfTicketHolders || 1,
+        }),
+        accessToken
+      )
+    }
     handleSetFormDataFromUserProfile(userProfile, accessToken)
   }
 
@@ -309,6 +336,7 @@ const Billing = (props: IBillingProps) => {
         if (props.onCheckoutFail) {
           props.onCheckoutFail(checkoutError)
         }
+        setSkippingStatus('false')
         return Alert.alert('', checkoutError)
       }
 
@@ -318,11 +346,12 @@ const Billing = (props: IBillingProps) => {
         total: checkoutData.data.data.attributes.total,
         status: checkoutData.data.data.attributes.status,
       }
-      if (props.onCheckoutSuccess) {
-        props.onCheckoutSuccess(checkoutResponseData)
-      }
+      setSkippingStatus('success')
+      props.onCheckoutSuccess(checkoutResponseData)
     } catch (x) {
       setIsSubmittingData(false)
+      setSkippingStatus('false')
+
       if (props.onCheckoutFail) {
         props.onCheckoutFail(x)
       }
@@ -383,66 +412,31 @@ const Billing = (props: IBillingProps) => {
   }
 
   const getCheckoutBody = (): ICheckoutBody => {
-    const withDefaultHolder =
-      (loggedUserFirstName &&
-        !_isEmpty(numberOfTicketHolders) &&
-        !isBillingRequired) ||
-      !isNameRequired
-
     let parsedTicketHolders: ICheckoutTicketHolder[] = []
-    const sProfile: IUserProfile = storedProfileData.current
 
-    if (withDefaultHolder) {
-      const hFirstName = storedProfileData.current.firstName
-      const hLastName = storedProfileData.current.lastName
-      const hPhone = storedProfileData.current.phone
-      const hEmail = storedProfileData.current.email
-
-      for (let i = 0; i <= numberOfTicketHolders - 1; i++) {
-        const individualHolder = i
-          ? {
-              first_name: ticketHoldersData[i].firstName || '',
-              last_name: ticketHoldersData[i].lastName || '',
-              phone: ticketHoldersData[i].phone || '',
-              email: ticketHoldersData[i].email || '',
-            }
-          : {
-              first_name: hFirstName,
-              last_name: hLastName,
-              phone: hPhone,
-              email: hEmail,
-            }
-
-        parsedTicketHolders.push(individualHolder)
+    for (let i = 0; i <= numberOfTicketHolders! - 1; i++) {
+      const individualHolder = {
+        first_name: ticketHoldersData[i].firstName || '',
+        last_name: ticketHoldersData[i].lastName || '',
+        phone: ticketHoldersData[i].phone || '',
+        email: ticketHoldersData[i].email || '',
       }
-    } else {
-      parsedTicketHolders = ticketHoldersData.map((th) => {
-        return {
-          email: th.email,
-          first_name: th.firstName,
-          last_name: th.lastName,
-          phone: th.phone,
-        }
-      })
+      parsedTicketHolders.push(individualHolder)
     }
 
     const checkoutBody: ICheckoutBody = {
       attributes: {
-        city: withDefaultHolder ? sProfile.city : city,
-        confirm_email: withDefaultHolder ? sProfile.email : emailConfirmation,
-        country: withDefaultHolder
-          ? parseInt(sProfile.country, 10)
-          : parseInt(selectedCountry!.value as string, 10),
-        email: withDefaultHolder ? sProfile.email : email,
-        first_name: withDefaultHolder ? sProfile.firstName : firstName,
-        last_name: withDefaultHolder ? sProfile.lastName : lastName,
+        city: city,
+        confirm_email: emailConfirmation,
+        country: parseInt(selectedCountry!.value as string, 10),
+        email: email,
+        first_name: firstName,
+        last_name: lastName,
         password: password,
-        phone: withDefaultHolder ? sProfile.phone : phone,
-        state: withDefaultHolder
-          ? parseInt(sProfile.stateId, 10)
-          : parseInt(selectedState!.value as string, 10),
-        street_address: withDefaultHolder ? sProfile.streetAddress : street,
-        zip: withDefaultHolder ? sProfile.zipCode : postalCode,
+        phone: phone,
+        state: parseInt(selectedState!.value as string, 10),
+        street_address: street,
+        zip: postalCode,
         ticket_holders: parsedTicketHolders,
         ttf_opt_in: isSubToTicketFairy,
         brand_opt_in: isSubToBrand,
@@ -453,6 +447,59 @@ const Billing = (props: IBillingProps) => {
       checkoutBody.attributes.dob_day = dateOfBirth.getDate()
       checkoutBody.attributes.dob_month = dateOfBirth.getMonth() + 1
       checkoutBody.attributes.dob_year = dateOfBirth.getFullYear()
+    }
+
+    return checkoutBody
+  }
+
+  const getCheckoutBodyWhenSkipping = ({
+    userProfile,
+    ticketsQuantity,
+  }: {
+    userProfile: IUserProfile
+    ticketsQuantity: number
+  }): ICheckoutBody => {
+    let parsedTicketHolders: ICheckoutTicketHolder[] = []
+    const hFirstName = userProfile.firstName
+    const hLastName = userProfile.lastName
+    const hPhone = userProfile.phone
+    const hEmail = userProfile.email
+
+    for (let i = 0; i <= ticketsQuantity - 1; i++) {
+      const individualHolder = i
+        ? {
+            first_name: '',
+            last_name: '',
+            phone: '',
+            email: '',
+          }
+        : {
+            first_name: hFirstName,
+            last_name: hLastName,
+            phone: hPhone,
+            email: hEmail,
+          }
+
+      parsedTicketHolders.push(individualHolder)
+    }
+
+    const checkoutBody: ICheckoutBody = {
+      attributes: {
+        city: userProfile.city,
+        confirm_email: userProfile.email,
+        country: parseInt(userProfile.countryId, 10),
+        email: userProfile.email,
+        first_name: userProfile.firstName,
+        last_name: userProfile.lastName,
+        phone: userProfile.phone,
+        state: parseInt(userProfile.stateId, 10),
+        street_address: userProfile.streetAddress,
+        zip: userProfile.zipCode,
+        ticket_holders: parsedTicketHolders,
+        ttf_opt_in: isSubToTicketFairy,
+        brand_opt_in: isSubToBrand,
+        password: password,
+      },
     }
 
     return checkoutBody
@@ -507,7 +554,6 @@ const Billing = (props: IBillingProps) => {
       }
 
       usrPrfl = userProfileResponse
-      handleSetFormDataFromUserProfile(userProfileResponse)
     } else {
       parsedCountries.unshift({ value: '-1', label: 'Country' })
       setSelectedCountry({ value: '-1', label: 'Country' })
@@ -538,10 +584,20 @@ const Billing = (props: IBillingProps) => {
       })
     }
 
-    // Make checkout ONLY IF user is logged in
-    if (!isBillingRequired && usrPrfl && usrTkn) {
-      await performCheckout(getCheckoutBody(), usrTkn)
-      setIsLoading(false)
+    if (!isBillingRequired && usrTkn && usrPrfl && cartData) {
+      const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
+        userProfile: usrPrfl,
+        ticketsQuantity: cartData.quantity,
+      })
+      await performCheckout(checkoutBody, usrTkn)
+    } else {
+      if (skipping === 'skipping') {
+        setSkippingStatus('fail')
+      }
+    }
+
+    if (usrPrfl) {
+      handleSetFormDataFromUserProfile(usrPrfl)
     }
 
     setCountries(parsedCountries)
@@ -549,6 +605,7 @@ const Billing = (props: IBillingProps) => {
     setIsLoading(false)
   }
 
+  //#region Effects
   useEffect(() => {
     if (countries.length > 1 && countryId) {
       const selectedCountryItem = _find(
@@ -609,10 +666,16 @@ const Billing = (props: IBillingProps) => {
 
   useEffect(() => {
     fetchData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   //#endregion
 
+  //#region Render
   const renderTicketHolders = () => {
+    if (!numberOfTicketHolders) {
+      return null
+    }
+
     let tHolders = []
     for (let i = 0; i < numberOfTicketHolders; i++) {
       tHolders.push(
@@ -668,6 +731,57 @@ const Billing = (props: IBillingProps) => {
     return tHolders
   }
 
+  const renderCheckingOut = () => {
+    return (
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex: 1,
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: R.colors.white,
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 24,
+            borderRadius: 5,
+            elevation: 4,
+            shadowColor: R.colors.black,
+            shadowOffset: {
+              width: 2,
+              height: 4,
+            },
+            shadowOpacity: 0.5,
+            shadowRadius: 3,
+          }}
+        >
+          <Image
+            source={R.images.brand}
+            style={{
+              height: 90,
+              width: 250,
+              resizeMode: 'contain',
+              tintColor: R.colors.black,
+            }}
+          />
+          <Text
+            style={{
+              fontSize: 20,
+              color: R.colors.black,
+              fontWeight: '700',
+              marginBottom: 24,
+            }}
+          >
+            Checking out...
+          </Text>
+          <ActivityIndicator color={R.colors.black} size='large' />
+        </View>
+      </View>
+    )
+  }
+
   const brandCheckBoxText = useMemo(() => {
     return texts?.brandCheckBox
       ? texts.brandCheckBox
@@ -679,7 +793,9 @@ const Billing = (props: IBillingProps) => {
   )
   const isDataValid = checkBasicDataValid()
 
-  return (
+  return skipping === 'skipping' ? (
+    renderCheckingOut()
+  ) : (
     <KeyboardAwareScrollView extraScrollHeight={32}>
       <View style={styles?.rootContainer}>
         <Login
@@ -869,6 +985,7 @@ const Billing = (props: IBillingProps) => {
       {isLoading && <Loading />}
     </KeyboardAwareScrollView>
   )
+  //#endregion
 }
 
 export default Billing

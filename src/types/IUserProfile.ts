@@ -6,7 +6,7 @@ export interface IUserProfile {
   phone: string
   streetAddress: string
   zipCode: string
-  country: string
+  countryId: string
   company?: string
   state: string
   stateId: string

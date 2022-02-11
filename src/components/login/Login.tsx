@@ -7,7 +7,6 @@ import {
   fetchUserProfile,
   setAccessTokenHandler,
 } from '../../api/ApiClient'
-import Constants from '../../api/Constants'
 import { Config } from '../../helpers/Config'
 import {
   deleteAllData,
