@@ -62,15 +62,12 @@ const TicketListItem = ({
     ticket.feeText || ticket.feeIncluded ? '(incl. Fees)' : '(excl. Fees)'
 
   const showOldPrice = ticket.price !== ticket.oldPrice
-  const isTicketFree = (+ticket.cost || +ticket.price) === 0
+  const isTicketFree = +ticket.price === 0
   const ticketPrice = isSoldOut
     ? 'SOLD OUT'
     : isTicketFree
     ? 'FREE'
-    : priceWithCurrency(
-        (+ticket.cost || +ticket.price).toFixed(2).toString(),
-        ticket.priceSymbol
-      )
+    : priceWithCurrency(ticket.price.toFixed(2).toString(), ticket.priceSymbol)
 
   const maximumOption = _maxBy(dropdownOptions, (o) => o.value)?.value
 
