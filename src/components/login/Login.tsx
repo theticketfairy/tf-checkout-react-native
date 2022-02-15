@@ -23,7 +23,6 @@ const Login = ({
   isLoginDialogVisible,
   showLoginDialog,
   hideLoginDialog,
-  message,
   userFirstName,
   onLogoutSuccess,
   texts,
@@ -120,7 +119,6 @@ const Login = ({
       onPressLogin={handleOnPressLogin}
       isLoading={isLoading}
       userProfile={userProfileData}
-      message={message}
       onPressLogout={handleOnPressLogout}
       texts={texts}
       styles={styles}

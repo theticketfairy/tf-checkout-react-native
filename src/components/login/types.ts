@@ -12,7 +12,6 @@ export interface ILoginProps {
   onLoginFailure?: (error: string) => void
   onFetchUserProfileFailure?: (error: string) => void
   onFetchAccessTokenFailure?: (error: string) => void
-  message?: string
   isLoginDialogVisible: boolean
   showLoginDialog: () => void
   hideLoginDialog: () => void
@@ -27,12 +26,12 @@ export interface ILoginProps {
 }
 
 export interface ILoginViewStyles {
-  message?: StyleProp<TextStyle>
   guest?: {
     loginButton?: IButtonStyles
     linesContainer?: StyleProp<ViewStyle>
     line1?: StyleProp<TextStyle>
     line2?: StyleProp<TextStyle>
+    message?: StyleProp<TextStyle>
   }
   dialog?: {
     container?: StyleProp<ViewStyle>
@@ -40,6 +39,7 @@ export interface ILoginViewStyles {
     loginButtonDisabled?: IButtonStyles
     input?: IInputStyles
     title?: StyleProp<TextStyle>
+    message?: StyleProp<TextStyle>
     logo?: StyleProp<ImageStyle>
   }
   loggedIn?: {
@@ -56,8 +56,10 @@ export interface ILoginViewTexts {
   logoutButton?: string
   line1?: string
   line2?: string
+  message?: string
   dialog?: {
     loginButton?: string
+    message?: string
   }
   logoutDialog?: {
     title?: string
@@ -73,7 +75,6 @@ export interface ILoginViewProps {
   isDialogVisible: boolean
   onPressLogin: (email: string, password: string) => void
   isLoading: boolean
-  message?: string
   userProfile?: IUserProfile
 
   onPressLogout: () => void

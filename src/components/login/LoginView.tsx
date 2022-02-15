@@ -35,7 +35,6 @@ const LoginView = ({
   isDialogVisible,
   onPressLogin,
   isLoading,
-  message,
   onPressLogout,
   styles,
   texts,
@@ -155,8 +154,8 @@ const LoginView = ({
 
   const GuestComponent = () => (
     <>
-      {message ? (
-        <Text style={styles?.message}>{message}</Text>
+      {texts?.message ? (
+        <Text style={styles?.guest?.message}>{texts?.message}</Text>
       ) : (
         <View style={styles?.guest?.linesContainer}>
           <Text style={styles?.guest?.line1}>{line1}</Text>
@@ -188,8 +187,10 @@ const LoginView = ({
                     source={R.images.brand}
                     style={[s.brand, styles?.dialog?.logo]}
                   />
-                  {!!message && (
-                    <Text style={[s.message, styles?.message]}>{message}</Text>
+                  {!!texts?.dialog?.message && (
+                    <Text style={[s.message, styles?.message]}>
+                      {texts.dialog.message}
+                    </Text>
                   )}
                   {renderFormFields()}
                   {!!loginError && <Text style={[s.error]}>{loginError}</Text>}
