@@ -136,9 +136,6 @@ This is used if the authentication worked but the fetch of the userProfile faile
 `onFetchAccessTokenFailure?: (error: string)`
 When the fetch of the access token failed.
 
-`message?: string`
-Use it to render a message in the login dialog
-
 `isLoginDialogVisible: boolean`
 Flag to show or hide the login dialog.
 
@@ -149,7 +146,7 @@ Callback to show the Login dialog.
 Callback to hide the login dialog.
 
 `onLogoutSuccess?: () => void`  
-Use it to logout the authenticated user. It will delete all the stored data, including access token.
+Use it to logout the authenticated user. It will delete all the stored data, including access token. Please make sure to update the `userFirstName` prop so the component will show the logged out view.
 
 `onLogoutFail?: () => void`
 Will be called if something went wrong while deleting the local data.
@@ -160,8 +157,12 @@ Use this to style your components.
 `texts?: ILoginViewTexts`
 Use this to change some texts that appear in this component.
 
-userFirstName?: string
+`userFirstName?: string`
 Once authenticated send the received firstName data to this prop, so the component can render the Logged in view.
+
+# styles
+<img width="899" alt="image" src="https://user-images.githubusercontent.com/66479719/154158723-864cdabd-2a0b-4a84-95ad-3176c67f7e8b.png">
+
 
 ---
 
