@@ -10,6 +10,8 @@ import {
   PurchaseConfirmation,
   Tickets,
   BillingInfo,
+  Login,
+  IUserProfile,
 } from 'tf-checkout-react-native'
 
 import Color from './Colors'
@@ -33,7 +35,15 @@ const App = () => {
   const [selectedOrderDetails, setSelectedOrderDetails] =
     useState<IMyOrderDetailsResponse>()
 
+  const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
+  const [loggedUserName, setLoggedUserName] = useState('')
   //#region Handlers
+  const handleOnLoginDialogSuccess = (
+    userProfile: IUserProfile,
+    accessToken: string
+  ) => {
+    setLoggedUserName(userProfile.firstName)
+  }
   const handleOnAddToCartSuccess = (data: IAddToCartSuccess) => {
     setCartProps(data)
   }
@@ -609,121 +619,130 @@ const App = () => {
 
       default:
         return (
-          <Tickets
-            config={{
-              DOMAIN: 'https://houseofx.nyc',
-              IS_BILLING_STREET_NAME_REQUIRED: false,
-            }}
-            eventId={EVENT_ID}
-            onAddToCartSuccess={handleOnAddToCartSuccess}
-            onPressMyOrders={handleOnPressMyOrders}
-            styles={{
-              container: {
-                backgroundColor: Color.backgroundMain,
-                padding: 16,
-              },
+          <View style={{ flex: 1 }}>
+            <Tickets
+              config={{
+                DOMAIN: 'https://houseofx.nyc',
+                IS_BILLING_STREET_NAME_REQUIRED: false,
+              }}
+              eventId={EVENT_ID}
+              onAddToCartSuccess={handleOnAddToCartSuccess}
+              onPressMyOrders={handleOnPressMyOrders}
+              styles={{
+                container: {
+                  backgroundColor: Color.backgroundMain,
+                  padding: 16,
+                },
 
-              title: {
-                color: Color.textMain,
-              },
-
-              getTicketsButtonActive: {
-                button: {
-                  backgroundColor: Color.primary,
-                  borderRadius: 2,
-                },
-              },
-              loggedIn: {
-                rootContainer: {
-                  marginTop: 64,
-                },
-                myOrdersButton: {
-                  button: {
-                    backgroundColor: Color.notificationSuccess,
-                    borderRadius: 2,
-                  },
-                },
-                logOutButton: {
-                  button: {
-                    backgroundColor: Color.danger,
-                    borderRadius: 2,
-                  },
-                },
-              },
-              promoCode: {
-                inputPlaceholderColor: Color.textMain,
-                input: {
-                  borderColor: Color.textMainOff,
-                  color: Color.white,
-                },
                 title: {
                   color: Color.textMain,
-                  fontSize: 18,
                 },
-                cancelButton: {
-                  text: {
-                    color: Color.textMain,
-                  },
-                  button: {
-                    borderRadius: 2,
-                  },
-                },
-                applyButton: {
+
+                getTicketsButtonActive: {
                   button: {
                     backgroundColor: Color.primary,
                     borderRadius: 2,
                   },
-                  text: {
-                    fontWeight: '800',
+                },
+                loggedIn: {
+                  rootContainer: {
+                    marginTop: 64,
+                  },
+                  myOrdersButton: {
+                    button: {
+                      backgroundColor: Color.notificationSuccess,
+                      borderRadius: 2,
+                    },
+                  },
+                  logOutButton: {
+                    button: {
+                      backgroundColor: Color.danger,
+                      borderRadius: 2,
+                    },
                   },
                 },
-              },
-              ticketList: {
-                item: {
-                  ticketName: {
+                promoCode: {
+                  inputPlaceholderColor: Color.textMain,
+                  input: {
+                    borderColor: Color.textMainOff,
+                    color: Color.white,
+                  },
+                  title: {
                     color: Color.textMain,
+                    fontSize: 18,
                   },
-                  price: {
-                    color: Color.textMain,
-                  },
-                  fees: {
-                    color: Color.textMainOff,
-                  },
-                  dropdown: {
-                    dialog: {
-                      backgroundColor: Color.backgroundMain,
-                      paddingHorizontal: 0,
-                    },
-                    button: {
-                      borderColor: Color.white,
-                      backgroundColor: Color.backgroundMain,
-                    },
-                    label: {
+                  cancelButton: {
+                    text: {
                       color: Color.textMain,
                     },
-                    icon: {
-                      tintColor: Color.textMain,
+                    button: {
+                      borderRadius: 2,
                     },
-                    listItem: {
+                  },
+                  applyButton: {
+                    button: {
+                      backgroundColor: Color.primary,
+                      borderRadius: 2,
+                    },
+                    text: {
+                      fontWeight: '800',
+                    },
+                  },
+                },
+                ticketList: {
+                  item: {
+                    ticketName: {
+                      color: Color.textMain,
+                    },
+                    price: {
+                      color: Color.textMain,
+                    },
+                    fees: {
+                      color: Color.textMainOff,
+                    },
+                    dropdown: {
+                      dialog: {
+                        backgroundColor: Color.backgroundMain,
+                        paddingHorizontal: 0,
+                      },
                       button: {
-                        width: 100,
+                        borderColor: Color.white,
                         backgroundColor: Color.backgroundMain,
                       },
-                      buttonSelected: {
-                        backgroundColor: Color.white,
-                      },
-                      text: {
+                      label: {
                         color: Color.textMain,
                       },
-                      textSelected: {
-                        color: Color.backgroundMain,
+                      icon: {
+                        tintColor: Color.textMain,
+                      },
+                      listItem: {
+                        button: {
+                          width: 100,
+                          backgroundColor: Color.backgroundMain,
+                        },
+                        buttonSelected: {
+                          backgroundColor: Color.white,
+                        },
+                        text: {
+                          color: Color.textMain,
+                        },
+                        textSelected: {
+                          color: Color.backgroundMain,
+                        },
                       },
                     },
                   },
                 },
-              },
-            }}
-          />
+              }}
+            />
+            <Login
+              onLoginSuccessful={handleOnLoginDialogSuccess}
+              isLoginDialogVisible={isLoginDialogVisible}
+              showLoginDialog={() => setIsLoginDialogVisible(true)}
+              hideLoginDialog={() => setIsLoginDialogVisible(false)}
+              userFirstName={loggedUserName}
+            />
+          </View>
         )
     }
   }

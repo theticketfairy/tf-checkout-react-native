@@ -68,6 +68,10 @@ Set appropriate style in your styles.xml file.
 
 This library exports the following components:
 
+## Login
+
+This is used to authenticate the user.
+
 ## Tickets
 
 Will retrieve and show a list of tickets corresponding to `eventId`. It also includes a PromoCode component that validates it and updates the tickets list.
@@ -97,6 +101,69 @@ Will show the purchased orders for the logged user.
 Will show the details for the selected Order, it also allows the user to download the Ticket PDF.
 
 # Usage [🚧 WIP 🚧]
+
+## Login
+
+Import the component from the library
+
+```js
+import { Login } from 'tf-checkout-react-native'
+```
+
+Then add it to the render function.
+
+```js
+<Login
+  onLoginSuccessful={handleOnLoginDialogSuccess}
+  isLoginDialogVisible={isLoginDialogVisible}
+  showLoginDialog={() => setIsLoginDialogVisible(true)}
+  hideLoginDialog={() => setIsLoginDialogVisible(false)}
+  userFirstName={loggedUserName}
+/>
+```
+
+## Props
+
+`onLoginSuccessful: (userProfile: IUserProfile, accessToken: string)`
+When login was successful, return userProfile data and the access token to use if for future API requests.
+
+`onLoginFailure?: (error: string)`
+When login fails will return the error received.
+
+`onFetchUserProfileFailure?: (error: string)`
+This is used if the authentication worked but the fetch of the userProfile failed.
+
+`onFetchAccessTokenFailure?: (error: string)`
+When the fetch of the access token failed.
+
+`message?: string`
+Use it to render a message in the login dialog
+
+`isLoginDialogVisible: boolean`
+Flag to show or hide the login dialog.
+
+`showLoginDialog: () => void`
+Callback to show the Login dialog.
+
+`hideLoginDialog: () => void`
+Callback to hide the login dialog.
+
+`onLogoutSuccess?: () => void`  
+Use it to logout the authenticated user. It will delete all the stored data, including access token.
+
+`onLogoutFail?: () => void`
+Will be called if something went wrong while deleting the local data.
+
+`styles?: ILoginViewStyles`
+Use this to style your components.
+
+`texts?: ILoginViewTexts`
+Use this to change some texts that appear in this component.
+
+userFirstName?: string
+Once authenticated send the received firstName data to this prop, so the component can render the Logged in view.
+
+---
 
 ## Tickets
 
@@ -179,13 +246,11 @@ waitingList?: IWaitingListStyles
 
 loggedIn?: ILoggedInStyles
 
-
 <img width="790" alt="props" src="https://user-images.githubusercontent.com/66479719/153976200-4bd6b254-6e80-49d6-bacc-076c59873434.png">
 
 <img width="675" alt="Screen Shot 2022-02-14 at 19 37 40" src="https://user-images.githubusercontent.com/66479719/153976314-9b4431bd-ea2f-49db-87ab-fb7d68b02a0c.png">
 
 <img width="682" alt="image" src="https://user-images.githubusercontent.com/66479719/154126406-101af4ca-7586-4686-9a93-88ef0375968e.png">
-
 
 ---
 
