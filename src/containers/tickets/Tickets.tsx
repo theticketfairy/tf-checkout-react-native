@@ -205,31 +205,30 @@ const Tickets = ({
   //#endregion
 
   return (
-    <Wrapper config={config}>
-      <TicketsView
-        eventId={eventId}
-        isGettingTickets={isGettingTickets}
-        tickets={tickets}
-        onPressGetTickets={handleOnPressGetTickets}
-        onPressApplyPromoCode={handleOnPressApplyPromoCode}
-        promoCodeValidationMessage={promoCodeResponse?.message}
-        isPromoCodeValid={promoCodeResponse?.isValid}
-        onSelectTicketOption={handleOnSelectTicketOption}
-        selectedTicket={selectedTicket}
-        isBookingTickets={isBooking}
-        styles={styles}
-        isGettingEvent={isGettingEvent}
-        texts={texts}
-        event={event}
-        isWaitingListVisible={isWaitingListVisible}
-        isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
-        isAccessCodeEnabled={isAccessCodeEnabled || isAccessCode}
-        isPromoEnabled={isPromoEnabled}
-        isUserLogged={isUserLogged}
-        onPressMyOrders={onPressMyOrders}
-        onPressLogout={handleOnLogout}
-      />
-    </Wrapper>
+    <TicketsView
+      eventId={eventId}
+      isGettingTickets={isGettingTickets}
+      tickets={tickets}
+      onPressGetTickets={handleOnPressGetTickets}
+      onPressApplyPromoCode={handleOnPressApplyPromoCode}
+      promoCodeValidationMessage={promoCodeResponse?.message}
+      isPromoCodeValid={promoCodeResponse?.isValid}
+      onSelectTicketOption={handleOnSelectTicketOption}
+      selectedTicket={selectedTicket}
+      isBookingTickets={isBooking}
+      styles={styles}
+      isGettingEvent={isGettingEvent}
+      texts={texts}
+      event={event}
+      isWaitingListVisible={isWaitingListVisible}
+      isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
+      isAccessCodeEnabled={isAccessCodeEnabled || isAccessCode}
+      isPromoEnabled={isPromoEnabled}
+      isUserLogged={isUserLogged}
+      onPressMyOrders={onPressMyOrders}
+      onPressLogout={handleOnLogout}
+      itemQuantityType={itemQuantityType}
+    />
   )
 }
 

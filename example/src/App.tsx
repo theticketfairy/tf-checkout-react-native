@@ -12,6 +12,7 @@ import {
   BillingInfo,
   Login,
   IUserProfile,
+  setConfig,
 } from 'tf-checkout-react-native'
 
 import Color from './Colors'
@@ -95,6 +96,12 @@ const App = () => {
   //#endregion
 
   //#region effects
+  useEffect(() => {
+    setConfig({
+      DOMAIN: 'https://houseofx.nyc',
+      IS_BILLING_STREET_NAME_REQUIRED: false,
+    })
+  }, [])
   useEffect(() => {
     if (cartProps) {
       console.log('cartProps', cartProps)
@@ -621,10 +628,6 @@ const App = () => {
         return (
           <View style={{ flex: 1 }}>
             <Tickets
-              config={{
-                DOMAIN: 'https://houseofx.nyc',
-                IS_BILLING_STREET_NAME_REQUIRED: false,
-              }}
               eventId={EVENT_ID}
               onAddToCartSuccess={handleOnAddToCartSuccess}
               onPressMyOrders={handleOnPressMyOrders}

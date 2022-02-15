@@ -54,6 +54,51 @@ Set appropriate style in your styles.xml file.
 </style>
 ```
 
+# Set your configuration
+
+Import the function from the library.
+
+```js
+import { setConfig } from 'tf-checkout-react-native'
+```
+
+Use it in your initial useEffect function:
+
+```js
+setConfig({
+  DOMAIN: 'https://yourdomain.mx',
+  IS_BILLING_STREET_NAME_REQUIRED: false,
+})
+```
+
+`setConfig` set your event's configuration, with the following options:
+
+```js
+{
+  DOMAIN?: string,
+  BASE_URL?: string,
+  CLIENT_ID?: string,
+  CLIENT_SECRET?: string,
+  TIMEOUT?: number,
+  BRAND?: string,
+  IS_BILLING_STREET_NAME_REQUIRED?: boolean,
+}
+```
+
+`DOMAIN` Specify your domains name example: `https://google.com` this is important to maintain cart session active and prevent it from expiring when user login in the BillingInfo component.
+
+`BASE_URL` If our dev team gives you a custom BASE_URL.
+
+`CLIENT_ID` Set your CLIENT_ID.
+
+`CLIENT_SECRET` Set your CLIENT_SECRET.
+
+`BRAND`: Set your BRAND so users can only see this brand in their orders.
+
+`TIMEOUT` Set custom timeout for the APIs requests.
+
+`IS_BILLING_STREET_NAME_REQUIRED`: Whether or not the Street name is required in the billing component.
+
 # Run the example app
 
 1. Clone this repo.
@@ -161,8 +206,8 @@ Use this to change some texts that appear in this component.
 Once authenticated send the received firstName data to this prop, so the component can render the Logged in view.
 
 # styles
-<img width="899" alt="image" src="https://user-images.githubusercontent.com/66479719/154158723-864cdabd-2a0b-4a84-95ad-3176c67f7e8b.png">
 
+<img width="899" alt="image" src="https://user-images.githubusercontent.com/66479719/154158723-864cdabd-2a0b-4a84-95ad-3176c67f7e8b.png">
 
 ---
 
@@ -197,35 +242,9 @@ Then add it to the render function.
 
 You can then call the `BillingInfo` component and pass them as props in the `cartProps` prop.
 
-`config` set your event's configuration, with the following options:
+## styles
 
-```js
-{
-  DOMAIN?: string,
-  BASE_URL?: string,
-  CLIENT_ID?: string,
-  CLIENT_SECRET?: string,
-  TIMEOUT?: number,
-  BRAND?: string,
-  IS_BILLING_STREET_NAME_REQUIRED?: boolean,
-}
-```
-
-`DOMAIN` Specify your domains name example: `https://google.com` this is important to maintain cart session active and prevent it from expiring when user login in the BillingInfo component.
-
-`BASE_URL` If our dev team gives you a custom BASE_URL.
-
-`CLIENT_ID` Set your CLIENT_ID.
-
-`CLIENT_SECRET` Set your CLIENT_SECRET.
-
-`BRAND`: Set your BRAND so users can only see this brand in their orders.
-
-`TIMEOUT` Set custom timeout for the APIs requests.
-
-`IS_BILLING_STREET_NAME_REQUIRED`: Whether or not the Street name is required in the billing component.
-
-`styles` Receives several props to style its sub-components.
+Receives several props to style its sub-components.
 
 rootContainer?: ViewStyle
 

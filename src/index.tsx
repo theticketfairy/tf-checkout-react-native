@@ -14,6 +14,7 @@ import {
 } from './containers'
 import { IOnCheckoutSuccess } from './containers/billingInfo/types'
 import { IAddToCartSuccess, ITicketsProps } from './containers/tickets/types'
+import { setConfig } from './helpers/Config'
 import { IUserProfile } from './types'
 
 LogBox.ignoreAllLogs()
@@ -34,6 +35,7 @@ export {
   MyOrderDetails,
   MyOrders,
   PurchaseConfirmation,
+  setConfig,
   Tickets,
 }
 
