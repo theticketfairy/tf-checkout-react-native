@@ -157,6 +157,36 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 
 `IS_BILLING_STREET_NAME_REQUIRED`: Whether or not the Street name is required in the billing component.
 
+`styles` Receives several props to style its sub-components.
+
+rootContainer?: ViewStyle
+
+container?: ViewStyle
+
+title?: TextStyle
+
+getTicketsButtonDisabled?: IButtonStyles
+
+getTicketsButtonActive?: IButtonStyles
+
+promoCode?: IPromoCodeStyles
+
+ticketList?: ITicketListStyles
+
+loading?: ILoadingStyles
+
+waitingList?: IWaitingListStyles
+
+loggedIn?: ILoggedInStyles
+
+
+<img width="790" alt="props" src="https://user-images.githubusercontent.com/66479719/153976200-4bd6b254-6e80-49d6-bacc-076c59873434.png">
+
+<img width="675" alt="Screen Shot 2022-02-14 at 19 37 40" src="https://user-images.githubusercontent.com/66479719/153976314-9b4431bd-ea2f-49db-87ab-fb7d68b02a0c.png">
+
+<img width="682" alt="image" src="https://user-images.githubusercontent.com/66479719/154126406-101af4ca-7586-4686-9a93-88ef0375968e.png">
+
+
 ---
 
 ## BillingInfo
