@@ -12,7 +12,6 @@ const FormField = ({
   id,
   fieldType,
   error,
-  validation,
   dropdownProps,
   inputProps,
   title,

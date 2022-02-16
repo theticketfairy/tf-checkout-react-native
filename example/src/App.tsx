@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
@@ -94,6 +94,10 @@ const App = () => {
     setComponentToShow(ComponentEnum.MyOrders)
   }
   //#endregion
+
+  const loginEmailRef = useRef(null)
+  const loginPasswordRef = useRef(null)
+  const touchableOpacityRef = useRef(null)
 
   //#region effects
   useEffect(() => {
@@ -254,9 +258,6 @@ const App = () => {
                 errorColor: Color.danger,
               },
               loginStyles: {
-                message: {
-                  color: Color.textMain,
-                },
                 guest: {
                   line1: {
                     color: Color.textMain,
@@ -744,6 +745,15 @@ const App = () => {
               showLoginDialog={() => setIsLoginDialogVisible(true)}
               hideLoginDialog={() => setIsLoginDialogVisible(false)}
               userFirstName={loggedUserName}
+              refs={{
+                inputs: {
+                  email: loginEmailRef,
+                  password: loginPasswordRef,
+                },
+                button: {
+                  touchableOpacity: touchableOpacityRef,
+                },
+              }}
             />
           </View>
         )

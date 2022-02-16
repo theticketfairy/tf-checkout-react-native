@@ -7,6 +7,20 @@ import { IButtonStyles } from '../button/types'
 import { IFormField } from '../formField/types'
 import { IInputStyles } from '../input/types'
 
+export interface ILoginRefs {
+  inputs?: {
+    email?: any
+    password?: any
+  }
+  button?: {
+    containerView?: any
+    touchableOpacity?: any
+    loadingView?: any
+    activityIndicator?: any
+    loadingText?: any
+  }
+}
+
 export interface ILoginProps {
   onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
   onLoginFailure?: (error: string) => void
@@ -23,6 +37,7 @@ export interface ILoginProps {
   texts?: ILoginViewTexts
 
   userFirstName?: string
+  refs?: ILoginRefs
 }
 
 export interface ILoginViewStyles {
@@ -86,6 +101,8 @@ export interface ILoginViewProps {
 
   loginError?: string
   userFirstName?: string
+
+  refs?: ILoginRefs
 }
 
 export interface ILoginViewState {

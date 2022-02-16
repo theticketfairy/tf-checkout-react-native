@@ -40,6 +40,7 @@ const LoginView = ({
   texts,
   userFirstName,
   loginError,
+  refs,
 }: ILoginViewProps) => {
   const [data, setData] = useState<ILoginViewState>(initialState)
   const { email, password } = data
@@ -59,6 +60,7 @@ const LoginView = ({
           keyboardType: 'email-address',
           autoCapitalize: 'none',
           styles: styles?.dialog?.input,
+          reference: refs?.inputs?.email,
         },
       },
       {
@@ -70,6 +72,7 @@ const LoginView = ({
           label: 'Password',
           secureTextEntry: true,
           styles: styles?.dialog?.input,
+          reference: refs?.inputs?.password,
         },
       },
     ]
@@ -207,6 +210,7 @@ const LoginView = ({
                     onPress={handleOnPressLogin}
                     isLoading={isLoading}
                     isDisabled={!checkIsDataValid()}
+                    ref={refs?.button}
                   />
                 </View>
               </TouchableWithoutFeedback>

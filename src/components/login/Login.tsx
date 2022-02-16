@@ -30,6 +30,7 @@ const Login = ({
   onLoginFailure,
   onFetchAccessTokenFailure,
   onFetchUserProfileFailure,
+  refs,
 }: ILoginProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [loginError, setLoginError] = useState('')
@@ -124,6 +125,7 @@ const Login = ({
       styles={styles}
       userFirstName={userFirstName}
       loginError={loginError}
+      refs={refs}
     />
   )
 }

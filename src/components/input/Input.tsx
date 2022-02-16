@@ -16,7 +16,7 @@ const Input = (props: IInputProps) => {
   return (
     <View style={[s.container, styles?.container]}>
       <TextField
-        ref={reference}
+        inputRef={reference}
         value={value}
         onChangeText={(text: string) =>
           id && onTextChanged ? onTextChanged(id, text) : onChangeText
