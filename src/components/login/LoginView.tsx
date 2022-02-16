@@ -188,7 +188,7 @@ const LoginView = ({
                     style={[s.brand, styles?.dialog?.logo]}
                   />
                   {!!texts?.dialog?.message && (
-                    <Text style={[s.message, styles?.message]}>
+                    <Text style={[s.message, styles?.dialog?.message]}>
                       {texts.dialog.message}
                     </Text>
                   )}

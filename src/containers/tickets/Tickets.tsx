@@ -227,7 +227,6 @@ const Tickets = ({
       isUserLogged={isUserLogged}
       onPressMyOrders={onPressMyOrders}
       onPressLogout={handleOnLogout}
-      itemQuantityType={itemQuantityType}
     />
   )
 }
