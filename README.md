@@ -164,6 +164,18 @@ Then add it to the render function.
   showLoginDialog={() => setIsLoginDialogVisible(true)}
   hideLoginDialog={() => setIsLoginDialogVisible(false)}
   userFirstName={loggedUserName}
+  refs={{
+    inputs?: {
+      email?: any
+      password?: any
+    }
+    button?: {
+      containerView?: any
+      touchableOpacity?: any
+      loadingView?: any
+      activityIndicator?: any
+      loadingText?: any
+  }}
 />
 ```
 
