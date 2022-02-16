@@ -782,7 +782,11 @@ const Billing = (props: IBillingProps) => {
           hideLoginDialog={hideLoginDialog}
           userFirstName={loggedUserFirstName}
           onLoginFailure={handleOnLoginFail}
-          message={loginMessage}
+          texts={{
+            dialog: {
+              message: loginMessage,
+            },
+          }}
           styles={styles?.loginStyles}
         />
         <Text style={styles?.titles}>Get Your Tickets</Text>
