@@ -256,6 +256,7 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 
 ## styles
 
+```js
 Receives several props to style its sub-components.
 
 rootContainer?: ViewStyle
@@ -277,6 +278,7 @@ loading?: ILoadingStyles
 waitingList?: IWaitingListStyles
 
 loggedIn?: ILoggedInStyles
+```
 
 <img width="790" alt="props" src="https://user-images.githubusercontent.com/66479719/153976200-4bd6b254-6e80-49d6-bacc-076c59873434.png">
 
@@ -367,6 +369,31 @@ Add it to the render function.
 
 If the you need to modify the card container, use the `styles.payment.cardContainer` prop. Useful if the card is to short and the zip code is not visible.
 
+`styles`
+
+```js
+{
+  rootStyle?: ViewStyle
+  title?: StyleProp<TextStyle>
+  subTitle?: StyleProp<TextStyle>
+  missingStripeConfig?: {
+    container?: StyleProp<ViewStyle>
+    message?: StyleProp<TextStyle>
+    exitButton?: IButtonStyles
+  }
+  freeRegistrationButton?: IButtonStyles
+  orderReview?: IOrderReviewStyles
+  payment?: {
+    container?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+    cardBackgroundColor?: string
+    cardContainer?: StyleProp<ViewStyle>
+    button?: IButtonStyles
+    buttonDisabled?: IButtonStyles
+  }
+}
+```
+
 ---
 
 ## PurchaseConfirmation
@@ -444,6 +471,21 @@ order: {
 
 `styles` to customize the component look & feel.
 
+```js
+export interface IMyOrdersStyles {
+  orderListItem?: IOrderListItemStyles
+  safeArea?: StyleProp<ViewStyle>
+  listContainer?: StyleProp<ViewStyle>
+  eventsContainer?: StyleProp<ViewStyle>
+  eventsTitle?: StyleProp<TextStyle>
+  refreshControlColor?: ColorValue
+  eventsDropdown?: IDropdownStyles
+  rootContainer?: StyleProp<ViewStyle>
+  eventsSelectionContainer?: StyleProp<ViewStyle>
+  clearEventSelectionIcon?: StyleProp<ImageStyle>
+}
+```
+
 `onFetchOrderDetailsFail` if the fetching fails, you can use this to know what happened.
 
 ---
@@ -497,6 +539,54 @@ order: {
 ```
 
 `styles` optional, to customize the component look & feel.
+
+```
+styles?: {
+    rootContainer?: StyleProp<ViewStyle>
+    header?: {
+      container?: StyleProp<ViewStyle>
+      title?: StyleProp<TextStyle>
+      subTitle?: StyleProp<TextStyle>
+
+      shareLink?: {
+        container?: StyleProp<ViewStyle>
+        text?: StyleProp<TextStyle>
+        link?: StyleProp<TextStyle>
+        copyContainer?: StyleProp<ViewStyle>
+        copyText?: StyleProp<TextStyle>
+        copyIcon?: StyleProp<ImageStyle>
+        copyIconTint?: ColorValue
+        copyIconTintActive?: ColorValue
+        message?: StyleProp<TextStyle>
+        referrals?: StyleProp<TextStyle>
+        referralValue?: StyleProp<TextStyle>
+      }
+    }
+    section0Footer?: {
+      container?: StyleProp<ViewStyle>
+      label?: StyleProp<TextStyle>
+      value?: StyleProp<TextStyle>
+    }
+    sectionHeader?: StyleProp<TextStyle>
+
+    listItem?: {
+      container?: StyleProp<ViewStyle>
+      innerLeftContainer?: StyleProp<ViewStyle>
+      innerRightContainer?: StyleProp<ViewStyle>
+      rowPlaceholder?: StyleProp<TextStyle>
+      rowValue?: StyleProp<TextStyle>
+    }
+    ticketItem?: {
+      container?: StyleProp<ViewStyle>
+      innerLeftContainer?: StyleProp<ViewStyle>
+      innerRightContainer?: StyleProp<ViewStyle>
+      rowPlaceholder?: StyleProp<TextStyle>
+      rowValue?: StyleProp<TextStyle>
+    }
+    downloadButton?: IButtonStyles
+  }
+```
+
 `texts` optional, to customize the texts that shows on the labels.
 
 ```js
