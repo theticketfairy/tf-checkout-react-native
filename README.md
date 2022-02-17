@@ -255,29 +255,21 @@ Then add it to the render function.
 You can then call the `BillingInfo` component and pass them as props in the `cartProps` prop.
 
 ## styles
-
-```js
 Receives several props to style its sub-components.
 
-rootContainer?: ViewStyle
-
-container?: ViewStyle
-
-title?: TextStyle
-
-getTicketsButtonDisabled?: IButtonStyles
-
-getTicketsButtonActive?: IButtonStyles
-
-promoCode?: IPromoCodeStyles
-
-ticketList?: ITicketListStyles
-
-loading?: ILoadingStyles
-
-waitingList?: IWaitingListStyles
-
-loggedIn?: ILoggedInStyles
+```js
+{
+  rootContainer?: ViewStyle
+  container?: ViewStyle
+  title?: TextStyle
+  getTicketsButtonDisabled?: IButtonStyles
+  getTicketsButtonActive?: IButtonStyles
+  promoCode?: IPromoCodeStyles
+  ticketList?: ITicketListStyles
+  loading?: ILoadingStyles
+  waitingList?: IWaitingListStyles 
+  loggedIn?: ILoggedInStyles
+}
 ```
 
 <img width="790" alt="props" src="https://user-images.githubusercontent.com/66479719/153976200-4bd6b254-6e80-49d6-bacc-076c59873434.png">
@@ -300,8 +292,28 @@ Add it to the render function.
 
 ```js
 <BillingInfo
-  cartProps={cartProps!}
-  onCheckoutSuccess={handleOnCheckoutSuccess}
+  cartProps: IAddToCartSuccess
+  onRegisterSuccess?: (tokens: ITokens) => void
+  onRegisterFail?: (error: string) => void
+
+  onCheckoutSuccess: (data: IOnCheckoutSuccess) => void
+  onCheckoutFail?: (error: string) => void
+
+  onLoginSuccess: (data: any) => void
+  onLoginFail?: (error: string) => void
+
+  onFetchUserProfileSuccess?: (data: any) => void
+  onFetchUserProfileFail?: (error: any) => void
+
+  onFetchCartError?: (error: string) => void
+
+  styles?: IBillingInfoViewStyles
+  texts?: IBillingInfoViewTexts
+
+  privacyPolicyLinkStyle?: StyleProp<TextStyle>
+
+  onFetchUserProfileFailure?: (error: string) => void
+  onFetchAccessTokenFailure?: (error: string) => void
 />
 ```
 
