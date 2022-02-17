@@ -10,6 +10,10 @@ import { IMyOrderDetailsResponse, IMyOrdersOrder } from '../../api/types'
 import { IDropdownItem, IDropdownStyles } from '../../components/dropdown/types'
 import { IOrderListItemStyles } from './components/types'
 
+export interface IMyOrdersConfig {
+  isEventsDropdownHidden?: boolean
+}
+
 export interface IMyOrdersStyles {
   orderListItem?: IOrderListItemStyles
   safeArea?: StyleProp<ViewStyle>
@@ -27,6 +31,7 @@ export interface IMyOrdersProps {
   onSelectOrder: (order: IMyOrderDetailsResponse) => void
   onFetchOrderDetailsFail?: (error: string) => void
   styles?: IMyOrdersStyles
+  config?: IMyOrdersConfig
 }
 
 export interface IMyOrdersViewProps {
@@ -39,4 +44,5 @@ export interface IMyOrdersViewProps {
   isLoading?: boolean
   styles?: IMyOrdersStyles
   onRefresh?: () => void
+  config?: IMyOrdersConfig
 }

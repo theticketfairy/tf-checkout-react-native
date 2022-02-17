@@ -8,7 +8,6 @@ import { Alert } from 'react-native'
 
 import { addToCart, fetchEvent, fetchTickets } from '../../api/ApiClient'
 import { IPromoCodeResponse } from '../../api/types'
-import { Wrapper } from '../../components'
 import {
   deleteAllData,
   deleteData,
@@ -31,7 +30,6 @@ const Tickets = ({
   onPressMyOrders,
   onPressLogout,
   onFetchEventError,
-  config,
 }: ITicketsProps) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)

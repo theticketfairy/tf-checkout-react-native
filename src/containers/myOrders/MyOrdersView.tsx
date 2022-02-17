@@ -26,6 +26,7 @@ const MyOrdersView = ({
   isLoading,
   onRefresh,
   isGettingEventDetails,
+  config,
 }: IMyOrdersViewProps) => {
   const handleOnSelectOrder = (order: IMyOrdersOrder) => {
     if (onSelectOrder) {
@@ -74,34 +75,32 @@ const MyOrdersView = ({
       value: '-1',
     })
 
+  const eventsDropdown = (
+    <View style={[s.eventsContainer, styles?.eventsContainer]}>
+      <Text style={[s.eventsTitle, styles?.eventsTitle]}>Events</Text>
+      <View
+        style={[s.eventsSelectionContainer, styles?.eventsSelectionContainer]}
+      >
+        <Dropdown
+          items={myEvents}
+          onSelectItem={onChangeEvent}
+          selectedOption={selectedEvent}
+          styles={dropdownStyles}
+        />
+        <TouchableOpacity onPress={onClearSelectedEvent}>
+          <Image
+            source={R.icons.error}
+            style={[s.clearEventSelectionIcon, styles?.clearEventSelectionIcon]}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
+
   return (
     <View style={[s.rootContainer, styles?.rootContainer]}>
       <SafeAreaView style={[s.safeArea, styles?.safeArea]}>
-        <View style={[s.eventsContainer, styles?.eventsContainer]}>
-          <Text style={[s.eventsTitle, styles?.eventsTitle]}>Events</Text>
-          <View
-            style={[
-              s.eventsSelectionContainer,
-              styles?.eventsSelectionContainer,
-            ]}
-          >
-            <Dropdown
-              items={myEvents}
-              onSelectItem={onChangeEvent}
-              selectedOption={selectedEvent}
-              styles={dropdownStyles}
-            />
-            <TouchableOpacity onPress={onClearSelectedEvent}>
-              <Image
-                source={R.icons.error}
-                style={[
-                  s.clearEventSelectionIcon,
-                  styles?.clearEventSelectionIcon,
-                ]}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+        {!config?.isEventsDropdownHidden && eventsDropdown}
         <View style={[s.listContainer, styles?.listContainer]}>
           <FlatList
             data={myOrders}

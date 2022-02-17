@@ -12,6 +12,7 @@ const MyOrders: FC<IMyOrdersProps> = ({
   onSelectOrder,
   onFetchOrderDetailsFail,
   styles,
+  config,
 }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isGettingEventDetails, setIsGettingEventDetails] = useState(false)
@@ -92,6 +93,7 @@ const MyOrders: FC<IMyOrdersProps> = ({
       isLoading={isLoading}
       isGettingEventDetails={isGettingEventDetails}
       styles={styles}
+      config={config}
     />
   )
 }

@@ -255,6 +255,7 @@ Then add it to the render function.
 You can then call the `BillingInfo` component and pass them as props in the `cartProps` prop.
 
 ## styles
+
 Receives several props to style its sub-components.
 
 ```js
@@ -267,7 +268,7 @@ Receives several props to style its sub-components.
   promoCode?: IPromoCodeStyles
   ticketList?: ITicketListStyles
   loading?: ILoadingStyles
-  waitingList?: IWaitingListStyles 
+  waitingList?: IWaitingListStyles
   loggedIn?: ILoggedInStyles
 }
 ```
@@ -446,6 +447,16 @@ import { MyOrders } from 'tf-checkout-react-native'
 There is no need to pass any data prop to it.
 
 ### Props
+
+`config` has properties to hide components.
+
+`isEventsDropdownHidden` if the Events dropdown should be hidden.
+
+```js
+config={{
+  isEventsDropdownHidden: true,
+}}
+```
 
 `onSelectOrder` handler to know which order the user has selected. Will return an object with following structure:
 
