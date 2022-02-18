@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 import {
   FlatList,
   Image,
@@ -27,11 +27,24 @@ const MyOrdersView = ({
   onRefresh,
   isGettingEventDetails,
   config,
+  onFetchMoreOrders,
 }: IMyOrdersViewProps) => {
+  const onEndReachedCalledDuringMomentum = useRef(false)
   const handleOnSelectOrder = (order: IMyOrdersOrder) => {
     if (onSelectOrder) {
       onSelectOrder(order)
     }
+  }
+
+  const handleOnReachEnd = () => {
+    if (!onEndReachedCalledDuringMomentum.current) {
+      onFetchMoreOrders()
+      onEndReachedCalledDuringMomentum.current = true
+    }
+  }
+
+  const handleOnMomentumScrollBegin = () => {
+    onEndReachedCalledDuringMomentum.current = false
   }
 
   const renderOrderListItem = useCallback(
@@ -106,6 +119,9 @@ const MyOrdersView = ({
             data={myOrders}
             renderItem={renderOrderListItem}
             refreshControl={renderRefreshControl}
+            onEndReached={handleOnReachEnd}
+            onMomentumScrollBegin={handleOnMomentumScrollBegin}
+            onEndReachedThreshold={0.2}
           />
         </View>
         {isGettingEventDetails && <Loading />}

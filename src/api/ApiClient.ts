@@ -259,19 +259,20 @@ export const addToWaitingList = async (
 
 //#region MyOrders
 export const fetchMyOrders = async (
+  page: number = 1,
   filter: string = ''
 ): Promise<IMyOrdersResponse> => {
-  const page = 1
   const limit = 20
   const data: IMyOrdersData = {
     events: [],
     orders: [],
   }
   let responseError = ''
-  const endpoint =
-    Config.BRAND === undefined
-      ? `/v1/account/orders/?page=${page}&limit=${limit}&filter[event]=${filter}`
-      : `/v1/account/orders/?page=${page}&limit=${limit}&filter[event]=${filter}&filter[brand]=${Config.BRAND}`
+
+  const withFilterEvent = filter ? `&filter[event]=${filter}` : ''
+  const withBrand = Config.BRAND ? `&filter[brand]=${Config.BRAND}` : ''
+  const endpoint = `/v1/account/orders/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}`
+
   const response: AxiosResponse | void = await Client.get(endpoint).catch(
     (error: AxiosError) => {
       responseError = error.response?.data.message || 'Error fetching My Orders'

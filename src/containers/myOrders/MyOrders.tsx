@@ -22,11 +22,13 @@ const MyOrders: FC<IMyOrdersProps> = ({
     value: '-1',
   })
   const [myOrders, setMyOrders] = useState<IMyOrdersOrder[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
   const getMyOrdersAsync = useCallback(async () => {
     setIsLoading(true)
     const validSelectedEvent =
       selectedEvent.value === '-1' ? null : selectedEvent
     const { myOrdersData, myOrdersError } = await fetchMyOrders(
+      currentPage,
       validSelectedEvent?.value.toString()
     )
 
@@ -41,10 +43,11 @@ const MyOrders: FC<IMyOrdersProps> = ({
       }
     })
 
-    setMyOrders(myOrdersData.orders)
+    setMyOrders([...myOrders, ...myOrdersData.orders])
     setMyEvents(events)
     setIsLoading(false)
-  }, [selectedEvent])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEvent, currentPage])
 
   //#region Handlers
   const handleOnChangeEvent = (event: IDropdownItem) => {
@@ -59,13 +62,16 @@ const MyOrders: FC<IMyOrdersProps> = ({
       order.id
     )
     setIsGettingEventDetails(false)
-    console.log('Order Details', orderDetailsData)
     if ((!orderDetailsData || orderDetailsError) && onFetchOrderDetailsFail) {
       return onFetchOrderDetailsFail(orderDetailsError!)
     }
     if (orderDetailsData) {
       onSelectOrder(orderDetailsData)
     }
+  }
+
+  const handleOnFetchMoreOrders = () => {
+    setCurrentPage(currentPage + 1)
   }
   //#endregion
 
@@ -94,6 +100,7 @@ const MyOrders: FC<IMyOrdersProps> = ({
       isGettingEventDetails={isGettingEventDetails}
       styles={styles}
       config={config}
+      onFetchMoreOrders={handleOnFetchMoreOrders}
     />
   )
 }

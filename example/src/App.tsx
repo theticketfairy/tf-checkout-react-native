@@ -452,6 +452,9 @@ const App = () => {
                     tintColor: Color.textMain,
                   },
                 },
+                listContainer: {
+                  flex: 0.8,
+                },
                 orderListItem: {
                   rootContainer: {
                     backgroundColor: Color.gray80,

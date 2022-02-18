@@ -45,4 +45,5 @@ export interface IMyOrdersViewProps {
   styles?: IMyOrdersStyles
   onRefresh?: () => void
   config?: IMyOrdersConfig
+  onFetchMoreOrders: () => void
 }
