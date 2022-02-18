@@ -155,9 +155,33 @@ export interface IBillingInfoViewTexts {
   loginTexts?: ILoginViewTexts
   loginButton?: string
   checkoutButton?: string
-  passwordTitle?: string
-  brandCheckBox?: string
   skippingMessage?: string
+  form?: {
+    firstName?: string
+    lastName?: string
+    email?: string
+    confirmEmail?: string
+    password?: string
+    confirmPassword?: string
+    phone?: string
+    street?: string
+    city?: string
+    country?: string
+    state?: string
+    zipCode?: string
+    dateOfBirth?: string
+    isSubToBrand?: string
+    ticketHoldersTitle?: string
+    ticketHolderItem?: string
+    holderFirstName?: string
+    holderLastName?: string
+    holderEmail?: string
+    holderPhone?: string
+    getYourTicketsTitle?: string
+    emailsAdvice?: string
+    choosePassword?: string
+    checkbox?: string
+  }
 }
 
 export interface IBillingInfoViewProps {

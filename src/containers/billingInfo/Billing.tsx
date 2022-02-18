@@ -22,11 +22,7 @@ import {
   registerNewUser,
 } from '../../api/ApiClient'
 import Constants from '../../api/Constants'
-import {
-  ICartResponse,
-  ICheckoutBody,
-  ICheckoutTicketHolder,
-} from '../../api/types'
+import { ICheckoutBody, ICheckoutTicketHolder } from '../../api/types'
 import {
   Button,
   Checkbox,
@@ -69,6 +65,54 @@ const Billing = (props: IBillingProps) => {
     },
   } = props
 
+  //#region Labels
+  const countryLabel = texts?.form?.country || 'Country'
+  const stateLabel = texts?.form?.country || 'State/County'
+  const defaultCountry: IDropdownItem = { value: '-1', label: countryLabel }
+  const defaultState: IDropdownItem = { value: '-1', label: stateLabel }
+
+  const brandCheckBoxText = useMemo(() => {
+    return texts?.form?.checkbox
+      ? texts.form?.checkbox
+      : 'I would like to be updated on news, events and offers.'
+  }, [texts?.form?.checkbox])
+
+  const phoneLabel = useMemo(() => {
+    const optionalPhone = isPhoneRequired ? '' : ' (optional)'
+    return texts?.form?.phone
+      ? `${texts?.form?.phone} ${optionalPhone}`
+      : `Phone ${optionalPhone}`
+  }, [isPhoneRequired, texts])
+
+  const addressLabel = useMemo(() => {
+    const optionalAddress = Config.IS_BILLING_STREET_NAME_REQUIRED
+      ? ''
+      : ' (optional)'
+
+    return texts?.form?.street
+      ? `${texts.form.street} ${optionalAddress}`
+      : `Street ${optionalAddress}`
+  }, [texts])
+
+  const holderLabels = useMemo(() => {
+    const optional = isNameRequired ? '' : ' (optional)'
+    return {
+      firstName: texts?.form?.holderFirstName
+        ? `${texts.form.holderFirstName} ${optional}`
+        : `First Name ${optional}`,
+      lastName: texts?.form?.holderLastName
+        ? `${texts.form.holderLastName} ${optional}`
+        : `Last Name ${optional}`,
+      email: texts?.form?.holderEmail
+        ? `${texts.form.holderEmail} (optional)`
+        : 'Email (optional)',
+      phone: texts?.form?.holderPhone
+        ? `${texts.form.holderPhone} (optional)`
+        : 'Phone (optional)',
+    }
+  }, [isNameRequired, texts])
+  //#endregion
+
   //#region State
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isSubmittingData, setIsSubmittingData] = useState<boolean>(false)
@@ -103,17 +147,15 @@ const Billing = (props: IBillingProps) => {
     number | undefined
   >()
 
-  const [countries, setCountries] = useState<IDropdownItem[]>([
-    { value: '-1', label: 'Country' },
-  ])
-  const [states, setStates] = useState<IDropdownItem[]>([
-    { value: '-1', label: 'State/County' },
-  ])
+  const [countries, setCountries] = useState<IDropdownItem[]>([defaultCountry])
+  const [states, setStates] = useState<IDropdownItem[]>([defaultState])
 
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
   const [skipping, setSkippingStatus] = useState<
     'skipping' | 'fail' | 'success' | 'false'
   >(isBillingRequired ? 'false' : 'skipping')
+
+  const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
 
   // Errors state
   const firstNameError = useDebounced(firstName, validateEmpty)
@@ -238,8 +280,8 @@ const Billing = (props: IBillingProps) => {
     setPasswordConfirmation('')
     setCountryId('')
     setStateId('')
-    setSelectedCountry({ value: '-1', label: 'Country' })
-    setStates([{ value: '-1', label: 'State/County' }])
+    setSelectedCountry(defaultCountry)
+    setStates([defaultState])
     setIsSubToTicketFairy(false)
     setIsSubToBrand(false)
     storedToken.current = ''
@@ -555,8 +597,8 @@ const Billing = (props: IBillingProps) => {
 
       usrPrfl = userProfileResponse
     } else {
-      parsedCountries.unshift({ value: '-1', label: 'Country' })
-      setSelectedCountry({ value: '-1', label: 'Country' })
+      parsedCountries.unshift(defaultCountry)
+      setSelectedCountry(defaultCountry)
     }
 
     const { cartData, cartError } = await fetchCart()
@@ -573,6 +615,7 @@ const Billing = (props: IBillingProps) => {
     setNumberOfTicketHolders(cartData.quantity)
     setIsSubToBrand(cartData.isMarketingOptedIn)
     setIsSubToTicketFairy(cartData.isTfOptIn)
+    setIsTtfCheckboxHidden(cartData.isTfOptInHidden || false)
 
     const tHolders: ITicketHolderField[] = []
     for (let i = 0; i < cartData.quantity; i++) {
@@ -641,12 +684,13 @@ const Billing = (props: IBillingProps) => {
     if (states.length > 1 && stateId) {
       const selectedStateItem = _find(states, (item) => item.value === stateId)
       if (!selectedStateItem) {
-        return setSelectedState({ value: '-1', label: 'State/County' })
+        return setSelectedState(defaultState)
       }
       setSelectedState(selectedStateItem)
     } else {
-      setSelectedState({ value: '-1', label: 'State/County' })
+      setSelectedState(defaultState)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateId, states])
 
   const initTicketHoldersErrors = useCallback(() => {
@@ -678,11 +722,14 @@ const Billing = (props: IBillingProps) => {
 
     let tHolders = []
     for (let i = 0; i < numberOfTicketHolders; i++) {
+      const thItemTitle = texts?.form?.ticketHolderItem || 'Ticket Holder'
       tHolders.push(
         <View key={`ticketHolder.${i}`}>
-          <Text style={styles?.titles}>Ticket holder {i + 1}</Text>
+          <Text style={styles?.titles}>
+            {thItemTitle} {i + 1}
+          </Text>
           <Input
-            label={isNameRequired ? 'First name' : 'First name (optional)'}
+            label={holderLabels.firstName}
             value={ticketHoldersData[i].firstName}
             onChangeText={(text) => {
               const copyTicketHolders = [...ticketHoldersData]
@@ -692,7 +739,7 @@ const Billing = (props: IBillingProps) => {
             styles={styles?.inputStyles}
           />
           <Input
-            label={isNameRequired ? 'Last name' : 'Last name (optional)'}
+            label={holderLabels.lastName}
             value={ticketHoldersData[i].lastName}
             onChangeText={(text) => {
               const copyTicketHolders = [...ticketHoldersData]
@@ -702,7 +749,7 @@ const Billing = (props: IBillingProps) => {
             styles={styles?.inputStyles}
           />
           <Input
-            label='Email Address (optional)'
+            label={holderLabels.email}
             value={ticketHoldersData[i].email}
             onChangeText={(text) => {
               const copyTicketHolders = [...ticketHoldersData]
@@ -714,7 +761,7 @@ const Billing = (props: IBillingProps) => {
             autoCapitalize='none'
           />
           <Input
-            label='Phone (optional)'
+            label={holderLabels.phone}
             value={ticketHoldersData[i].phone}
             onChangeText={(text) => {
               const copyTicketHolders = [...ticketHoldersData]
@@ -758,15 +805,6 @@ const Billing = (props: IBillingProps) => {
     )
   }
 
-  const brandCheckBoxText = useMemo(() => {
-    return texts?.brandCheckBox
-      ? texts.brandCheckBox
-      : 'I would like to be updated on news, events and offers.'
-  }, [texts?.brandCheckBox])
-  const phoneLabel = useMemo(
-    () => (isPhoneRequired ? 'Phone' : 'Phone (optional)'),
-    [isPhoneRequired]
-  )
   const isDataValid = checkBasicDataValid()
 
   return skipping === 'skipping' ? (
@@ -789,17 +827,19 @@ const Billing = (props: IBillingProps) => {
           }}
           styles={styles?.loginStyles}
         />
-        <Text style={styles?.titles}>Get Your Tickets</Text>
+        <Text style={styles?.titles}>
+          {texts?.form?.getYourTicketsTitle || 'Get Your Tickets'}
+        </Text>
 
         <Input
-          label='First name'
+          label={texts?.form?.firstName || 'First name'}
           value={firstName}
           onChangeText={setFirstName}
           error={firstNameError}
           styles={styles?.inputStyles}
         />
         <Input
-          label='Last name'
+          label={texts?.form?.lastName || 'Last name'}
           value={lastName}
           onChangeText={setLastName}
           error={lastNameError}
@@ -807,12 +847,12 @@ const Billing = (props: IBillingProps) => {
         />
 
         <Text style={styles?.texts}>
-          IMPORTANT: Please double check that your email address is correct.
-          It's where we send your confirmation and e-tickets to!
+          {texts?.form?.emailsAdvice ||
+            `IMPORTANT: Please double check that your email address is correct.\nIt's where we send your confirmation and e-tickets to!`}
         </Text>
 
         <Input
-          label='Email'
+          label={texts?.form?.email || 'Email'}
           value={email}
           onChangeText={setEmail}
           keyboardType='email-address'
@@ -821,7 +861,7 @@ const Billing = (props: IBillingProps) => {
           autoCapitalize='none'
         />
         <Input
-          label='Confirm Email'
+          label={texts?.form?.confirmEmail || 'Confirm email'}
           value={emailConfirmation}
           onChangeText={setEmailConfirmation}
           keyboardType='email-address'
@@ -831,7 +871,7 @@ const Billing = (props: IBillingProps) => {
         />
         {isAgeRequired && (
           <DatePicker
-            text={'Date of Birth'}
+            text={texts?.form?.dateOfBirth || 'Date of Birth'}
             onSelectDate={handleOnSelectDate}
             selectedDate={dateOfBirth}
             styles={styles?.datePicker}
@@ -841,10 +881,11 @@ const Billing = (props: IBillingProps) => {
         {!loggedUserFirstName && (
           <>
             <Text style={styles?.passwordTitle}>
-              Choose a password for your new TICKETFAIRY account
+              {texts?.form?.choosePassword ||
+                'Choose a password for your new TICKETFAIRY account'}
             </Text>
             <Input
-              label='Password'
+              label={texts?.form?.password || 'Password'}
               isSecure
               onChangeText={setPassword}
               error={passwordError}
@@ -853,7 +894,7 @@ const Billing = (props: IBillingProps) => {
               secureTextEntry={true}
             />
             <Input
-              label='Confirm Password'
+              label={texts?.form?.confirmPassword || 'Confirm password'}
               isSecure
               onChangeText={setPasswordConfirmation}
               error={confirmPasswordError}
@@ -872,18 +913,14 @@ const Billing = (props: IBillingProps) => {
           styles={styles?.inputStyles}
         />
         <Input
-          label={
-            Config.IS_BILLING_STREET_NAME_REQUIRED
-              ? 'Billing Street Address'
-              : 'Billing Street Address (optional)'
-          }
+          label={addressLabel}
           value={street}
           onChangeText={setStreet}
           error={streetError}
           styles={styles?.inputStyles}
         />
         <Input
-          label='City'
+          label={texts?.form?.city || 'City'}
           value={city}
           onChangeText={setCity}
           error={cityError}
@@ -896,7 +933,7 @@ const Billing = (props: IBillingProps) => {
           styles={styles?.dropdownStyles}
         />
         <Input
-          label='Postal Code / Zip Code'
+          label={texts?.form?.zipCode || 'Postal Code / Zip Code'}
           value={postalCode}
           onChangeText={setPostalCode}
           error={postalCodeError}
@@ -914,28 +951,34 @@ const Billing = (props: IBillingProps) => {
           isActive={isSubToBrand}
           styles={styles?.checkboxStyles}
         />
-        <Checkbox
-          onPress={handleIsSubToTicketFairyToggle}
-          isActive={isSubToTicketFairy}
-          customTextComp={
-            <Text style={styles?.customCheckbox?.text}>
-              I agree that The Ticket Fairy may use the personal data that I
-              have provided for marketing purposes, such as recommending events
-              that I might be interested in, in accordance with its{' '}
-              <Text
-                style={props.privacyPolicyLinkStyle}
-                onPress={handleOpenPrivacyLink}
-              >
-                Privacy Policy.
+
+        {!isTtfCheckboxHidden && (
+          <Checkbox
+            onPress={handleIsSubToTicketFairyToggle}
+            isActive={isSubToTicketFairy}
+            customTextComp={
+              <Text style={styles?.customCheckbox?.text}>
+                I agree that The Ticket Fairy may use the personal data that I
+                have provided for marketing purposes, such as recommending
+                events that I might be interested in, in accordance with its{' '}
+                <Text
+                  style={props.privacyPolicyLinkStyle}
+                  onPress={handleOpenPrivacyLink}
+                >
+                  Privacy Policy
+                </Text>
+                .
               </Text>
-            </Text>
-          }
-          styles={styles?.checkboxStyles}
-        />
+            }
+            styles={styles?.checkboxStyles}
+          />
+        )}
 
         {ticketHoldersData.length > 0 && (
           <>
-            <Text style={styles?.headers}> Ticket Holders</Text>
+            <Text style={styles?.headers}>
+              {texts?.form?.ticketHoldersTitle || 'Ticket Holders'}
+            </Text>
             {renderTicketHolders()}
           </>
         )}

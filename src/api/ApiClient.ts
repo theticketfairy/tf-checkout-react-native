@@ -509,7 +509,7 @@ export const fetchCart = async () => {
         typeof isMarketingOptedIn === 'number'
           ? isMarketingOptedIn > 0
           : isMarketingOptedIn,
-      isTfOptInHidden: _get(attr, 'hide_ttf_opt_in', true),
+      isTfOptInHidden: _get(attr, 'hide_ttf_opt_in', false),
       isTfOptIn: typeof tfOptIn === 'number' ? tfOptIn > 0 : tfOptIn,
     }
   } else {

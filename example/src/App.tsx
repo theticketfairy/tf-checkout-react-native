@@ -143,7 +143,9 @@ const App = () => {
               color: Color.primary,
             }}
             texts={{
-              brandCheckBox: 'This is an injected text for your brand',
+              form: {
+                checkbox: 'This is an injected text for your brand',
+              },
             }}
             styles={{
               datePicker: {
@@ -739,22 +741,6 @@ const App = () => {
                       },
                     },
                   },
-                },
-              }}
-            />
-            <Login
-              onLoginSuccessful={handleOnLoginDialogSuccess}
-              isLoginDialogVisible={isLoginDialogVisible}
-              showLoginDialog={() => setIsLoginDialogVisible(true)}
-              hideLoginDialog={() => setIsLoginDialogVisible(false)}
-              userFirstName={loggedUserName}
-              refs={{
-                inputs: {
-                  email: loginEmailRef,
-                  password: loginPasswordRef,
-                },
-                button: {
-                  touchableOpacity: touchableOpacityRef,
                 },
               }}
             />
