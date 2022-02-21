@@ -14,7 +14,6 @@ import {
   IWaitingListStyles,
   IWaitingListTexts,
 } from '../../components/waitingList/types'
-import { IConfig } from '../../helpers/Config'
 import { IEvent, ISelectedTicket, ITicket } from '../../types'
 import { ITicketListItemStyles, ITicketListItemTexts } from './components/types'
 
@@ -98,6 +97,4 @@ export interface ITicketsProps {
 
   onPressMyOrders: () => void
   onPressLogout?: () => void
-
-  config?: IConfig
 }
