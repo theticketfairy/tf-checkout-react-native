@@ -709,6 +709,19 @@ const App = () => {
                     fees: {
                       color: Color.textMainOff,
                     },
+
+                    input: {
+                      container: {
+                        borderWidth: 1,
+                        borderColor: 'red',
+                        width: 60,
+                      },
+                      content: {
+                        borderWidth: 1,
+                        borderColor: 'yellow',
+                      },
+                    },
+
                     dropdown: {
                       dialog: {
                         backgroundColor: Color.backgroundMain,

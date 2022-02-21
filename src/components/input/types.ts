@@ -16,6 +16,10 @@ export interface IInputStyles {
   activeLineWidth?: number
   baseColor?: ColorValue
   errorColor?: ColorValue
+  // For non-material-ui inputs
+  content?: StyleProp<ViewStyle>
+  label?: StyleProp<TextStyle>
+  error?: StyleProp<TextStyle>
 }
 
 export interface IInputProps extends TextInputProps {

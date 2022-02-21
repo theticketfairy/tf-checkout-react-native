@@ -2,8 +2,9 @@ import _maxBy from 'lodash/maxBy'
 import React from 'react'
 import { Text, View } from 'react-native'
 
-import { Dropdown } from '../../../components'
+import { Dropdown, Input } from '../../../components'
 import { IDropdownItem } from '../../../components/dropdown/types'
+import { Config } from '../../../helpers/Config'
 import { priceWithCurrency } from '../../../helpers/StringsHelper'
 import { CartListItemStyles as s } from './styles'
 import { ITicketListItemProps } from './types'
@@ -16,8 +17,8 @@ const TicketListItem = ({
   styles,
   texts,
 }: ITicketListItemProps) => {
+  const [ticketQty, setTicketQty] = React.useState('')
   const isSoldOut = ticket.sold_out || !ticket.displayTicket || ticket.soldOut
-
   const isSalesClosed = !ticket.salesStarted || ticket.salesEnded
 
   const customSoldOutMessage = texts?.soldOut ? texts.soldOut : 'SOLD OUT'
@@ -73,6 +74,24 @@ const TicketListItem = ({
 
   let rightContent = <></>
 
+  console.log('Ticket Qty', ticketQty)
+  const ticketQuantityComponent =
+    Config.TICKETS_QUANTITY_TYPE === 'dropdown' ? (
+      <Dropdown
+        items={dropdownOptions}
+        selectedOption={selectedOption}
+        onSelectItem={handleOnSelectItem}
+        styles={styles?.dropdown}
+      />
+    ) : (
+      <Input
+        label={'Qty'}
+        value={ticketQty}
+        onChangeText={setTicketQty}
+        styles={styles?.input}
+      />
+    )
+
   if (ticket.soldOut || ticket.sold_out || !ticket.displayTicket) {
     rightContent = <Text>{soldOutMessage}</Text>
   }
@@ -80,12 +99,7 @@ const TicketListItem = ({
     rightContent = isSalesClosed ? (
       <Text>{ticketsClosedMessage}</Text>
     ) : maximumOption && maximumOption > 0 ? (
-      <Dropdown
-        items={dropdownOptions}
-        selectedOption={selectedOption}
-        onSelectItem={handleOnSelectItem}
-        styles={styles?.dropdown}
-      />
+      ticketQuantityComponent
     ) : (
       <></>
     )

@@ -3,6 +3,8 @@ import _forEach from 'lodash/forEach'
 import { Client } from '../api/ApiClient'
 import Constants from '../api/Constants'
 
+export type ITicketsQuantityType = 'dropdown' | 'input'
+
 export interface IConfig {
   DOMAIN?: string
   BASE_URL?: string
@@ -11,6 +13,8 @@ export interface IConfig {
   TIMEOUT?: number
   BRAND?: string
   IS_BILLING_STREET_NAME_REQUIRED?: boolean
+  TICKETS_QUANTITY_TYPE?: ITicketsQuantityType
+  IS_INPUT_MATERIAL?: boolean
 
   [key: string]: string | number | boolean | undefined
 }
@@ -46,6 +50,9 @@ export const setConfig = (configs: IConfig): string | undefined => {
   }
   if (Config.IS_BILLING_STREET_NAME_REQUIRED === undefined) {
     Config.IS_BILLING_STREET_NAME_REQUIRED = true
+  }
+  if (Config.TICKETS_QUANTITY_TYPE === undefined) {
+    Config.TICKETS_QUANTITY_TYPE = 'input'
   }
 
   return undefined

@@ -1,6 +1,7 @@
 import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 import { IDropdownStyles } from '../../../components/dropdown/types'
+import { IInputStyles } from '../../../components/input/types'
 import { ISelectedTicket, ITicket } from '../../../types'
 
 export interface ITicketListItemStyles {
@@ -12,6 +13,7 @@ export interface ITicketListItemStyles {
   soldOutText?: TextStyle
   soldOutContainer?: ViewStyle
   dropdown?: IDropdownStyles
+  input?: IInputStyles
   pricesContainer?: StyleProp<ViewStyle>
 }
 
