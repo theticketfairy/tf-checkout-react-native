@@ -11,7 +11,7 @@ import { IButtonStyles } from '../../components/button/types'
 
 export interface IMyOrderDetailsProps {
   data: IMyOrderDetailsResponse
-  onPressSellTicket?: (ticket: IMyOrderDetailsTicket) => void
+  onPressSellTicket: (ticket: IMyOrderDetailsTicket) => void
 
   styles?: {
     rootContainer?: StyleProp<ViewStyle>
@@ -86,5 +86,5 @@ export interface IMyOrderDetailsView extends IMyOrderDetailsProps {
   onPressCopyLink: () => void
   onPressTicketDownload: (link: string, hash: string) => void
   downloadStatus?: DownloadStatus
-  onPressSellTicket?: (ticket: IMyOrderDetailsTicket) => void
+  isLoading?: boolean
 }

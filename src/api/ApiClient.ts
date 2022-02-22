@@ -696,12 +696,43 @@ export const fetchPurchaseConfirmation = async (orderHash: string) => {
 //#endregion
 
 //#region Resale Tickets
-export const resaleTicket = (data: any, orderHash: string) => {
-  return Client.post(`v1/ticket/${orderHash}/sell`, data)
+export const resaleTicket = async (data: FormData, orderHash: string) => {
+  let responseError
+  console.log(`Resaling order ${orderHash} with data ${data}`, data)
+  const response = await Client.post(`v1/ticket/${orderHash}/sell`, data).catch(
+    (error: AxiosError) => {
+      console.log('Raw error resale ticket', error.response)
+      responseError =
+        error.response?.data.message || 'Error while re-sale ticket'
+    }
+  )
+
+  console.log('resaleTicket', response)
+  console.log('resaleTicket err', responseError)
+
+  return {
+    resaleTicketData: response?.data,
+    resaleTicketError: responseError,
+  }
 }
 
-export const removeFromResale = (orderHash: string) => {
-  return Client.delete(`v1/ticket/${orderHash}/sell`)
+export const removeTicketFromResale = async (orderHash: string) => {
+  let responseError
+
+  const response = await Client.delete(`v1/ticket/${orderHash}/sell`).catch(
+    (error: AxiosError) => {
+      responseError =
+        error.response?.data.message || 'Error removing ticket from resale'
+    }
+  )
+
+  console.log('removeTicketFromResale', response)
+  console.log('removeTicketFromResale err', responseError)
+
+  return {
+    removeTicketFromResaleData: response?.data,
+    removeTicketFromResaleError: responseError,
+  }
 }
 
 export const postReferralVisits = (eventId: string, referralId: string) =>

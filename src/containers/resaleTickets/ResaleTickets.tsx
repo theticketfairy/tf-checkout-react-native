@@ -1,5 +1,7 @@
 import React, { FC, useState } from 'react'
+import { Alert } from 'react-native'
 
+import { resaleTicket } from '../../api/ApiClient'
 import { useDebounced } from '../../helpers/Debounced'
 import { validateEmail, validateEmpty } from '../../helpers/Validators'
 import ResaleTicketsView from './ResaleTicketsView'
@@ -9,7 +11,12 @@ import {
   SellToWhomFieldIdEnum,
 } from './types'
 
-const ResaleTickets: FC<IResaleTicketsProps> = ({ styles, ticket }) => {
+const ResaleTickets: FC<IResaleTicketsProps> = ({
+  styles,
+  ticket,
+  onSellTicketsSuccess,
+  onSellTicketsFail,
+}) => {
   console.log('TICKET', ticket)
   const [isLoading, setIsLoading] = useState(false)
   const [sellToWhomData, setSellToWhomData] = useState<ISellToWhomData>({
@@ -38,8 +45,29 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({ styles, ticket }) => {
     validateEmail(emailConfirm, email)
   )
 
-  const handleOnPressSellTickets = () => {
-    console.log('handleOnPressSellTickets')
+  const handleOnPressSellTickets = async () => {
+    setIsLoading(true)
+    const formData = new FormData()
+    formData.append('to', toWhom)
+    formData.append('first_name', firstName)
+    formData.append('last_name', lastName)
+    formData.append('email', email)
+    formData.append('confirm_email', emailConfirm)
+    formData.append('confirm', String(isTermsAgreed))
+
+    const { resaleTicketData, resaleTicketError } = await resaleTicket(
+      formData,
+      ticket.hash
+    )
+
+    if (resaleTicketError || !resaleTicketData) {
+      if (onSellTicketsFail) {
+        onSellTicketsFail(resaleTicketError!)
+      }
+      return Alert.alert('', resaleTicketError)
+    }
+
+    return onSellTicketsSuccess(ticket)
   }
 
   const handleSellToWhomDataChange = (
@@ -56,7 +84,7 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({ styles, ticket }) => {
       case SellToWhomFieldIdEnum.radioIndex:
         setSellToWhomData({
           ...sellToWhomData,
-          toWhom: value === 0 ? 'someone' : 'anyone',
+          toWhom: value === 0 ? 'friend' : 'anyone',
         })
         break
       case SellToWhomFieldIdEnum.firstName:
@@ -103,7 +131,7 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({ styles, ticket }) => {
       return true
     }
     if (
-      toWhom === 'someone' &&
+      toWhom === 'friend' &&
       firstName &&
       lastName &&
       email &&

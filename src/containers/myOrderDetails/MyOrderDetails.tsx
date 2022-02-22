@@ -1,5 +1,6 @@
+import _forEach from 'lodash/forEach'
 import React, { FC, useEffect, useState } from 'react'
-import { PermissionsAndroid, Platform } from 'react-native'
+import { Alert, PermissionsAndroid, Platform } from 'react-native'
 import {
   DocumentDirectoryPath,
   DownloadDirectoryPath,
@@ -7,6 +8,8 @@ import {
   DownloadFileOptions,
 } from 'react-native-fs'
 
+import { IMyOrderDetailsResponse, IMyOrderDetailsTicket } from '../..'
+import { removeTicketFromResale } from '../../api/ApiClient'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import MyOrderDetailsView from './MyOrderDetailsView'
 import { DownloadStatus, IMyOrderDetailsProps } from './types'
@@ -20,6 +23,8 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
   const [isWriteStorageEnabled, setIsWriteStorageEnabled] = useState<
     boolean | undefined
   >(undefined)
+  const [orderInfo, setOrderInfo] = useState<IMyOrderDetailsResponse>(data)
+  const [isLoading, setIsLoading] = useState(false)
   const [isLinkCopied, setIsLinkCopied] = useState(false)
   const [downloadStatus, setDownloadStatus] = useState<
     DownloadStatus | undefined
@@ -69,6 +74,46 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
     }, 5000)
   }
 
+  const handleWithdrawTicket = async (ticket: IMyOrderDetailsTicket) => {
+    setIsLoading(true)
+    const { removeTicketFromResaleData, removeTicketFromResaleError } =
+      await removeTicketFromResale(ticket.hash)
+    setIsLoading(false)
+
+    if (removeTicketFromResaleError || !removeTicketFromResaleData) {
+      return Alert.alert('', removeTicketFromResaleError)
+    }
+
+    const updatedOrderInfo = { ...orderInfo }
+    _forEach(updatedOrderInfo.tickets, (item) => {
+      if (item.hash === ticket.hash) {
+        item.isSellable = true
+        item.isOnSale = false
+      }
+    })
+    setOrderInfo(updatedOrderInfo)
+  }
+
+  const handleOnPressResaleTicket = (ticket: IMyOrderDetailsTicket) => {
+    if (ticket.isOnSale) {
+      return Alert.alert(
+        'Withdraw ticket confirmation',
+        'Are you sure you want to withdraw your ticket from resale?',
+        [
+          {
+            text: 'No',
+          },
+          {
+            text: 'Yes, withdraw',
+            onPress: () => handleWithdrawTicket(ticket),
+          },
+        ]
+      )
+    }
+
+    return onPressSellTicket(ticket)
+  }
+
   useEffect(() => {
     if (Platform.OS === 'ios') {
       return
@@ -93,14 +138,15 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
 
   return (
     <MyOrderDetailsView
-      data={data}
+      data={orderInfo}
       styles={styles}
       texts={texts}
       isLinkCopied={isLinkCopied}
       onPressCopyLink={handleOnPressCopyLink}
       onPressTicketDownload={handleOnPressTicketDownload}
       downloadStatus={downloadStatus}
-      onPressSellTicket={onPressSellTicket}
+      onPressSellTicket={handleOnPressResaleTicket}
+      isLoading={isLoading}
     />
   )
 }

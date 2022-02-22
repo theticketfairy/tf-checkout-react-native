@@ -43,7 +43,7 @@ export interface ISellTicketsFormDataErrors {
 }
 
 export interface ISellToWhomData {
-  toWhom: 'someone' | 'anyone' | undefined
+  toWhom: 'friend' | 'anyone' | undefined
   someoneData: ISellTicketsFormData
   isTermsAgreed: boolean
 }
@@ -84,8 +84,8 @@ export interface IResaleTicketsStyles {
 export interface IResaleTicketsProps {
   ticket: IMyOrderDetailsTicket
   styles?: IResaleTicketsStyles
-  onSellTicketsSuccess: () => void
-  onSellTicketsFail?: () => void
+  onSellTicketsSuccess: (ticket: IMyOrderDetailsTicket) => void
+  onSellTicketsFail?: (errorMessage: string) => void
 }
 
 export interface IResaleTicketsViewTexts {

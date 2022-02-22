@@ -12,7 +12,7 @@ import {
 } from 'react-native'
 
 import { IMyOrderDetailsTicket } from '../../api/types'
-import { Button } from '../../components'
+import { Button, Loading } from '../../components'
 import R from '../../res'
 import Notification from './components/Notification'
 import s from './styles'
@@ -27,6 +27,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
   onPressTicketDownload,
   downloadStatus,
   onPressSellTicket,
+  isLoading,
 }) => {
   //#region Handlers
   const onCopyLinkHandler = () => {
@@ -220,16 +221,18 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
           onPress={() => onPressTicketDownload(item.pdfLink, item.hash)}
         />
       </View>
-      <Button
-        onPress={() => handleOnPressSellTicket(item)}
-        text='Resale ticket'
-        styles={{
-          container: s.resaleButtonContainer,
-          button: s.resaleButton,
-          text: s.resaleButtonText,
-          ...styles?.resaleButton,
-        }}
-      />
+      {item.isSellable && (
+        <Button
+          onPress={() => handleOnPressSellTicket(item)}
+          text={item.isOnSale ? 'Remove from Resale' : 'Sell Ticket'}
+          styles={{
+            container: s.resaleButtonContainer,
+            button: s.resaleButton,
+            text: s.resaleButtonText,
+            ...styles?.resaleButton,
+          }}
+        />
+      )}
     </View>
   )
 
@@ -263,6 +266,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
       {(downloadStatus === 'downloaded' || downloadStatus === 'failed') && (
         <Notification isSuccess={downloadStatus === 'downloaded'} />
       )}
+      {isLoading && <Loading />}
     </View>
   )
 }
