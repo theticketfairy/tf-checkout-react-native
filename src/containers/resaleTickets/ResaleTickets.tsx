@@ -20,17 +20,22 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({ styles, ticket }) => {
       email: '',
       emailConfirm: '',
     },
+    isTermsAgreed: false,
   })
 
-  const { someoneData } = sellToWhomData
+  const {
+    someoneData: { firstName, lastName, email, emailConfirm },
+    isTermsAgreed,
+    toWhom,
+  } = sellToWhomData
 
-  const firstNameError = useDebounced(someoneData.firstName, validateEmpty)
-  const lastNameError = useDebounced(someoneData.lastName, validateEmpty)
-  const emailError = useDebounced(someoneData.email, () =>
-    validateEmail(someoneData.email, someoneData.emailConfirm)
+  const firstNameError = useDebounced(firstName, validateEmpty)
+  const lastNameError = useDebounced(lastName, validateEmpty)
+  const emailError = useDebounced(email, () =>
+    validateEmail(email, emailConfirm)
   )
-  const emailConfirmError = useDebounced(someoneData.emailConfirm, () =>
-    validateEmail(someoneData.emailConfirm, someoneData.email)
+  const emailConfirmError = useDebounced(emailConfirm, () =>
+    validateEmail(emailConfirm, email)
   )
 
   const handleOnPressSellTickets = () => {
@@ -39,9 +44,15 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({ styles, ticket }) => {
 
   const handleSellToWhomDataChange = (
     id: SellToWhomFieldIdEnum,
-    value: string | number
+    value?: string | number
   ) => {
     switch (id) {
+      case SellToWhomFieldIdEnum.terms:
+        setSellToWhomData({
+          ...sellToWhomData,
+          isTermsAgreed: !isTermsAgreed,
+        })
+        break
       case SellToWhomFieldIdEnum.radioIndex:
         setSellToWhomData({
           ...sellToWhomData,
@@ -52,7 +63,7 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({ styles, ticket }) => {
         setSellToWhomData({
           ...sellToWhomData,
           someoneData: {
-            ...someoneData,
+            ...sellToWhomData.someoneData,
             firstName: value as string,
           },
         })
@@ -61,7 +72,7 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({ styles, ticket }) => {
         setSellToWhomData({
           ...sellToWhomData,
           someoneData: {
-            ...someoneData,
+            ...sellToWhomData.someoneData,
             lastName: value as string,
           },
         })
@@ -70,7 +81,7 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({ styles, ticket }) => {
         setSellToWhomData({
           ...sellToWhomData,
           someoneData: {
-            ...someoneData,
+            ...sellToWhomData.someoneData,
             email: value as string,
           },
         })
@@ -79,12 +90,34 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({ styles, ticket }) => {
         setSellToWhomData({
           ...sellToWhomData,
           someoneData: {
-            ...someoneData,
+            ...sellToWhomData.someoneData,
             emailConfirm: value as string,
           },
         })
         break
     }
+  }
+
+  const isDataValid = () => {
+    if (toWhom === 'anyone' && isTermsAgreed) {
+      return true
+    }
+    if (
+      toWhom === 'someone' &&
+      firstName &&
+      lastName &&
+      email &&
+      emailConfirm &&
+      !emailConfirmError &&
+      !emailError &&
+      !firstNameError &&
+      !lastNameError &&
+      isTermsAgreed
+    ) {
+      return true
+    }
+
+    return false
   }
 
   return (
@@ -98,13 +131,7 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({ styles, ticket }) => {
         emailError: emailError,
         emailConfirmError: emailConfirmError,
       }}
-      isDataValid={
-        !firstNameError &&
-        !lastNameError &&
-        !emailError &&
-        !emailConfirmError &&
-        !!sellToWhomData.toWhom
-      }
+      isDataValid={isDataValid()}
       onSellToWhomDataChanged={handleSellToWhomDataChange}
       onPressSellTickets={handleOnPressSellTickets}
       ticket={ticket}

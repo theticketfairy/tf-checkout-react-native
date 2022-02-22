@@ -670,6 +670,17 @@ const App = () => {
                   color: Color.textMain,
                 },
               },
+              termsCheckbox: {
+                text: {
+                  color: Color.textMain,
+                },
+                indicator: {
+                  backgroundColor: Color.validationGreen,
+                },
+                indicatorDisabled: {
+                  borderColor: Color.white
+                }
+              },
               ticketBuyerForm: {
                 rootContainer: {
                   paddingHorizontal: 16,

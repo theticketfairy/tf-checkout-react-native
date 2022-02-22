@@ -2,7 +2,7 @@ import React, { FC, useMemo, useRef } from 'react'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { Button, Input, RadioButton } from '../../components'
+import { Button, Checkbox, Input, RadioButton } from '../../components'
 import { IResaleTicketsViewProps, SellToWhomFieldIdEnum } from './types'
 
 const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
@@ -30,6 +30,7 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
   const {
     someoneData: { firstName, lastName, email, emailConfirm },
     toWhom,
+    isTermsAgreed,
   } = sellToWhomData
 
   const { firstNameError, lastNameError, emailError, emailConfirmError } =
@@ -58,9 +59,19 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
           and that any existing refunds due to me for referring sales for this
           event are no longer valid.{'\n'}
         </Text>
+
+        <Checkbox
+          onPress={() => onSellToWhomDataChanged(SellToWhomFieldIdEnum.terms)}
+          isActive={isTermsAgreed}
+          styles={styles?.termsCheckbox}
+          text={'I agree'}
+        />
       </View>
     ),
     [
+      isTermsAgreed,
+      onSellToWhomDataChanged,
+      styles?.termsCheckbox,
       termsStyles?.item,
       termsStyles?.itemBold,
       termsStyles?.rootContainer,
@@ -217,7 +228,7 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
 
         <Button
           styles={buttonStyles}
-          text='Sell Tickets'
+          text='Sell Ticket'
           onPress={onPressSellTickets}
           isDisabled={!isDataValid}
         />

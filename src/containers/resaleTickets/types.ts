@@ -2,6 +2,7 @@ import { StyleProp, Text, TextStyle, ViewStyle } from 'react-native'
 
 import { IMyOrderDetailsTicket } from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
+import { ICheckboxStyles } from '../../components/checkbox/types'
 import { IInputStyles } from '../../components/input/types'
 import { IRadioButtonStyles } from '../../components/radioButton/types'
 
@@ -44,6 +45,7 @@ export interface ISellTicketsFormDataErrors {
 export interface ISellToWhomData {
   toWhom: 'someone' | 'anyone' | undefined
   someoneData: ISellTicketsFormData
+  isTermsAgreed: boolean
 }
 export interface ITicketBuyerFormProps {
   isDataValid?: boolean
@@ -76,6 +78,7 @@ export interface IResaleTicketsStyles {
   sellTicketsButtonLoading?: IButtonStyles
   ticketOrderDetails?: ITicketOrderDetailsStyles
   ticketBuyerForm?: ITicketBuyerFormStyles
+  termsCheckbox?: ICheckboxStyles
 }
 
 export interface IResaleTicketsProps {
@@ -96,6 +99,7 @@ export enum SellToWhomFieldIdEnum {
   email,
   emailConfirm,
   radioIndex,
+  terms,
 }
 
 export interface IResaleTicketsViewProps {
@@ -104,7 +108,7 @@ export interface IResaleTicketsViewProps {
   sellToWhomData: ISellToWhomData
   onSellToWhomDataChanged: (
     id: SellToWhomFieldIdEnum,
-    value: string | number
+    value?: string | number
   ) => void
   isDataValid?: boolean
   isSomeoneDataValid?: boolean
