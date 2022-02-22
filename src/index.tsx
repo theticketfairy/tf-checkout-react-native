@@ -2,7 +2,11 @@
 import * as React from 'react' //Needed to render
 import { LogBox, NativeModules } from 'react-native'
 
-import { IMyOrderDetailsResponse, IMyOrdersOrder } from './api/types'
+import {
+  IMyOrderDetailsResponse,
+  IMyOrderDetailsTicket,
+  IMyOrdersOrder,
+} from './api/types'
 import { LoggedIn, Login } from './components'
 import {
   BillingInfo,
@@ -10,6 +14,7 @@ import {
   MyOrderDetails,
   MyOrders,
   PurchaseConfirmation,
+  ResaleTickets,
   Tickets,
 } from './containers'
 import { IOnCheckoutSuccess } from './containers/billingInfo/types'
@@ -26,6 +31,7 @@ export {
   Checkout,
   IAddToCartSuccess,
   IMyOrderDetailsResponse,
+  IMyOrderDetailsTicket,
   IMyOrdersOrder,
   IOnCheckoutSuccess,
   ITicketsProps,
@@ -35,6 +41,7 @@ export {
   MyOrderDetails,
   MyOrders,
   PurchaseConfirmation,
+  ResaleTickets,
   setConfig,
   Tickets,
 }

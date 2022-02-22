@@ -178,6 +178,7 @@ export interface IMyOrdersOrder {
   eventUrl: string
   image: string
 }
+
 export interface IMyOrdersData {
   events: IMyOrdersEvent[]
   orders: IMyOrdersOrder[]
@@ -205,6 +206,12 @@ export interface IMyOrderDetailsTicket {
   holderName: string
   status: string
   pdfLink: string
+  //For resale
+  isSellable?: boolean
+  isOnSale?: boolean
+  eventName?: string
+  currency?: string
+  feeAmount?: number | string
 }
 
 export interface IMyOrderDetailsHeader {
@@ -225,4 +232,18 @@ export interface ICartResponse {
   isTfOptInHidden?: boolean
   isTfOptIn: boolean // Ticket fairy
   isMarketingOptedIn: boolean // Brand
+}
+
+export interface IResaleTicketInfo {
+  addOns: any
+  orderHash: string
+  ticketType: string
+  holderName: string
+  status: string
+  pdfLink: string
+  isSellable: boolean
+  isOnSale?: boolean
+  eventName: string
+  currency: string
+  feeAmount: number | string
 }

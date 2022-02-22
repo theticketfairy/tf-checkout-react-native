@@ -1,3 +1,4 @@
+import _forEach from 'lodash/forEach'
 import _map from 'lodash/map'
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import { Alert } from 'react-native'
@@ -58,15 +59,30 @@ const MyOrders: FC<IMyOrdersProps> = ({
 
   const handleOnSelectOrder = async (order: IMyOrdersOrder) => {
     setIsGettingEventDetails(true)
+    console.log(' My orders, handle on select orter', order)
     const { orderDetailsData, orderDetailsError } = await fetchOrderDetails(
       order.id
     )
+    console.log(' My orders, handle on fetch order det', orderDetailsData)
     setIsGettingEventDetails(false)
-    if ((!orderDetailsData || orderDetailsError) && onFetchOrderDetailsFail) {
-      return onFetchOrderDetailsFail(orderDetailsError!)
+
+    if (!orderDetailsData || orderDetailsError) {
+      if (onFetchOrderDetailsFail) {
+        return onFetchOrderDetailsFail(
+          orderDetailsError || 'Error fetching order details'
+        )
+      }
     }
+
     if (orderDetailsData) {
-      onSelectOrder(orderDetailsData)
+      const orderDetails = { ...orderDetailsData }
+      _forEach(orderDetails.tickets, (ticket, index) => {
+        console.log('Tuicke', ticket)
+        orderDetailsData.tickets[index].eventName = order.eventName
+      })
+
+      console.log('==> orderDetails', orderDetails)
+      return onSelectOrder(orderDetailsData)
     }
   }
 

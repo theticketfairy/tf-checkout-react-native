@@ -13,13 +13,15 @@ import {
   Login,
   IUserProfile,
   setConfig,
+  ResaleTickets,
+  IMyOrderDetailsTicket,
 } from 'tf-checkout-react-native'
 
 import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles from './styles'
 
-const EVENT_ID = 5420 // Replace with assigned ID
+const EVENT_ID = 11929 // Replace with assigned ID
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -36,9 +38,17 @@ const App = () => {
   const [selectedOrderDetails, setSelectedOrderDetails] =
     useState<IMyOrderDetailsResponse>()
 
+  const [ticketToSell, setTicketToSell] = useState<
+    undefined | IMyOrderDetailsTicket
+  >(undefined)
+
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
   const [loggedUserName, setLoggedUserName] = useState('')
+
   //#region Handlers
+  const handleOnPressSellTicket = (ticket: IMyOrderDetailsTicket) => {
+    setTicketToSell(ticket)
+  }
   const handleOnLoginDialogSuccess = (
     userProfile: IUserProfile,
     accessToken: string
@@ -95,17 +105,13 @@ const App = () => {
   }
   //#endregion
 
-  const loginEmailRef = useRef(null)
-  const loginPasswordRef = useRef(null)
-  const touchableOpacityRef = useRef(null)
-
   //#region effects
   useEffect(() => {
     setConfig({
-      DOMAIN: 'https://houseofx.nyc',
-      IS_BILLING_STREET_NAME_REQUIRED: false,
+      DOMAIN: 'https://manacommon.com',
     })
   }, [])
+
   useEffect(() => {
     if (cartProps) {
       console.log('cartProps', cartProps)
@@ -132,6 +138,12 @@ const App = () => {
       setComponentToShow(ComponentEnum.MyOrderDetails)
     }
   }, [selectedOrderDetails])
+
+  useEffect(() => {
+    if (ticketToSell) {
+      setComponentToShow(ComponentEnum.ResaleTickets)
+    }
+  }, [ticketToSell])
   //#endregion
 
   const RenderComponent = () => {
@@ -506,6 +518,7 @@ const App = () => {
         return (
           <View style={{ flex: 1 }}>
             <MyOrderDetails
+              onPressSellTicket={handleOnPressSellTicket}
               data={selectedOrderDetails!}
               styles={{
                 downloadButton: {
@@ -628,6 +641,107 @@ const App = () => {
               <Text>Back</Text>
             </TouchableOpacity>
           </View>
+        )
+
+      case ComponentEnum.ResaleTickets:
+        return (
+          <ResaleTickets
+            ticket={ticketToSell!}
+            styles={{
+              title: {
+                color: Color.textMain,
+                fontSize: 20,
+                fontWeight: '700',
+                marginLeft: 16,
+              },
+              ticketOrderDetails: {
+                rootContainer: {
+                  marginVertical: 16,
+                  paddingHorizontal: 16,
+                },
+                title: {
+                  color: Color.textMain,
+                  fontSize: 18,
+                },
+                label: {
+                  color: Color.textMainOff,
+                },
+                value: {
+                  color: Color.textMain,
+                },
+              },
+              ticketBuyerForm: {
+                rootContainer: {
+                  paddingHorizontal: 16,
+                  marginBottom: 16,
+                },
+                inputs: {
+                  baseColor: Color.textMain,
+                  input: {
+                    color: Color.textMain,
+                  },
+                  errorColor: Color.danger,
+                },
+                radioButtons: {
+                  rootContainer: {
+                    marginVertical: 8,
+                  },
+                  indicator: {
+                    backgroundColor: Color.textMain,
+                  },
+                  radio: {
+                    borderColor: Color.textMainOff,
+                  },
+                  text: {
+                    color: Color.textMain,
+                  },
+                },
+                title: {
+                  fontSize: 20,
+                  fontWeight: '700',
+                  marginBottom: 16,
+                  color: Color.textMain,
+                },
+                formContainer: {
+                  marginVertical: 16,
+                },
+              },
+              sellTicketsButton: {
+                button: {
+                  backgroundColor: Color.primary,
+                  width: '70%',
+                  borderRadius: 2,
+                },
+              },
+              sellTicketsButtonDisabled: {
+                button: {
+                  backgroundColor: Color.gray20,
+                  width: '70%',
+                  borderRadius: 2,
+                },
+              },
+              terms: {
+                rootContainer: {
+                  paddingHorizontal: 16,
+                },
+                title: {
+                  color: Color.textMain,
+                  fontSize: 20,
+                  fontWeight: '700',
+                  marginBottom: 16,
+                },
+                item: {
+                  color: Color.textMain,
+                },
+                itemBold: {
+                  fontWeight: '900',
+                },
+              },
+            }}
+            onSellTicketsSuccess={function (): void {
+              throw new Error('Function not implemented.')
+            }}
+          />
         )
 
       default:

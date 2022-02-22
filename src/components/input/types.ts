@@ -1,4 +1,4 @@
-import { LegacyRef } from 'react'
+import { LegacyRef, RefObject } from 'react'
 import {
   ColorValue,
   StyleProp,
@@ -21,7 +21,7 @@ export interface IInputStyles {
 export interface IInputProps extends TextInputProps {
   isSecure?: boolean
   label: string
-  reference?: LegacyRef<TextField>
+  reference?: RefObject<any> | undefined
   formatText?: (text: string) => string
   error?: string
   isDisabled?: boolean

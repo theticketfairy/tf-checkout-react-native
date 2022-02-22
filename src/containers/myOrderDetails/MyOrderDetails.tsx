@@ -11,7 +11,12 @@ import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import MyOrderDetailsView from './MyOrderDetailsView'
 import { DownloadStatus, IMyOrderDetailsProps } from './types'
 
-const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
+const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
+  data,
+  styles,
+  texts,
+  onPressSellTicket,
+}) => {
   const [isWriteStorageEnabled, setIsWriteStorageEnabled] = useState<
     boolean | undefined
   >(undefined)
@@ -95,6 +100,7 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
       onPressCopyLink={handleOnPressCopyLink}
       onPressTicketDownload={handleOnPressTicketDownload}
       downloadStatus={downloadStatus}
+      onPressSellTicket={onPressSellTicket}
     />
   )
 }

@@ -33,7 +33,6 @@ export default StyleSheet.create({
   listItemContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderWidth: 2,
     marginVertical: 8,
   },
   rowContainer: {
@@ -45,7 +44,6 @@ export default StyleSheet.create({
   },
 
   ticketItemContainer: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     borderWidth: 2,
     marginVertical: 8,

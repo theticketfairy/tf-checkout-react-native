@@ -29,6 +29,11 @@ const MyOrdersView = ({
   config,
   onFetchMoreOrders,
 }: IMyOrdersViewProps) => {
+  console.log(
+    '%cMyOrdersView.tsx line:32 myOrders',
+    'color: #007acc;',
+    myOrders
+  )
   const onEndReachedCalledDuringMomentum = useRef(false)
   const handleOnSelectOrder = (order: IMyOrdersOrder) => {
     if (onSelectOrder) {

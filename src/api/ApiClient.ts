@@ -279,6 +279,8 @@ export const fetchMyOrders = async (
     }
   )
 
+  console.log('My orders', response)
+
   if (response?.data) {
     data.events = response.data.data.attributes.purchased_events
     data.orders = response.data.data.attributes.orders
@@ -289,9 +291,13 @@ export const fetchMyOrders = async (
     myOrdersData: data,
   }
 }
-//&filter[brand]=${CONFIGS.BRAND_SLUG}
 
-export const fetchOrderDetails = async (orderId: string) => {
+export const fetchOrderDetails = async (
+  orderId: string
+): Promise<{
+  orderDetailsData: IMyOrderDetailsResponse | undefined
+  orderDetailsError: string
+}> => {
   let responseError = ''
   let responseData: IMyOrderDetailsResponse | undefined
   const response = await Client.get(`/v1/account/order/${orderId}`).catch(
@@ -326,6 +332,9 @@ export const fetchOrderDetails = async (orderId: string) => {
           holderName: item.holder_name,
           status: item.status,
           pdfLink: item.pdf_link,
+          isSellable: item.is_sellable || false,
+          isOnSale: item.is_on_sale || false,
+          feeAmount: item.resale_fee_amount || 0,
         }
       }
     )
@@ -678,6 +687,39 @@ export const fetchPurchaseConfirmation = async (orderHash: string) => {
   ).catch((error: AxiosError) => {
     responseError = error.response?.data.message
   })
+
+  return {
+    error: responseError,
+    data: response,
+  }
+}
+//#endregion
+
+//#region Resale Tickets
+export const resaleTicket = (data: any, orderHash: string) => {
+  return Client.post(`v1/ticket/${orderHash}/sell`, data)
+}
+
+export const removeFromResale = (orderHash: string) => {
+  return Client.delete(`v1/ticket/${orderHash}/sell`)
+}
+
+export const postReferralVisits = (eventId: string, referralId: string) =>
+  Client.post(`v1/event/${eventId}/referrer/`, {
+    referrer: `${referralId}`,
+  })
+
+export const checkTicketStatus = async (orderHash: string) => {
+  let responseError
+  const response = await Client.post(`v1/ticket/${orderHash}/status/`).catch(
+    (error: AxiosError) => {
+      responseError =
+        error.response?.data.message || 'Error fetching ticket status'
+    }
+  )
+
+  console.log('Check ticket status', response)
+  console.log('Check ticket status - Error', responseError)
 
   return {
     error: responseError,

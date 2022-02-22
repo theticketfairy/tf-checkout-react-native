@@ -26,6 +26,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
   onPressCopyLink,
   onPressTicketDownload,
   downloadStatus,
+  onPressSellTicket,
 }) => {
   //#region Handlers
   const onCopyLinkHandler = () => {
@@ -35,7 +36,14 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
     Clipboard.setString(header.shareLink)
     onPressCopyLink()
   }
+
+  const handleOnPressSellTicket = (ticket: IMyOrderDetailsTicket) => {
+    onPressSellTicket(ticket)
+  }
   //#endregion
+
+  console.log('data', items)
+  console.log('data', tickets)
 
   const copyIconTint = styles?.header?.shareLink?.copyIconTint || R.colors.black
   const copyIconTintActive =
@@ -212,6 +220,16 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
           onPress={() => onPressTicketDownload(item.pdfLink, item.hash)}
         />
       </View>
+      <Button
+        onPress={() => handleOnPressSellTicket(item)}
+        text='Resale ticket'
+        styles={{
+          container: s.resaleButtonContainer,
+          button: s.resaleButton,
+          text: s.resaleButtonText,
+          ...styles?.resaleButton,
+        }}
+      />
     </View>
   )
 
