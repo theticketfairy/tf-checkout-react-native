@@ -1341,7 +1341,7 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@stripe/stripe-react-native@^0.2.3":
+"@stripe/stripe-react-native@0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@stripe/stripe-react-native/-/stripe-react-native-0.2.3.tgz#c0570d6afa30ab432983cea03ccf532c1f8d731a"
   integrity sha512-UugLDeJEHAbrHDj5OcwhD5Za96pTwXr2sCfvO6UrGzH71HZ7vzBSq+/Cckm2HJFmkC4JqamGjTxy/pI6pqZ4ng==
@@ -5629,7 +5629,7 @@ prompts@^2.0.1, prompts@^2.4.0:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.7.2:
+prop-types@^15.5.9, prop-types@^15.7.2:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -5995,6 +5995,13 @@ rimraf@~2.6.2:
   integrity sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==
   dependencies:
     glob "^7.1.3"
+
+rn-material-ui-textfield@1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/rn-material-ui-textfield/-/rn-material-ui-textfield-1.0.5.tgz#19a190f1de04d651ea983cfe02a0fc87c01bbec2"
+  integrity sha512-G3G380aJaWbwq7ayVXhlf8d3TwEUyvZaAOSiE5Hd/AJ/HsNt6LfrTeNHt16XTZsd1ZgvrHfBstjsBbWpFWzGrA==
+  dependencies:
+    prop-types "^15.5.9"
 
 rsvp@^4.8.4:
   version "4.8.5"
