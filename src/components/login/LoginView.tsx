@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import _map from 'lodash/map'
 import React, { useCallback, useMemo, useState } from 'react'
 import {
