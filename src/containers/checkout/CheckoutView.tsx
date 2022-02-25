@@ -84,7 +84,6 @@ const CheckoutView = ({
             <CardForm
               onFormComplete={handleOnFormComplete}
               style={[s.card, styles?.payment?.cardContainer]}
-              cardStyle={s.cardStyle}
             />
           </View>
         )}

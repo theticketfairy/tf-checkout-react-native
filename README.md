@@ -506,7 +506,6 @@ If the you need to modify the card container, use the `styles.payment.cardContai
   payment?: {
     container?: StyleProp<ViewStyle>
     title?: StyleProp<TextStyle>
-    cardBackgroundColor?: string
     cardContainer?: StyleProp<ViewStyle>
     button?: IButtonStyles
     buttonDisabled?: IButtonStyles
