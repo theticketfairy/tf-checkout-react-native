@@ -418,7 +418,8 @@ export const addToCart = async (id: string | number, data: any) => {
         !response?.data?.data?.attributes?.skip_billing_page ?? true,
       isNameRequired: response?.data?.data?.attributes?.names_required ?? false,
       isAgeRequired: response?.data?.data?.attributes?.age_required ?? false,
-      isPhoneRequired: response?.data?.data?.attributes?.phone_required ?? true,
+      isPhoneRequired:
+        response?.data?.data?.attributes?.phone_required ?? false,
       minimumAge: response?.data?.data?.attributes?.minimum_age ?? 18,
     }
   }
