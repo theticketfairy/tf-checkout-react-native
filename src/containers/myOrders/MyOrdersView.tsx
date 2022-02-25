@@ -122,6 +122,7 @@ const MyOrdersView = ({
             onEndReached={handleOnReachEnd}
             onMomentumScrollBegin={handleOnMomentumScrollBegin}
             onEndReachedThreshold={0.2}
+            extraData={myOrders}
           />
         </View>
         {isGettingEventDetails && <Loading />}

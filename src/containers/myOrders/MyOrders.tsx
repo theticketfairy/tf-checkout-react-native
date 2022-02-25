@@ -1,5 +1,7 @@
 import _map from 'lodash/map'
-import React, { FC, useCallback, useEffect, useState } from 'react'
+import _uniqBy from 'lodash/uniqBy'
+import _sortBy from 'lodash/sortBy'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
 import { fetchMyOrders, fetchOrderDetails } from '../../api/ApiClient'
@@ -22,38 +24,69 @@ const MyOrders: FC<IMyOrdersProps> = ({
     value: '-1',
   })
   const [myOrders, setMyOrders] = useState<IMyOrdersOrder[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const getMyOrdersAsync = useCallback(async () => {
+  const currentPage = useRef(1)
+
+  const getOrdersAsync = async (): Promise<undefined | IMyOrdersOrder[]> => {
     setIsLoading(true)
     const validSelectedEvent =
       selectedEvent.value === '-1' ? null : selectedEvent
     const { myOrdersData, myOrdersError } = await fetchMyOrders(
-      currentPage,
+      currentPage.current,
       validSelectedEvent?.value.toString()
     )
-
+    setIsLoading(false)
     if (myOrdersError || !myOrdersData) {
-      return Alert.alert('', myOrdersError)
+      Alert.alert('', myOrdersError)
+      return undefined
     }
 
-    const events: IDropdownItem[] = _map(myOrdersData.events, (item) => {
-      return {
-        label: item.event_name,
-        value: item.url_name,
-      }
-    })
+    const events = _sortBy(
+      _map(myOrdersData.events, (item) => {
+        return {
+          label: item.event_name,
+          value: item.url_name,
+        }
+      }),
+      'value'
+    )
 
-    setMyOrders([...myOrders, ...myOrdersData.orders])
     setMyEvents(events)
-    setIsLoading(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedEvent, currentPage])
+
+    return myOrdersData.orders
+  }
+
+  const getOrders = async () => {
+    const fetchedOrders = await getOrdersAsync()
+    setMyOrders(fetchedOrders ?? [])
+  }
+
+  const getMoreOrders = async () => {
+    const fetchedOrders = await getOrdersAsync()
+    const uniqOrders = _uniqBy(
+      [...myOrders, ...(fetchedOrders ?? [])],
+      (item) => item.id
+    )
+    setMyOrders(uniqOrders)
+  }
+
+  useEffect(() => {
+    getOrders()
+  }, [selectedEvent])
 
   //#region Handlers
   const handleOnChangeEvent = (event: IDropdownItem) => {
     if (event.value !== selectedEvent.value) {
+      currentPage.current = 1
       setSelectedEvent(event)
     }
+  }
+
+  const handleOnFetchMoreOrders = () => {
+    if (myOrders.length < 8) {
+      return
+    }
+    currentPage.current = currentPage.current + 1
+    getMoreOrders()
   }
 
   const handleOnSelectOrder = async (order: IMyOrdersOrder) => {
@@ -69,23 +102,15 @@ const MyOrders: FC<IMyOrdersProps> = ({
       onSelectOrder(orderDetailsData)
     }
   }
-
-  const handleOnFetchMoreOrders = () => {
-    setCurrentPage(currentPage + 1)
-  }
   //#endregion
 
   //#region useEffect
   useEffect(() => {
-    if (selectedEvent?.value) {
-      getMyOrdersAsync()
+    const _fetchMyOrders = async () => {
+      await getOrders()
     }
-  }, [getMyOrdersAsync, selectedEvent])
-
-  useEffect(() => {
-    if (myEvents.length > 0) {
-    }
-  }, [myEvents])
+    _fetchMyOrders()
+  }, [])
   //#endregion
 
   return (
@@ -95,7 +120,7 @@ const MyOrders: FC<IMyOrdersProps> = ({
       onChangeEvent={handleOnChangeEvent}
       myOrders={myOrders}
       onSelectOrder={handleOnSelectOrder}
-      onRefresh={getMyOrdersAsync}
+      onRefresh={getOrders}
       isLoading={isLoading}
       isGettingEventDetails={isGettingEventDetails}
       styles={styles}
