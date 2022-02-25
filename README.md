@@ -85,7 +85,6 @@ useEffect(() => {
   CLIENT_SECRET?: string,
   TIMEOUT?: number,
   BRAND?: string,
-  IS_BILLING_STREET_NAME_REQUIRED?: boolean,
 }
 ```
 
@@ -100,8 +99,6 @@ useEffect(() => {
 `BRAND`: Set your BRAND so users can only see this brand in their orders.
 
 `TIMEOUT` Set custom timeout for the APIs requests.
-
-`IS_BILLING_STREET_NAME_REQUIRED`: Whether or not the Street name is required in the billing component.
 
 # Run the example app
 
