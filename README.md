@@ -9,7 +9,16 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 ## Android
 
 - Android 5.0 (API level 21) and above
-- Android gradle plugin 4.x and above
+- Minimum Gradle plugin version `4.2.2`
+- Minimum Gradle version `6.7.1`
+- Compile Sdk Version and Target Sdk Version `31`
+- Build Tools Version `30.0.3`
+
+Add the following to your Android Manifest as activity property.
+
+```
+android:exported="true"
+```
 
 To download the PDFs, add the `WRITE_EXTERNAL_STORAGE` permission to the Android's Manifest file.
 

@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, Platform } from 'react-native'
 
 import R from '../../res'
 export default StyleSheet.create({
@@ -21,12 +21,13 @@ export default StyleSheet.create({
   },
   card: {
     marginTop: 24,
-    minHeight: 250,
-    maxHeight: 350,
+    minHeight: Platform.OS === 'ios' ? 180 : 270,
+    maxHeight: Platform.OS === 'ios' ? 300 : 350,
     width: '80%',
     borderRadius: 10,
     padding: 8,
     alignSelf: 'center',
+    backgroundColor: R.colors.white,
   },
   missingStripeContainer: {
     flex: 1,
