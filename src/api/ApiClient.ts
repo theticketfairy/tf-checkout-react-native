@@ -612,7 +612,7 @@ export const fetchOrderReview = async (
         addressData: {
           city: billing_info.city,
           line1: billing_info.street_address,
-          state: billing_info?.state || '',
+          state: billing_info.state ? billing_info.state.toString() : '',
           postalCode: billing_info.zip,
         },
         billingData: {
