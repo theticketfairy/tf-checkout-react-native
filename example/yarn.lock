@@ -1341,10 +1341,10 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@stripe/stripe-react-native@0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@stripe/stripe-react-native/-/stripe-react-native-0.2.3.tgz#c0570d6afa30ab432983cea03ccf532c1f8d731a"
-  integrity sha512-UugLDeJEHAbrHDj5OcwhD5Za96pTwXr2sCfvO6UrGzH71HZ7vzBSq+/Cckm2HJFmkC4JqamGjTxy/pI6pqZ4ng==
+"@stripe/stripe-react-native@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-react-native/-/stripe-react-native-0.3.0.tgz#d89dc4617f586cb5f4abec288cf47dfd70ce3ec7"
+  integrity sha512-XKg+hjuiLgDEOwp8P/63DOlX5UlU/TieTPMc/Alpa0xver9k8O9FZ+qXhGc+F60B0AsLmQ3GLhsLycdFetCo3g==
   dependencies:
     "@expo/config-plugins" "^3.0.5"
 
