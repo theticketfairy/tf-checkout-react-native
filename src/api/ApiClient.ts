@@ -271,7 +271,10 @@ export const fetchMyOrders = async (
 
   const withFilterEvent = filter ? `&filter[event]=${filter}` : ''
   const withBrand = Config.BRAND ? `&filter[brand]=${Config.BRAND}` : ''
-  const endpoint = `/v1/account/orders/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}`
+  const withSubBrands = Config.ARE_SUB_BRANDS_INCLUDED
+    ? `&filter[subbrands]=${Config.ARE_SUB_BRANDS_INCLUDED}`
+    : ''
+  const endpoint = `/v1/account/orders/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}`
 
   const response: AxiosResponse | void = await Client.get(endpoint).catch(
     (error: AxiosError) => {
