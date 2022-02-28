@@ -58,8 +58,7 @@ const TicketListItem = ({
       ? selectedTicket.selectedOption
       : { label: '0', value: 0 }
 
-  const taxText =
-    ticket.feeText || ticket.feeIncluded ? '(incl. Fees)' : '(excl. Fees)'
+  const feesIncluded = ticket.feeIncluded ? '(incl. Fees)' : '(excl. Fees)'
 
   const showOldPrice = ticket.price !== ticket.oldPrice
   const isTicketFree = +ticket.price === 0
@@ -116,7 +115,9 @@ const TicketListItem = ({
               )}
               <Text style={[s.price, styles?.price]}>{ticketPrice}</Text>
             </View>
-            <Text style={[s.tax, styles?.fees]}>{taxText.toUpperCase()}</Text>
+            <Text style={[s.tax, styles?.fees]}>
+              {feesIncluded.toUpperCase()}
+            </Text>
           </>
         )}
       </View>

@@ -19,7 +19,7 @@ import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles from './styles'
 
-const EVENT_ID = 5420 // Replace with assigned ID
+const EVENT_ID = 12342 //5420 // Replace with assigned ID
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -103,7 +103,8 @@ const App = () => {
   useEffect(() => {
     setConfig({
       DOMAIN: 'https://houseofx.nyc',
-      IS_BILLING_STREET_NAME_REQUIRED: false,
+      BRAND: 'the-ticket-fairy',
+      ARE_SUB_BRANDS_INCLUDED: true,
     })
   }, [])
   useEffect(() => {
