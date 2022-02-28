@@ -10,6 +10,7 @@ export interface IConfig {
   CLIENT_SECRET?: string
   TIMEOUT?: number
   BRAND?: string
+  ARE_SUB_BRANDS_INCLUDED?: boolean
   // IS_BILLING_STREET_NAME_REQUIRED?: boolean
 
   [key: string]: string | number | boolean | undefined
@@ -43,6 +44,10 @@ export const setConfig = (configs: IConfig): string | undefined => {
   }
   if (!Config.Client_ID) {
     Config.CLIENT_ID = Constants.CLIENT_ID
+  }
+
+  if (!Config.ARE_SUB_BRANDS_INCLUDED) {
+    Config.ARE_SUB_BRANDS_INCLUDED = false
   }
   // if (Config.IS_BILLING_STREET_NAME_REQUIRED === undefined) {
   //   Config.IS_BILLING_STREET_NAME_REQUIRED = true

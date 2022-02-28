@@ -94,6 +94,7 @@ useEffect(() => {
   CLIENT_SECRET?: string,
   TIMEOUT?: number,
   BRAND?: string,
+  ARE_SUB_BRANDS_INCLUDED?: boolean
 }
 ```
 
@@ -108,6 +109,8 @@ useEffect(() => {
 `BRAND`: Set your BRAND so users can only see this brand in their orders.
 
 `TIMEOUT` Set custom timeout for the APIs requests.
+
+`ARE_SUB_BRANDS_INCLUDED` If true will include orders from the `BRAND` sub-brands.
 
 # Run the example app
 
