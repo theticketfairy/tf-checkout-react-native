@@ -31,6 +31,7 @@ const Login = ({
   onFetchAccessTokenFailure,
   onFetchUserProfileFailure,
   refs,
+  logoImage,
 }: ILoginProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [loginError, setLoginError] = useState('')
@@ -126,6 +127,7 @@ const Login = ({
       userFirstName={userFirstName}
       loginError={loginError}
       refs={refs}
+      logoImage={logoImage}
     />
   )
 }

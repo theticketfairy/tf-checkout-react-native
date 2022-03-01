@@ -1,4 +1,4 @@
-import { ImageStyle } from 'react-native'
+import { ImageSourcePropType, ImageStyle } from 'react-native'
 import { TextStyle } from 'react-native'
 import { StyleProp, ViewStyle } from 'react-native'
 
@@ -38,6 +38,8 @@ export interface ILoginProps {
 
   userFirstName?: string
   refs?: ILoginRefs
+
+  logoImage?: ImageSourcePropType
 }
 
 export interface ILoginViewStyles {
@@ -103,6 +105,8 @@ export interface ILoginViewProps {
   userFirstName?: string
 
   refs?: ILoginRefs
+
+  logoImage?: ImageSourcePropType
 }
 
 export interface ILoginViewState {

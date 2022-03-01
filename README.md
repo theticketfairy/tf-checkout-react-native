@@ -363,6 +363,8 @@ Add it to the render function.
 
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
+
+  logoImage?: ImageSourcePropType
 />
 ```
 

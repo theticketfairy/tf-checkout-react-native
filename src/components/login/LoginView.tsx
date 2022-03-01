@@ -43,6 +43,7 @@ const LoginView = ({
   userFirstName,
   loginError,
   refs,
+  logoImage,
 }: ILoginViewProps) => {
   const [data, setData] = useState<ILoginViewState>(initialState)
   const { email, password } = data
@@ -189,7 +190,7 @@ const LoginView = ({
                     LOGIN
                   </Text>
                   <Image
-                    source={R.images.brand}
+                    source={logoImage || R.images.brand}
                     style={[s.brand, styles?.dialog?.logo]}
                   />
                   {!!texts?.dialog?.message && (
