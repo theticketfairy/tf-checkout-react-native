@@ -43,15 +43,21 @@ export interface ICheckoutProps {
 
   onStripeInitializeError?: (error: string) => void
 
-  onPressExit?: () => void
+  onPressExit: () => void
   texts?: {
     title?: string
     subTitle?: string
     missingStripeConfigMessage?: string
     exitButton?: string
+    payButton?: string
+    freeRegistrationButton?: string
   }
 
   styles?: ICheckoutStyles
+
+  onLoadingChange?: (isLoading: boolean) => void
+  areAlertsEnabled?: boolean
+  areLoadingIndicatorsEnabled?: boolean
 }
 
 // Components

@@ -1,6 +1,7 @@
-import { StyleSheet, Platform } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 
 import R from '../../res'
+
 export default StyleSheet.create({
   title: {
     fontSize: 20,

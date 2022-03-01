@@ -1,4 +1,5 @@
 import {
+  CardForm,
   CardFormView,
   initStripe,
   useConfirmPayment,
@@ -7,8 +8,9 @@ import _every from 'lodash/every'
 import _forEach from 'lodash/forEach'
 import _map from 'lodash/map'
 import _mapKeys from 'lodash/mapKeys'
-import React, { useEffect, useState } from 'react'
-import { Alert } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Alert, Text, View } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {
   fetchEventConditions,
@@ -17,10 +19,14 @@ import {
   postOnPaymentSuccess,
 } from '../../api/ApiClient'
 import { IOrderReview } from '../../api/types'
+import { Loading } from '../../components'
+import Button from '../../components/button/Button'
 import { IFormFieldProps } from '../../components/formField/types'
 import { priceWithCurrency } from '../../helpers/StringsHelper'
 import { orderReviewItems } from './CheckoutData'
-import CheckoutView from './CheckoutView'
+import Conditions from './components/Conditions'
+import OrderReview from './components/OrderReview'
+import s from './styles'
 import { ICheckoutProps, IOrderItem } from './types'
 
 const Checkout = ({
@@ -38,8 +44,11 @@ const Checkout = ({
   texts,
   styles,
   onPressExit,
+  areAlertsEnabled = true,
+  areLoadingIndicatorsEnabled = true,
+  onLoadingChange,
 }: ICheckoutProps) => {
-  const { confirmPayment, loading: isStripeLoading } = useConfirmPayment()
+  const { confirmPayment } = useConfirmPayment()
   const [isLoading, setIsLoading] = useState(true)
   const [orderReview, setOrderReview] = useState<IOrderReview>()
   const [conditionsTexts, setConditionsTexts] = useState<string[]>([])
@@ -48,10 +57,21 @@ const Checkout = ({
   const [paymentInfo, setPaymentInfo] = useState<CardFormView.Details>()
   const [isStripeConfigMissing, setIsStripeConfigMissing] = useState(false)
   const [isPaymentRequired, setIsPaymentRequired] = useState(false)
-  const [isLoadingFreeRegistration, setIsLoadingFreeRegistration] =
-    useState(false)
+
+  const showLoading = () => setIsLoading(true)
+  const hideLoading = () => setIsLoading(false)
+
+  const showAlert = (message: string) => {
+    if (areAlertsEnabled) {
+      Alert.alert('', message)
+    }
+  }
 
   //#region Handlers
+  const handleOnPressExit = () => {
+    onPressExit()
+  }
+
   const handleOnChangePaymentInfo = (details: CardFormView.Details) => {
     setPaymentInfo(details)
   }
@@ -63,15 +83,16 @@ const Checkout = ({
   }
 
   const handleOnPressFreeRegistration = async () => {
-    setIsLoadingFreeRegistration(true)
+    showLoading()
     const { freeRegistrationData, freeRegistrationError } =
       await postOnFreeRegistration(hash)
-    setIsLoadingFreeRegistration(false)
+    hideLoading()
     if (freeRegistrationError) {
       if (onPaymentError) {
         onPaymentError(freeRegistrationError || 'Error while registering')
       }
-      return Alert.alert('', freeRegistrationError || 'Error while registering')
+      showAlert(freeRegistrationError || 'Error while registering')
+      return
     }
 
     if (onPaymentSuccess) {
@@ -80,12 +101,19 @@ const Checkout = ({
   }
 
   const handleOnPressPay = async () => {
-    if (!orderReview || !paymentInfo) {
+    if (!orderReview) {
+      if (onPaymentError) {
+        onPaymentError(`Order data is missing ${JSON.stringify(orderReview)}`)
+      }
+
+      showAlert('No order data found')
+
       return
     }
 
     const { addressData } = orderReview
 
+    showLoading()
     const { error: confirmPaymentError, paymentIntent } = await confirmPayment(
       orderReview.paymentData!.stripeClientSecret!,
       {
@@ -100,13 +128,13 @@ const Checkout = ({
       }
     )
 
-    if (confirmPaymentError || !paymentInfo) {
+    if (confirmPaymentError) {
+      hideLoading()
       if (onCheckoutCompletedFail) {
-        onCheckoutCompletedFail(
-          confirmPaymentError?.message || 'Missing Payment Info'
-        )
+        onCheckoutCompletedFail(confirmPaymentError?.message)
       }
-      return Alert.alert('', 'Missing Payment Info')
+      showAlert(confirmPaymentError?.message || 'Error confirming payment')
+      return
     }
 
     if (onCheckoutCompletedSuccess) {
@@ -117,17 +145,19 @@ const Checkout = ({
       await postOnPaymentSuccess(hash)
 
     if (onPaymentSuccessError) {
+      hideLoading()
       if (onPaymentError) {
         onPaymentError(onPaymentSuccessError)
       }
-      return Alert.alert(
-        '',
-        onPaymentSuccessError || 'Error while performing payment'
-      )
+      showAlert(onPaymentSuccessError || 'Error while performing payment')
+      return
     }
 
+    hideLoading()
     if (onPaymentSuccess) {
-      onPaymentSuccess(onPaymentSuccessData)
+      setTimeout(() => {
+        onPaymentSuccess(onPaymentSuccessData)
+      }, 200)
     }
   }
   //#endregion
@@ -145,27 +175,38 @@ const Checkout = ({
       }
     })
 
+  const onLoadingChangeCallback = useCallback(
+    (loading: boolean) => {
+      if (onLoadingChange) {
+        onLoadingChange(loading)
+      }
+    },
+    [onLoadingChange]
+  )
+
   //#region useEffects
+  useEffect(() => {
+    onLoadingChangeCallback(isLoading)
+  }, [isLoading, onLoadingChangeCallback])
+
   useEffect(() => {
     const fetchEventConditionsAsync = async () => {
       const { error: conditionsError, data: conditionsData } =
         await fetchEventConditions(eventId.toString())
 
       if (conditionsError) {
-        setIsLoadingFreeRegistration(false)
+        hideLoading()
         if (onFetchEventConditionsFail) {
           onFetchEventConditionsFail(conditionsError)
         }
-        return Alert.alert(
-          '',
-          conditionsError || 'Error while fetching conditions'
-        )
+        showAlert(conditionsError || 'Error while fetching conditions')
+        return
       }
 
       setConditionsValues(_map(conditionsData, () => false))
       setConditionsTexts(conditionsData)
+      hideLoading()
       if (onFetchEventConditionsSuccess) {
-        setIsLoadingFreeRegistration(false)
         onFetchEventConditionsSuccess(conditionsData)
       }
     }
@@ -173,24 +214,22 @@ const Checkout = ({
     const fetchOrderReviewAsync = async () => {
       const { data: orderReviewData, error: orderReviewError } =
         await fetchOrderReview(hash)
-      setIsLoading(false)
+      hideLoading()
 
       if (orderReviewError || !orderReviewData) {
-        setIsLoadingFreeRegistration(false)
+        hideLoading()
         setIsStripeConfigMissing(true)
         if (onFetchOrderReviewFail) {
           onFetchOrderReviewFail(
             orderReviewError || 'Error while getting Order Review'
           )
         }
-        return Alert.alert(
-          '',
-          orderReviewError || 'Error while getting Order Review'
-        )
+        showAlert(orderReviewError || 'Error while getting Order Review')
+        return
       }
 
+      hideLoading()
       if (onFetchOrderReviewSuccess) {
-        setIsLoadingFreeRegistration(false)
         onFetchOrderReviewSuccess(orderReviewData)
       }
 
@@ -217,10 +256,10 @@ const Checkout = ({
             onStripeInitializeError('Stripe is not configured for this event')
           }
 
-          return Alert.alert(
-            'Stripe is not configured for this event',
-            'Please contact support.'
+          showAlert(
+            'Stripe is not configured for this event.Please contact support.'
           )
+          return
         }
 
         setIsPaymentRequired(true)
@@ -241,10 +280,10 @@ const Checkout = ({
     }
 
     const fetchInitialData = async () => {
-      setIsLoading(true)
+      showLoading()
       await fetchEventConditionsAsync()
       await fetchOrderReviewAsync()
-      setIsLoading(false)
+      hideLoading()
     }
 
     fetchInitialData()
@@ -257,22 +296,78 @@ const Checkout = ({
     return paymentValid && _every(conditionsValues, (item) => item === true)
   }
 
-  return (
-    <CheckoutView
-      orderReviewDataItems={orderInfo}
-      onPressPay={handleOnPressPay}
-      onPressFreeRegistration={handleOnPressFreeRegistration}
-      conditions={getConditions()}
-      onFormComplete={handleOnChangePaymentInfo}
-      isLoading={isLoading || isStripeLoading}
-      isDataValid={!getIsDataValid()}
-      isStripeConfigMissing={isStripeConfigMissing}
-      styles={styles}
-      texts={texts}
-      onPressExit={onPressExit}
-      isPaymentRequired={isPaymentRequired}
-      isLoadingFreeRegistration={isLoadingFreeRegistration}
-    />
+  const isDataValid = getIsDataValid()
+
+  const payButtonStyle = isDataValid
+    ? styles?.payment?.button
+    : styles?.payment?.buttonDisabled
+
+  return isStripeConfigMissing ? (
+    <View
+      style={[s.missingStripeContainer, styles?.missingStripeConfig?.container]}
+    >
+      <Text
+        style={[s.missingStripeMessage, styles?.missingStripeConfig?.message]}
+      >
+        {texts?.missingStripeConfigMessage ||
+          'Payment handler is missing, please contact support'}
+      </Text>
+
+      <Button
+        styles={styles?.missingStripeConfig?.exitButton}
+        text={texts?.exitButton || 'Exit'}
+        onPress={handleOnPressExit}
+      />
+    </View>
+  ) : (
+    <KeyboardAwareScrollView
+      extraScrollHeight={32}
+      keyboardDismissMode='on-drag'
+    >
+      <View style={styles?.rootStyle}>
+        <View>
+          <Text style={[s.title, styles?.title]}>
+            {texts?.title || 'GET YOUR TICKETS'}
+          </Text>
+          <Text style={[styles?.subTitle]}>
+            {texts?.subTitle || 'Order review'}
+          </Text>
+        </View>
+        <OrderReview orderItems={orderInfo} styles={styles?.orderReview} />
+        {isPaymentRequired && !isStripeConfigMissing && (
+          <View style={styles?.payment?.container}>
+            <Text style={styles?.payment?.title}>
+              Please provide your payment information
+            </Text>
+            <CardForm
+              onFormComplete={handleOnChangePaymentInfo}
+              style={[s.card, styles?.payment?.cardContainer]}
+            />
+          </View>
+        )}
+        <Conditions {...getConditions()} />
+        {isPaymentRequired && !isStripeConfigMissing && (
+          <Button
+            text={texts?.payButton || 'PAY'}
+            onPress={handleOnPressPay}
+            isDisabled={!isDataValid}
+            styles={{
+              container: s.payButton,
+              ...payButtonStyle,
+            }}
+          />
+        )}
+        {!isPaymentRequired && (
+          <Button
+            text={texts?.freeRegistrationButton || 'COMPLETE REGISTRATION'}
+            onPress={handleOnPressFreeRegistration}
+            isLoading={isLoading}
+            styles={styles?.freeRegistrationButton}
+          />
+        )}
+      </View>
+      {isLoading && areLoadingIndicatorsEnabled && <Loading />}
+    </KeyboardAwareScrollView>
   )
 }
 
