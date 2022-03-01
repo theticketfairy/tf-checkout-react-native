@@ -456,8 +456,10 @@ interface IBillingInfoViewStyles {
   dropdownStyles?: IDropdownStyles
   checkboxStyles?: ICheckboxStyles
 
-  titles?: StyleProp<TextStyle>
-  headers?: StyleProp<TextStyle>
+  screenTitle?: StyleProp<TextStyle>
+  ticketHoldersTitle?: StyleProp<TextStyle>
+  ticketHolderItemHeader?: StyleProp<TextStyle>
+
   texts?: StyleProp<TextStyle>
   customCheckbox?: ICheckboxStyles
 
@@ -487,6 +489,7 @@ import { Checkout } from 'tf-checkout-react-native'
 
 Add it to the render function.
 
+## Props
 ```js
 {
   eventId: number

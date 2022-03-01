@@ -725,7 +725,7 @@ const Billing = (props: IBillingProps) => {
       const thItemTitle = texts?.form?.ticketHolderItem || 'Ticket Holder'
       tHolders.push(
         <View key={`ticketHolder.${i}`}>
-          <Text style={styles?.titles}>
+          <Text style={styles?.ticketHolderItemHeader}>
             {thItemTitle} {i + 1}
           </Text>
           <Input
@@ -827,7 +827,7 @@ const Billing = (props: IBillingProps) => {
           }}
           styles={styles?.loginStyles}
         />
-        <Text style={styles?.titles}>
+        <Text style={styles?.screenTitle}>
           {texts?.form?.getYourTicketsTitle || 'Get Your Tickets'}
         </Text>
 
@@ -976,7 +976,7 @@ const Billing = (props: IBillingProps) => {
 
         {ticketHoldersData.length > 0 && (
           <>
-            <Text style={styles?.headers}>
+            <Text style={styles?.ticketHoldersTitle}>
               {texts?.form?.ticketHoldersTitle || 'Ticket Holders'}
             </Text>
             {renderTicketHolders()}

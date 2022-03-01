@@ -216,12 +216,7 @@ const App = () => {
                   borderRadius: 2,
                 },
               },
-              headers: {
-                fontSize: 28,
-                fontWeight: '800',
-                marginBottom: 16,
-                color: Color.textMain,
-              },
+
               texts: {
                 color: Color.textMain,
                 fontSize: 14,
@@ -247,7 +242,19 @@ const App = () => {
                   tintColor: Color.white,
                 },
               },
-              titles: {
+              ticketHolderItemHeader: {
+                fontSize: 28,
+                fontWeight: '800',
+                marginBottom: 16,
+                color: Color.textMain,
+              },
+              screenTitle: {
+                fontSize: 28,
+                fontWeight: '800',
+                marginBottom: 16,
+                color: Color.textMain,
+              },
+              ticketHoldersTitle: {
                 color: Color.textMain,
                 fontSize: 20,
                 fontWeight: '700',
@@ -256,6 +263,9 @@ const App = () => {
               inputStyles: {
                 input: {
                   color: Color.textMain,
+                },
+                container: {
+                  borderColor: 'red',
                 },
                 baseColor: Color.white,
                 errorColor: Color.danger,
@@ -342,6 +352,7 @@ const App = () => {
             total={checkoutProps!.total}
             onPaymentSuccess={handleOnPaymentSuccess}
             onPressExit={handleStripeError}
+            areLoadingIndicatorsEnabled={false}
             styles={{
               rootStyle: {
                 paddingHorizontal: 16,
@@ -357,6 +368,7 @@ const App = () => {
                   },
                 },
               },
+
               title: {
                 color: Color.textMain,
               },
