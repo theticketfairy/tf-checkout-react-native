@@ -30,6 +30,9 @@ To download the PDFs, add the `WRITE_EXTERNAL_STORAGE` permission to the Android
 
 - Compatible with apps targeting iOS 11 or above.
 
+- Pods version `1.11.2`
+- Command Line Tools version `13.0`
+
 To download the PDFs, add the following flags to `Info.plist` file:
 
 - UIFileSharingEnabled: Application supports iTunes file sharing
@@ -483,12 +486,42 @@ import { Checkout } from 'tf-checkout-react-native'
 Add it to the render function.
 
 ```js
-<Checkout
-  eventId={EVENT_ID}
-  hash={checkoutProps!.hash}
-  total={checkoutProps!.total}
-  onPaymentSuccess={handleOnPaymentSuccess}
-/>
+{
+  eventId: number
+  hash: string
+  total: string
+
+  onFetchOrderReviewFail?: (error: string) => void
+  onFetchOrderReviewSuccess?: (data: any) => void
+
+  onFetchEventConditionsFail?: (error: string) => void
+  onFetchEventConditionsSuccess?: (data: any) => void
+
+  onCheckoutCompletedSuccess?: (data: any) => void
+  onCheckoutCompletedFail?: (error: string) => void
+
+  onPaymentSuccess: (data: any) => void
+  onPaymentError?: (error: string) => void
+
+  onStripeInitializeError?: (error: string) => void
+
+  onPressExit: () => void
+
+  texts?: {
+    title?: string
+    subTitle?: string
+    missingStripeConfigMessage?: string
+    exitButton?: string
+    payButton?: string
+    freeRegistrationButton?: string
+  }
+
+  styles?: ICheckoutStyles
+
+  onLoadingChange?: (isLoading: boolean) => void
+  areAlertsEnabled?: boolean
+  areLoadingIndicatorsEnabled?: boolean
+}
 ```
 
 `eventId` Same as used in the `Tickets` component.
@@ -498,6 +531,10 @@ Add it to the render function.
 `total` retrieved from the `onCheckoutSuccess` callback in the `BillingInfo` component.
 
 `onPaymentSuccess` will handle the success in the payment process. Will return the `hash`.
+
+`areLoadingIndicatorsEnabled` whether or not show the Loading Indicator, `default: true`.
+
+`areAlertsEnabled` whether or not show the Error Alerts, `default: true`.
 
 If the you need to modify the card container, use the `styles.payment.cardContainer` prop. Useful if the card is to short and the zip code is not visible.
 
@@ -524,6 +561,12 @@ If the you need to modify the card container, use the `styles.payment.cardContai
   }
 }
 ```
+### Stripe
+Currently, Stripe card is not customizable. Please see the open issues in their Github.
+
+- [563](https://github.com/stripe/stripe-react-native/issues/563)
+- [285](https://github.com/stripe/stripe-react-native/issues/285)
+
 
 ---
 
