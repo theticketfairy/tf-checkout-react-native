@@ -81,12 +81,23 @@ export interface ITicketsViewTexts {
   loggedInTexts?: ILoggedInTexts
 }
 
+export interface IOnFetchTicketsSuccess {
+  tickets: ITicket[]
+  promoCodeResponse: {
+    success?: boolean
+    message?: string
+  }
+  isInWaitingList: boolean
+  isAccessCodeRequired: boolean
+}
+
 export interface ITicketsProps {
   eventId: number
 
   onAddToCartSuccess: (data: IAddToCartSuccess) => void
   onAddToCartError?: (error: any) => void
   onFetchTicketsError?: (error: any) => void
+  onFetchTicketsSuccess?: (data: IOnFetchTicketsSuccess) => void
   onFetchEventError?: (error: string) => void
 
   styles?: ITicketsViewStyles

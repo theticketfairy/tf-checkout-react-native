@@ -29,6 +29,7 @@ const Tickets = ({
   isPromoEnabled = true,
   onPressMyOrders,
   onPressLogout,
+  onFetchTicketsSuccess,
   onFetchEventError,
 }: ITicketsProps) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
@@ -94,11 +95,33 @@ const Tickets = ({
     if (responseTickets && !_isEmpty(responseTickets)) {
       setTickets(responseTickets)
       setPromoCodeResponse(promoCodeResult)
+      if (onFetchTicketsSuccess) {
+        onFetchTicketsSuccess({
+          promoCodeResponse: {
+            success: true,
+            message: promoCodeResponse?.message,
+          },
+          tickets: responseTickets,
+          isInWaitingList,
+          isAccessCodeRequired,
+        })
+      }
 
       if (
         !isFirstCall &&
         (!promoCodeResult?.isValid || promoCodeResult.isValid === 0)
       ) {
+        if (onFetchTicketsSuccess) {
+          onFetchTicketsSuccess({
+            promoCodeResponse: {
+              success: false,
+              message: promoCodeResponse?.message,
+            },
+            tickets: responseTickets,
+            isInWaitingList,
+            isAccessCodeRequired,
+          })
+        }
         Alert.alert('', promoCodeResult?.message)
       }
     }

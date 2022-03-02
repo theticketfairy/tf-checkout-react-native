@@ -285,6 +285,34 @@ Then add it to the render function.
 ```
 
 ## Props
+```js
+{
+  eventId: number
+
+  onAddToCartSuccess: (data: IAddToCartSuccess) => void
+  onAddToCartError?: (error: any) => void
+  onFetchTicketsError?: (error: any) => void
+  onFetchTicketsSuccess?: (data: {
+    tickets: ITicket[]
+    promoCodeResponse: {
+      success?: boolean
+      message?: string
+    }
+    isInWaitingList: boolean
+    isAccessCodeRequired: boolean
+  }) => void
+  onFetchEventError?: (error: string) => void
+
+  styles?: ITicketsViewStyles
+  texts?: ITicketsViewTexts
+
+  isPromoEnabled?: boolean
+  isAccessCodeEnabled?: boolean
+
+  onPressMyOrders: () => void
+  onPressLogout?: () => void
+}
+```
 
 `eventId` is required in order to fetch the tickets from this event.
 `onAddToCartSuccess` is called after the Add to Cart was completed successfully, it will return the following data:
@@ -298,6 +326,9 @@ Then add it to the render function.
 ```
 
 You can then call the `BillingInfo` component and pass them as props in the `cartProps` prop.
+
+`onFetchTicketsSuccess` When tickets fetching was successful, will return fetched data, including `promoCodeResponse`.
+
 
 ## styles
 
