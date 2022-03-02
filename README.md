@@ -6,6 +6,11 @@ React Native library for Ticket Fairy checkout.
 
 Configure [ReactNative environment](https://reactnative.dev/docs/environment-setup) for desired platforms (iOS, Android or both).
 
+## React Native
+- Suggested ReactNative version 0.66.3
+- Suggested Flipper version 0.66
+- React 0.17.1
+
 ## Android
 
 - Android 5.0 (API level 21) and above
