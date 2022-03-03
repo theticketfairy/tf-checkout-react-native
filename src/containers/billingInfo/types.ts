@@ -9,11 +9,14 @@ import {
 import { IButtonStyles } from '../../components/button/types'
 import { ICheckboxStyles } from '../../components/checkbox/types'
 import { IDatePickerStyles } from '../../components/datePicker/types'
-import { IDropdownItem, IDropdownStyles } from '../../components/dropdown/types'
+import { IDropdownStyles } from '../../components/dropdown/types'
 import { IFormFieldProps } from '../../components/formField/types'
 import { IInputStyles } from '../../components/input/types'
-import { ILoginViewStyles, ILoginViewTexts } from '../../components/login/types'
-import { IUserProfile } from '../../types'
+import {
+  ILoginBrandImages,
+  ILoginViewStyles,
+  ILoginViewTexts,
+} from '../../components/login/types'
 import { IAddToCartSuccess } from '../tickets/types'
 
 export interface ITokens {
@@ -51,31 +54,8 @@ export interface IBillingProps {
 
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
-}
 
-export interface IBillingInfoProps {
-  cartProps: IAddToCartSuccess
-  onRegisterSuccess?: (tokens: ITokens) => void
-  onRegisterFail?: (error: string) => void
-
-  onCheckoutSuccess: (data: IOnCheckoutSuccess) => void
-  onCheckoutFail?: (error: string) => void
-
-  onLoginSuccess: (data: any) => void
-  onLoginFail?: (error: string) => void
-
-  onFetchUserProfileSuccess?: (data: any) => void
-  onFetchUserProfileFail?: (error: any) => void
-
-  onFetchCartError?: (error: string) => void
-
-  styles?: IBillingInfoViewStyles
-  texts?: IBillingInfoViewTexts
-
-  privacyPolicyLinkStyle?: StyleProp<TextStyle>
-
-  onFetchUserProfileFailure?: (error: string) => void
-  onFetchAccessTokenFailure?: (error: string) => void
+  loginBrandImages?: ILoginBrandImages
 }
 
 export interface ITicketHolderField {
@@ -88,38 +68,6 @@ export interface ITicketHolderField {
 export interface ITicketHolderFieldError {
   firstNameError?: string
   lastNameError?: string
-}
-
-export interface IBillingInfoFormData {
-  firstName: string
-  lastName: string
-  email: string
-  confirmEmail: string
-  password: string
-  confirmPassword: string
-  phone: string
-  street: string
-  city: string
-  country?: IDropdownItem
-  state?: IDropdownItem
-  zipCode: string
-  isSubToNewsletter: boolean
-  isSubToMarketing: boolean
-  ticketHoldersFields: ITicketHolderField[]
-  birthday?: Date
-
-  errors: {
-    firstName: string
-    lastName: string
-    email: string
-    confirmEmail: string
-    password: string
-    confirmPassword: string
-    phone: string
-    street: string
-    city: string
-    zipCode: string
-  }
 }
 
 export interface IBillingInfoViewStyles {
@@ -184,26 +132,4 @@ export interface IBillingInfoViewTexts {
     choosePassword?: string
     checkbox?: string
   }
-}
-
-export interface IBillingInfoViewProps {
-  formFields: IFormFieldProps[]
-  isLoading: boolean
-  onSubmit: () => void
-  onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
-  isDataValid: boolean
-  isLoginDialogVisible: boolean
-  showLoginDialog: () => void
-  hideLoginDialog: () => void
-  loginMessage?: string
-  userProfile?: IUserProfile
-  isSubmitLoading?: boolean
-  onLogoutSuccess?: () => void
-
-  styles?: IBillingInfoViewStyles
-  texts?: IBillingInfoViewTexts
-
-  onLoginFail?: (error: string) => void
-  onFetchUserProfileFailure?: (error: string) => void
-  onFetchAccessTokenFailure?: (error: string) => void
 }

@@ -292,9 +292,6 @@ const App = () => {
                   title: {
                     color: Color.textMain,
                   },
-                  logo: {
-                    tintColor: Color.textMain,
-                  },
                   input: {
                     baseColor: Color.textMain,
                     input: {

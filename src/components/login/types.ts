@@ -21,6 +21,14 @@ export interface ILoginRefs {
   }
 }
 
+export interface ILoginBrandImages {
+  containerStyle?: StyleProp<ViewStyle>
+  image1?: ImageSourcePropType
+  image1Style?: StyleProp<ImageStyle>
+  image2?: ImageSourcePropType
+  image2Style?: StyleProp<ImageStyle>
+}
+
 export interface ILoginProps {
   onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
   onLoginFailure?: (error: string) => void
@@ -39,7 +47,7 @@ export interface ILoginProps {
   userFirstName?: string
   refs?: ILoginRefs
 
-  logoImage?: ImageSourcePropType
+  brandImages?: ILoginBrandImages
 }
 
 export interface ILoginViewStyles {
@@ -57,7 +65,6 @@ export interface ILoginViewStyles {
     input?: IInputStyles
     title?: StyleProp<TextStyle>
     message?: StyleProp<TextStyle>
-    logo?: StyleProp<ImageStyle>
   }
   loggedIn?: {
     container?: StyleProp<ViewStyle>
@@ -106,7 +113,7 @@ export interface ILoginViewProps {
 
   refs?: ILoginRefs
 
-  logoImage?: ImageSourcePropType
+  brandImages?: ILoginBrandImages
 }
 
 export interface ILoginViewState {
