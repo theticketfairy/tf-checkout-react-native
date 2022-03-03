@@ -43,7 +43,7 @@ const LoginView = ({
   userFirstName,
   loginError,
   refs,
-  logoImage,
+  brandImages,
 }: ILoginViewProps) => {
   const [data, setData] = useState<ILoginViewState>(initialState)
   const { email, password } = data
@@ -176,6 +176,19 @@ const LoginView = ({
     </>
   )
 
+  const BrandImages = () => (
+    <View style={brandImages?.containerStyle}>
+      <Image
+        source={brandImages?.image1 || R.images.brand}
+        style={[s.brand, brandImages?.image1Style]}
+      />
+
+      {brandImages?.image2 && (
+        <Image source={brandImages.image2} style={brandImages?.image2Style} />
+      )}
+    </View>
+  )
+
   return (
     <View style={s.rootContainer}>
       {userFirstName ? LoggedComponent() : GuestComponent()}
@@ -189,10 +202,7 @@ const LoginView = ({
                   <Text style={[s.dialogTitle, styles?.dialog?.title]}>
                     LOGIN
                   </Text>
-                  <Image
-                    source={logoImage || R.images.brand}
-                    style={[s.brand, styles?.dialog?.logo]}
-                  />
+                  <BrandImages />
                   {!!texts?.dialog?.message && (
                     <Text style={[s.message, styles?.dialog?.message]}>
                       {texts.dialog.message}

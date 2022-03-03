@@ -41,10 +41,11 @@ export default StyleSheet.create({
     marginTop: 16,
   },
   brand: {
-    width: '80%',
+    width: 200,
     height: 50,
     resizeMode: 'contain',
     marginBottom: 16,
+    tintColor: R.colors.white,
   },
   message: {
     marginBottom: 24,

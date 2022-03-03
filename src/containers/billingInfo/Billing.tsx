@@ -63,6 +63,7 @@ const Billing = (props: IBillingProps) => {
       minimumAge,
       isBillingRequired,
     },
+    loginBrandImages,
   } = props
 
   //#region Labels
@@ -826,6 +827,7 @@ const Billing = (props: IBillingProps) => {
             },
           }}
           styles={styles?.loginStyles}
+          brandImages={loginBrandImages}
         />
         <Text style={styles?.screenTitle}>
           {texts?.form?.getYourTicketsTitle || 'Get Your Tickets'}

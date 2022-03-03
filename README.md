@@ -6,12 +6,13 @@ React Native library for Ticket Fairy checkout.
 
 Configure [ReactNative environment](https://reactnative.dev/docs/environment-setup) for desired platforms (iOS, Android or both).
 
-## React Native
-- Suggested ReactNative version 0.66.3
-- Suggested Flipper version 0.66
-- React 0.17.1
+### React Native
 
-## Android
+- Suggested ReactNative version `0.66.3`
+- Suggested Flipper version `0.66`
+- React version `0.17.1`
+
+### Android
 
 - Android 5.0 (API level 21) and above
 - Minimum Gradle plugin version `4.2.2`
@@ -31,33 +32,34 @@ To download the PDFs, add the `WRITE_EXTERNAL_STORAGE` permission to the Android
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 ```
 
-## iOS
+### iOS
 
 - Compatible with apps targeting iOS 11 or above.
-
-- Pods version `1.11.2`
+- Pods version `1.10.1`
 - Command Line Tools version `13.0`
 
 To download the PDFs, add the following flags to `Info.plist` file:
 
+```
 - UIFileSharingEnabled: Application supports iTunes file sharing
 - LSSupportsOpeningDocumentsInPlace: Supports opening documents in place
+```
 
 # Installation
 
-```node
+```sh
 yarn add tf-checkout-react-native
 ```
 
 or
 
-```node
+```sh
 npm install tf-checkout-react-native
 ```
 
 Make sure to install all the required dependencies in your project.
 
-# Required for Android
+### Required for Android
 
 Add below dependency to your `app/build.gradle` file with specified version (in our example we are using `1.4.0`).
 
@@ -69,7 +71,7 @@ Set appropriate style in your styles.xml file.
 
 ```xml
 <style name="Theme.MyApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-    <!-- ... -->
+  <!-- ... -->
 </style>
 ```
 
@@ -105,27 +107,23 @@ useEffect(() => {
   ARE_SUB_BRANDS_INCLUDED?: boolean
 }
 ```
-
-`DOMAIN` Specify your domains name example: `https://google.com` this is important to maintain cart session active and prevent it from expiring when user login in the BillingInfo component.
-
-`BASE_URL` If our dev team gives you a custom BASE_URL.
-
-`CLIENT_ID` Set your CLIENT_ID.
-
-`CLIENT_SECRET` Set your CLIENT_SECRET.
-
-`BRAND`: Set your BRAND so users can only see this brand in their orders.
-
-`TIMEOUT` Set custom timeout for the APIs requests.
-
-`ARE_SUB_BRANDS_INCLUDED` If true will include orders from the `BRAND` sub-brands.
+### Props
+| Property | Description |
+| -------- | ----------- |
+| DOMAIN | Specify your domains name example: `https://google.com` this is important to maintain cart session active and prevent it from expiring when user login in the BillingInfo component. |
+| BASE_URL | If our dev team gives you a custom BASE_URL.|
+| CLIENT_ID | Set your CLIENT_ID. |
+| CLIENT_SECRET | Set your CLIENT_SECRET. |
+| BRAND | Set your BRAND so users can only see this brand in their orders. |
+| TIMEOUT | Set custom timeout for the APIs requests. |
+| ARE_SUB_BRANDS_INCLUDED | If true will include orders from the `BRAND` sub-brands. Default `false`. |
 
 # Run the example app
 
 1. Clone this repo.
 2. In the App.tsx file, update the `EVENT_ID` const with the assigned ID to be able to retrieve data from the server.
-3. cd into the project folder and `yarn` or `npm install`.
-4. cd into the example folder and `yarn` or `npm install`.
+3. cd into the _root project_ folder and `yarn` or `npm install`.
+4. cd into the _example_ folder and `yarn` or `npm install`.
    - If running on iOS, cd into ios folder and `pod install && cd ..`.
 5. Run `yarn ios` or `npm run ios` to initialize and run in the iPhone simulator.
 6. If running on Android, run `yarn android` or `npm run android` to run it in the Android emulator or connected physical device.
@@ -134,41 +132,61 @@ useEffect(() => {
 
 This library exports the following components:
 
-## Login
+### Login
 
 Used to authenticate the user.
 
-## Tickets
+### Tickets
 
 Will retrieve and show a list of tickets corresponding to `eventId`. It also includes a PromoCode component that validates it and updates the tickets list.
 
 User can select what ticket type wants to buy and the quantity of tickets.
 
-## Billing information
+### Billing information
 
 User will need to enter its data into a form to create a Ticket Fairy account. Also, depending on the number of tickets selected, will need to fill the information of each one of them.
 
-## Checkout
+### Checkout
 
 Will show the order details and a card form that the user will need to fill with its card details.
 
 TicketFairy doesn't store any card related data, we use [Stripe](https://stripe.com/) as payments solution.
 
-## Purchase confirmation
+### Purchase confirmation
 
 This is shown once the payment is successfully completed, could show components to share the purchase in social media or refer it with friends to get discounts on the purchase.
 
-## My Orders
+### My Orders
 
 Will show the purchased orders for the logged user.
 
-## My Order details
+### My Order details
 
 Will show the details for the selected Order, it also allows the user to download the Ticket PDF.
 
-# Usage [🚧 WIP 🚧]
-
-# Login
+# Component styling
+### Button
+```js
+interface IButtonStyles {
+  container?: StyleProp<ViewStyle>
+  button?: StyleProp<ViewStyle>
+  text?: StyleProp<TextStyle>
+}
+```
+### Input
+```js
+interface IInputStyles {
+  color?: ColorValue
+  container?: StyleProp<ViewStyle>
+  input?: StyleProp<TextStyle>
+  lineWidth?: number
+  activeLineWidth?: number
+  baseColor?: ColorValue
+  errorColor?: ColorValue
+}
+```
+# Exported components
+## Login
 
 Import the component from the library
 
@@ -197,48 +215,34 @@ Then add it to the render function.
       activityIndicator?: any
       loadingText?: any
   }}
+  brandImages={
+    containerStyle?: StyleProp<ViewStyle>
+    image1?: ImageSourcePropType
+    image1Style?: StyleProp<ImageStyle>
+    image2?: ImageSourcePropType
+    image2Style?: StyleProp<ImageStyle>
+  }
 />
 ```
 
-## Props
+### Props
+| Property | Description |
+|----------|-------------|
+| onLoginSuccessful: (userProfile: IUserProfile, accessToken: string)` |When login was successful, return userProfile data and the access token to use if for future API requests.
+| onLoginFailure?: (error: string) | When login fails will return the error received. |
+| onFetchUserProfileFailure?: (error: string) | This is used if the authentication worked but the fetch of the userProfile failed. |
+| onFetchAccessTokenFailure?: (error: string) | When the fetch of the access token failed. |
+| isLoginDialogVisible: boolean | Flag to show or hide the login dialog. |
+| showLoginDialog: () => void | Callback to show the Login dialog. |
+| hideLoginDialog: () => void | Callback to hide the Login dialog. |
+| onLogoutSuccess?: () => void | Use it to logout the authenticated user. It will delete all the stored data, including access token. Please make sure to update the `userFirstName` prop so the component will show the logged out view. |
+|onLogoutFail?: () => void | Will be called if something went wrong while deleting the local data. |
+|styles?: ILoginViewStyles | Use this to style your components. |
+|texts?: ILoginViewTexts | Use this to change some texts that appear in this component. |
+|userFirstName?: string | Once authenticated send the received firstName data to this prop, so the component can render the Logged in view. |
+|brandImages?: ILoginBrandImages | Receives up to 2 images with their styles and the container style for the images. |
 
-`onLoginSuccessful: (userProfile: IUserProfile, accessToken: string)`
-When login was successful, return userProfile data and the access token to use if for future API requests.
-
-`onLoginFailure?: (error: string)`
-When login fails will return the error received.
-
-`onFetchUserProfileFailure?: (error: string)`
-This is used if the authentication worked but the fetch of the userProfile failed.
-
-`onFetchAccessTokenFailure?: (error: string)`
-When the fetch of the access token failed.
-
-`isLoginDialogVisible: boolean`
-Flag to show or hide the login dialog.
-
-`showLoginDialog: () => void`
-Callback to show the Login dialog.
-
-`hideLoginDialog: () => void`
-Callback to hide the login dialog.
-
-`onLogoutSuccess?: () => void`  
-Use it to logout the authenticated user. It will delete all the stored data, including access token. Please make sure to update the `userFirstName` prop so the component will show the logged out view.
-
-`onLogoutFail?: () => void`
-Will be called if something went wrong while deleting the local data.
-
-`styles?: ILoginViewStyles`
-Use this to style your components.
-
-`texts?: ILoginViewTexts`
-Use this to change some texts that appear in this component.
-
-`userFirstName?: string`
-Once authenticated send the received firstName data to this prop, so the component can render the Logged in view.
-
-## styles
+### styles
 
 ```js
 interface ILoginViewStyles {
@@ -256,7 +260,6 @@ interface ILoginViewStyles {
     input?: IInputStyles
     title?: StyleProp<TextStyle>
     message?: StyleProp<TextStyle>
-    logo?: StyleProp<ImageStyle>
   }
   loggedIn?: {
     container?: StyleProp<ViewStyle>
@@ -266,12 +269,29 @@ interface ILoginViewStyles {
     message?: StyleProp<TextStyle>
   }
 }
-
 ```
 
-<img width="899" alt="image" src="https://user-images.githubusercontent.com/66479719/154158723-864cdabd-2a0b-4a84-95ad-3176c67f7e8b.png">
+\*Note: Logos images styles are passed from the `brandImages` prop.
 
----
+### texts
+```js
+{
+  loginButton?: string
+  logoutButton?: string
+  line1?: string
+  line2?: string
+  message?: string
+  dialog?: {
+    loginButton?: string
+    message?: string
+  }
+  logoutDialog?: {
+    title?: string
+    message?: string
+    confirm?: string
+    cancel?: string
+  }
+```
 
 # Tickets
 
@@ -290,6 +310,7 @@ Then add it to the render function.
 ```
 
 ## Props
+
 ```js
 {
   eventId: number
@@ -334,7 +355,6 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 
 `onFetchTicketsSuccess` When tickets fetching was successful, will return fetched data, including `promoCodeResponse`.
 
-
 ## styles
 
 Receives several props to style its sub-components.
@@ -360,7 +380,6 @@ Receives several props to style its sub-components.
 
 <img width="682" alt="image" src="https://user-images.githubusercontent.com/66479719/154126406-101af4ca-7586-4686-9a93-88ef0375968e.png">
 
----
 
 # BillingInfo
 
@@ -374,11 +393,22 @@ Add it to the render function.
 
 ```js
 <BillingInfo
-  cartProps: IAddToCartSuccess
+  cartProps: { 
+    isBillingRequired: boolean
+    isNameRequired: boolean
+    isAgeRequired: boolean
+    isPhoneRequired: boolean
+    minimumAge: number
+  }
   onRegisterSuccess?: (tokens: ITokens) => void
   onRegisterFail?: (error: string) => void
 
-  onCheckoutSuccess: (data: IOnCheckoutSuccess) => void
+  onCheckoutSuccess: (data: {   
+    id: string
+    hash: string
+    total: string
+    status: string
+  }) => void
   onCheckoutFail?: (error: string) => void
 
   onLoginSuccess: (data: any) => void
@@ -400,47 +430,22 @@ Add it to the render function.
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
 
-  logoImage?: ImageSourcePropType
+  loginBrandImages?:  {
+    containerStyle?: StyleProp<ViewStyle>
+    image1?: ImageSourcePropType
+    image1Style?: StyleProp<ImageStyle>
+    image2?: ImageSourcePropType
+    image2Style?: StyleProp<ImageStyle>
+  }
 />
 ```
 
-## Props
-
-### cartProps
-
-will receive
-
-```js
-{
-  isBillingRequired: boolean
-  isNameRequired: boolean
-  isAgeRequired: boolean
-}
-```
-
-### onCheckoutSuccess
-
-Will be called when the user completes all the data required in the form and taps on the button. Will return the following data:
-
-```js
-{
-  id: string
-  hash: string
-  total: string
-  status: string
-}
-```
-
-`hash` and `total` will be used in the `Checkout` component.
-
-### skipBilling
-
-Will auto-populate the checkout form with the logged user data, perform the order `Checkout` and call the callback `onCheckoutSuccess` so you can call the next component.
-
-### canSkipHolderNames
-
-Will skip the need of holder names information and will be automatically filled with the logged user data.
-
+### Props
+| Property | Description |
+|----------|-------------|
+| CartProps | Received from the Tickets component |
+| onCheckoutSuccess | Will return Order data from the Checkout action |
+| loginBrandImages | Receives styles and images sources to show in the `Login` component.
 ### texts
 
 ```js
@@ -515,7 +520,7 @@ interface IBillingInfoViewStyles {
 
 ---
 
-# Checkout
+## Checkout
 
 Import the component from the library
 
@@ -525,7 +530,8 @@ import { Checkout } from 'tf-checkout-react-native'
 
 Add it to the render function.
 
-## Props
+### Props
+
 ```js
 {
   eventId: number
@@ -564,22 +570,18 @@ Add it to the render function.
   areLoadingIndicatorsEnabled?: boolean
 }
 ```
+| Property | Description |
+|----------|-------------|
+| eventId | Same as used in the `Tickets` component. |
+| hash | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo`component. |
+| total | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo` component. |
+| onPaymentSuccess | will handle the success in the payment process. Will return the `hash`. |
+| areLoadingIndicatorsEnabled | whether or not show the Loading Indicator, `default: true`. |
+| areAlertsEnabled | whether or not show the Error Alerts, `default: true`. |
 
-`eventId` Same as used in the `Tickets` component.
+*Note: If the you need to modify the card container, use the `styles.payment.cardContainer` prop. Useful if the card is to short and the zip code is not visible.*
 
-`hash` retrieved from the `onCheckoutSuccess` callback in the `BillingInfo`component.
-
-`total` retrieved from the `onCheckoutSuccess` callback in the `BillingInfo` component.
-
-`onPaymentSuccess` will handle the success in the payment process. Will return the `hash`.
-
-`areLoadingIndicatorsEnabled` whether or not show the Loading Indicator, `default: true`.
-
-`areAlertsEnabled` whether or not show the Error Alerts, `default: true`.
-
-If the you need to modify the card container, use the `styles.payment.cardContainer` prop. Useful if the card is to short and the zip code is not visible.
-
-`styles`
+### styles
 
 ```js
 {
@@ -602,16 +604,18 @@ If the you need to modify the card container, use the `styles.payment.cardContai
   }
 }
 ```
+
 ### Stripe
+
 Currently, Stripe card is not customizable. Please see the open issues in their Github.
 
 - [563](https://github.com/stripe/stripe-react-native/issues/563)
 - [285](https://github.com/stripe/stripe-react-native/issues/285)
 
+Additionally, if you are encountering problems with building your project, please take a look at the [Stripe troubleshooting](https://github.com/stripe/stripe-react-native#troubleshooting).
 
----
 
-# PurchaseConfirmation
+## PurchaseConfirmation
 
 Import the component from the library
 
@@ -715,7 +719,7 @@ export interface IMyOrdersStyles {
 
 ---
 
-# MyOrderDetails
+## MyOrderDetails
 
 ![image](https://user-images.githubusercontent.com/66479719/151049265-ebaabb75-58b1-4b22-bf99-83b1375b1a70.png)
 
@@ -763,7 +767,7 @@ order: {
 }
 ```
 
-`styles` optional, to customize the component look & feel.
+### styles
 
 ```
 styles?: {
@@ -812,7 +816,7 @@ styles?: {
   }
 ```
 
-`texts` optional, to customize the texts that shows on the labels.
+### texts
 
 ```js
 texts?: {
