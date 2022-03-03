@@ -89,7 +89,6 @@ Use it in your initial useEffect function:
 useEffect(() => {
   setConfig({
     DOMAIN: 'https://yourdomain.mx',
-    IS_BILLING_STREET_NAME_REQUIRED: false,
   })
 }, [])
 ```
