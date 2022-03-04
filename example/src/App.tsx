@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
-  IAddToCartSuccess,
   IMyOrderDetailsResponse,
   IOnCheckoutSuccess,
   MyOrderDetails,
@@ -13,6 +12,7 @@ import {
   Login,
   IUserProfile,
   setConfig,
+  ITicketsResponseData,
 } from 'tf-checkout-react-native'
 
 import Color from './Colors'
@@ -25,7 +25,7 @@ const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
     ComponentEnum.Tickets
   )
-  const [cartProps, setCartProps] = useState<IAddToCartSuccess | undefined>(
+  const [cartProps, setCartProps] = useState<ITicketsResponseData | undefined>(
     undefined
   )
   const [checkoutProps, setCheckOutProps] = useState<
@@ -45,7 +45,7 @@ const App = () => {
   ) => {
     setLoggedUserName(userProfile.firstName)
   }
-  const handleOnAddToCartSuccess = (data: IAddToCartSuccess) => {
+  const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
     setCartProps(data)
   }
 

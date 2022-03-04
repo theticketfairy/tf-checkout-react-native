@@ -10,14 +10,13 @@ import { IButtonStyles } from '../../components/button/types'
 import { ICheckboxStyles } from '../../components/checkbox/types'
 import { IDatePickerStyles } from '../../components/datePicker/types'
 import { IDropdownStyles } from '../../components/dropdown/types'
-import { IFormFieldProps } from '../../components/formField/types'
 import { IInputStyles } from '../../components/input/types'
 import {
   ILoginBrandImages,
   ILoginViewStyles,
   ILoginViewTexts,
 } from '../../components/login/types'
-import { IAddToCartSuccess } from '../tickets/types'
+import { ITicketsResponseData } from '../../types'
 
 export interface ITokens {
   accessToken: string
@@ -32,7 +31,7 @@ export interface IOnCheckoutSuccess {
 }
 
 export interface IBillingProps {
-  cartProps: IAddToCartSuccess
+  cartProps: ITicketsResponseData
   onRegisterSuccess?: (tokens: ITokens) => void
   onRegisterFail?: (error: string) => void
 

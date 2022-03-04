@@ -30,6 +30,7 @@ const TicketsView = ({
   isUserLogged,
   onPressMyOrders,
   onPressLogout,
+  areLoadingIndicatorsEnabled,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -97,7 +98,8 @@ const TicketsView = ({
             onPressLogout={onPressLogout}
           />
         )}
-        {(isGettingTickets || isGettingEvent) && <Loading />}
+        {(isGettingTickets || isGettingEvent) &&
+          areLoadingIndicatorsEnabled && <Loading />}
       </View>
     </KeyboardAwareScrollView>
   )

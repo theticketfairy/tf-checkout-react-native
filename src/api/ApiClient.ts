@@ -15,7 +15,11 @@ import {
   storeData,
 } from '../helpers/LocalStorage'
 import { IEvent, IUserProfile } from '../types'
-import { ITicket } from '../types/ITicket'
+import {
+  ITicket,
+  ITicketsResponseData,
+  ITicketsResponsePayload,
+} from '../types/ITicket'
 import Constants from './Constants'
 import {
   IAuthorizeResponse,
@@ -402,16 +406,20 @@ export const fetchTickets = async (
   }
 }
 
-export const addToCart = async (id: string | number, data: any) => {
-  let responseError
-  let responseData
+export const addToCart = async (
+  id: string | number,
+  data: any
+): Promise<ITicketsResponsePayload> => {
+  let responseError: AxiosError | undefined
+  let responseData: ITicketsResponseData | undefined
+
   const response: AxiosResponse | void = await Client.post(
     `v1/event/${id}/add-to-cart/`,
     {
       data,
     }
-  ).catch((error: Error) => {
-    responseError = error.message
+  ).catch((error: AxiosError) => {
+    responseError = error
   })
 
   if (!responseError) {
@@ -423,7 +431,12 @@ export const addToCart = async (id: string | number, data: any) => {
       isAgeRequired: response?.data?.data?.attributes?.age_required ?? false,
       isPhoneRequired:
         response?.data?.data?.attributes?.phone_required ?? false,
-      minimumAge: response?.data?.data?.attributes?.minimum_age ?? 18,
+      minimumAge: undefined,
+    }
+
+    if (response?.data?.data?.attributes?.age_required) {
+      responseData.minimumAge =
+        response?.data?.data?.attributes?.minimum_age ?? 18
     }
   }
 

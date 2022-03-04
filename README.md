@@ -314,7 +314,7 @@ Then add it to the render function.
 {
   eventId: number
 
-  onAddToCartSuccess: (data: IAddToCartSuccess) => void
+  onAddToCartSuccess: (data: ITicketsResponseData) => void
   onAddToCartError?: (error: any) => void
   onFetchTicketsError?: (error: any) => void
   onFetchTicketsSuccess?: (data: {
@@ -336,6 +336,11 @@ Then add it to the render function.
 
   onPressMyOrders: () => void
   onPressLogout?: () => void
+
+  // With the following 3 props you can control the visibility of the stock loading indicators and alerts, so you can use your own.
+  onLoadingChange?: (isLoading: boolean) => void
+  areAlertsEnabled?: boolean
+  areLoadingIndicatorsEnabled?: boolean
 }
 ```
 
@@ -445,8 +450,8 @@ Add it to the render function.
 | CartProps | Received from the Tickets component |
 | onCheckoutSuccess | Will return Order data from the Checkout action |
 | loginBrandImages | Receives styles and images sources to show in the `Login` component.
-### texts
 
+### texts
 ```js
 interface IBillingInfoViewTexts {
   loginTexts?: ILoginViewTexts
