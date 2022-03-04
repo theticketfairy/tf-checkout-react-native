@@ -429,6 +429,22 @@ Add it to the render function.
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
 
+  // Configure the skipping component visible, when isBillingRequired is false
+  skipBillingConfig?: {
+    styles?: {
+      rootContainer?: StyleProp<ViewStyle>
+      dialogContainer?: StyleProp<ViewStyle>
+      brandImage?: StyleProp<ImageStyle>
+      text?: StyleProp<TextStyle>
+      activityIndicator?: {
+        color?: ColorValue
+        size?: 'large' | 'small'
+      }
+    }
+    brandImage?: ImageSourcePropType
+    isActivityIndicatorVisible?: boolean
+  }
+
   loginBrandImages?:  {
     containerStyle?: StyleProp<ViewStyle>
     image1?: ImageSourcePropType
@@ -442,9 +458,10 @@ Add it to the render function.
 ### Props
 | Property | Description |
 |----------|-------------|
-| CartProps | Received from the Tickets component |
+| cartProps | Received from the Tickets component |
 | onCheckoutSuccess | Will return Order data from the Checkout action |
-| loginBrandImages | Receives styles and images sources to show in the `Login` component.
+| loginBrandImages | Receives styles and images sources to show in the `Login` component |
+| skipBillingConfig | Configure the skipping component, visible when `isBillingRequired` is set to false |
 ### texts
 
 ```js
@@ -504,16 +521,6 @@ interface IBillingInfoViewStyles {
   customCheckbox?: ICheckboxStyles
 
   datePicker?: IDatePickerStyles
-  skippingDialog?: {
-    rootContainer?: StyleProp<ViewStyle>
-    dialogContainer?: StyleProp<ViewStyle>
-    brandImage?: StyleProp<ImageStyle>
-    message?: StyleProp<TextStyle>
-    spinner?: {
-      color: ColorValue
-      size: 'large' | 'small'
-    }
-  }
 }
 ```
 
