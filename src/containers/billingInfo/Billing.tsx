@@ -820,11 +820,7 @@ const Billing = (props: IBillingProps) => {
           hideLoginDialog={hideLoginDialog}
           userFirstName={loggedUserFirstName}
           onLoginFailure={handleOnLoginFail}
-          texts={{
-            dialog: {
-              message: loginMessage,
-            },
-          }}
+          texts={texts?.loginTexts}
           styles={styles?.loginStyles}
           brandImages={loginBrandImages}
         />
