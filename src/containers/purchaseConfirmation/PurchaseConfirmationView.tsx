@@ -3,13 +3,13 @@ import { Text, View } from 'react-native'
 
 import { Button } from '../../components'
 import s from './styles'
-import { IPurchaseConfirmationProps } from './types'
+import { IPurchaseConfirmationViewProps } from './types'
 
 const PurchaseConfirmationView = ({
   texts,
   styles,
   onComplete,
-}: IPurchaseConfirmationProps) => (
+}: IPurchaseConfirmationViewProps) => (
   <View style={[s.rootContainer, styles?.rootContainer]}>
     <Text style={[s.title, styles?.title]}>
       {texts?.title || 'Your Tickets are Confirmed!'}

@@ -84,6 +84,8 @@ export interface ILoginViewTexts {
   dialog?: {
     loginButton?: string
     message?: string
+    emailLabel?: string
+    passwordLabel?: string
   }
   logoutDialog?: {
     title?: string

@@ -621,7 +621,7 @@ Currently, Stripe card is not customizable. Please see the open issues in their 
 Additionally, if you are encountering problems with building your project, please take a look at the [Stripe troubleshooting](https://github.com/stripe/stripe-react-native#troubleshooting).
 
 
-## PurchaseConfirmation
+## Purchase Confirmation
 
 Import the component from the library
 
@@ -635,13 +635,40 @@ Add it to the render function.
 <PurchaseConfirmation
   orderHash={checkoutProps!.hash}
   onComplete={handleOnComplete}
+
+  styles?: {
+    rootContainer?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+
+    message?: {
+      container?: StyleProp<ViewStyle>
+      line1?: StyleProp<TextStyle>
+      line2?: StyleProp<TextStyle>
+    }
+    exitButton?: {
+      container?: StyleProp<ViewStyle>
+      button?: StyleProp<ViewStyle>
+      text?: StyleProp<TextStyle>
+    }
+  }
+
+  texts?: {
+    title?: string
+    message?: {
+      line1?: string
+      line2?: string
+    }
+    exitButton?: string
+  }
 />
 ```
-
-`orderHash` the `hash` returned in the `BillingInfo` component.
-
-`onComplete` to handle the completion of the flow. Here you can handle the unmount of the component or navigate to another screen.
-
+### Props
+| Property | Description |
+|----------|-------------|
+| orderHash | The `hash` returned in the `BillingInfo` component |
+| onComplete | To handle the completion of the flow. Here you can handle the unmount of the component or navigate to another screen |
+| styles | Styles for the component |
+| texts | Texts for the component  |
 ---
 
 ## MyOrders
