@@ -6,6 +6,7 @@ export interface IPurchaseConfirmationProps {
   orderHash: string
   onComplete: () => void
   styles?: IPurchaseConfirmationStyles
+  texts?: IPurchaseConfirmationTexts
 }
 
 export interface IPurchaseConfirmationTexts {
@@ -57,8 +58,10 @@ export interface IPurchaseConfirmationStyles {
   exitButton?: IButtonStyles
 }
 
-export interface IPurchaseConfirmationProps {
+export interface IPurchaseConfirmationViewProps {
   texts?: IPurchaseConfirmationTexts
   styles?: IPurchaseConfirmationStyles
   referralLink?: string
+  onComplete: () => void
+  orderHash: string
 }

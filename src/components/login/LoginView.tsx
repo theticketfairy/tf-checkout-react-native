@@ -59,7 +59,7 @@ const LoginView = ({
         inputProps: {
           value: email.value as string,
           onTextChanged: setInputData,
-          label: 'Email',
+          label: texts?.dialog?.emailLabel || 'Email',
           keyboardType: 'email-address',
           autoCapitalize: 'none',
           styles: styles?.dialog?.input,
@@ -72,7 +72,7 @@ const LoginView = ({
         inputProps: {
           value: password.value as string,
           onTextChanged: setInputData,
-          label: 'Password',
+          label: texts?.dialog?.passwordLabel || 'Password',
           secureTextEntry: true,
           styles: styles?.dialog?.input,
           reference: refs?.inputs?.password,
@@ -219,7 +219,7 @@ const LoginView = ({
                             ...styles?.dialog?.loginButton,
                           }
                     }
-                    text={texts?.loginButton || 'LOGIN'}
+                    text={texts?.dialog?.loginButton || 'LOGIN'}
                     onPress={handleOnPressLogin}
                     isLoading={isLoading}
                     isDisabled={!checkIsDataValid()}
