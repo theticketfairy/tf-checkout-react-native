@@ -1,6 +1,6 @@
 import _map from 'lodash/map'
-import _uniqBy from 'lodash/uniqBy'
 import _sortBy from 'lodash/sortBy'
+import _uniqBy from 'lodash/uniqBy'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
