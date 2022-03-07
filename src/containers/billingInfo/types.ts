@@ -1,5 +1,6 @@
 import {
   ColorValue,
+  ImageSourcePropType,
   ImageStyle,
   StyleProp,
   TextStyle,
@@ -54,6 +55,22 @@ export interface IBillingProps {
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
 
+  // Configure the skipping component, visible when isBillingRequired is false
+  skipBillingConfig?: {
+    styles?: {
+      rootContainer?: StyleProp<ViewStyle>
+      dialogContainer?: StyleProp<ViewStyle>
+      brandImage?: StyleProp<ImageStyle>
+      text?: StyleProp<TextStyle>
+      activityIndicator?: {
+        color?: ColorValue
+        size?: 'large' | 'small'
+      }
+    }
+    brandImage?: ImageSourcePropType
+    isActivityIndicatorVisible?: boolean
+  }
+
   loginBrandImages?: ILoginBrandImages
 }
 
@@ -88,16 +105,6 @@ export interface IBillingInfoViewStyles {
   customCheckbox?: ICheckboxStyles
 
   datePicker?: IDatePickerStyles
-  skippingDialog?: {
-    rootContainer?: StyleProp<ViewStyle>
-    dialogContainer?: StyleProp<ViewStyle>
-    brandImage?: StyleProp<ImageStyle>
-    message?: StyleProp<TextStyle>
-    spinner?: {
-      color: ColorValue
-      size: 'large' | 'small'
-    }
-  }
 }
 
 export interface IBillingInfoViewTexts {

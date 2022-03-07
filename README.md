@@ -434,6 +434,22 @@ Add it to the render function.
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
 
+  // Configure the skipping component visible, when isBillingRequired is false
+  skipBillingConfig?: {
+    styles?: {
+      rootContainer?: StyleProp<ViewStyle>
+      dialogContainer?: StyleProp<ViewStyle>
+      brandImage?: StyleProp<ImageStyle>
+      text?: StyleProp<TextStyle>
+      activityIndicator?: {
+        color?: ColorValue
+        size?: 'large' | 'small'
+      }
+    }
+    brandImage?: ImageSourcePropType
+    isActivityIndicatorVisible?: boolean
+  }
+
   loginBrandImages?:  {
     containerStyle?: StyleProp<ViewStyle>
     image1?: ImageSourcePropType
@@ -447,11 +463,12 @@ Add it to the render function.
 ### Props
 | Property | Description |
 |----------|-------------|
-| CartProps | Received from the Tickets component |
+| cartProps | Received from the Tickets component |
 | onCheckoutSuccess | Will return Order data from the Checkout action |
-| loginBrandImages | Receives styles and images sources to show in the `Login` component.
-
+| loginBrandImages | Receives styles and images sources to show in the `Login` component |
+| skipBillingConfig | Configure the skipping component, visible when `isBillingRequired` is set to false |
 ### texts
+
 ```js
 interface IBillingInfoViewTexts {
   loginTexts?: ILoginViewTexts
@@ -509,16 +526,6 @@ interface IBillingInfoViewStyles {
   customCheckbox?: ICheckboxStyles
 
   datePicker?: IDatePickerStyles
-  skippingDialog?: {
-    rootContainer?: StyleProp<ViewStyle>
-    dialogContainer?: StyleProp<ViewStyle>
-    brandImage?: StyleProp<ImageStyle>
-    message?: StyleProp<TextStyle>
-    spinner?: {
-      color: ColorValue
-      size: 'large' | 'small'
-    }
-  }
 }
 ```
 
@@ -619,7 +626,7 @@ Currently, Stripe card is not customizable. Please see the open issues in their 
 Additionally, if you are encountering problems with building your project, please take a look at the [Stripe troubleshooting](https://github.com/stripe/stripe-react-native#troubleshooting).
 
 
-## PurchaseConfirmation
+## Purchase Confirmation
 
 Import the component from the library
 
@@ -633,13 +640,40 @@ Add it to the render function.
 <PurchaseConfirmation
   orderHash={checkoutProps!.hash}
   onComplete={handleOnComplete}
+
+  styles?: {
+    rootContainer?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+
+    message?: {
+      container?: StyleProp<ViewStyle>
+      line1?: StyleProp<TextStyle>
+      line2?: StyleProp<TextStyle>
+    }
+    exitButton?: {
+      container?: StyleProp<ViewStyle>
+      button?: StyleProp<ViewStyle>
+      text?: StyleProp<TextStyle>
+    }
+  }
+
+  texts?: {
+    title?: string
+    message?: {
+      line1?: string
+      line2?: string
+    }
+    exitButton?: string
+  }
 />
 ```
-
-`orderHash` the `hash` returned in the `BillingInfo` component.
-
-`onComplete` to handle the completion of the flow. Here you can handle the unmount of the component or navigate to another screen.
-
+### Props
+| Property | Description |
+|----------|-------------|
+| orderHash | The `hash` returned in the `BillingInfo` component |
+| onComplete | To handle the completion of the flow. Here you can handle the unmount of the component or navigate to another screen |
+| styles | Styles for the component |
+| texts | Texts for the component  |
 ---
 
 ## MyOrders

@@ -64,6 +64,7 @@ const Billing = (props: IBillingProps) => {
       isBillingRequired,
     },
     loginBrandImages,
+    skipBillingConfig,
   } = props
 
   //#region Labels
@@ -780,27 +781,25 @@ const Billing = (props: IBillingProps) => {
   }
 
   const renderCheckingOut = () => {
+    const skippingStyles = skipBillingConfig?.styles
     return (
-      <View
-        style={[s.skippingRootContainer, styles?.skippingDialog?.rootContainer]}
-      >
+      <View style={[s.skippingRootContainer, skippingStyles?.rootContainer]}>
         <View
-          style={[
-            s.skippingDialogContainer,
-            styles?.skippingDialog?.dialogContainer,
-          ]}
+          style={[s.skippingDialogContainer, skippingStyles?.dialogContainer]}
         >
           <Image
-            source={R.images.brand}
-            style={[s.skippingBrandImage, styles?.skippingDialog?.brandImage]}
+            source={skipBillingConfig?.brandImage || R.images.brand}
+            style={[s.skippingBrandImage, skippingStyles?.brandImage]}
           />
-          <Text style={[s.skippingMessage, styles?.skippingDialog?.message]}>
+          <Text style={[s.skippingMessage, skippingStyles?.text]}>
             {texts?.skippingMessage || 'Checking out...'}
           </Text>
-          <ActivityIndicator
-            color={styles?.skippingDialog?.spinner?.color || R.colors.black}
-            size={styles?.skippingDialog?.spinner?.size || 'large'}
-          />
+          {!!skipBillingConfig?.isActivityIndicatorVisible && (
+            <ActivityIndicator
+              color={skippingStyles?.activityIndicator?.color || R.colors.black}
+              size={skippingStyles?.activityIndicator?.size || 'large'}
+            />
+          )}
         </View>
       </View>
     )
@@ -821,11 +820,7 @@ const Billing = (props: IBillingProps) => {
           hideLoginDialog={hideLoginDialog}
           userFirstName={loggedUserFirstName}
           onLoginFailure={handleOnLoginFail}
-          texts={{
-            dialog: {
-              message: loginMessage,
-            },
-          }}
+          texts={texts?.loginTexts}
           styles={styles?.loginStyles}
           brandImages={loginBrandImages}
         />
