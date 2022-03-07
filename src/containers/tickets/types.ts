@@ -1,5 +1,6 @@
 import { TextStyle, ViewStyle } from 'react-native'
 
+import { IEventData } from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
 import { ILoadingStyles } from '../../components/loading/types'
 import {
@@ -53,6 +54,12 @@ export interface ITicketsViewProps {
   onPressLogout: () => void
 
   areLoadingIndicatorsEnabled?: boolean
+  areAlertsEnabled?: boolean
+
+  // Callbacks for Waiting list
+  onAddToWaitingListSuccess?: () => void
+  onAddToWaitingListError?: (error: IError) => void
+  onLoadingChange?: (isLoading: boolean) => void
 }
 
 export interface ITicketListStyles {
@@ -102,7 +109,13 @@ export interface ITicketsProps {
   onFetchTicketsSuccess?: (data: IOnFetchTicketsSuccess) => void
   onFetchTicketsError?: (error: IError) => void
 
+  // Callbacks for fetching the Event
   onFetchEventError?: (error: string) => void
+  onFetchEventSuccess?: (data: IEventData) => void
+
+  // Callbacks for Waiting list
+  onAddToWaitingListSuccess?: () => void
+  onAddToWaitingListError?: (error: IError) => void
 
   styles?: ITicketsViewStyles
   texts?: ITicketsViewTexts

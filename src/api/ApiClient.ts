@@ -14,7 +14,7 @@ import {
   LocalStorageKeys,
   storeData,
 } from '../helpers/LocalStorage'
-import { IEvent, IUserProfile } from '../types'
+import { IError, IEvent, IUserProfile } from '../types'
 import {
   ITicket,
   ITicketsResponseData,
@@ -246,12 +246,15 @@ export const addToWaitingList = async (
     },
   }
 
-  let responseError = ''
+  let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.post(
     `/v1/event/${id}/add_to_waiting_list`,
     requestData
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status!,
+    }
   })
 
   return {
@@ -378,8 +381,17 @@ export const fetchTickets = async (
   const response = await Client.get(`v1/event/${id}/tickets/`, {
     headers: headers,
   }).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      code: error.response?.status!,
+      message: error.response?.data.message,
+    }
   })
+
+  if (responseError) {
+    return {
+      error: responseError,
+    }
+  }
 
   const attributes = _get(response, 'data.data.attributes.tickets')
   const ticketsAttributes = _filter(
@@ -410,7 +422,7 @@ export const addToCart = async (
   id: string | number,
   data: any
 ): Promise<ITicketsResponsePayload> => {
-  let responseError: AxiosError | undefined
+  let responseError: IError | undefined
   let responseData: ITicketsResponseData | undefined
 
   const response: AxiosResponse | void = await Client.post(
@@ -419,7 +431,10 @@ export const addToCart = async (
       data,
     }
   ).catch((error: AxiosError) => {
-    responseError = error
+    responseError = {
+      code: error.response?.status!,
+      message: error.response?.data.message,
+    }
   })
 
   if (!responseError) {
@@ -449,12 +464,15 @@ export const addToCart = async (
 export const fetchEvent = async (
   id: string | number
 ): Promise<IEventResponse> => {
-  let responseError: string | undefined
+  let responseError: IError | undefined
   let event: IEvent | undefined
   const response: AxiosResponse | void = await Client.get(`v1/event/${id}`, {
     headers: HEADERS,
   }).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      code: error.response?.status!,
+      message: error.response?.data.message,
+    }
   })
 
   if (response?.status === 200) {

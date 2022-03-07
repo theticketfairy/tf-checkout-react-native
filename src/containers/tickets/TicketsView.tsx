@@ -31,6 +31,10 @@ const TicketsView = ({
   onPressMyOrders,
   onPressLogout,
   areLoadingIndicatorsEnabled,
+  onAddToWaitingListError,
+  onAddToWaitingListSuccess,
+  onLoadingChange,
+  areAlertsEnabled,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -66,6 +70,10 @@ const TicketsView = ({
             eventId={eventId}
             styles={styles?.waitingList}
             texts={texts?.waitingList}
+            onAddToWaitingListSuccess={onAddToWaitingListSuccess}
+            onAddToWaitingListError={onAddToWaitingListError}
+            onLoadingChange={onLoadingChange}
+            areAlertsEnabled={areAlertsEnabled}
           />
         )}
         <PromoCode

@@ -48,7 +48,7 @@ const Checkout = ({
   areLoadingIndicatorsEnabled = true,
   onLoadingChange,
 }: ICheckoutProps) => {
-  const { confirmPayment } = useConfirmPayment()
+  const { confirmPayment, loading: isLoadingPayment } = useConfirmPayment()
   const [isLoading, setIsLoading] = useState(true)
   const [orderReview, setOrderReview] = useState<IOrderReview>()
   const [conditionsTexts, setConditionsTexts] = useState<string[]>([])
@@ -361,7 +361,7 @@ const Checkout = ({
           <Button
             text={texts?.freeRegistrationButton || 'COMPLETE REGISTRATION'}
             onPress={handleOnPressFreeRegistration}
-            isLoading={isLoading}
+            isLoading={isLoading || isLoadingPayment}
             styles={styles?.freeRegistrationButton}
           />
         )}

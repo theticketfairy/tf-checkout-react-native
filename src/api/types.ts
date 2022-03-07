@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { AxiosInstance } from 'axios'
 
-import { IEvent, ITicket } from '../types'
+import { IError, IEvent, ITicket } from '../types'
 
 export interface IClientRequest extends AxiosInstance {
   setGuestToken: (token: string) => void
@@ -18,7 +18,7 @@ export interface IPromoCodeResponse {
 
 export interface IFetchTicketsResponse {
   tickets?: ITicket[]
-  error?: any
+  error?: IError
   promoCodeResult?: IPromoCodeResponse
   isInWaitingList?: boolean
   isAccessCodeRequired?: boolean
@@ -50,9 +50,16 @@ export interface IAddToCartParams {
   }
 }
 
+export interface IEventData {
+  slug: string
+  name: string
+  description?: string
+  title: string
+}
+
 // Event types
 export interface IEventResponse {
-  eventError?: string
+  eventError?: IError
   eventData?: IEvent
 }
 

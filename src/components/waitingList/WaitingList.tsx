@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 
 import { addToWaitingList } from '../../api/ApiClient'
@@ -7,7 +7,15 @@ import { validateEmail, validateEmpty } from '../../helpers/Validators'
 import { IWaitingListFields, IWaitingListProps } from './types'
 import WaitingListView from './WaitingListView'
 
-const WaitingList = ({ styles, texts, eventId }: IWaitingListProps) => {
+const WaitingList = ({
+  styles,
+  texts,
+  eventId,
+  onAddToWaitingListError,
+  onAddToWaitingListSuccess,
+  onLoadingChange,
+  areAlertsEnabled,
+}: IWaitingListProps) => {
   const [isSuccess, setIsSuccess] = useState<boolean | undefined>(undefined)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [firstName, setFirstName] = useState('')
@@ -39,13 +47,36 @@ const WaitingList = ({ styles, texts, eventId }: IWaitingListProps) => {
     setIsLoading(false)
     if (addToWaitingListError) {
       setIsSuccess(false)
-      return Alert.alert('', addToWaitingListError)
+      if (areAlertsEnabled) {
+        Alert.alert('', addToWaitingListError.message)
+      }
+
+      if (onAddToWaitingListError) {
+        onAddToWaitingListError(addToWaitingListError)
+      }
+      return
     }
 
     if (addToWaitingListData) {
+      if (onAddToWaitingListSuccess) {
+        onAddToWaitingListSuccess()
+      }
       setIsSuccess(true)
     }
   }
+
+  const onLoadingChangeCallback = useCallback(
+    (loading: boolean) => {
+      if (onLoadingChange) {
+        onLoadingChange(loading)
+      }
+    },
+    [onLoadingChange]
+  )
+
+  useEffect(() => {
+    onLoadingChangeCallback(isLoading)
+  }, [isLoading, onLoadingChangeCallback])
 
   return (
     <WaitingListView

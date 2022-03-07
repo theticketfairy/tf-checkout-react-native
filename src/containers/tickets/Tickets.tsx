@@ -34,6 +34,9 @@ const Tickets = ({
   onLoadingChange,
   areAlertsEnabled = true,
   areLoadingIndicatorsEnabled = true,
+  onFetchEventSuccess,
+  onAddToWaitingListError,
+  onAddToWaitingListSuccess,
 }: ITicketsProps) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
@@ -148,6 +151,16 @@ const Tickets = ({
       showAlert(eventError)
       return
     }
+
+    if (onFetchEventSuccess) {
+      onFetchEventSuccess({
+        name: eventData?.name,
+        slug: eventData?.slug,
+        description: eventData?.description,
+        title: eventData?.title,
+      })
+    }
+
     setEvent(eventData)
   }
 
@@ -247,6 +260,10 @@ const Tickets = ({
       onPressLogout()
     }
   }
+
+  const handleOnLoadingChange = (loading: boolean) => {
+    onLoadingChangeCallback(loading)
+  }
   //#endregion
 
   return (
@@ -273,6 +290,9 @@ const Tickets = ({
       onPressMyOrders={onPressMyOrders}
       onPressLogout={handleOnLogout}
       areLoadingIndicatorsEnabled={areLoadingIndicatorsEnabled}
+      onAddToWaitingListError={onAddToWaitingListError}
+      onAddToWaitingListSuccess={onAddToWaitingListSuccess}
+      onLoadingChange={handleOnLoadingChange}
     />
   )
 }
