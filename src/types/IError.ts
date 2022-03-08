@@ -1,5 +1,5 @@
 export interface IError {
-  code: number
+  code?: number
   message: string
   extraData?: any
 }

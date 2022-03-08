@@ -25,7 +25,7 @@ export interface IFetchTicketsResponse {
 }
 
 export interface IAuthorizeResponse {
-  error?: string
+  error?: IError
   code?: string
 }
 
@@ -128,8 +128,8 @@ export interface IRegisterNewUserResponse {
 
 // Billing information
 export interface ICheckoutResponse {
-  error: string
-  data: any
+  error?: IError
+  data?: any
 }
 
 // Checkout

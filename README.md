@@ -291,6 +291,7 @@ interface ILoginViewStyles {
     cancel?: string
   }
 ```
+---
 
 ## Tickets
 
@@ -492,7 +493,7 @@ You can then call the `BillingInfo` component and pass them as props in the `car
   }
 }
 ```
-
+---
 ## BillingInfo
 
 Import the component from the library
@@ -512,8 +513,9 @@ Add it to the render function.
     isPhoneRequired: boolean
     minimumAge: number
   }
+  // registerNewUser
   onRegisterSuccess?: (tokens: ITokens) => void
-  onRegisterFail?: (error: string) => void
+  onRegisterError?: (error: string) => void
 
   onCheckoutSuccess: (data: {   
     id: string
@@ -521,23 +523,33 @@ Add it to the render function.
     total: string
     status: string
   }) => void
-  onCheckoutFail?: (error: string) => void
+  onCheckoutError?: (error: IError) => void
 
   onLoginSuccess: (data: any) => void
-  onLoginFail?: (error: string) => void
+  onLoginError?: (error: IError) => void
+
 
   onFetchUserProfileSuccess?: (data: any) => void
-  onFetchUserProfileFail?: (error: any) => void
+  onFetchUserProfileError?: (error: IError) => void
 
-  onFetchCartError?: (error: string) => void
+  //fetchCart
+  onFetchCartError?: (error: IError) => void
+  onFetchCartSuccess?: () => void
+
+    // fetchCountries
+  onFetchCountriesError?: (error: IError) => void
+  onFetchCountriesSuccess?: () => void
+
+  // fetchState
+  onFetchStatesError?: (error: IError) => void
+  onFetchStatesSuccess?: () => void
+
+  // fetch Token
+  onFetchAccessTokenError?: (error: IError) => void
+  onFetchAccessTokenSuccess?: () => void
 
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
-
-  privacyPolicyLinkStyle?: StyleProp<TextStyle>
-
-  onFetchUserProfileFailure?: (error: string) => void
-  onFetchAccessTokenFailure?: (error: string) => void
 
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
@@ -634,6 +646,8 @@ interface IBillingInfoViewStyles {
   customCheckbox?: ICheckboxStyles
 
   datePicker?: IDatePickerStyles
+  
+  privacyPolicyLinkStyle?: StyleProp<TextStyle>
 }
 ```
 

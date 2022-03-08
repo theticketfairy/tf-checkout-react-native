@@ -2,7 +2,14 @@ import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _forEach from 'lodash/forEach'
 import _map from 'lodash/map'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import {
   ActivityIndicator,
   Alert,
@@ -43,7 +50,7 @@ import {
   validatePasswords,
 } from '../../helpers/Validators'
 import R from '../../res'
-import { IUserProfile } from '../../types'
+import { IError, IUserProfile } from '../../types'
 import s from './styles'
 import {
   IBillingProps,
@@ -52,21 +59,38 @@ import {
   ITicketHolderFieldError,
 } from './types'
 
-const Billing = (props: IBillingProps) => {
-  const {
-    styles,
-    texts,
-    cartProps: {
-      isAgeRequired,
-      isNameRequired,
-      isPhoneRequired,
-      minimumAge,
-      isBillingRequired,
-    },
-    loginBrandImages,
-    skipBillingConfig,
-  } = props
-
+const Billing: FC<IBillingProps> = ({
+  styles,
+  texts,
+  cartProps: {
+    isAgeRequired,
+    isNameRequired,
+    isPhoneRequired,
+    minimumAge,
+    isBillingRequired,
+  },
+  loginBrandImages,
+  skipBillingConfig,
+  areAlertsEnabled = true,
+  areLoadingIndicatorsEnabled = true,
+  onLoadingChange,
+  onLoginError,
+  onLoginSuccess,
+  onRegisterError,
+  onRegisterSuccess,
+  onCheckoutSuccess,
+  onCheckoutError,
+  onFetchUserProfileSuccess,
+  onFetchUserProfileError,
+  onFetchCartError,
+  onFetchCartSuccess,
+  onFetchCountriesError,
+  onFetchCountriesSuccess,
+  onFetchStatesError,
+  onFetchStatesSuccess,
+  onFetchAccessTokenError,
+  onFetchAccessTokenSuccess,
+}) => {
   //#region Labels
   const countryLabel = texts?.form?.country || 'Country'
   const stateLabel = texts?.form?.country || 'State/County'
@@ -188,6 +212,21 @@ const Billing = (props: IBillingProps) => {
   //#endregion
 
   //#region Handlers
+  const handleOnLoadingChange = useCallback(
+    (loading: boolean) => {
+      if (onLoadingChange) {
+        onLoadingChange(loading)
+      }
+    },
+    [onLoadingChange]
+  )
+
+  const showAlert = (text: string) => {
+    if (areAlertsEnabled) {
+      Alert.alert('', text)
+    }
+  }
+
   const showLoginDialog = () => setIsLoginDialogVisible(true)
   const hideLoginDialog = () => setIsLoginDialogVisible(false)
 
@@ -242,8 +281,8 @@ const Billing = (props: IBillingProps) => {
     userProfile: IUserProfile,
     accessToken: string
   ) => {
-    if (props.onLoginSuccess) {
-      props.onLoginSuccess({
+    if (onLoginSuccess) {
+      onLoginSuccess({
         accessToken: accessToken,
         userData: userProfile,
       })
@@ -263,9 +302,9 @@ const Billing = (props: IBillingProps) => {
     handleSetFormDataFromUserProfile(userProfile, accessToken)
   }
 
-  const handleOnLoginFail = (error: string) => {
-    if (props.onLoginFail) {
-      props.onLoginFail(error)
+  const handleOnLoginFail = (error: IError) => {
+    if (onLoginError) {
+      onLoginError(error)
     }
   }
 
@@ -359,8 +398,8 @@ const Billing = (props: IBillingProps) => {
 
   //#region Submit form
   const handleOnRegisterFail = (rawError: any) => {
-    if (props.onRegisterFail) {
-      props.onRegisterFail(rawError)
+    if (onRegisterError) {
+      onRegisterError(rawError)
     }
   }
 
@@ -377,11 +416,11 @@ const Billing = (props: IBillingProps) => {
       setIsSubmittingData(false)
 
       if (checkoutError) {
-        if (props.onCheckoutFail) {
-          props.onCheckoutFail(checkoutError)
+        if (onCheckoutError) {
+          onCheckoutError(checkoutError)
         }
         setSkippingStatus('false')
-        return Alert.alert('', checkoutError)
+        return showAlert(checkoutError.message)
       }
 
       const checkoutResponseData: IOnCheckoutSuccess = {
@@ -391,13 +430,15 @@ const Billing = (props: IBillingProps) => {
         status: checkoutData.data.data.attributes.status,
       }
       setSkippingStatus('success')
-      props.onCheckoutSuccess(checkoutResponseData)
+      onCheckoutSuccess(checkoutResponseData)
     } catch (err) {
       setIsSubmittingData(false)
       setSkippingStatus('false')
 
-      if (props.onCheckoutFail) {
-        props.onCheckoutFail('Error while performing checkout')
+      if (onCheckoutError) {
+        onCheckoutError({
+          message: 'Error while performing checkout',
+        })
       }
     }
   }
@@ -432,13 +473,13 @@ const Billing = (props: IBillingProps) => {
         return handleOnRegisterFail(registerResponseError.raw)
       }
       handleOnRegisterFail(registerResponseError.raw)
-      return Alert.alert('', registerResponseError.message)
+      return showAlert(registerResponseError.message!)
     }
 
     if (!registerResponseData) {
       setIsSubmittingData(false)
       handleOnRegisterFail('Register returned no data')
-      return Alert.alert('', 'Register returned no data')
+      return showAlert('Register returned no data')
     }
 
     const tokens = {
@@ -448,8 +489,8 @@ const Billing = (props: IBillingProps) => {
 
     storedToken.current = tokens.accessToken
 
-    if (props.onRegisterSuccess) {
-      props.onRegisterSuccess(tokens)
+    if (onRegisterSuccess) {
+      onRegisterSuccess(tokens)
     }
 
     await performCheckout(checkoutBody, tokens.accessToken)
@@ -552,7 +593,7 @@ const Billing = (props: IBillingProps) => {
   const onSubmit = async () => {
     const isExtraDataValid = checkExtraDataValid()
     if (isExtraDataValid) {
-      return Alert.alert('', isExtraDataValid)
+      return showAlert(isExtraDataValid)
     }
 
     const checkoutBody = getCheckoutBody()
@@ -574,7 +615,14 @@ const Billing = (props: IBillingProps) => {
 
     if (countriesError) {
       setIsLoading(false)
-      return Alert.alert('', countriesError || 'Error fetching countries')
+      if (onFetchCountriesError) {
+        onFetchCountriesError(countriesError)
+      }
+      return showAlert(countriesError.message || 'Error fetching countries')
+    }
+
+    if (onFetchCountriesSuccess) {
+      onFetchCountriesSuccess()
     }
 
     const parsedCountries: IDropdownItem[] = _map(
@@ -591,10 +639,19 @@ const Billing = (props: IBillingProps) => {
 
       if (userProfileError || !userProfileResponse) {
         setIsLoading(false)
-        return Alert.alert(
-          '',
-          userProfileError || 'Error fetching user profile'
+        if (onFetchUserProfileError) {
+          onFetchUserProfileError(userProfileError!)
+        }
+        return showAlert(
+          userProfileError?.message || 'Error fetching user profile'
         )
+      }
+
+      if (onFetchUserProfileSuccess) {
+        onFetchUserProfileSuccess({
+          firstName: userProfileResponse.firstName,
+          lastName: userProfileResponse.lastName,
+        })
       }
 
       usrPrfl = userProfileResponse
@@ -607,11 +664,14 @@ const Billing = (props: IBillingProps) => {
 
     if (cartError) {
       setIsLoading(false)
-      Alert.alert('', cartError)
-      if (props.onFetchCartError) {
-        props.onFetchCartError(cartError)
+      if (onFetchCartError) {
+        onFetchCartError(cartError)
       }
-      return
+      return showAlert(cartError.message)
+    }
+
+    if (onFetchCartSuccess) {
+      onFetchCartSuccess()
     }
 
     setNumberOfTicketHolders(cartData.quantity)
@@ -651,6 +711,10 @@ const Billing = (props: IBillingProps) => {
   }
 
   //#region Effects
+  useCallback(() => {
+    handleOnLoadingChange(isLoading)
+  }, [isLoading, handleOnLoadingChange])
+
   useEffect(() => {
     if (countries.length > 1 && countryId) {
       const selectedCountryItem = _find(
@@ -667,19 +731,27 @@ const Billing = (props: IBillingProps) => {
         selectedCountry!.value as string
       )
 
-      if (statesError || !statesData) {
-        return Alert.alert('', statesError || 'Error fetching states')
+      if (statesError) {
+        if (onFetchStatesError) {
+          onFetchStatesError(statesError!)
+        }
+        return showAlert(statesError?.message || 'Error fetching states')
       }
 
       const parsedStates: IDropdownItem[] = _map(statesData, (item, index) => {
         return { label: item, value: index }
       })
+
+      if (onFetchStatesSuccess) {
+        onFetchStatesSuccess()
+      }
       setStates(parsedStates)
     }
 
     if (selectedCountry && selectedCountry.value !== '-1') {
       getStates()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCountry])
 
   useEffect(() => {
@@ -819,10 +891,14 @@ const Billing = (props: IBillingProps) => {
           showLoginDialog={showLoginDialog}
           hideLoginDialog={hideLoginDialog}
           userFirstName={loggedUserFirstName}
-          onLoginFailure={handleOnLoginFail}
+          onLoginError={handleOnLoginFail}
           texts={texts?.loginTexts}
           styles={styles?.loginStyles}
           brandImages={loginBrandImages}
+          onFetchAccessTokenError={onFetchAccessTokenError}
+          onFetchAccessTokenSuccess={onFetchAccessTokenSuccess}
+          onFetchUserProfileError={onFetchUserProfileError}
+          onFetchUserProfileSuccess={onFetchUserProfileSuccess}
         />
         <Text style={styles?.screenTitle}>
           {texts?.form?.getYourTicketsTitle || 'Get Your Tickets'}
@@ -959,7 +1035,7 @@ const Billing = (props: IBillingProps) => {
                 have provided for marketing purposes, such as recommending
                 events that I might be interested in, in accordance with its{' '}
                 <Text
-                  style={props.privacyPolicyLinkStyle}
+                  style={styles?.privacyPolicyLinkStyle}
                   onPress={handleOpenPrivacyLink}
                 >
                   Privacy Policy
@@ -1002,7 +1078,7 @@ const Billing = (props: IBillingProps) => {
           }
         />
       </View>
-      {isLoading && <Loading />}
+      {areLoadingIndicatorsEnabled && isLoading && <Loading />}
     </KeyboardAwareScrollView>
   )
   //#endregion

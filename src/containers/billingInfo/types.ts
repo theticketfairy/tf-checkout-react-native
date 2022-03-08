@@ -17,7 +17,7 @@ import {
   ILoginViewStyles,
   ILoginViewTexts,
 } from '../../components/login/types'
-import { ITicketsResponseData } from '../../types'
+import { IError, ITicketsResponseData } from '../../types'
 
 export interface ITokens {
   accessToken: string
@@ -33,24 +33,38 @@ export interface IOnCheckoutSuccess {
 
 export interface IBillingProps {
   cartProps: ITicketsResponseData
+
+  // registerNewUser
   onRegisterSuccess?: (tokens: ITokens) => void
-  onRegisterFail?: (error: string) => void
+  onRegisterError?: (error: string) => void
 
+  // checkoutOrder
   onCheckoutSuccess: (data: IOnCheckoutSuccess) => void
-  onCheckoutFail?: (error: string) => void
+  onCheckoutError?: (error: IError) => void
 
+  // login
   onLoginSuccess: (data: any) => void
-  onLoginFail?: (error: string) => void
+  onLoginError?: (error: IError) => void
 
+  //fetchUserProfile
   onFetchUserProfileSuccess?: (data: any) => void
-  onFetchUserProfileFail?: (error: any) => void
+  onFetchUserProfileError?: (error: IError) => void
 
-  onFetchCartError?: (error: string) => void
+  //fetchCart
+  onFetchCartError?: (error: IError) => void
+  onFetchCartSuccess?: () => void
 
-  privacyPolicyLinkStyle?: StyleProp<TextStyle>
+  // fetchCountries
+  onFetchCountriesError?: (error: IError) => void
+  onFetchCountriesSuccess?: () => void
 
-  onFetchUserProfileFailure?: (error: string) => void
-  onFetchAccessTokenFailure?: (error: string) => void
+  // fetchState
+  onFetchStatesError?: (error: IError) => void
+  onFetchStatesSuccess?: () => void
+
+  // fetch Token
+  onFetchAccessTokenError?: (error: IError) => void
+  onFetchAccessTokenSuccess?: () => void
 
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
@@ -72,6 +86,10 @@ export interface IBillingProps {
   }
 
   loginBrandImages?: ILoginBrandImages
+
+  areLoadingIndicatorsEnabled?: boolean
+  areAlertsEnabled?: boolean
+  onLoadingChange?: (isLoading: boolean) => void
 }
 
 export interface ITicketHolderField {
@@ -105,6 +123,8 @@ export interface IBillingInfoViewStyles {
   customCheckbox?: ICheckboxStyles
 
   datePicker?: IDatePickerStyles
+
+  privacyPolicyLinkStyle?: StyleProp<TextStyle>
 }
 
 export interface IBillingInfoViewTexts {

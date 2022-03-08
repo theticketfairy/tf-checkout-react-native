@@ -144,12 +144,15 @@ export const setAccessTokenHandler = async (accessToken: string) => {
 export const authorize = async (
   data: FormData
 ): Promise<IAuthorizeResponse> => {
-  let responseError: string = ''
+  let responseError: IError | undefined
   const response = await Client.post(
     `/v1/oauth/authorize-rn?client_id=${Config.CLIENT_ID}`,
     data
   ).catch((error: AxiosError) => {
-    responseError = error?.response?.data.message
+    responseError = {
+      message: error?.response?.data.message,
+      code: error?.response?.status,
+    }
   })
 
   return {
@@ -159,10 +162,13 @@ export const authorize = async (
 }
 
 export const fetchAccessToken = async (data: FormData) => {
-  let responseError
+  let responseError: IError | undefined
   const response = await Client.post('/v1/oauth/access_token', data).catch(
-    (error: Error) => {
-      responseError = error.message
+    (error: AxiosError) => {
+      responseError = {
+        message: error.response?.data.message,
+        code: error.response?.status,
+      }
     }
   )
 
@@ -173,7 +179,7 @@ export const fetchAccessToken = async (data: FormData) => {
 }
 
 export const fetchUserProfile = async (accessToken: any) => {
-  let responseError
+  let responseError: IError | undefined
   let userProfile: IUserProfile | undefined
 
   const response: AxiosResponse | void = await Client.get(
@@ -185,7 +191,10 @@ export const fetchUserProfile = async (accessToken: any) => {
       },
     }
   ).catch((error: AxiosError) => {
-    responseError = error.message
+    responseError = {
+      message: error?.response?.data?.message,
+      code: error.response?.status!,
+    }
   })
 
   if (!responseError && response) {
@@ -289,6 +298,8 @@ export const fetchMyOrders = async (
     }
   )
 
+  console.log('My Orders Response', response)
+
   if (response?.data) {
     data.events = response.data.data.attributes.purchased_events
     data.orders = response.data.data.attributes.orders
@@ -310,6 +321,8 @@ export const fetchOrderDetails = async (orderId: string) => {
         error.response?.data.message || 'Error while fetching order details'
     }
   )
+
+  console.log('Order details', response)
 
   if (!responseError && response) {
     const { attributes } = response.data.data
@@ -488,10 +501,13 @@ export const fetchEvent = async (
 
 //#region Billing Information
 export const fetchCountries = async () => {
-  let responseError: string = ''
+  let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.get('/countries/').catch(
     (error: AxiosError) => {
-      responseError = error.response?.data.message
+      responseError = {
+        message: error.response?.data.message,
+        code: error.response?.status!,
+      }
     }
   )
 
@@ -506,11 +522,14 @@ export const fetchCountries = async () => {
 }
 
 export const fetchStates = async (countryId: string) => {
-  let responseError: string = ''
+  let responseError: IError | undefined
   const response: void | AxiosResponse = await Client.get(
     `/countries/${countryId}/states/`
   ).catch((ex: AxiosError) => {
-    responseError = ex.response?.data.message
+    responseError = {
+      code: ex.response?.status!,
+      message: ex.response?.data.message,
+    }
   })
 
   if (response?.status === 200) {
@@ -524,11 +543,14 @@ export const fetchStates = async (countryId: string) => {
 }
 
 export const fetchCart = async () => {
-  let responseError: string = ''
+  let responseError: IError | undefined
   let cartData = {} as ICartResponse
   const res: AxiosResponse | void = await Client.get('v1/cart/').catch(
     (error: AxiosError) => {
-      responseError = error.response?.data.message
+      responseError = {
+        code: error.response?.status!,
+        message: error.response?.data.message,
+      }
     }
   )
 
@@ -548,7 +570,9 @@ export const fetchCart = async () => {
       isTfOptIn: typeof tfOptIn === 'number' ? tfOptIn > 0 : tfOptIn,
     }
   } else {
-    responseError = 'Error fetching cart'
+    responseError = {
+      message: 'Error fetching cart',
+    }
   }
 
   return {
@@ -561,7 +585,7 @@ export const checkoutOrder = async (
   data: any,
   accessToken: string
 ): Promise<ICheckoutResponse> => {
-  let responseError = ''
+  let responseError: IError | undefined
   const res: AxiosResponse | void = await Client.post(
     'v1/on-checkout/',
     { data },
@@ -572,7 +596,10 @@ export const checkoutOrder = async (
       },
     }
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      code: error.response?.status!,
+      message: error.response?.data.message,
+    }
   })
 
   return {
