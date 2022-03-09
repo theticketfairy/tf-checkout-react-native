@@ -298,8 +298,6 @@ export const fetchMyOrders = async (
     }
   )
 
-  console.log('My Orders Response', response)
-
   if (response?.data) {
     data.events = response.data.data.attributes.purchased_events
     data.orders = response.data.data.attributes.orders
@@ -310,19 +308,19 @@ export const fetchMyOrders = async (
     myOrdersData: data,
   }
 }
-//&filter[brand]=${CONFIGS.BRAND_SLUG}
 
 export const fetchOrderDetails = async (orderId: string) => {
-  let responseError = ''
+  let responseError: IError | undefined
   let responseData: IMyOrderDetailsResponse | undefined
   const response = await Client.get(`/v1/account/order/${orderId}`).catch(
     (error: AxiosError) => {
-      responseError =
-        error.response?.data.message || 'Error while fetching order details'
+      responseError = {
+        message:
+          error.response?.data.message || 'Error while fetching order details',
+        code: error.response?.status,
+      }
     }
   )
-
-  console.log('Order details', response)
 
   if (!responseError && response) {
     const { attributes } = response.data.data
@@ -746,15 +744,19 @@ export const postOnFreeRegistration = async (
     freeRegistrationData: responseData,
   }
 }
+
 //#endregion
 
 //#region Purchase Confirmation
 export const fetchPurchaseConfirmation = async (orderHash: string) => {
-  let responseError
+  let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.get(
     `/v1/order/${orderHash}/payment/complete`
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status,
+    }
   })
 
   return {

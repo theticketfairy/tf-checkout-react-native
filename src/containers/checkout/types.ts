@@ -4,6 +4,7 @@ import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 import { IButtonStyles } from '../../components/button/types'
 import { IFormFieldProps } from '../../components/formField/types'
 import { IError } from '../../types'
+import { IOnCheckoutSuccess } from '../billingInfo/types'
 
 export interface ICheckoutStyles {
   rootStyle?: ViewStyle
@@ -25,10 +26,26 @@ export interface ICheckoutStyles {
     buttonDisabled?: IButtonStyles
   }
 }
+
+export interface IOrderDetailsTicketHolder {
+  qrCodeData: string
+  holderName: string
+  email?: string //TODO: remove optional when finish
+  phoneNumber?: string
+}
+
+export interface IOrderDetails {
+  eventId: number
+  ticketName?: string
+  ticketCost?: string
+  numberOfTickets: number
+  eventUserTickets: IOrderDetailsTicketHolder[]
+}
+
 export interface ICheckoutProps {
   eventId: number
-  hash: string
-  total: string
+
+  checkoutData: IOnCheckoutSuccess
 
   onFetchOrderReviewError?: (error: IError) => void
   onFetchOrderReviewSuccess?: (data: any) => void
@@ -36,11 +53,14 @@ export interface ICheckoutProps {
   onFetchEventConditionsError?: (error: IError) => void
   onFetchEventConditionsSuccess?: (data: any) => void
 
-  onCheckoutCompletedSuccess?: (data: any) => void
+  onCheckoutCompletedSuccess?: (data: IOnCheckoutSuccess) => void
   onCheckoutCompletedError?: (error: IError) => void
 
   onPaymentSuccess: (data: any) => void
   onPaymentError?: (error: IError) => void
+
+  onFetchOrderDetailsSuccess: (orderData: IOrderDetails) => void
+  onFetchOrderDetailsError: (error: IError) => void
 
   onStripeInitializeError?: (error: string) => void
 

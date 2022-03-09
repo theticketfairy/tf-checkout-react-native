@@ -38,6 +38,7 @@ const App = () => {
 
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
   const [loggedUserName, setLoggedUserName] = useState('')
+  
   //#region Handlers
   const handleOnLoginDialogSuccess = (
     userProfile: IUserProfile,
@@ -57,12 +58,12 @@ const App = () => {
   const handleOnFetchUserProfileSuccess = () => {}
 
   const handleOnCheckoutSuccess = (data: IOnCheckoutSuccess) => {
-    console.log('handleOnCheckoutSuccess', handleOnCheckoutSuccess)
+    console.log('handleOnCheckoutSuccess', data) // here is the order ID
     setCheckOutProps(data)
   }
 
-  const handleOnPaymentSuccess = (data: any) => {
-    console.log('handleOnPaymentSuccess')
+  const handleOnPaymentSuccess = (data: IOnCheckoutSuccess) => {
+    console.log('handleOnPaymentSuccess', data)
     setIsPaymentSuccess(true)
   }
 
@@ -141,9 +142,6 @@ const App = () => {
       case ComponentEnum.BillingInfo:
         return (
           <BillingInfo
-            privacyPolicyLinkStyle={{
-              color: Color.primary,
-            }}
             texts={{
               form: {
                 checkbox: 'This is an injected text for your brand',
@@ -346,8 +344,7 @@ const App = () => {
         return (
           <Checkout
             eventId={EVENT_ID}
-            hash={checkoutProps!.hash}
-            total={checkoutProps!.total}
+            checkoutData={checkoutProps!}
             onPaymentSuccess={handleOnPaymentSuccess}
             onPressExit={handleStripeError}
             areLoadingIndicatorsEnabled={false}

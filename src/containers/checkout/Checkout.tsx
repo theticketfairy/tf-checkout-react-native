@@ -14,6 +14,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import {
   fetchEventConditions,
+  fetchOrderDetails,
   fetchOrderReview,
   postOnFreeRegistration,
   postOnPaymentSuccess,
@@ -27,11 +28,11 @@ import { orderReviewItems } from './CheckoutData'
 import Conditions from './components/Conditions'
 import OrderReview from './components/OrderReview'
 import s from './styles'
-import { ICheckoutProps, IOrderItem } from './types'
+import { ICheckoutProps, IOrderDetails, IOrderItem } from './types'
 
 const Checkout = ({
   eventId,
-  hash,
+  checkoutData,
   onFetchOrderReviewError,
   onFetchOrderReviewSuccess,
   onFetchEventConditionsError,
@@ -47,6 +48,8 @@ const Checkout = ({
   areAlertsEnabled = true,
   areLoadingIndicatorsEnabled = true,
   onLoadingChange,
+  onFetchOrderDetailsError,
+  onFetchOrderDetailsSuccess,
 }: ICheckoutProps) => {
   const { confirmPayment, loading: isLoadingPayment } = useConfirmPayment()
   const [isLoading, setIsLoading] = useState(true)
@@ -82,13 +85,51 @@ const Checkout = ({
     setConditionsValues(tConditionsValues)
   }
 
+  const handleFetchOrderDetails = async () => {
+    showLoading()
+    const { orderDetailsData, orderDetailsError } = await fetchOrderDetails(
+      checkoutData.id
+    )
+    hideLoading()
+
+    if (orderDetailsError) {
+      onFetchOrderDetailsError?.(orderDetailsError)
+      return showAlert(
+        orderDetailsError.message || 'Error while fetching order details'
+      )
+    }
+
+    if (!orderDetailsData) {
+      onFetchOrderDetailsError?.({
+        code: 404,
+        message: 'No order data found',
+      })
+      return showAlert('No order data found')
+    }
+
+    const orderDetails: IOrderDetails = {
+      eventId: eventId,
+      ticketName: orderDetailsData.items[0]?.name,
+      ticketCost: orderDetailsData.items[0]?.price,
+      numberOfTickets: parseInt(orderDetailsData.items[0]?.quantity, 10),
+      eventUserTickets: _map(orderDetailsData.tickets, (ticket) => ({
+        qrCodeData: ticket.hash,
+        holderName: ticket.ticketType,
+        email: '',
+        phoneNumber: '',
+      })),
+    }
+
+    onFetchOrderDetailsSuccess?.(orderDetails)
+  }
+
   const handleOnPressFreeRegistration = async () => {
     showLoading()
     const { freeRegistrationData, freeRegistrationError } =
-      await postOnFreeRegistration(hash)
-    hideLoading()
+      await postOnFreeRegistration(checkoutData.hash)
 
     if (freeRegistrationError) {
+      hideLoading()
       if (onPaymentError) {
         onPaymentError(freeRegistrationError)
       }
@@ -97,9 +138,10 @@ const Checkout = ({
       )
     }
 
-    if (onPaymentSuccess) {
-      return onPaymentSuccess(freeRegistrationData)
-    }
+    hideLoading()
+    onPaymentSuccess?.(freeRegistrationData)
+
+    await handleFetchOrderDetails()
   }
 
   const handleOnPressPay = async () => {
@@ -130,39 +172,36 @@ const Checkout = ({
       }
     )
 
-    if (confirmPaymentError) {
+    if (confirmPaymentError || paymentIntent.status !== 'Succeeded') {
       hideLoading()
       if (onCheckoutCompletedError) {
         onCheckoutCompletedError({
-          message: confirmPaymentError.message,
-          extraData: confirmPaymentError.code,
+          message: confirmPaymentError?.message || 'Error confirming payment',
+          extraData: confirmPaymentError?.code,
         })
       }
-      showAlert(confirmPaymentError?.message || 'Error confirming payment')
-      return
+      return showAlert(
+        confirmPaymentError?.message || 'Error confirming payment'
+      )
     }
 
-    if (onCheckoutCompletedSuccess) {
-      onCheckoutCompletedSuccess(paymentIntent)
-    }
+    onCheckoutCompletedSuccess?.(checkoutData)
 
     const { data: onPaymentSuccessData, error: onPaymentSuccessError } =
-      await postOnPaymentSuccess(hash)
+      await postOnPaymentSuccess(checkoutData.hash)
 
     if (onPaymentSuccessError) {
       hideLoading()
-      if (onPaymentError) {
-        onPaymentError(onPaymentSuccessError)
-      }
+      onPaymentError?.(onPaymentSuccessError)
+
       return showAlert(
         onPaymentSuccessError.message || 'Error while performing payment'
       )
     }
 
     hideLoading()
-    if (onPaymentSuccess) {
-      onPaymentSuccess(onPaymentSuccessData)
-    }
+    onPaymentSuccess?.(onPaymentSuccessData)
+    await handleFetchOrderDetails()
   }
   //#endregion
 
@@ -218,7 +257,7 @@ const Checkout = ({
 
     const fetchOrderReviewAsync = async () => {
       const { data: orderReviewData, error: orderReviewError } =
-        await fetchOrderReview(hash)
+        await fetchOrderReview(checkoutData.hash)
       hideLoading()
 
       if (orderReviewError) {
@@ -333,10 +372,7 @@ const Checkout = ({
       />
     </View>
   ) : (
-    <KeyboardAwareScrollView
-      extraScrollHeight={32}
-      keyboardDismissMode='on-drag'
-    >
+    <KeyboardAwareScrollView extraScrollHeight={32}>
       <View style={styles?.rootStyle}>
         <View>
           <Text style={[s.title, styles?.title]}>
@@ -363,6 +399,7 @@ const Checkout = ({
           <Button
             text={texts?.payButton || 'PAY'}
             onPress={handleOnPressPay}
+            isLoading={isLoading || isLoadingPayment}
             isDisabled={!isDataValid}
             styles={{
               container: s.payButton,
