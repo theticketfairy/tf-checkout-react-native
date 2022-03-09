@@ -101,7 +101,7 @@ export interface IFreeRegistrationData {
   orderHash: string
 }
 export interface IFreeRegistrationResponse {
-  freeRegistrationError?: string
+  freeRegistrationError?: IError
   freeRegistrationData?: IFreeRegistrationData
 }
 //#endregion
@@ -166,7 +166,7 @@ export interface IOrderReview {
 }
 
 export interface IOrderReviewResponse {
-  error?: string
+  error?: IError
   data?: IOrderReview
 }
 

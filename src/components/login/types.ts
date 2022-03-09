@@ -39,6 +39,7 @@ export interface ILoginProps {
   onFetchAccessTokenError?: (error: IError) => void
   onFetchAccessTokenSuccess?: () => void
 
+  isLoginDialogVisible: boolean
   showLoginDialog: () => void
   hideLoginDialog: () => void
 
@@ -53,8 +54,6 @@ export interface ILoginProps {
   refs?: ILoginRefs
 
   brandImages?: ILoginBrandImages
-
-  isLoginDialogVisible: boolean
 }
 
 export interface ILoginViewStyles {

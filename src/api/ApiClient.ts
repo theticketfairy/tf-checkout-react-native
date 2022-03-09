@@ -611,11 +611,14 @@ export const checkoutOrder = async (
 
 //#region Checkout
 export const fetchEventConditions = async (eventId: string) => {
-  let responseError
+  let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.get(
     `v1/event/${eventId}/conditions`
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data
+    responseError = {
+      message: error.response?.data,
+      code: error.response?.status!,
+    }
   })
 
   return {
@@ -627,12 +630,15 @@ export const fetchEventConditions = async (eventId: string) => {
 export const fetchOrderReview = async (
   hash: string
 ): Promise<IOrderReviewResponse> => {
-  let responseError = ''
+  let responseError: IError | undefined
 
   const response: AxiosResponse | void = await Client.get(
     `v1/order/${hash}/review/`
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status!,
+    }
   })
 
   let resData: IOrderReview | undefined
@@ -645,7 +651,9 @@ export const fetchOrderReview = async (
       !payment_method.stripe_client_secret &&
       order_details.total !== '0.00'
     ) {
-      responseError = 'Stripe is not configured'
+      responseError = {
+        message: 'Stripe is not configured',
+      }
     } else {
       const {
         tickets: [ticket],
@@ -690,12 +698,16 @@ export const fetchOrderReview = async (
 }
 
 export const postOnPaymentSuccess = async (orderHash: string) => {
-  let responseError: string = ''
+  let responseError: IError | undefined
+
   const response: AxiosResponse | void = await Client.post(
     `v1/order/${orderHash}/success`
   ).catch((error: AxiosError) => {
-    responseError =
-      error.response?.data.message || 'Error while notifying Payment Success'
+    responseError = {
+      message:
+        error.response?.data.message || 'Error while notifying Payment Success',
+      code: error.response?.status,
+    }
   })
 
   return {
@@ -707,12 +719,16 @@ export const postOnPaymentSuccess = async (orderHash: string) => {
 export const postOnFreeRegistration = async (
   orderHash: string
 ): Promise<IFreeRegistrationResponse> => {
-  let responseError = ''
+  let responseError: IError | undefined
   let responseData: IFreeRegistrationData | undefined
+
   const res: AxiosResponse | void = await Client.post(
     `v1/order/${orderHash}/complete_free_registration`
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status,
+    }
   })
 
   if (res?.data) {

@@ -32,11 +32,11 @@ import { ICheckoutProps, IOrderItem } from './types'
 const Checkout = ({
   eventId,
   hash,
-  onFetchOrderReviewFail,
+  onFetchOrderReviewError,
   onFetchOrderReviewSuccess,
-  onFetchEventConditionsFail,
+  onFetchEventConditionsError,
   onFetchEventConditionsSuccess,
-  onCheckoutCompletedFail,
+  onCheckoutCompletedError,
   onCheckoutCompletedSuccess,
   onPaymentError,
   onPaymentSuccess,
@@ -87,12 +87,14 @@ const Checkout = ({
     const { freeRegistrationData, freeRegistrationError } =
       await postOnFreeRegistration(hash)
     hideLoading()
+
     if (freeRegistrationError) {
       if (onPaymentError) {
-        onPaymentError(freeRegistrationError || 'Error while registering')
+        onPaymentError(freeRegistrationError)
       }
-      showAlert(freeRegistrationError || 'Error while registering')
-      return
+      return showAlert(
+        freeRegistrationError.message || 'Error while registering'
+      )
     }
 
     if (onPaymentSuccess) {
@@ -103,12 +105,12 @@ const Checkout = ({
   const handleOnPressPay = async () => {
     if (!orderReview) {
       if (onPaymentError) {
-        onPaymentError(`Order data is missing ${JSON.stringify(orderReview)}`)
+        onPaymentError({
+          message: `Order data is missing ${JSON.stringify(orderReview)}`,
+        })
       }
 
-      showAlert('No order data found')
-
-      return
+      return showAlert('No order data found')
     }
 
     const { addressData } = orderReview
@@ -130,8 +132,11 @@ const Checkout = ({
 
     if (confirmPaymentError) {
       hideLoading()
-      if (onCheckoutCompletedFail) {
-        onCheckoutCompletedFail(confirmPaymentError?.message)
+      if (onCheckoutCompletedError) {
+        onCheckoutCompletedError({
+          message: confirmPaymentError.message,
+          extraData: confirmPaymentError.code,
+        })
       }
       showAlert(confirmPaymentError?.message || 'Error confirming payment')
       return
@@ -149,15 +154,14 @@ const Checkout = ({
       if (onPaymentError) {
         onPaymentError(onPaymentSuccessError)
       }
-      showAlert(onPaymentSuccessError || 'Error while performing payment')
-      return
+      return showAlert(
+        onPaymentSuccessError.message || 'Error while performing payment'
+      )
     }
 
     hideLoading()
     if (onPaymentSuccess) {
-      setTimeout(() => {
-        onPaymentSuccess(onPaymentSuccessData)
-      }, 200)
+      onPaymentSuccess(onPaymentSuccessData)
     }
   }
   //#endregion
@@ -196,11 +200,12 @@ const Checkout = ({
 
       if (conditionsError) {
         hideLoading()
-        if (onFetchEventConditionsFail) {
-          onFetchEventConditionsFail(conditionsError)
+        if (onFetchEventConditionsError) {
+          onFetchEventConditionsError(conditionsError)
         }
-        showAlert(conditionsError || 'Error while fetching conditions')
-        return
+        return showAlert(
+          conditionsError.message || 'Error while fetching conditions'
+        )
       }
 
       setConditionsValues(_map(conditionsData, () => false))
@@ -216,16 +221,24 @@ const Checkout = ({
         await fetchOrderReview(hash)
       hideLoading()
 
-      if (orderReviewError || !orderReviewData) {
+      if (orderReviewError) {
         hideLoading()
         setIsStripeConfigMissing(true)
-        if (onFetchOrderReviewFail) {
-          onFetchOrderReviewFail(
-            orderReviewError || 'Error while getting Order Review'
-          )
+        if (onFetchOrderReviewError) {
+          onFetchOrderReviewError(orderReviewError)
         }
-        showAlert(orderReviewError || 'Error while getting Order Review')
-        return
+        return showAlert(
+          orderReviewError?.message || 'Error while getting Order Review'
+        )
+      }
+
+      if (!orderReviewData) {
+        if (onFetchOrderReviewError) {
+          onFetchOrderReviewError({
+            message: 'No order review data found. Please try again later',
+          })
+        }
+        return showAlert('No order review data found. Please try again later')
       }
 
       hideLoading()

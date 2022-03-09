@@ -197,10 +197,23 @@ Then add it to the render function.
 
 ```js
 <Login
-  onLoginSuccessful={handleOnLoginDialogSuccess}
-  isLoginDialogVisible={isLoginDialogVisible}
-  showLoginDialog={() => setIsLoginDialogVisible(true)}
-  hideLoginDialog={() => setIsLoginDialogVisible(false)}
+  onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
+  onLoginError?: (error: IError) => void
+
+  onFetchUserProfileError?: (error: IError) => void
+  onFetchUserProfileSuccess?: (data: any) => void
+
+  onFetchAccessTokenError?: (error: IError) => void
+  onFetchAccessTokenSuccess?: () => void
+  
+  isLoginDialogVisible: boolean
+  showLoginDialog: () => void
+  hideLoginDialog: () => void
+
+  //Logout
+  onLogoutSuccess?: () => void
+  onLogoutError?: () => void
+
   userFirstName={loggedUserName}
   refs={{
     inputs?: {
@@ -221,6 +234,8 @@ Then add it to the render function.
     image2?: ImageSourcePropType
     image2Style?: StyleProp<ImageStyle>
   }
+  styles?: ILoginViewStyles
+  texts?: ILoginViewTexts
 />
 ```
 
@@ -294,8 +309,6 @@ interface ILoginViewStyles {
 ---
 
 ## Tickets
-
-![image](https://user-images.githubusercontent.com/66479719/151049068-450a52d9-dfc8-40bf-b12a-f2555a832c8d.png)
 
 Import the component from the library
 
@@ -663,6 +676,19 @@ import { Checkout } from 'tf-checkout-react-native'
 
 Add it to the render function.
 
+```js
+<Checkout
+  eventId={EVENT_ID}
+  hash={hash}
+  total={total}
+  onPaymentSuccess={handleOnPaymentSuccess}
+  onPressExit={handleStripeError}
+  areLoadingIndicatorsEnabled={false}
+  styles={styles}
+  {...props}
+/>
+```
+
 ### Props
 
 ```js
@@ -671,17 +697,17 @@ Add it to the render function.
   hash: string
   total: string
 
-  onFetchOrderReviewFail?: (error: string) => void
+  onFetchOrderReviewError?: (error: IError) => void
   onFetchOrderReviewSuccess?: (data: any) => void
 
-  onFetchEventConditionsFail?: (error: string) => void
+  onFetchEventConditionsError?: (error: IError) => void
   onFetchEventConditionsSuccess?: (data: any) => void
 
   onCheckoutCompletedSuccess?: (data: any) => void
-  onCheckoutCompletedFail?: (error: string) => void
+  onCheckoutCompletedError?: (error: IError) => void
 
   onPaymentSuccess: (data: any) => void
-  onPaymentError?: (error: string) => void
+  onPaymentError?: (error: IError) => void
 
   onStripeInitializeError?: (error: string) => void
 
@@ -747,7 +773,7 @@ Currently, Stripe card is not customizable. Please see the open issues in their 
 
 Additionally, if you are encountering problems with building your project, please take a look at the [Stripe troubleshooting](https://github.com/stripe/stripe-react-native#troubleshooting).
 
-
+---
 ## Purchase Confirmation
 
 Import the component from the library

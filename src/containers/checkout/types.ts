@@ -3,6 +3,7 @@ import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 import { IButtonStyles } from '../../components/button/types'
 import { IFormFieldProps } from '../../components/formField/types'
+import { IError } from '../../types'
 
 export interface ICheckoutStyles {
   rootStyle?: ViewStyle
@@ -29,17 +30,17 @@ export interface ICheckoutProps {
   hash: string
   total: string
 
-  onFetchOrderReviewFail?: (error: string) => void
+  onFetchOrderReviewError?: (error: IError) => void
   onFetchOrderReviewSuccess?: (data: any) => void
 
-  onFetchEventConditionsFail?: (error: string) => void
+  onFetchEventConditionsError?: (error: IError) => void
   onFetchEventConditionsSuccess?: (data: any) => void
 
   onCheckoutCompletedSuccess?: (data: any) => void
-  onCheckoutCompletedFail?: (error: string) => void
+  onCheckoutCompletedError?: (error: IError) => void
 
   onPaymentSuccess: (data: any) => void
-  onPaymentError?: (error: string) => void
+  onPaymentError?: (error: IError) => void
 
   onStripeInitializeError?: (error: string) => void
 
