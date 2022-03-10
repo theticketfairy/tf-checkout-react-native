@@ -364,6 +364,7 @@ const App = () => {
                 },
               },
 
+              
               title: {
                 color: Color.textMain,
               },
@@ -690,6 +691,9 @@ const App = () => {
                     backgroundColor: Color.primary,
                     borderRadius: 2,
                   },
+                  text: {
+                    color: Color.white,
+                  }
                 },
                 loggedIn: {
                   rootContainer: {

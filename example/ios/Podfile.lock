@@ -345,23 +345,19 @@ PODS:
     - React-Core
   - RNFS (2.18.0):
     - React
-  - Stripe (21.12.0):
-    - Stripe/Stripe3DS2 (= 21.12.0)
-    - StripeApplePay (= 21.12.0)
-    - StripeCore (= 21.12.0)
-    - StripeUICore (= 21.12.0)
-  - stripe-react-native (0.3.0):
+  - Stripe (21.9.1):
+    - Stripe/Stripe3DS2 (= 21.9.1)
+    - StripeCore (= 21.9.1)
+    - StripeUICore (= 21.9.1)
+  - stripe-react-native (0.2.3):
     - React-Core
-    - Stripe (~> 21.12.0)
-  - Stripe/Stripe3DS2 (21.12.0):
-    - StripeApplePay (= 21.12.0)
-    - StripeCore (= 21.12.0)
-    - StripeUICore (= 21.12.0)
-  - StripeApplePay (21.12.0):
-    - StripeCore (= 21.12.0)
-  - StripeCore (21.12.0)
-  - StripeUICore (21.12.0):
-    - StripeCore (= 21.12.0)
+    - Stripe (~> 21.9.0)
+  - Stripe/Stripe3DS2 (21.9.1):
+    - StripeCore (= 21.9.1)
+    - StripeUICore (= 21.9.1)
+  - StripeCore (21.9.1)
+  - StripeUICore (21.9.1):
+    - StripeCore (= 21.9.1)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -442,7 +438,6 @@ SPEC REPOS:
     - libevent
     - OpenSSL-Universal
     - Stripe
-    - StripeApplePay
     - StripeCore
     - StripeUICore
     - YogaKit
@@ -566,14 +561,13 @@ SPEC CHECKSUMS:
   RNCClipboard: cc054ad1e8a33d2a74cd13e565588b4ca928d8fd
   RNDateTimePicker: b829aa2110816633975f40161d04c42b64ca4459
   RNFS: 3ab21fa6c56d65566d1fb26c2228e2b6132e5e32
-  Stripe: c3692f360abcdfeef9751e3c240e7efbc68b921f
-  stripe-react-native: a8e376386d39d8668c399eec23ca9fee3f23f97f
-  StripeApplePay: 14db90fdf89abb2809ce41fc68bc6b1a86221408
-  StripeCore: 5e38cdea3dc176a32d8797ef312fe1ab41571272
-  StripeUICore: c28e371b385f968388ae38bedb93a2723c078442
+  Stripe: 22c1b8da5ee20a1aaf40fd198160efa72e71644a
+  stripe-react-native: 980f3d19f52a7dc4b373c6c20d30ebd760bc39e5
+  StripeCore: 91ea038ac0abbb72f11014044dfd1e5d39089714
+  StripeUICore: 7edf64b24c9c178bfd97e988f2cffdbb7a7628b0
   Yoga: 32a18c0e845e185f4a2a66ec76e1fd1f958f22fa
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
 PODFILE CHECKSUM: 9d2dead264e8a42ac453e46434ac53d9891db9dd
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.10.1

@@ -8,12 +8,14 @@
     "ios": "react-native run-ios",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "androidBuild": "cd ./android && ./gradlew assembleRelease -x bundleReleaseJsAndAssets",
+    "androidClear": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.15.14",
     "@react-native-clipboard/clipboard": "1.8.5",
-    "@stripe/stripe-react-native": "0.3.0",
+    "@stripe/stripe-react-native": "0.2.3",
     "react": "17.0.2",
     "react-native": "0.66.3",
     "react-native-fs": "2.18.0",
