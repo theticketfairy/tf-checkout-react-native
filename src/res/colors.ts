@@ -1,8 +1,4 @@
-import { Appearance } from 'react-native'
-
-const isDark = Appearance.getColorScheme() === 'dark'
-
-const lightTheme = {
+const colors = {
   primary: 'black',
   disabled: 'gray',
   white: 'white',
@@ -16,20 +12,4 @@ const lightTheme = {
   fff: '#fff',
 }
 
-const darkTheme = {
-  primary: 'white',
-  disabled: 'gray',
-  white: 'black',
-  black: 'white',
-  tint: 'rgba(100,100,100,0.7)',
-  transparentBlack: 'rgba(0,0,0,0.5)',
-  transparent: 'rgba(0,0,0,0)',
-  danger: '#D9534F',
-  listBackground: 'rgba(0,0,0,0.1)',
-  validGreen: '#139679',
-  fff: '#fff',
-}
-
-const currentTheme = isDark ? darkTheme : lightTheme
-
-export default currentTheme
+export default colors
