@@ -137,6 +137,11 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName '1.0'
+        configurations.all {
+          resolutionStrategy {
+            force 'com.stripe:stripe-android:18.1.0'
+          }
+        }
     }
     splits {
         abi {

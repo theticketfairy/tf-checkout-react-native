@@ -19,7 +19,7 @@ import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles from './styles'
 
-const EVENT_ID = 12342 //5420 // Replace with assigned ID
+const EVENT_ID = 10690 //5420 // Replace with assigned ID
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -102,8 +102,8 @@ const App = () => {
   //#region effects
   useEffect(() => {
     setConfig({
-      DOMAIN: 'https://houseofx.nyc',
-      BRAND: 'the-ticket-fairy',
+      DOMAIN: 'https://tickets.manacommon.com',
+      BRAND: 'mana-onetree-testing-brand',
       ARE_SUB_BRANDS_INCLUDED: true,
     })
   }, [])
