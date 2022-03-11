@@ -350,6 +350,10 @@ export const fetchOrderDetails = async (orderId: string) => {
           holderName: item.holder_name,
           status: item.status,
           pdfLink: item.pdf_link,
+          qrData: item.qr_data,
+          isSellable: item.is_sellable,
+          holderEmail: item.holder_email,
+          holderPhone: item.holder_phone,
         }
       }
     )

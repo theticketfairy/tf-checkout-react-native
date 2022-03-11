@@ -209,9 +209,13 @@ export interface IMyOrderDetailsItem {
 export interface IMyOrderDetailsTicket {
   hash: string
   ticketType: string
-  holderName: string
+  holderName?: string
+  holderEmail?: string
+  holderPhone?: string
   status: string
-  pdfLink: string
+  pdfLink?: string
+  qrData?: string
+  isSellable?: boolean
 }
 
 export interface IMyOrderDetailsHeader {

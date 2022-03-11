@@ -28,10 +28,13 @@ export interface ICheckoutStyles {
 }
 
 export interface IOrderDetailsTicketHolder {
-  qrCodeData: string
-  holderName: string
-  email?: string //TODO: remove optional when finish
-  phoneNumber?: string
+  hash: string
+  ticketType: string
+  holderName?: string
+  holderEmail?: string
+  holderPhone?: string
+  qrData?: string
+  pdfLink?: string
 }
 
 export interface IOrderDetails {

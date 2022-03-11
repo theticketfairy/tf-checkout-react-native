@@ -113,10 +113,13 @@ const Checkout = ({
       ticketCost: orderDetailsData.items[0]?.price,
       numberOfTickets: parseInt(orderDetailsData.items[0]?.quantity, 10),
       eventUserTickets: _map(orderDetailsData.tickets, (ticket) => ({
-        qrCodeData: ticket.hash,
-        holderName: ticket.ticketType,
-        email: '',
-        phoneNumber: '',
+        hash: ticket.hash,
+        ticketType: ticket.ticketType,
+        holderEmail: ticket.holderEmail,
+        holderPhone: ticket.holderPhone,
+        holderName: ticket.holderName,
+        qrData: ticket.qrData,
+        pdfLink: ticket.pdfLink,
       })),
     }
 

@@ -199,21 +199,23 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
           <Text style={styles?.ticketItem?.rowValue}>{item.status}</Text>
         </Text>
 
-        <Button
-          isLoading={downloadStatus === 'downloading'}
-          text={ticketsDownload}
-          styles={{
-            text: {
-              fontSize: 12,
-            },
-            button: {
-              height: 30,
-              marginVertical: 8,
-            },
-            ...styles?.downloadButton,
-          }}
-          onPress={() => onPressTicketDownload(item.pdfLink, item.hash)}
-        />
+        {item.pdfLink && (
+          <Button
+            isLoading={downloadStatus === 'downloading'}
+            text={ticketsDownload}
+            styles={{
+              text: {
+                fontSize: 12,
+              },
+              button: {
+                height: 30,
+                marginVertical: 8,
+              },
+              ...styles?.downloadButton,
+            }}
+            onPress={() => onPressTicketDownload(item.pdfLink, item.hash)}
+          />
+        )}
       </View>
     </View>
   )
