@@ -172,7 +172,7 @@ const Checkout = ({
       }
     )
 
-    if (confirmPaymentError || paymentIntent.status !== 'Succeeded') {
+    if (confirmPaymentError || paymentIntent?.status !== 'Succeeded') {
       hideLoading()
       if (onCheckoutCompletedError) {
         onCheckoutCompletedError({

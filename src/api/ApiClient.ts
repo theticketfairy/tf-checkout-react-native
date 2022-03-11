@@ -283,7 +283,7 @@ export const fetchMyOrders = async (
     events: [],
     orders: [],
   }
-  let responseError = ''
+  let responseError: IError | undefined
 
   const withFilterEvent = filter ? `&filter[event]=${filter}` : ''
   const withBrand = Config.BRAND ? `&filter[brand]=${Config.BRAND}` : ''
@@ -294,7 +294,10 @@ export const fetchMyOrders = async (
 
   const response: AxiosResponse | void = await Client.get(endpoint).catch(
     (error: AxiosError) => {
-      responseError = error.response?.data.message || 'Error fetching My Orders'
+      responseError = {
+        message: error.response?.data.message || 'Error fetching My Orders',
+        code: error.response?.status,
+      }
     }
   )
 

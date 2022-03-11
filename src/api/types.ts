@@ -192,7 +192,7 @@ export interface IMyOrdersData {
 
 export interface IMyOrdersResponse {
   myOrdersData?: IMyOrdersData
-  myOrdersError?: string
+  myOrdersError?: IError
 }
 //#endregion
 

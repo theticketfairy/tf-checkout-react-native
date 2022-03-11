@@ -28,6 +28,7 @@ const MyOrdersView = ({
   isGettingEventDetails,
   config,
   onFetchMoreOrders,
+  texts,
 }: IMyOrdersViewProps) => {
   const onEndReachedCalledDuringMomentum = useRef(false)
   const handleOnSelectOrder = (order: IMyOrdersOrder) => {
@@ -84,7 +85,7 @@ const MyOrdersView = ({
 
   const onClearSelectedEvent = () =>
     onChangeEvent({
-      label: 'Select event',
+      label: texts?.selectEventPlaceholder || 'Select event',
       value: '-1',
     })
 
@@ -125,7 +126,9 @@ const MyOrdersView = ({
             extraData={myOrders}
           />
         </View>
-        {isGettingEventDetails && <Loading />}
+        {config?.areActivityIndicatorsEnabled && isGettingEventDetails && (
+          <Loading />
+        )}
       </SafeAreaView>
     </View>
   )
