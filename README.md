@@ -15,8 +15,8 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 ### Android
 
 - Android 5.0 (API level 21) and above
-- Minimum Gradle plugin version `4.2.2`
-- Minimum Gradle version `6.7.1`
+- Gradle plugin version `4.2.2`
+- Gradle version `6.7.1`
 - Compile Sdk Version and Target Sdk Version `30`
 - Build Tools Version `30.0.2`
 - Java version `1.8`
@@ -820,12 +820,10 @@ Add it to the render function.
 | onComplete | To handle the completion of the flow. Here you can handle the unmount of the component or navigate to another screen |
 | styles | Styles for the component |
 | texts | Texts for the component  |
+
+
 ---
-
-## MyOrders
-
-![image](https://user-images.githubusercontent.com/66479719/151049211-5faebe6b-df3b-4785-ac0d-3adb7a3d6699.png)
-
+## My Orders
 If there is a valid session, there will appear a button to access `MyOrders` in the `Tickets` component.
 
 Import the component from the library.
@@ -834,80 +832,116 @@ Import the component from the library.
 import { MyOrders } from 'tf-checkout-react-native'
 ```
 
-There is no need to pass any data prop to it.
 
 ### Props
 
-`config` has properties to hide components.
-
-`isEventsDropdownHidden` if the Events dropdown should be hidden.
-
 ```js
-config={{
-  isEventsDropdownHidden: true,
-}}
-```
-
-`onSelectOrder` handler to know which order the user has selected. Will return an object with following structure:
-
-```js
-order: {
-  header: {
-    isReferralDisabled: boolean
-    shareLink: string
-    total: string
-    salesReferred: string
-  },
-  items: [
-    {
-      name: string
-      currency: string
-      price: string
-      discount: string
-      quantity: string
+{
+  onSelectOrder: (order: {
+    order: {
+    header: {
+      isReferralDisabled: boolean
+      shareLink: string
       total: string
+      salesReferred: string
     },
-    {...}
-  ],
-  tickets: [
-    {
-      hash: string
-      ticketType: string
-      holderName: string
-      status: string
-      pdfLink: string
-    },
-    {...}
-  ]
+    items: [
+      {
+        name: string
+        currency: string
+        price: string
+        discount: string
+        quantity: string
+        total: string
+      },
+      {...}
+    ],
+    tickets: [
+      {
+        hash: string
+        ticketType: string
+        holderName: string
+        status: string
+        pdfLink: string
+      },
+      {...}
+    ]
+  }
+  }) => void
+
+  onFetchMyOrdersSuccess?: () => void
+  onFetchMyOrdersError?: (error: IError) => void
+
+  onFetchOrderDetailsSuccess?: () => void
+  onFetchOrderDetailsError?: (error: IError) => void
+
+  onLoadingChange?: (isLoading: boolean) => void
+
+  styles?: IMyOrdersStyles
+  config?: {
+    isEventsDropdownHidden?: boolean
+    areActivityIndicatorsEnabled?: boolean
+    areAlertsEnabled?: boolean
+  }
+  texts?: {
+    selectEventPlaceholder?: string
+  }
 }
 ```
 
-`styles` to customize the component look & feel.
-
+### styles
 ```js
-export interface IMyOrdersStyles {
-  orderListItem?: IOrderListItemStyles
+{
+  orderListItem?: {
+    rootContainer?: StyleProp<ViewStyle>
+    contentContainer?: StyleProp<ViewStyle>
+    infoContainer?: StyleProp<ViewStyle>
+    infoTopContainer?: StyleProp<ViewStyle>
+    infoBottomContainer?: StyleProp<ViewStyle>
+    imageContainer?: StyleProp<ViewStyle>
+    image?: StyleProp<ImageStyle>
+    infoRootContainer?: StyleProp<ViewStyle>
+    iconNextContainer?: StyleProp<ViewStyle>
+    iconNext?: StyleProp<ImageStyle>
+    orderId?: StyleProp<TextStyle>
+    orderDate?: StyleProp<TextStyle>
+    eventName?: StyleProp<TextStyle>
+    priceContainer?: StyleProp<ViewStyle>
+    price?: StyleProp<TextStyle>
+    currency?: StyleProp<TextStyle>
+  }
   safeArea?: StyleProp<ViewStyle>
   listContainer?: StyleProp<ViewStyle>
   eventsContainer?: StyleProp<ViewStyle>
   eventsTitle?: StyleProp<TextStyle>
   refreshControlColor?: ColorValue
-  eventsDropdown?: IDropdownStyles
+  eventsDropdown?: {
+    container?: StyleProp<ViewStyle>
+    button?: StyleProp<ViewStyle>
+    icon?: StyleProp<ImageStyle>
+    label?: StyleProp<TextStyle>
+    dialog?: StyleProp<ViewStyle>
+    flatListContainer?: StyleProp<ViewStyle>
+    listItem?: {
+      container?: StyleProp<ViewStyle>
+      button?: StyleProp<ViewStyle>
+      buttonSelected?: StyleProp<ViewStyle>
+      text?: StyleProp<TextStyle>
+      textSelected?: StyleProp<TextStyle>
+    }
+
+  }
   rootContainer?: StyleProp<ViewStyle>
   eventsSelectionContainer?: StyleProp<ViewStyle>
   clearEventSelectionIcon?: StyleProp<ImageStyle>
 }
 ```
 
-`onFetchOrderDetailsFail` if the fetching fails, you can use this to know what happened.
-
 ---
 
 ## MyOrderDetails
 
-![image](https://user-images.githubusercontent.com/66479719/151049265-ebaabb75-58b1-4b22-bf99-83b1375b1a70.png)
-
-When user selects an order from the `MyOrders`component, will show it details.
+When user selects an order from the `MyOrders` component, will show it details.
 
 Import the component from the library.
 
@@ -917,44 +951,25 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
 
 ### Props
 
-`data` receives same data as the one of the object received from the `onSelectOrder` handler in `MyOrders`component:
-
 ```js
-order: {
-  header: {
-    isReferralDisabled: boolean
-    shareLink: string
-    total: string
-    salesReferred: string
-  },
-  items: [
-    {
-      name: string
-      currency: string
-      price: string
-      discount: string
-      quantity: string
-      total: string
-    },
-    {...}
-  ],
-  tickets: [
-    {
-      hash: string
-      ticketType: string
-      holderName: string
-      status: string
-      pdfLink: string
-    },
-    {...}
-  ]
-}
-```
-
-### styles
-
-```
-styles?: {
+{
+  data: IMyOrderDetailsResponse
+  config?: {
+    areActivityIndicatorsEnabled?: boolean
+    areAlertsEnabled?: boolean
+  }
+  onDownloadStatusChange?: (status?: 
+    'downloading' | 
+    'downloaded' | 
+    'failed'
+  ) => void
+  downloadStatusIcons?: {
+    success?: ImageSourcePropType
+    error?: ImageSourcePropType
+  }
+  onAndroidWritePermission?: (permission?: boolean) => void
+  onLinkCopied?: (copied?: boolean) => void
+  styles?: {
     rootContainer?: StyleProp<ViewStyle>
     header?: {
       container?: StyleProp<ViewStyle>
@@ -998,29 +1013,34 @@ styles?: {
     }
     downloadButton?: IButtonStyles
   }
-```
-
-### texts
-
-```js
-texts?: {
-  title?: string
-  subTitle?: string
-  referralLink?: string
-  listItem?: {
+  texts?: {
     title?: string
-    ticketType?: string
-    price?: string
-    quantity?: string
-    total?: string
-  }
-  ticketItem?: {
-    title?: string
-    ticketId?: string
-    ticketType?: string
-    ticketHolder?: string
-    status?: string
-    download?: string
+    subTitle?: string
+    referralLink?: string
+    listItem?: {
+      title?: string
+      ticketType?: string
+      price?: string
+      quantity?: string
+      total?: string
+    }
+    ticketItem?: {
+      title?: string
+      ticketId?: string
+      ticketType?: string
+      ticketHolder?: string
+      status?: string
+      download?: string
+    }
+    downloadNotification?: {
+      successMessage?: string
+      errorMessage?: string
+    }
+    copyText?: {
+      copy?: string
+      copied?: string
+    }
   }
 }
 ```
+
