@@ -1,25 +1,36 @@
-import React from 'react'
-import { Image, Text, View } from 'react-native'
+import React, { FC } from 'react'
+import { Image, ImageSourcePropType, Text, View } from 'react-native'
 
 import R from '../../../res'
 import { NotificationStyles as s } from './styles'
 
-export interface INotificationProps {
-  isSuccess: boolean
-  text?: string
+export interface INotificationIcons {
+  success?: ImageSourcePropType
+  error?: ImageSourcePropType
 }
 
-const Notification = ({ isSuccess, text }: INotificationProps) => {
-  const textToShow = text
-    ? text
-    : isSuccess
-    ? 'File downloaded successfully'
-    : 'There was an error downloading the file'
+export interface INotificationProps {
+  isSuccess: boolean
+  textSuccess?: string
+  textError?: string
+
+  icons?: INotificationIcons
+}
+
+const Notification: FC<INotificationProps> = ({
+  isSuccess,
+  textSuccess = 'File downloaded successfully',
+  textError = 'There was an error downloading the file',
+  icons,
+}) => {
+  const textToShow = isSuccess ? textSuccess : textError
+  const successIcon = icons?.success || R.icons.check
+  const errorIcon = icons?.error || R.icons.error
   return (
     <View style={s.rootContainer}>
       <Text style={s.text}>{textToShow}</Text>
       <Image
-        source={isSuccess ? R.icons.check : R.icons.error}
+        source={isSuccess ? successIcon : errorIcon}
         style={isSuccess ? s.iconSuccess : s.iconError}
       />
     </View>
