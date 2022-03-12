@@ -43,6 +43,7 @@ export interface ITicketsViewProps {
     title?: string
     waitingList?: IWaitingListTexts
     loggedIn?: ILoggedInTexts
+    listItem?: ITicketListItemTexts
   }
   event?: IEvent
   isWaitingListVisible?: boolean

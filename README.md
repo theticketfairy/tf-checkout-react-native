@@ -492,7 +492,7 @@ You can then call the `BillingInfo` component and pass them as props in the `car
     successTitle?: string
     successMessage?: string
   }
-  loggedIn?: {
+  loggedInTexts?: {
     logoutDialog?: {
       title?: string
       message?: string
@@ -501,6 +501,15 @@ You can then call the `BillingInfo` component and pass them as props in the `car
     }
     myOrderButtonText?: string
     logOutButtonText?: string
+  }
+  listItem?: {
+    soldOut?: string
+    salesNotStarted?: string
+    salesEnded?: string
+    inclFees?: string
+    exclFees?: string
+    free?: string
+    ticket?: string
   }
 }
 ```

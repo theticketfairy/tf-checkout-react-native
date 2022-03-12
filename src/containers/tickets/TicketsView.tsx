@@ -60,6 +60,7 @@ const TicketsView = ({
               ticketNumber={index}
               selectedTicket={selectedTicket}
               styles={styles?.ticketList?.item}
+              texts={texts?.listItem}
               {...item}
             />
           )}
