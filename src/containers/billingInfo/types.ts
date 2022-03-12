@@ -147,6 +147,8 @@ export interface IBillingInfoViewTexts {
     zipCode?: string
     dateOfBirth?: string
     isSubToBrand?: string
+    isSubToTicketFairy?: string
+    privacyPolicy?: string
     ticketHoldersTitle?: string
     ticketHolderItem?: string
     holderFirstName?: string

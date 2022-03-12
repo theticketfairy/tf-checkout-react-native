@@ -1031,14 +1031,13 @@ const Billing: FC<IBillingProps> = ({
             isActive={isSubToTicketFairy}
             customTextComp={
               <Text style={styles?.customCheckbox?.text}>
-                I agree that The Ticket Fairy may use the personal data that I
-                have provided for marketing purposes, such as recommending
-                events that I might be interested in, in accordance with its{' '}
+                {texts?.form?.isSubToTicketFairy ||
+                  `I agree that The Ticket Fairy may use the personal data that have provided for marketing purposes, such as recommending events that I might be interested in, in accordance with its `}
                 <Text
                   style={styles?.privacyPolicyLinkStyle}
                   onPress={handleOpenPrivacyLink}
                 >
-                  Privacy Policy
+                  {texts?.form?.privacyPolicy || 'Privacy Policy'}
                 </Text>
                 .
               </Text>
