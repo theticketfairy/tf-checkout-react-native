@@ -1,30 +1,42 @@
 import _map from 'lodash/map'
 import _sortBy from 'lodash/sortBy'
 import _uniqBy from 'lodash/uniqBy'
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
 import { fetchMyOrders, fetchOrderDetails } from '../../api/ApiClient'
 import { IMyOrdersOrder } from '../../api/types'
 import { IDropdownItem } from '../../components/dropdown/types'
+import { IError } from '../../types'
 import MyOrdersView from './MyOrdersView'
 import { IMyOrdersProps } from './types'
 
 const MyOrders: FC<IMyOrdersProps> = ({
   onSelectOrder,
-  onFetchOrderDetailsFail,
+  onFetchOrderDetailsError,
+  onFetchMyOrdersError,
+  onFetchMyOrdersSuccess,
+  onFetchOrderDetailsSuccess,
+  onLoadingChange,
   styles,
+  texts,
   config,
 }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isGettingEventDetails, setIsGettingEventDetails] = useState(false)
   const [myEvents, setMyEvents] = useState<IDropdownItem[]>([])
   const [selectedEvent, setSelectedEvent] = useState<IDropdownItem>({
-    label: 'Select event',
+    label: texts?.selectEventPlaceholder || 'Select event',
     value: '-1',
   })
   const [myOrders, setMyOrders] = useState<IMyOrdersOrder[]>([])
   const currentPage = useRef(1)
+
+  const showAlert = (text: string) => {
+    if (config?.areAlertsEnabled) {
+      Alert.alert('', text)
+    }
+  }
 
   const getOrdersAsync = async (): Promise<undefined | IMyOrdersOrder[]> => {
     setIsLoading(true)
@@ -35,10 +47,23 @@ const MyOrders: FC<IMyOrdersProps> = ({
       validSelectedEvent?.value.toString()
     )
     setIsLoading(false)
-    if (myOrdersError || !myOrdersData) {
-      Alert.alert('', myOrdersError)
+
+    if (myOrdersError) {
+      onFetchMyOrdersError?.(myOrdersError)
+      showAlert(myOrdersError.message)
       return undefined
     }
+
+    if (!myOrdersData) {
+      const altError: IError = {
+        message: 'My orders returned no data',
+      }
+      onFetchMyOrdersError?.(altError)
+      showAlert(altError.message)
+      return undefined
+    }
+
+    onFetchMyOrdersSuccess?.()
 
     const events = _sortBy(
       _map(myOrdersData.events, (item) => {
@@ -71,9 +96,17 @@ const MyOrders: FC<IMyOrdersProps> = ({
 
   useEffect(() => {
     getOrders()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEvent])
 
   //#region Handlers
+  const handleOnLoadingChange = useCallback(
+    (loading: boolean) => {
+      onLoadingChange?.(loading)
+    },
+    [onLoadingChange]
+  )
+
   const handleOnChangeEvent = (event: IDropdownItem) => {
     if (event.value !== selectedEvent.value) {
       currentPage.current = 1
@@ -95,10 +128,17 @@ const MyOrders: FC<IMyOrdersProps> = ({
       order.id
     )
     setIsGettingEventDetails(false)
-    if ((!orderDetailsData || orderDetailsError) && onFetchOrderDetailsFail) {
-      return onFetchOrderDetailsFail(orderDetailsError!)
+    if ((!orderDetailsData || orderDetailsError) && onFetchOrderDetailsError) {
+      showAlert(orderDetailsError?.message ?? 'Error fetching order details')
+      return onFetchOrderDetailsError(
+        orderDetailsError || {
+          message: 'Order details returned no data',
+        }
+      )
     }
+
     if (orderDetailsData) {
+      onFetchOrderDetailsSuccess?.()
       onSelectOrder(orderDetailsData)
     }
   }
@@ -106,10 +146,15 @@ const MyOrders: FC<IMyOrdersProps> = ({
 
   //#region useEffect
   useEffect(() => {
+    handleOnLoadingChange(isLoading || isGettingEventDetails)
+  }, [handleOnLoadingChange, isLoading, isGettingEventDetails])
+
+  useEffect(() => {
     const _fetchMyOrders = async () => {
       await getOrders()
     }
     _fetchMyOrders()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   //#endregion
 
@@ -126,6 +171,7 @@ const MyOrders: FC<IMyOrdersProps> = ({
       styles={styles}
       config={config}
       onFetchMoreOrders={handleOnFetchMoreOrders}
+      texts={texts}
     />
   )
 }

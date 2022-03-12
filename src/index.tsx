@@ -13,9 +13,9 @@ import {
   Tickets,
 } from './containers'
 import { IOnCheckoutSuccess } from './containers/billingInfo/types'
-import { IAddToCartSuccess, ITicketsProps } from './containers/tickets/types'
+import { ITicketsProps } from './containers/tickets/types'
 import { setConfig } from './helpers/Config'
-import { IUserProfile } from './types'
+import { ITicketsResponseData, IUserProfile } from './types'
 
 LogBox.ignoreAllLogs()
 // @ts-ignore
@@ -24,11 +24,11 @@ console.reportErrorsAsExceptions = false
 export {
   BillingInfo,
   Checkout,
-  IAddToCartSuccess,
   IMyOrderDetailsResponse,
   IMyOrdersOrder,
   IOnCheckoutSuccess,
   ITicketsProps,
+  ITicketsResponseData,
   IUserProfile,
   LoggedIn,
   Login,

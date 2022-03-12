@@ -14,6 +14,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import {
   fetchEventConditions,
+  fetchOrderDetails,
   fetchOrderReview,
   postOnFreeRegistration,
   postOnPaymentSuccess,
@@ -27,16 +28,16 @@ import { orderReviewItems } from './CheckoutData'
 import Conditions from './components/Conditions'
 import OrderReview from './components/OrderReview'
 import s from './styles'
-import { ICheckoutProps, IOrderItem } from './types'
+import { ICheckoutProps, IOrderDetails, IOrderItem } from './types'
 
 const Checkout = ({
   eventId,
-  hash,
-  onFetchOrderReviewFail,
+  checkoutData,
+  onFetchOrderReviewError,
   onFetchOrderReviewSuccess,
-  onFetchEventConditionsFail,
+  onFetchEventConditionsError,
   onFetchEventConditionsSuccess,
-  onCheckoutCompletedFail,
+  onCheckoutCompletedError,
   onCheckoutCompletedSuccess,
   onPaymentError,
   onPaymentSuccess,
@@ -47,8 +48,10 @@ const Checkout = ({
   areAlertsEnabled = true,
   areLoadingIndicatorsEnabled = true,
   onLoadingChange,
+  onFetchOrderDetailsError,
+  onFetchOrderDetailsSuccess,
 }: ICheckoutProps) => {
-  const { confirmPayment } = useConfirmPayment()
+  const { confirmPayment, loading: isLoadingPayment } = useConfirmPayment()
   const [isLoading, setIsLoading] = useState(true)
   const [orderReview, setOrderReview] = useState<IOrderReview>()
   const [conditionsTexts, setConditionsTexts] = useState<string[]>([])
@@ -82,33 +85,77 @@ const Checkout = ({
     setConditionsValues(tConditionsValues)
   }
 
+  const handleFetchOrderDetails = async () => {
+    showLoading()
+    const { orderDetailsData, orderDetailsError } = await fetchOrderDetails(
+      checkoutData.id
+    )
+    hideLoading()
+
+    if (orderDetailsError) {
+      onFetchOrderDetailsError?.(orderDetailsError)
+      return showAlert(
+        orderDetailsError.message || 'Error while fetching order details'
+      )
+    }
+
+    if (!orderDetailsData) {
+      onFetchOrderDetailsError?.({
+        code: 404,
+        message: 'No order data found',
+      })
+      return showAlert('No order data found')
+    }
+
+    const orderDetails: IOrderDetails = {
+      eventId: eventId,
+      ticketName: orderDetailsData.items[0]?.name,
+      ticketCost: orderDetailsData.items[0]?.price,
+      numberOfTickets: parseInt(orderDetailsData.items[0]?.quantity, 10),
+      eventUserTickets: _map(orderDetailsData.tickets, (ticket) => ({
+        hash: ticket.hash,
+        ticketType: ticket.ticketType,
+        holderEmail: ticket.holderEmail,
+        holderPhone: ticket.holderPhone,
+        holderName: ticket.holderName,
+        qrData: ticket.qrData,
+        pdfLink: ticket.pdfLink,
+      })),
+    }
+
+    onFetchOrderDetailsSuccess?.(orderDetails)
+  }
+
   const handleOnPressFreeRegistration = async () => {
     showLoading()
     const { freeRegistrationData, freeRegistrationError } =
-      await postOnFreeRegistration(hash)
-    hideLoading()
+      await postOnFreeRegistration(checkoutData.hash)
+
     if (freeRegistrationError) {
+      hideLoading()
       if (onPaymentError) {
-        onPaymentError(freeRegistrationError || 'Error while registering')
+        onPaymentError(freeRegistrationError)
       }
-      showAlert(freeRegistrationError || 'Error while registering')
-      return
+      return showAlert(
+        freeRegistrationError.message || 'Error while registering'
+      )
     }
 
-    if (onPaymentSuccess) {
-      return onPaymentSuccess(freeRegistrationData)
-    }
+    hideLoading()
+    onPaymentSuccess?.(freeRegistrationData)
+
+    await handleFetchOrderDetails()
   }
 
   const handleOnPressPay = async () => {
     if (!orderReview) {
       if (onPaymentError) {
-        onPaymentError(`Order data is missing ${JSON.stringify(orderReview)}`)
+        onPaymentError({
+          message: `Order data is missing ${JSON.stringify(orderReview)}`,
+        })
       }
 
-      showAlert('No order data found')
-
-      return
+      return showAlert('No order data found')
     }
 
     const { addressData } = orderReview
@@ -128,37 +175,36 @@ const Checkout = ({
       }
     )
 
-    if (confirmPaymentError) {
+    if (confirmPaymentError || paymentIntent?.status !== 'Succeeded') {
       hideLoading()
-      if (onCheckoutCompletedFail) {
-        onCheckoutCompletedFail(confirmPaymentError?.message)
+      if (onCheckoutCompletedError) {
+        onCheckoutCompletedError({
+          message: confirmPaymentError?.message || 'Error confirming payment',
+          extraData: confirmPaymentError?.code,
+        })
       }
-      showAlert(confirmPaymentError?.message || 'Error confirming payment')
-      return
+      return showAlert(
+        confirmPaymentError?.message || 'Error confirming payment'
+      )
     }
 
-    if (onCheckoutCompletedSuccess) {
-      onCheckoutCompletedSuccess(paymentIntent)
-    }
+    onCheckoutCompletedSuccess?.(checkoutData)
 
     const { data: onPaymentSuccessData, error: onPaymentSuccessError } =
-      await postOnPaymentSuccess(hash)
+      await postOnPaymentSuccess(checkoutData.hash)
 
     if (onPaymentSuccessError) {
       hideLoading()
-      if (onPaymentError) {
-        onPaymentError(onPaymentSuccessError)
-      }
-      showAlert(onPaymentSuccessError || 'Error while performing payment')
-      return
+      onPaymentError?.(onPaymentSuccessError)
+
+      return showAlert(
+        onPaymentSuccessError.message || 'Error while performing payment'
+      )
     }
 
     hideLoading()
-    if (onPaymentSuccess) {
-      setTimeout(() => {
-        onPaymentSuccess(onPaymentSuccessData)
-      }, 200)
-    }
+    onPaymentSuccess?.(onPaymentSuccessData)
+    await handleFetchOrderDetails()
   }
   //#endregion
 
@@ -196,11 +242,12 @@ const Checkout = ({
 
       if (conditionsError) {
         hideLoading()
-        if (onFetchEventConditionsFail) {
-          onFetchEventConditionsFail(conditionsError)
+        if (onFetchEventConditionsError) {
+          onFetchEventConditionsError(conditionsError)
         }
-        showAlert(conditionsError || 'Error while fetching conditions')
-        return
+        return showAlert(
+          conditionsError.message || 'Error while fetching conditions'
+        )
       }
 
       setConditionsValues(_map(conditionsData, () => false))
@@ -213,19 +260,27 @@ const Checkout = ({
 
     const fetchOrderReviewAsync = async () => {
       const { data: orderReviewData, error: orderReviewError } =
-        await fetchOrderReview(hash)
+        await fetchOrderReview(checkoutData.hash)
       hideLoading()
 
-      if (orderReviewError || !orderReviewData) {
+      if (orderReviewError) {
         hideLoading()
         setIsStripeConfigMissing(true)
-        if (onFetchOrderReviewFail) {
-          onFetchOrderReviewFail(
-            orderReviewError || 'Error while getting Order Review'
-          )
+        if (onFetchOrderReviewError) {
+          onFetchOrderReviewError(orderReviewError)
         }
-        showAlert(orderReviewError || 'Error while getting Order Review')
-        return
+        return showAlert(
+          orderReviewError?.message || 'Error while getting Order Review'
+        )
+      }
+
+      if (!orderReviewData) {
+        if (onFetchOrderReviewError) {
+          onFetchOrderReviewError({
+            message: 'No order review data found. Please try again later',
+          })
+        }
+        return showAlert('No order review data found. Please try again later')
       }
 
       hideLoading()
@@ -320,10 +375,7 @@ const Checkout = ({
       />
     </View>
   ) : (
-    <KeyboardAwareScrollView
-      extraScrollHeight={32}
-      keyboardDismissMode='on-drag'
-    >
+    <KeyboardAwareScrollView extraScrollHeight={32}>
       <View style={styles?.rootStyle}>
         <View>
           <Text style={[s.title, styles?.title]}>
@@ -355,6 +407,7 @@ const Checkout = ({
           <Button
             text={texts?.payButton || 'PAY'}
             onPress={handleOnPressPay}
+            isLoading={isLoading || isLoadingPayment}
             isDisabled={!isDataValid}
             styles={{
               container: s.payButton,
@@ -366,7 +419,7 @@ const Checkout = ({
           <Button
             text={texts?.freeRegistrationButton || 'COMPLETE REGISTRATION'}
             onPress={handleOnPressFreeRegistration}
-            isLoading={isLoading}
+            isLoading={isLoading || isLoadingPayment}
             styles={styles?.freeRegistrationButton}
           />
         )}

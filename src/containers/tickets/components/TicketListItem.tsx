@@ -16,18 +16,23 @@ const TicketListItem = ({
   styles,
   texts,
 }: ITicketListItemProps) => {
+  const soldOutText = texts?.soldOut || 'SOLD OUT'
+  const salesNotStartedText = texts?.salesNotStarted || 'Sales not started'
+  const salesEnded = texts?.salesEnded || 'Sales ended'
+  const feesIncludedText = texts?.inclFees || '(incl. Fees)'
+  const feesExcludedText = texts?.exclFees || '(excl. Fees)'
+  const freeText = texts?.free || 'Free'
+  const ticketText = texts?.ticket || 'Ticket'
   const isSoldOut = ticket.sold_out || !ticket.displayTicket || ticket.soldOut
-
   const isSalesClosed = !ticket.salesStarted || ticket.salesEnded
-
-  const customSoldOutMessage = texts?.soldOut ? texts.soldOut : 'SOLD OUT'
+  const customSoldOutMessage = texts?.soldOut || 'SOLD OUT'
   const soldOutMessage = ticket.soldOutMessage
     ? `${ticket.soldOutMessage}`.toUpperCase()
     : customSoldOutMessage
 
   const ticketsClosedMessage = !ticket.salesStarted
-    ? 'Sales not started'
-    : 'Sales Ended'
+    ? salesNotStartedText
+    : salesEnded
 
   const getSelectOptions = (
     maxCount: number = 10,
@@ -58,14 +63,13 @@ const TicketListItem = ({
       ? selectedTicket.selectedOption
       : { label: '0', value: 0 }
 
-  const feesIncluded = ticket.feeIncluded ? '(incl. Fees)' : '(excl. Fees)'
-
+  const feesIncluded = ticket.feeIncluded ? feesIncludedText : feesExcludedText
   const showOldPrice = ticket.price !== ticket.oldPrice
   const isTicketFree = +ticket.price === 0
   const ticketPrice = isSoldOut
-    ? 'SOLD OUT'
+    ? soldOutText
     : isTicketFree
-    ? 'FREE'
+    ? freeText
     : priceWithCurrency(ticket.price.toFixed(2).toString(), ticket.priceSymbol)
 
   const maximumOption = _maxBy(dropdownOptions, (o) => o.value)?.value
@@ -94,7 +98,7 @@ const TicketListItem = ({
     <View style={[s.container, styles?.container]}>
       <View style={s.leftContainer}>
         <Text style={[s.ticketNumber, styles?.ticketName]} numberOfLines={2}>
-          {ticket.displayName.toUpperCase() || `TICKET ${ticketNumber}`}
+          {ticket.displayName.toUpperCase() || `${ticketText} ${ticketNumber}`}
         </Text>
         {isSoldOut ? (
           <View style={[s.soldOutContainer, styles?.soldOutContainer]}>

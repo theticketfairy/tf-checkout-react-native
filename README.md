@@ -15,8 +15,8 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 ### Android
 
 - Android 5.0 (API level 21) and above
-- Minimum Gradle plugin version `4.2.2`
-- Minimum Gradle version `6.7.1`
+- Gradle plugin version `4.2.2`
+- Gradle version `6.7.1`
 - Compile Sdk Version and Target Sdk Version `30`
 - Build Tools Version `30.0.2`
 - Java version `1.8`
@@ -195,10 +195,23 @@ Then add it to the render function.
 
 ```js
 <Login
-  onLoginSuccessful={handleOnLoginDialogSuccess}
-  isLoginDialogVisible={isLoginDialogVisible}
-  showLoginDialog={() => setIsLoginDialogVisible(true)}
-  hideLoginDialog={() => setIsLoginDialogVisible(false)}
+  onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
+  onLoginError?: (error: IError) => void
+
+  onFetchUserProfileError?: (error: IError) => void
+  onFetchUserProfileSuccess?: (data: any) => void
+
+  onFetchAccessTokenError?: (error: IError) => void
+  onFetchAccessTokenSuccess?: () => void
+  
+  isLoginDialogVisible: boolean
+  showLoginDialog: () => void
+  hideLoginDialog: () => void
+
+  //Logout
+  onLogoutSuccess?: () => void
+  onLogoutError?: () => void
+
   userFirstName={loggedUserName}
   refs={{
     inputs?: {
@@ -219,6 +232,8 @@ Then add it to the render function.
     image2?: ImageSourcePropType
     image2Style?: StyleProp<ImageStyle>
   }
+  styles?: ILoginViewStyles
+  texts?: ILoginViewTexts
 />
 ```
 
@@ -289,10 +304,9 @@ interface ILoginViewStyles {
     cancel?: string
   }
 ```
+---
 
-# Tickets
-
-![image](https://user-images.githubusercontent.com/66479719/151049068-450a52d9-dfc8-40bf-b12a-f2555a832c8d.png)
+## Tickets
 
 Import the component from the library
 
@@ -306,15 +320,34 @@ Then add it to the render function.
 <Tickets eventId={EVENT_ID} onAddToCartSuccess={handleOnAddToCartSuccess} />
 ```
 
-## Props
+### Props
 
 ```js
 {
   eventId: number
 
-  onAddToCartSuccess: (data: IAddToCartSuccess) => void
-  onAddToCartError?: (error: any) => void
-  onFetchTicketsError?: (error: any) => void
+  // Callbacks for when user taps on GET Tickets button
+  onAddToCartSuccess: (data: {
+    isBillingRequired: boolean
+    isPhoneRequired?: boolean
+    isAgeRequired?: boolean
+    minimumAge?: number
+    isNameRequired?: boolean
+  }) => void
+  onAddToCartError?: (error: {
+    code: number
+    message: string
+    extraData?: any
+  }) => void
+  
+  // Callbacks for fetching the tickets
+  onFetchTicketsError?: (error: {
+    code: number
+    message: string
+    extraData?: any
+  }) => void
+  
+  // Callbacks for fetching the Event base on the eventId prop
   onFetchTicketsSuccess?: (data: {
     tickets: ITicket[]
     promoCodeResponse: {
@@ -324,7 +357,19 @@ Then add it to the render function.
     isInWaitingList: boolean
     isAccessCodeRequired: boolean
   }) => void
-  onFetchEventError?: (error: string) => void
+  onFetchEventError?: (error: {
+    code: number
+    message: string
+    extraData?: any
+  }) => void
+
+  // Callbacks for Waiting list
+  onAddToWaitingListSuccess?: (data: any) => void
+  onAddToWaitingListError?: (error: {
+    code: number
+    message: string
+    extraData?: any
+  }) => void
 
   styles?: ITicketsViewStyles
   texts?: ITicketsViewTexts
@@ -334,6 +379,11 @@ Then add it to the render function.
 
   onPressMyOrders: () => void
   onPressLogout?: () => void
+
+  // With the following 3 props you can control the visibility of the stock loading indicators and alerts, so you can use your own.
+  onLoadingChange?: (isLoading: boolean) => void
+  areAlertsEnabled?: boolean
+  areLoadingIndicatorsEnabled?: boolean
 }
 ```
 
@@ -343,8 +393,10 @@ Then add it to the render function.
 ```js
 {
   isBillingRequired: boolean
-  isNameRequired: boolean
-  isAgeRequired: boolean
+  isPhoneRequired?: boolean
+  isAgeRequired?: boolean
+  minimumAge?: number
+  isNameRequired?: boolean
 }
 ```
 
@@ -352,10 +404,7 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 
 `onFetchTicketsSuccess` When tickets fetching was successful, will return fetched data, including `promoCodeResponse`.
 
-## styles
-
-Receives several props to style its sub-components.
-
+### styles
 ```js
 {
   rootContainer?: ViewStyle
@@ -363,22 +412,109 @@ Receives several props to style its sub-components.
   title?: TextStyle
   getTicketsButtonDisabled?: IButtonStyles
   getTicketsButtonActive?: IButtonStyles
-  promoCode?: IPromoCodeStyles
-  ticketList?: ITicketListStyles
-  loading?: ILoadingStyles
-  waitingList?: IWaitingListStyles
-  loggedIn?: ILoggedInStyles
+  promoCode?: {
+    rootContainer?: StyleProp<ViewStyle>
+    contentWrapper?: StyleProp<ViewStyle>
+    content?: StyleProp<ViewStyle>
+    input?: TextInputProps['style']
+    inputPlaceholderColor?: string
+    title?: StyleProp<TextStyle>
+
+    mainButton?: IButtonStyles
+    cancelButton?: IButtonStyles
+    applyButton?: IButtonStyles
+    applyDisabledButton?: IButtonStyles
+
+    messageContainer?: StyleProp<ViewStyle>
+    message?: StyleProp<TextStyle>
+  }
+  ticketList?: {
+    listContainer?: ViewStyle
+    item?: {
+      container?: ViewStyle
+      ticketName?: TextStyle
+      price?: TextStyle
+      oldPrice?: TextStyle
+      fees?: TextStyle
+      soldOutText?: TextStyle
+      soldOutContainer?: ViewStyle
+      dropdown?: IDropdownStyles
+      pricesContainer?: StyleProp<ViewStyle>
+    }
+  }
+  loading?: {
+    animation?: {
+      color?: ActivityIndicatorProps['color']
+      size?: ActivityIndicatorProps['size']
+    }
+    content?: ViewStyle
+    text?: TextStyle
+  }
+  waitingList?: {
+    rootContainer?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+    button?: IButtonStyles
+    input?: IInputStyles
+    buttonDisabled?: IButtonStyles
+    success?: {
+      container?: StyleProp<ViewStyle>
+      title?: StyleProp<ViewStyle>
+      message?: StyleProp<ViewStyle>
+    }
+  }
+  loggedIn?: {
+    rootContainer?: StyleProp<ViewStyle>
+    myOrdersButton?: IButtonStyles
+    logOutButton?: IButtonStyles
+  }
 }
 ```
 
-<img width="790" alt="props" src="https://user-images.githubusercontent.com/66479719/153976200-4bd6b254-6e80-49d6-bacc-076c59873434.png">
-
-<img width="675" alt="Screen Shot 2022-02-14 at 19 37 40" src="https://user-images.githubusercontent.com/66479719/153976314-9b4431bd-ea2f-49db-87ab-fb7d68b02a0c.png">
-
-<img width="682" alt="image" src="https://user-images.githubusercontent.com/66479719/154126406-101af4ca-7586-4686-9a93-88ef0375968e.png">
-
-
-# BillingInfo
+### texts
+```js
+{
+  promoCode?: {
+    promoCodeButton?: string
+    inputPlaceHolder?: string
+    apply?: string
+    cancel?: string
+    mainButton?: string
+    title?: string
+  }
+  getTicketsButton?: string
+  title?: string
+  waitingList?: {
+    title?: string
+    firstName?: string
+    lastName?: string
+    email?: string
+    button?: string
+    successTitle?: string
+    successMessage?: string
+  }
+  loggedInTexts?: {
+    logoutDialog?: {
+      title?: string
+      message?: string
+      confirmButton?: string
+      cancelButton?: string
+    }
+    myOrderButtonText?: string
+    logOutButtonText?: string
+  }
+  listItem?: {
+    soldOut?: string
+    salesNotStarted?: string
+    salesEnded?: string
+    inclFees?: string
+    exclFees?: string
+    free?: string
+    ticket?: string
+  }
+}
+```
+---
+## BillingInfo
 
 Import the component from the library
 
@@ -397,8 +533,9 @@ Add it to the render function.
     isPhoneRequired: boolean
     minimumAge: number
   }
+  // registerNewUser
   onRegisterSuccess?: (tokens: ITokens) => void
-  onRegisterFail?: (error: string) => void
+  onRegisterError?: (error: string) => void
 
   onCheckoutSuccess: (data: {   
     id: string
@@ -406,23 +543,33 @@ Add it to the render function.
     total: string
     status: string
   }) => void
-  onCheckoutFail?: (error: string) => void
+  onCheckoutError?: (error: IError) => void
 
   onLoginSuccess: (data: any) => void
-  onLoginFail?: (error: string) => void
+  onLoginError?: (error: IError) => void
+
 
   onFetchUserProfileSuccess?: (data: any) => void
-  onFetchUserProfileFail?: (error: any) => void
+  onFetchUserProfileError?: (error: IError) => void
 
-  onFetchCartError?: (error: string) => void
+  //fetchCart
+  onFetchCartError?: (error: IError) => void
+  onFetchCartSuccess?: () => void
+
+    // fetchCountries
+  onFetchCountriesError?: (error: IError) => void
+  onFetchCountriesSuccess?: () => void
+
+  // fetchState
+  onFetchStatesError?: (error: IError) => void
+  onFetchStatesSuccess?: () => void
+
+  // fetch Token
+  onFetchAccessTokenError?: (error: IError) => void
+  onFetchAccessTokenSuccess?: () => void
 
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
-
-  privacyPolicyLinkStyle?: StyleProp<TextStyle>
-
-  onFetchUserProfileFailure?: (error: string) => void
-  onFetchAccessTokenFailure?: (error: string) => void
 
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
@@ -460,8 +607,8 @@ Add it to the render function.
 | onCheckoutSuccess | Will return Order data from the Checkout action |
 | loginBrandImages | Receives styles and images sources to show in the `Login` component |
 | skipBillingConfig | Configure the skipping component, visible when `isBillingRequired` is set to false |
-### texts
 
+### texts
 ```js
 interface IBillingInfoViewTexts {
   loginTexts?: ILoginViewTexts
@@ -519,6 +666,8 @@ interface IBillingInfoViewStyles {
   customCheckbox?: ICheckboxStyles
 
   datePicker?: IDatePickerStyles
+  
+  privacyPolicyLinkStyle?: StyleProp<TextStyle>
 }
 ```
 
@@ -534,6 +683,19 @@ import { Checkout } from 'tf-checkout-react-native'
 
 Add it to the render function.
 
+```js
+<Checkout
+  eventId={EVENT_ID}
+  hash={hash}
+  total={total}
+  onPaymentSuccess={handleOnPaymentSuccess}
+  onPressExit={handleStripeError}
+  areLoadingIndicatorsEnabled={false}
+  styles={styles}
+  {...props}
+/>
+```
+
 ### Props
 
 ```js
@@ -542,17 +704,17 @@ Add it to the render function.
   hash: string
   total: string
 
-  onFetchOrderReviewFail?: (error: string) => void
+  onFetchOrderReviewError?: (error: IError) => void
   onFetchOrderReviewSuccess?: (data: any) => void
 
-  onFetchEventConditionsFail?: (error: string) => void
+  onFetchEventConditionsError?: (error: IError) => void
   onFetchEventConditionsSuccess?: (data: any) => void
 
   onCheckoutCompletedSuccess?: (data: any) => void
-  onCheckoutCompletedFail?: (error: string) => void
+  onCheckoutCompletedError?: (error: IError) => void
 
   onPaymentSuccess: (data: any) => void
-  onPaymentError?: (error: string) => void
+  onPaymentError?: (error: IError) => void
 
   onStripeInitializeError?: (error: string) => void
 
@@ -618,7 +780,7 @@ Currently, Stripe card is not customizable. Please see the open issues in their 
 
 Additionally, if you are encountering problems with building your project, please take a look at the [Stripe troubleshooting](https://github.com/stripe/stripe-react-native#troubleshooting).
 
-
+---
 ## Purchase Confirmation
 
 Import the component from the library
@@ -667,12 +829,10 @@ Add it to the render function.
 | onComplete | To handle the completion of the flow. Here you can handle the unmount of the component or navigate to another screen |
 | styles | Styles for the component |
 | texts | Texts for the component  |
+
+
 ---
-
-## MyOrders
-
-![image](https://user-images.githubusercontent.com/66479719/151049211-5faebe6b-df3b-4785-ac0d-3adb7a3d6699.png)
-
+## My Orders
 If there is a valid session, there will appear a button to access `MyOrders` in the `Tickets` component.
 
 Import the component from the library.
@@ -681,80 +841,116 @@ Import the component from the library.
 import { MyOrders } from 'tf-checkout-react-native'
 ```
 
-There is no need to pass any data prop to it.
 
 ### Props
 
-`config` has properties to hide components.
-
-`isEventsDropdownHidden` if the Events dropdown should be hidden.
-
 ```js
-config={{
-  isEventsDropdownHidden: true,
-}}
-```
-
-`onSelectOrder` handler to know which order the user has selected. Will return an object with following structure:
-
-```js
-order: {
-  header: {
-    isReferralDisabled: boolean
-    shareLink: string
-    total: string
-    salesReferred: string
-  },
-  items: [
-    {
-      name: string
-      currency: string
-      price: string
-      discount: string
-      quantity: string
+{
+  onSelectOrder: (order: {
+    order: {
+    header: {
+      isReferralDisabled: boolean
+      shareLink: string
       total: string
+      salesReferred: string
     },
-    {...}
-  ],
-  tickets: [
-    {
-      hash: string
-      ticketType: string
-      holderName: string
-      status: string
-      pdfLink: string
-    },
-    {...}
-  ]
+    items: [
+      {
+        name: string
+        currency: string
+        price: string
+        discount: string
+        quantity: string
+        total: string
+      },
+      {...}
+    ],
+    tickets: [
+      {
+        hash: string
+        ticketType: string
+        holderName: string
+        status: string
+        pdfLink: string
+      },
+      {...}
+    ]
+  }
+  }) => void
+
+  onFetchMyOrdersSuccess?: () => void
+  onFetchMyOrdersError?: (error: IError) => void
+
+  onFetchOrderDetailsSuccess?: () => void
+  onFetchOrderDetailsError?: (error: IError) => void
+
+  onLoadingChange?: (isLoading: boolean) => void
+
+  styles?: IMyOrdersStyles
+  config?: {
+    isEventsDropdownHidden?: boolean
+    areActivityIndicatorsEnabled?: boolean
+    areAlertsEnabled?: boolean
+  }
+  texts?: {
+    selectEventPlaceholder?: string
+  }
 }
 ```
 
-`styles` to customize the component look & feel.
-
+### styles
 ```js
-export interface IMyOrdersStyles {
-  orderListItem?: IOrderListItemStyles
+{
+  orderListItem?: {
+    rootContainer?: StyleProp<ViewStyle>
+    contentContainer?: StyleProp<ViewStyle>
+    infoContainer?: StyleProp<ViewStyle>
+    infoTopContainer?: StyleProp<ViewStyle>
+    infoBottomContainer?: StyleProp<ViewStyle>
+    imageContainer?: StyleProp<ViewStyle>
+    image?: StyleProp<ImageStyle>
+    infoRootContainer?: StyleProp<ViewStyle>
+    iconNextContainer?: StyleProp<ViewStyle>
+    iconNext?: StyleProp<ImageStyle>
+    orderId?: StyleProp<TextStyle>
+    orderDate?: StyleProp<TextStyle>
+    eventName?: StyleProp<TextStyle>
+    priceContainer?: StyleProp<ViewStyle>
+    price?: StyleProp<TextStyle>
+    currency?: StyleProp<TextStyle>
+  }
   safeArea?: StyleProp<ViewStyle>
   listContainer?: StyleProp<ViewStyle>
   eventsContainer?: StyleProp<ViewStyle>
   eventsTitle?: StyleProp<TextStyle>
   refreshControlColor?: ColorValue
-  eventsDropdown?: IDropdownStyles
+  eventsDropdown?: {
+    container?: StyleProp<ViewStyle>
+    button?: StyleProp<ViewStyle>
+    icon?: StyleProp<ImageStyle>
+    label?: StyleProp<TextStyle>
+    dialog?: StyleProp<ViewStyle>
+    flatListContainer?: StyleProp<ViewStyle>
+    listItem?: {
+      container?: StyleProp<ViewStyle>
+      button?: StyleProp<ViewStyle>
+      buttonSelected?: StyleProp<ViewStyle>
+      text?: StyleProp<TextStyle>
+      textSelected?: StyleProp<TextStyle>
+    }
+
+  }
   rootContainer?: StyleProp<ViewStyle>
   eventsSelectionContainer?: StyleProp<ViewStyle>
   clearEventSelectionIcon?: StyleProp<ImageStyle>
 }
 ```
 
-`onFetchOrderDetailsFail` if the fetching fails, you can use this to know what happened.
-
 ---
 
 ## MyOrderDetails
 
-![image](https://user-images.githubusercontent.com/66479719/151049265-ebaabb75-58b1-4b22-bf99-83b1375b1a70.png)
-
-When user selects an order from the `MyOrders`component, will show it details.
+When user selects an order from the `MyOrders` component, will show it details.
 
 Import the component from the library.
 
@@ -764,44 +960,25 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
 
 ### Props
 
-`data` receives same data as the one of the object received from the `onSelectOrder` handler in `MyOrders`component:
-
 ```js
-order: {
-  header: {
-    isReferralDisabled: boolean
-    shareLink: string
-    total: string
-    salesReferred: string
-  },
-  items: [
-    {
-      name: string
-      currency: string
-      price: string
-      discount: string
-      quantity: string
-      total: string
-    },
-    {...}
-  ],
-  tickets: [
-    {
-      hash: string
-      ticketType: string
-      holderName: string
-      status: string
-      pdfLink: string
-    },
-    {...}
-  ]
-}
-```
-
-### styles
-
-```
-styles?: {
+{
+  data: IMyOrderDetailsResponse
+  config?: {
+    areActivityIndicatorsEnabled?: boolean
+    areAlertsEnabled?: boolean
+  }
+  onDownloadStatusChange?: (status?: 
+    'downloading' | 
+    'downloaded' | 
+    'failed'
+  ) => void
+  downloadStatusIcons?: {
+    success?: ImageSourcePropType
+    error?: ImageSourcePropType
+  }
+  onAndroidWritePermission?: (permission?: boolean) => void
+  onLinkCopied?: (copied?: boolean) => void
+  styles?: {
     rootContainer?: StyleProp<ViewStyle>
     header?: {
       container?: StyleProp<ViewStyle>
@@ -845,29 +1022,34 @@ styles?: {
     }
     downloadButton?: IButtonStyles
   }
-```
-
-### texts
-
-```js
-texts?: {
-  title?: string
-  subTitle?: string
-  referralLink?: string
-  listItem?: {
+  texts?: {
     title?: string
-    ticketType?: string
-    price?: string
-    quantity?: string
-    total?: string
-  }
-  ticketItem?: {
-    title?: string
-    ticketId?: string
-    ticketType?: string
-    ticketHolder?: string
-    status?: string
-    download?: string
+    subTitle?: string
+    referralLink?: string
+    listItem?: {
+      title?: string
+      ticketType?: string
+      price?: string
+      quantity?: string
+      total?: string
+    }
+    ticketItem?: {
+      title?: string
+      ticketId?: string
+      ticketType?: string
+      ticketHolder?: string
+      status?: string
+      download?: string
+    }
+    downloadNotification?: {
+      successMessage?: string
+      errorMessage?: string
+    }
+    copyText?: {
+      copy?: string
+      copied?: string
+    }
   }
 }
 ```
+

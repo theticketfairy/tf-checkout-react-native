@@ -1,12 +1,20 @@
 import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 import { IButtonStyles } from '../../components/button/types'
+import { IError } from '../../types'
 
 export interface IPurchaseConfirmationProps {
   orderHash: string
   onComplete: () => void
   styles?: IPurchaseConfirmationStyles
   texts?: IPurchaseConfirmationTexts
+
+  onFetchPurchaseConfirmationError?: (error: IError) => void
+  onFetchPurchaseConfirmationSuccess?: () => void
+
+  areActivityIndicatorsEnabled?: boolean
+  areAlertsEnabled?: boolean
+  onLoadingChange?: (isLoading: boolean) => void
 }
 
 export interface IPurchaseConfirmationTexts {
@@ -64,4 +72,6 @@ export interface IPurchaseConfirmationViewProps {
   referralLink?: string
   onComplete: () => void
   orderHash: string
+  areActivityIndicatorsEnabled?: boolean
+  isLoading?: boolean
 }

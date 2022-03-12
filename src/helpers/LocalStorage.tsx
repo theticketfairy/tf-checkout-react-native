@@ -15,12 +15,9 @@ export interface IStoredUserData {
 }
 
 export const storeData = async (key: string, value: string) => {
-  console.log(`StoreData with key ${key} and value ${value}`)
-
   try {
     await AsyncStorage.setItem(key, value)
   } catch (ex) {
-    console.log('Local Storage StoreData Error', ex)
     return undefined
   }
 }
@@ -71,7 +68,7 @@ export const checkStoredData = async () => {
       LocalStorageKeys.USER_DATA,
       LocalStorageKeys.CHECKOUT_DATA,
     ])
-    console.log('checkStoredData', values)
+    return values
   } catch (ex) {
     console.log('Local Storage GetData Error - checkStoredData', ex)
   }

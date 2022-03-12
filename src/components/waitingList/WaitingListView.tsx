@@ -25,17 +25,32 @@ const WaitingListView = ({
     onChangeLastName,
   } = data
 
-  const isDataValid = () => !!emailError || !!lastNameError || !!firstNameError
+  const getIsDataValid = () =>
+    firstName.length > 0 &&
+    lastName.length > 0 &&
+    email.length > 0 &&
+    !emailError &&
+    !lastNameError &&
+    !firstNameError
+
+  const isDataValid = getIsDataValid()
+
+  const buttonStyle = isDataValid
+    ? styles?.button
+    : styles?.buttonDisabled
+    ? styles?.buttonDisabled
+    : styles?.button
 
   return (
     <View style={styles?.rootContainer}>
       {isSuccess ? (
         <View style={styles?.success?.container}>
           <Text style={styles?.success?.title}>
-            You've been added to the waiting list!
+            {texts?.successTitle || `You've been added to the waiting list!`}
           </Text>
           <Text style={styles?.success?.message}>
-            You'll be notified if tickets become available.
+            {texts?.successMessage ||
+              `You'll be notified if tickets become available.`}
           </Text>
         </View>
       ) : (
@@ -48,12 +63,14 @@ const WaitingListView = ({
             value={firstName}
             onChangeText={onChangeFirstName}
             error={firstNameError}
+            styles={styles?.input}
           />
           <Input
             label={texts?.lastName || 'Last name'}
             value={lastName}
             onChangeText={onChangeLastName}
             error={lastNameError}
+            styles={styles?.input}
           />
           <Input
             label={texts?.email || 'Email'}
@@ -62,12 +79,13 @@ const WaitingListView = ({
             value={email}
             onChangeText={onChangeEmail}
             error={emailError}
+            styles={styles?.input}
           />
           <Button
             onPress={onPressButton}
             text={texts?.button || 'ADD TO WAITING LIST'}
-            styles={styles?.button}
-            isDisabled={isDataValid()}
+            styles={buttonStyle}
+            isDisabled={!isDataValid}
             isLoading={isLoading}
           />
         </>

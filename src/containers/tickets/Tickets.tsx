@@ -3,7 +3,7 @@ import jwtDecode from 'jwt-decode'
 import _get from 'lodash/get'
 import _isEmpty from 'lodash/isEmpty'
 import _some from 'lodash/some'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 
 import { addToCart, fetchEvent, fetchTickets } from '../../api/ApiClient'
@@ -31,6 +31,12 @@ const Tickets = ({
   onPressLogout,
   onFetchTicketsSuccess,
   onFetchEventError,
+  onLoadingChange,
+  areAlertsEnabled = true,
+  areLoadingIndicatorsEnabled = true,
+  onFetchEventSuccess,
+  onAddToWaitingListError,
+  onAddToWaitingListSuccess,
 }: ITicketsProps) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
@@ -46,8 +52,10 @@ const Tickets = ({
   >(undefined)
   const [isFirstCall, setIsFirstCall] = useState(true)
 
-  const showError = (error: string) => {
-    Alert.alert('', error)
+  const showAlert = (message: string) => {
+    if (areAlertsEnabled) {
+      Alert.alert('', message)
+    }
   }
 
   const isTicketOnSale = _some(
@@ -86,7 +94,7 @@ const Tickets = ({
       if (onFetchTicketsError) {
         onFetchTicketsError(error)
       }
-      return showError('Error while getting tickets, please try again')
+      return showAlert('Error while getting tickets, please try again')
     }
 
     setIsWaitingListVisible(!!isInWaitingList)
@@ -122,7 +130,7 @@ const Tickets = ({
             isAccessCodeRequired,
           })
         }
-        Alert.alert('', promoCodeResult?.message)
+        showAlert(promoCodeResult?.message)
       }
     }
 
@@ -140,8 +148,19 @@ const Tickets = ({
           eventError || 'There was an error while fetching event'
         )
       }
-      return Alert.alert('', eventError)
+      showAlert(eventError)
+      return
     }
+
+    if (onFetchEventSuccess) {
+      onFetchEventSuccess({
+        name: eventData?.name,
+        slug: eventData?.slug,
+        description: eventData?.description,
+        title: eventData?.title,
+      })
+    }
+
     setEvent(eventData)
   }
 
@@ -186,12 +205,30 @@ const Tickets = ({
       if (onAddToCartError) {
         onAddToCartError(addToCartError)
       }
-      return Alert.alert('', addToCartError)
+      showAlert(addToCartError)
+      return
     }
   }
   //#endregion
 
+  const onLoadingChangeCallback = useCallback(
+    (loading: boolean) => {
+      if (onLoadingChange) {
+        onLoadingChange(loading)
+      }
+    },
+    [onLoadingChange]
+  )
+
   //#region UseEffects
+  useEffect(() => {
+    if (isGettingEvent || isGettingTickets || isBooking) {
+      onLoadingChangeCallback(true)
+    } else {
+      onLoadingChangeCallback(false)
+    }
+  }, [isGettingTickets, isGettingEvent, isBooking, onLoadingChangeCallback])
+
   useEffect(() => {
     const fetchInitialData = async () => {
       await retrieveStoredAccessToken()
@@ -223,6 +260,10 @@ const Tickets = ({
       onPressLogout()
     }
   }
+
+  const handleOnLoadingChange = (loading: boolean) => {
+    onLoadingChangeCallback(loading)
+  }
   //#endregion
 
   return (
@@ -248,6 +289,10 @@ const Tickets = ({
       isUserLogged={isUserLogged}
       onPressMyOrders={onPressMyOrders}
       onPressLogout={handleOnLogout}
+      areLoadingIndicatorsEnabled={areLoadingIndicatorsEnabled}
+      onAddToWaitingListError={onAddToWaitingListError}
+      onAddToWaitingListSuccess={onAddToWaitingListSuccess}
+      onLoadingChange={handleOnLoadingChange}
     />
   )
 }

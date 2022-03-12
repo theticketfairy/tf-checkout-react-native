@@ -1,5 +1,6 @@
 import { TextStyle, ViewStyle } from 'react-native'
 
+import { IEventData } from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
 import { ILoadingStyles } from '../../components/loading/types'
 import {
@@ -14,7 +15,13 @@ import {
   IWaitingListStyles,
   IWaitingListTexts,
 } from '../../components/waitingList/types'
-import { IEvent, ISelectedTicket, ITicket } from '../../types'
+import {
+  IEvent,
+  ISelectedTicket,
+  ITicket,
+  ITicketsResponseData,
+} from '../../types'
+import { IError } from '../../types/IError'
 import { ITicketListItemStyles, ITicketListItemTexts } from './components/types'
 
 export interface ITicketsViewProps {
@@ -36,6 +43,7 @@ export interface ITicketsViewProps {
     title?: string
     waitingList?: IWaitingListTexts
     loggedIn?: ILoggedInTexts
+    listItem?: ITicketListItemTexts
   }
   event?: IEvent
   isWaitingListVisible?: boolean
@@ -45,14 +53,14 @@ export interface ITicketsViewProps {
   isUserLogged?: boolean
   onPressMyOrders: () => void
   onPressLogout: () => void
-}
 
-export interface IAddToCartSuccess {
-  isBillingRequired: boolean
-  isNameRequired: boolean
-  isAgeRequired: boolean
-  isPhoneRequired: boolean
-  minimumAge: number
+  areLoadingIndicatorsEnabled?: boolean
+  areAlertsEnabled?: boolean
+
+  // Callbacks for Waiting list
+  onAddToWaitingListSuccess?: () => void
+  onAddToWaitingListError?: (error: IError) => void
+  onLoadingChange?: (isLoading: boolean) => void
 }
 
 export interface ITicketListStyles {
@@ -94,11 +102,21 @@ export interface IOnFetchTicketsSuccess {
 export interface ITicketsProps {
   eventId: number
 
-  onAddToCartSuccess: (data: IAddToCartSuccess) => void
-  onAddToCartError?: (error: any) => void
-  onFetchTicketsError?: (error: any) => void
+  // Callbacks for when user taps on GET Tickets button
+  onAddToCartSuccess: (data: ITicketsResponseData) => void
+  onAddToCartError?: (error: IError) => void
+
+  // Callbacks for fetching the tickets
   onFetchTicketsSuccess?: (data: IOnFetchTicketsSuccess) => void
+  onFetchTicketsError?: (error: IError) => void
+
+  // Callbacks for fetching the Event
   onFetchEventError?: (error: string) => void
+  onFetchEventSuccess?: (data: IEventData) => void
+
+  // Callbacks for Waiting list
+  onAddToWaitingListSuccess?: () => void
+  onAddToWaitingListError?: (error: IError) => void
 
   styles?: ITicketsViewStyles
   texts?: ITicketsViewTexts
@@ -108,4 +126,9 @@ export interface ITicketsProps {
 
   onPressMyOrders: () => void
   onPressLogout?: () => void
+
+  // With the following 3 props you can control the visibility of the stock loading indicators and alerts, so you can use your own.
+  onLoadingChange?: (isLoading: boolean) => void
+  areAlertsEnabled?: boolean
+  areLoadingIndicatorsEnabled?: boolean
 }

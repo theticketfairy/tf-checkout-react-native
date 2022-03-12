@@ -8,10 +8,13 @@ import {
 
 import { IMyOrderDetailsResponse, IMyOrdersOrder } from '../../api/types'
 import { IDropdownItem, IDropdownStyles } from '../../components/dropdown/types'
+import { IError } from '../../types'
 import { IOrderListItemStyles } from './components/types'
 
 export interface IMyOrdersConfig {
   isEventsDropdownHidden?: boolean
+  areActivityIndicatorsEnabled?: boolean
+  areAlertsEnabled?: boolean
 }
 
 export interface IMyOrdersStyles {
@@ -27,11 +30,24 @@ export interface IMyOrdersStyles {
   clearEventSelectionIcon?: StyleProp<ImageStyle>
 }
 
+export interface IMyOrdersTexts {
+  selectEventPlaceholder?: string
+}
+
 export interface IMyOrdersProps {
   onSelectOrder: (order: IMyOrderDetailsResponse) => void
-  onFetchOrderDetailsFail?: (error: string) => void
+
+  onFetchMyOrdersSuccess?: () => void
+  onFetchMyOrdersError?: (error: IError) => void
+
+  onFetchOrderDetailsSuccess?: () => void
+  onFetchOrderDetailsError?: (error: IError) => void
+
+  onLoadingChange?: (isLoading: boolean) => void
+
   styles?: IMyOrdersStyles
   config?: IMyOrdersConfig
+  texts?: IMyOrdersTexts
 }
 
 export interface IMyOrdersViewProps {
@@ -46,4 +62,5 @@ export interface IMyOrdersViewProps {
   onRefresh?: () => void
   config?: IMyOrdersConfig
   onFetchMoreOrders: () => void
+  texts?: IMyOrdersTexts
 }

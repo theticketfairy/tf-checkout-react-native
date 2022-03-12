@@ -1,6 +1,8 @@
 import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
+import { IError } from '../../types'
 import { IButtonStyles } from '../button/types'
+import { IInputStyles } from '../input/types'
 
 export interface IWaitingListTexts {
   title?: string
@@ -8,12 +10,16 @@ export interface IWaitingListTexts {
   lastName?: string
   email?: string
   button?: string
+  successTitle?: string
+  successMessage?: string
 }
 
 export interface IWaitingListStyles {
   rootContainer?: StyleProp<ViewStyle>
   title?: StyleProp<TextStyle>
   button?: IButtonStyles
+  buttonDisabled?: IButtonStyles
+  input?: IInputStyles
   success?: {
     container?: StyleProp<ViewStyle>
     title?: StyleProp<ViewStyle>
@@ -46,6 +52,12 @@ export interface IWaitingListProps {
   eventId: number
   styles?: IWaitingListStyles
   texts?: IWaitingListTexts
+
+  onAddToWaitingListSuccess?: () => void
+  onAddToWaitingListError?: (error: IError) => void
+
+  onLoadingChange?: (isLoading: boolean) => void
+  areAlertsEnabled?: boolean
 }
 
 export interface IWaitingListFields {
