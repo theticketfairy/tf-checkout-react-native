@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
-  IAddToCartSuccess,
   IMyOrderDetailsResponse,
   IOnCheckoutSuccess,
   MyOrderDetails,
@@ -13,19 +12,20 @@ import {
   Login,
   IUserProfile,
   setConfig,
+  ITicketsResponseData,
 } from 'tf-checkout-react-native'
 
 import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles from './styles'
 
-const EVENT_ID = 12342 //5420 // Replace with assigned ID
+const EVENT_ID =  10915//MANA//10690 //5420 // Replace with assigned ID
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
     ComponentEnum.Tickets
   )
-  const [cartProps, setCartProps] = useState<IAddToCartSuccess | undefined>(
+  const [cartProps, setCartProps] = useState<ITicketsResponseData | undefined>(
     undefined
   )
   const [checkoutProps, setCheckOutProps] = useState<
@@ -38,6 +38,7 @@ const App = () => {
 
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
   const [loggedUserName, setLoggedUserName] = useState('')
+  
   //#region Handlers
   const handleOnLoginDialogSuccess = (
     userProfile: IUserProfile,
@@ -45,7 +46,8 @@ const App = () => {
   ) => {
     setLoggedUserName(userProfile.firstName)
   }
-  const handleOnAddToCartSuccess = (data: IAddToCartSuccess) => {
+  const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
+    console.log('handleOnAddToCartSuccess',data)
     setCartProps(data)
   }
 
@@ -56,12 +58,12 @@ const App = () => {
   const handleOnFetchUserProfileSuccess = () => {}
 
   const handleOnCheckoutSuccess = (data: IOnCheckoutSuccess) => {
-    console.log('handleOnCheckoutSuccess', handleOnCheckoutSuccess)
+    console.log('handleOnCheckoutSuccess', data) // here is the order ID
     setCheckOutProps(data)
   }
 
-  const handleOnPaymentSuccess = (data: any) => {
-    console.log('handleOnPaymentSuccess')
+  const handleOnPaymentSuccess = (data: IOnCheckoutSuccess) => {
+    console.log('handleOnPaymentSuccess', data)
     setIsPaymentSuccess(true)
   }
 
@@ -102,8 +104,8 @@ const App = () => {
   //#region effects
   useEffect(() => {
     setConfig({
-      DOMAIN: 'https://houseofx.nyc',
-      BRAND: 'the-ticket-fairy',
+      DOMAIN: 'https://tickets.manacommon.com',
+      BRAND: 'mana-onetree-testing-brand',
       ARE_SUB_BRANDS_INCLUDED: true,
     })
   }, [])
@@ -140,9 +142,6 @@ const App = () => {
       case ComponentEnum.BillingInfo:
         return (
           <BillingInfo
-            privacyPolicyLinkStyle={{
-              color: Color.primary,
-            }}
             texts={{
               form: {
                 checkbox: 'This is an injected text for your brand',
@@ -345,8 +344,7 @@ const App = () => {
         return (
           <Checkout
             eventId={EVENT_ID}
-            hash={checkoutProps!.hash}
-            total={checkoutProps!.total}
+            checkoutData={checkoutProps!}
             onPaymentSuccess={handleOnPaymentSuccess}
             onPressExit={handleStripeError}
             areLoadingIndicatorsEnabled={false}
@@ -366,6 +364,7 @@ const App = () => {
                 },
               },
 
+              
               title: {
                 color: Color.textMain,
               },
@@ -645,9 +644,39 @@ const App = () => {
           <View style={{ flex: 1 }}>
             <Tickets
               eventId={EVENT_ID}
+              onLoadingChange={(isLoading) => {console.log('is tickets loading', isLoading)}}
+
+              onFetchTicketsSuccess={(tickets) => {console.log('onFetchTicketsSuccess', tickets)}}
+              onFetchTicketsError={(error) => {console.log('onFetchTicketsError', error)}}
+
               onAddToCartSuccess={handleOnAddToCartSuccess}
+              onAddToCartError={(error)=> {console.log('onAddToCartError', error)}}
+
+              onFetchEventError={(error)=> {console.log('onFetchEventError', error)}}
+              onFetchEventSuccess={(event)=> {console.log('onFetchEventSuccess', event)}}
+
+              onPressLogout={handleOnPressLogout}
+
               onPressMyOrders={handleOnPressMyOrders}
               styles={{
+                waitingList: {
+                  title: { color: Color.textMain },
+                  input: {
+                    color: Color.textMain,
+                    input: {color: Color.textMain}
+                  },
+                  button: {
+                    button: {
+                      backgroundColor: 'green'
+                    }
+                  },
+                  buttonDisabled: {
+                    button: {
+                      backgroundColor: 'gray'
+                    }
+                  }
+                }
+                ,
                 container: {
                   backgroundColor: Color.backgroundMain,
                   padding: 16,
@@ -662,6 +691,9 @@ const App = () => {
                     backgroundColor: Color.primary,
                     borderRadius: 2,
                   },
+                  text: {
+                    color: Color.white,
+                  }
                 },
                 loggedIn: {
                   rootContainer: {

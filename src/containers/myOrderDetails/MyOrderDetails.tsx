@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useCallback, useEffect, useState } from 'react'
 import { PermissionsAndroid, Platform } from 'react-native'
 import {
   DocumentDirectoryPath,
@@ -11,7 +11,16 @@ import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import MyOrderDetailsView from './MyOrderDetailsView'
 import { DownloadStatus, IMyOrderDetailsProps } from './types'
 
-const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
+const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
+  data,
+  styles,
+  texts,
+  config,
+  onDownloadStatusChange,
+  downloadStatusIcons,
+  onAndroidWritePermission,
+  onLinkCopied,
+}) => {
   const [isWriteStorageEnabled, setIsWriteStorageEnabled] = useState<
     boolean | undefined
   >(undefined)
@@ -20,10 +29,20 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
     DownloadStatus | undefined
   >(undefined)
 
+  //#region Handlers
+  const handleOnDownloadStatusChange = useCallback(
+    (status?: DownloadStatus) => {
+      onDownloadStatusChange?.(status)
+    },
+    [onDownloadStatusChange]
+  )
+
   const handleOnPressCopyLink = () => {
     setIsLinkCopied(true)
+    onLinkCopied?.(true)
     setTimeout(() => {
       setIsLinkCopied(false)
+      onLinkCopied?.(false)
     }, 3000)
   }
 
@@ -63,6 +82,12 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
       setDownloadStatus(undefined)
     }, 5000)
   }
+  //#endregion
+
+  //#region Effects
+  useEffect(() => {
+    handleOnDownloadStatusChange(downloadStatus)
+  }, [downloadStatus, handleOnDownloadStatusChange])
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -77,6 +102,10 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
   }, [])
 
   useEffect(() => {
+    if (Platform.OS === 'android') {
+      onAndroidWritePermission?.(isWriteStorageEnabled)
+    }
+
     if (isWriteStorageEnabled === false && Platform.OS === 'android') {
       PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
@@ -84,8 +113,11 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
         setIsWriteStorageEnabled(result === 'granted')
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWriteStorageEnabled])
+  //#endregion
 
+  //#region Render
   return (
     <MyOrderDetailsView
       data={data}
@@ -95,8 +127,11 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({ data, styles, texts }) => {
       onPressCopyLink={handleOnPressCopyLink}
       onPressTicketDownload={handleOnPressTicketDownload}
       downloadStatus={downloadStatus}
+      config={config}
+      downloadStatusIcons={downloadStatusIcons}
     />
   )
+  //#endregion
 }
 
 export default MyOrderDetails

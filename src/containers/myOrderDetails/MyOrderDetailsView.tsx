@@ -26,6 +26,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
   onPressCopyLink,
   onPressTicketDownload,
   downloadStatus,
+  config,
 }) => {
   //#region Handlers
   const onCopyLinkHandler = () => {
@@ -56,6 +57,8 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
     texts?.ticketItem?.ticketHolder || 'Ticket Holder Name: '
   const ticketsStatus = texts?.ticketItem?.status || 'Status: '
   const ticketsDownload = texts?.ticketItem?.download || 'Download'
+  const copyText = texts?.copyText?.copy || 'Copy'
+  const copiedText = texts?.copyText?.copied || 'Copied'
 
   const renderShareLink = () => (
     <View style={[s.shareLinkContainer, styles?.header?.shareLink?.container]}>
@@ -71,7 +74,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
         onPress={onCopyLinkHandler}
       >
         <Text style={[s.copyText, styles?.header?.shareLink?.copyText]}>
-          {isLinkCopied ? 'Copied' : 'Copy'}
+          {isLinkCopied ? copiedText : copyText}
         </Text>
         <Image
           source={isLinkCopied ? R.icons.check : R.icons.copy}
@@ -196,21 +199,23 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
           <Text style={styles?.ticketItem?.rowValue}>{item.status}</Text>
         </Text>
 
-        <Button
-          isLoading={downloadStatus === 'downloading'}
-          text={ticketsDownload}
-          styles={{
-            text: {
-              fontSize: 12,
-            },
-            button: {
-              height: 30,
-              marginVertical: 8,
-            },
-            ...styles?.downloadButton,
-          }}
-          onPress={() => onPressTicketDownload(item.pdfLink, item.hash)}
-        />
+        {item.pdfLink && (
+          <Button
+            isLoading={downloadStatus === 'downloading'}
+            text={ticketsDownload}
+            styles={{
+              text: {
+                fontSize: 12,
+              },
+              button: {
+                height: 30,
+                marginVertical: 8,
+              },
+              ...styles?.downloadButton,
+            }}
+            onPress={() => onPressTicketDownload(item.pdfLink, item.hash)}
+          />
+        )}
       </View>
     </View>
   )
@@ -242,9 +247,14 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
           return null
         }}
       />
-      {(downloadStatus === 'downloaded' || downloadStatus === 'failed') && (
-        <Notification isSuccess={downloadStatus === 'downloaded'} />
-      )}
+      {config?.areAlertsEnabled &&
+        (downloadStatus === 'downloaded' || downloadStatus === 'failed') && (
+          <Notification
+            isSuccess={downloadStatus === 'downloaded'}
+            textSuccess={texts?.downloadNotification?.successMessage}
+            textError={texts?.downloadNotification?.errorMessage}
+          />
+        )}
     </View>
   )
 }

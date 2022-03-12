@@ -28,7 +28,9 @@ export default StyleSheet.create({
     borderRadius: 10,
     padding: 8,
     alignSelf: 'center',
-    backgroundColor: R.colors.white,
+  },
+  cardBackground: {
+    backgroundColor: 'gray',
   },
   missingStripeContainer: {
     flex: 1,

@@ -1,4 +1,7 @@
+import { AxiosError } from 'axios'
+
 import { IDropdownItem } from '../components/dropdown/types'
+import { IError } from './IError'
 
 export interface ITicket {
   sortOrder: number
@@ -43,4 +46,17 @@ export interface ITicket {
 
 export interface ISelectedTicket extends ITicket {
   selectedOption?: IDropdownItem
+}
+
+export interface ITicketsResponseData {
+  isBillingRequired: boolean
+  isPhoneRequired?: boolean
+  isAgeRequired?: boolean
+  minimumAge?: number
+  isNameRequired?: boolean
+}
+
+export interface ITicketsResponsePayload {
+  error?: IError
+  data?: ITicketsResponseData
 }

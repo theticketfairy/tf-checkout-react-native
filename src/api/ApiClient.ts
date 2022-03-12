@@ -14,8 +14,12 @@ import {
   LocalStorageKeys,
   storeData,
 } from '../helpers/LocalStorage'
-import { IEvent, IUserProfile } from '../types'
-import { ITicket } from '../types/ITicket'
+import { IError, IEvent, IUserProfile } from '../types'
+import {
+  ITicket,
+  ITicketsResponseData,
+  ITicketsResponsePayload,
+} from '../types/ITicket'
 import Constants from './Constants'
 import {
   IAuthorizeResponse,
@@ -140,12 +144,15 @@ export const setAccessTokenHandler = async (accessToken: string) => {
 export const authorize = async (
   data: FormData
 ): Promise<IAuthorizeResponse> => {
-  let responseError: string = ''
+  let responseError: IError | undefined
   const response = await Client.post(
     `/v1/oauth/authorize-rn?client_id=${Config.CLIENT_ID}`,
     data
   ).catch((error: AxiosError) => {
-    responseError = error?.response?.data.message
+    responseError = {
+      message: error?.response?.data.message,
+      code: error?.response?.status,
+    }
   })
 
   return {
@@ -155,10 +162,13 @@ export const authorize = async (
 }
 
 export const fetchAccessToken = async (data: FormData) => {
-  let responseError
+  let responseError: IError | undefined
   const response = await Client.post('/v1/oauth/access_token', data).catch(
-    (error: Error) => {
-      responseError = error.message
+    (error: AxiosError) => {
+      responseError = {
+        message: error.response?.data.message,
+        code: error.response?.status,
+      }
     }
   )
 
@@ -169,7 +179,7 @@ export const fetchAccessToken = async (data: FormData) => {
 }
 
 export const fetchUserProfile = async (accessToken: any) => {
-  let responseError
+  let responseError: IError | undefined
   let userProfile: IUserProfile | undefined
 
   const response: AxiosResponse | void = await Client.get(
@@ -181,7 +191,10 @@ export const fetchUserProfile = async (accessToken: any) => {
       },
     }
   ).catch((error: AxiosError) => {
-    responseError = error.message
+    responseError = {
+      message: error?.response?.data?.message,
+      code: error.response?.status!,
+    }
   })
 
   if (!responseError && response) {
@@ -242,12 +255,15 @@ export const addToWaitingList = async (
     },
   }
 
-  let responseError = ''
+  let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.post(
     `/v1/event/${id}/add_to_waiting_list`,
     requestData
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status!,
+    }
   })
 
   return {
@@ -267,7 +283,7 @@ export const fetchMyOrders = async (
     events: [],
     orders: [],
   }
-  let responseError = ''
+  let responseError: IError | undefined
 
   const withFilterEvent = filter ? `&filter[event]=${filter}` : ''
   const withBrand = Config.BRAND ? `&filter[brand]=${Config.BRAND}` : ''
@@ -278,7 +294,10 @@ export const fetchMyOrders = async (
 
   const response: AxiosResponse | void = await Client.get(endpoint).catch(
     (error: AxiosError) => {
-      responseError = error.response?.data.message || 'Error fetching My Orders'
+      responseError = {
+        message: error.response?.data.message || 'Error fetching My Orders',
+        code: error.response?.status,
+      }
     }
   )
 
@@ -292,15 +311,17 @@ export const fetchMyOrders = async (
     myOrdersData: data,
   }
 }
-//&filter[brand]=${CONFIGS.BRAND_SLUG}
 
 export const fetchOrderDetails = async (orderId: string) => {
-  let responseError = ''
+  let responseError: IError | undefined
   let responseData: IMyOrderDetailsResponse | undefined
   const response = await Client.get(`/v1/account/order/${orderId}`).catch(
     (error: AxiosError) => {
-      responseError =
-        error.response?.data.message || 'Error while fetching order details'
+      responseError = {
+        message:
+          error.response?.data.message || 'Error while fetching order details',
+        code: error.response?.status,
+      }
     }
   )
 
@@ -329,6 +350,10 @@ export const fetchOrderDetails = async (orderId: string) => {
           holderName: item.holder_name,
           status: item.status,
           pdfLink: item.pdf_link,
+          qrData: item.qr_data,
+          isSellable: item.is_sellable,
+          holderEmail: item.holder_email,
+          holderPhone: item.holder_phone,
         }
       }
     )
@@ -374,8 +399,17 @@ export const fetchTickets = async (
   const response = await Client.get(`v1/event/${id}/tickets/`, {
     headers: headers,
   }).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      code: error.response?.status!,
+      message: error.response?.data.message,
+    }
   })
+
+  if (responseError) {
+    return {
+      error: responseError,
+    }
+  }
 
   const attributes = _get(response, 'data.data.attributes.tickets')
   const ticketsAttributes = _filter(
@@ -402,16 +436,23 @@ export const fetchTickets = async (
   }
 }
 
-export const addToCart = async (id: string | number, data: any) => {
-  let responseError
-  let responseData
+export const addToCart = async (
+  id: string | number,
+  data: any
+): Promise<ITicketsResponsePayload> => {
+  let responseError: IError | undefined
+  let responseData: ITicketsResponseData | undefined
+
   const response: AxiosResponse | void = await Client.post(
     `v1/event/${id}/add-to-cart/`,
     {
       data,
     }
-  ).catch((error: Error) => {
-    responseError = error.message
+  ).catch((error: AxiosError) => {
+    responseError = {
+      code: error.response?.status!,
+      message: error.response?.data.message,
+    }
   })
 
   if (!responseError) {
@@ -423,7 +464,12 @@ export const addToCart = async (id: string | number, data: any) => {
       isAgeRequired: response?.data?.data?.attributes?.age_required ?? false,
       isPhoneRequired:
         response?.data?.data?.attributes?.phone_required ?? false,
-      minimumAge: response?.data?.data?.attributes?.minimum_age ?? 18,
+      minimumAge: undefined,
+    }
+
+    if (response?.data?.data?.attributes?.age_required) {
+      responseData.minimumAge =
+        response?.data?.data?.attributes?.minimum_age ?? 18
     }
   }
 
@@ -436,12 +482,15 @@ export const addToCart = async (id: string | number, data: any) => {
 export const fetchEvent = async (
   id: string | number
 ): Promise<IEventResponse> => {
-  let responseError: string | undefined
+  let responseError: IError | undefined
   let event: IEvent | undefined
   const response: AxiosResponse | void = await Client.get(`v1/event/${id}`, {
     headers: HEADERS,
   }).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      code: error.response?.status!,
+      message: error.response?.data.message,
+    }
   })
 
   if (response?.status === 200) {
@@ -457,10 +506,13 @@ export const fetchEvent = async (
 
 //#region Billing Information
 export const fetchCountries = async () => {
-  let responseError: string = ''
+  let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.get('/countries/').catch(
     (error: AxiosError) => {
-      responseError = error.response?.data.message
+      responseError = {
+        message: error.response?.data.message,
+        code: error.response?.status!,
+      }
     }
   )
 
@@ -475,11 +527,14 @@ export const fetchCountries = async () => {
 }
 
 export const fetchStates = async (countryId: string) => {
-  let responseError: string = ''
+  let responseError: IError | undefined
   const response: void | AxiosResponse = await Client.get(
     `/countries/${countryId}/states/`
   ).catch((ex: AxiosError) => {
-    responseError = ex.response?.data.message
+    responseError = {
+      code: ex.response?.status!,
+      message: ex.response?.data.message,
+    }
   })
 
   if (response?.status === 200) {
@@ -493,11 +548,14 @@ export const fetchStates = async (countryId: string) => {
 }
 
 export const fetchCart = async () => {
-  let responseError: string = ''
+  let responseError: IError | undefined
   let cartData = {} as ICartResponse
   const res: AxiosResponse | void = await Client.get('v1/cart/').catch(
     (error: AxiosError) => {
-      responseError = error.response?.data.message
+      responseError = {
+        code: error.response?.status!,
+        message: error.response?.data.message,
+      }
     }
   )
 
@@ -517,7 +575,9 @@ export const fetchCart = async () => {
       isTfOptIn: typeof tfOptIn === 'number' ? tfOptIn > 0 : tfOptIn,
     }
   } else {
-    responseError = 'Error fetching cart'
+    responseError = {
+      message: 'Error fetching cart',
+    }
   }
 
   return {
@@ -530,7 +590,7 @@ export const checkoutOrder = async (
   data: any,
   accessToken: string
 ): Promise<ICheckoutResponse> => {
-  let responseError = ''
+  let responseError: IError | undefined
   const res: AxiosResponse | void = await Client.post(
     'v1/on-checkout/',
     { data },
@@ -541,7 +601,10 @@ export const checkoutOrder = async (
       },
     }
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      code: error.response?.status!,
+      message: error.response?.data.message,
+    }
   })
 
   return {
@@ -553,11 +616,14 @@ export const checkoutOrder = async (
 
 //#region Checkout
 export const fetchEventConditions = async (eventId: string) => {
-  let responseError
+  let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.get(
     `v1/event/${eventId}/conditions`
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data
+    responseError = {
+      message: error.response?.data,
+      code: error.response?.status!,
+    }
   })
 
   return {
@@ -569,12 +635,15 @@ export const fetchEventConditions = async (eventId: string) => {
 export const fetchOrderReview = async (
   hash: string
 ): Promise<IOrderReviewResponse> => {
-  let responseError = ''
+  let responseError: IError | undefined
 
   const response: AxiosResponse | void = await Client.get(
     `v1/order/${hash}/review/`
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status!,
+    }
   })
 
   let resData: IOrderReview | undefined
@@ -587,7 +656,9 @@ export const fetchOrderReview = async (
       !payment_method.stripe_client_secret &&
       order_details.total !== '0.00'
     ) {
-      responseError = 'Stripe is not configured'
+      responseError = {
+        message: 'Stripe is not configured',
+      }
     } else {
       const {
         tickets: [ticket],
@@ -632,12 +703,16 @@ export const fetchOrderReview = async (
 }
 
 export const postOnPaymentSuccess = async (orderHash: string) => {
-  let responseError: string = ''
+  let responseError: IError | undefined
+
   const response: AxiosResponse | void = await Client.post(
     `v1/order/${orderHash}/success`
   ).catch((error: AxiosError) => {
-    responseError =
-      error.response?.data.message || 'Error while notifying Payment Success'
+    responseError = {
+      message:
+        error.response?.data.message || 'Error while notifying Payment Success',
+      code: error.response?.status,
+    }
   })
 
   return {
@@ -649,12 +724,16 @@ export const postOnPaymentSuccess = async (orderHash: string) => {
 export const postOnFreeRegistration = async (
   orderHash: string
 ): Promise<IFreeRegistrationResponse> => {
-  let responseError = ''
+  let responseError: IError | undefined
   let responseData: IFreeRegistrationData | undefined
+
   const res: AxiosResponse | void = await Client.post(
     `v1/order/${orderHash}/complete_free_registration`
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status,
+    }
   })
 
   if (res?.data) {
@@ -672,15 +751,19 @@ export const postOnFreeRegistration = async (
     freeRegistrationData: responseData,
   }
 }
+
 //#endregion
 
 //#region Purchase Confirmation
 export const fetchPurchaseConfirmation = async (orderHash: string) => {
-  let responseError
+  let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.get(
     `/v1/order/${orderHash}/payment/complete`
   ).catch((error: AxiosError) => {
-    responseError = error.response?.data.message
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status,
+    }
   })
 
   return {

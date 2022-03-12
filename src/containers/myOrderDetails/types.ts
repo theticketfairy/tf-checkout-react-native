@@ -8,9 +8,20 @@ import {
 
 import { IMyOrderDetailsResponse } from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
+import { INotificationIcons } from './components/Notification'
+
+export interface IMyOrdersDetailsConfig {
+  areActivityIndicatorsEnabled?: boolean
+  areAlertsEnabled?: boolean
+}
 
 export interface IMyOrderDetailsProps {
   data: IMyOrderDetailsResponse
+  config?: IMyOrdersDetailsConfig
+  onDownloadStatusChange?: (status?: DownloadStatus) => void
+  downloadStatusIcons?: INotificationIcons
+  onAndroidWritePermission?: (permission?: boolean) => void
+  onLinkCopied?: (copied?: boolean) => void
   styles?: {
     rootContainer?: StyleProp<ViewStyle>
     header?: {
@@ -73,6 +84,14 @@ export interface IMyOrderDetailsProps {
       ticketHolder?: string
       status?: string
       download?: string
+    }
+    downloadNotification?: {
+      successMessage?: string
+      errorMessage?: string
+    }
+    copyText?: {
+      copy?: string
+      copied?: string
     }
   }
 }

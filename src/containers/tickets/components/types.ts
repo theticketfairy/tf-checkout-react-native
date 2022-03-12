@@ -17,6 +17,12 @@ export interface ITicketListItemStyles {
 
 export interface ITicketListItemTexts {
   soldOut?: string
+  salesNotStarted?: string
+  salesEnded?: string
+  inclFees?: string
+  exclFees?: string
+  free?: string
+  ticket?: string
 }
 
 export interface ITicketListItemProps extends ITicket {

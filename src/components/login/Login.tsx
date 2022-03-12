@@ -27,11 +27,13 @@ const Login = ({
   onLogoutSuccess,
   texts,
   styles,
-  onLoginFailure,
-  onFetchAccessTokenFailure,
-  onFetchUserProfileFailure,
+  onLoginError,
+  onFetchAccessTokenError,
+  onFetchUserProfileError,
   refs,
   brandImages,
+  onFetchAccessTokenSuccess,
+  onFetchUserProfileSuccess,
 }: ILoginProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [loginError, setLoginError] = useState('')
@@ -49,9 +51,9 @@ const Login = ({
     const { code, error } = await authorize(bodyFormData)
     if (error || !code) {
       setIsLoading(false)
-      if (onLoginFailure) {
-        setLoginError(error || 'Auth error')
-        return onLoginFailure(error || 'Auth error')
+      if (onLoginError) {
+        setLoginError(error?.message || 'Auth error')
+        return onLoginError(error!)
       }
     }
 
@@ -68,12 +70,18 @@ const Login = ({
 
     if (tokenError) {
       setIsLoading(false)
-      if (onFetchAccessTokenFailure) {
-        return onFetchAccessTokenFailure(tokenError)
+      if (onFetchAccessTokenError) {
+        return onFetchAccessTokenError(tokenError)
       }
     }
 
-    setAccessTokenHandler(accessToken)
+    if (onFetchAccessTokenError) {
+      setAccessTokenHandler(accessToken)
+    }
+
+    if (onFetchAccessTokenSuccess) {
+      onFetchAccessTokenSuccess()
+    }
 
     const { error: userProfileError, userProfile } = await fetchUserProfile(
       accessToken
@@ -81,11 +89,17 @@ const Login = ({
 
     if (userProfileError || !userProfile) {
       setIsLoading(false)
-      if (onFetchUserProfileFailure) {
-        return onFetchUserProfileFailure(
-          userProfileError || 'Error fetching user profile'
-        )
+      if (onFetchUserProfileError) {
+        return onFetchUserProfileError(userProfileError!)
       }
+      return
+    }
+
+    if (onFetchUserProfileSuccess) {
+      onFetchUserProfileSuccess({
+        firstName: userProfile.firstName,
+        lastName: userProfile.lastName,
+      })
     }
 
     const storedUserData: IStoredUserData = {

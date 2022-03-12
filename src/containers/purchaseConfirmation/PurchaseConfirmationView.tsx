@@ -1,7 +1,7 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-import { Button } from '../../components'
+import { Button, Loading } from '../../components'
 import s from './styles'
 import { IPurchaseConfirmationViewProps } from './types'
 
@@ -9,6 +9,8 @@ const PurchaseConfirmationView = ({
   texts,
   styles,
   onComplete,
+  areActivityIndicatorsEnabled,
+  isLoading,
 }: IPurchaseConfirmationViewProps) => (
   <View style={[s.rootContainer, styles?.rootContainer]}>
     <Text style={[s.title, styles?.title]}>
@@ -73,6 +75,7 @@ const PurchaseConfirmationView = ({
       styles={styles?.exitButton}
       onPress={onComplete}
     />
+    {areActivityIndicatorsEnabled && isLoading && <Loading />}
   </View>
 )
 

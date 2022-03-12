@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { AxiosInstance } from 'axios'
 
-import { IEvent, ITicket } from '../types'
+import { IError, IEvent, ITicket } from '../types'
 
 export interface IClientRequest extends AxiosInstance {
   setGuestToken: (token: string) => void
@@ -18,14 +18,14 @@ export interface IPromoCodeResponse {
 
 export interface IFetchTicketsResponse {
   tickets?: ITicket[]
-  error?: any
+  error?: IError
   promoCodeResult?: IPromoCodeResponse
   isInWaitingList?: boolean
   isAccessCodeRequired?: boolean
 }
 
 export interface IAuthorizeResponse {
-  error?: string
+  error?: IError
   code?: string
 }
 
@@ -50,9 +50,16 @@ export interface IAddToCartParams {
   }
 }
 
+export interface IEventData {
+  slug: string
+  name: string
+  description?: string
+  title: string
+}
+
 // Event types
 export interface IEventResponse {
-  eventError?: string
+  eventError?: IError
   eventData?: IEvent
 }
 
@@ -94,7 +101,7 @@ export interface IFreeRegistrationData {
   orderHash: string
 }
 export interface IFreeRegistrationResponse {
-  freeRegistrationError?: string
+  freeRegistrationError?: IError
   freeRegistrationData?: IFreeRegistrationData
 }
 //#endregion
@@ -121,8 +128,8 @@ export interface IRegisterNewUserResponse {
 
 // Billing information
 export interface ICheckoutResponse {
-  error: string
-  data: any
+  error?: IError
+  data?: any
 }
 
 // Checkout
@@ -159,7 +166,7 @@ export interface IOrderReview {
 }
 
 export interface IOrderReviewResponse {
-  error?: string
+  error?: IError
   data?: IOrderReview
 }
 
@@ -185,7 +192,7 @@ export interface IMyOrdersData {
 
 export interface IMyOrdersResponse {
   myOrdersData?: IMyOrdersData
-  myOrdersError?: string
+  myOrdersError?: IError
 }
 //#endregion
 
@@ -202,9 +209,13 @@ export interface IMyOrderDetailsItem {
 export interface IMyOrderDetailsTicket {
   hash: string
   ticketType: string
-  holderName: string
+  holderName?: string
+  holderEmail?: string
+  holderPhone?: string
   status: string
-  pdfLink: string
+  pdfLink?: string
+  qrData?: string
+  isSellable?: boolean
 }
 
 export interface IMyOrderDetailsHeader {
