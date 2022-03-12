@@ -159,5 +159,6 @@ export interface IBillingInfoViewTexts {
     emailsAdvice?: string
     choosePassword?: string
     checkbox?: string
+    fillAllRequiredFieldsAlert?: string
   }
 }

@@ -371,6 +371,10 @@ const Billing: FC<IBillingProps> = ({
     return true
   }
 
+  const fillAllRequiredFieldsAlert =
+    texts?.form?.fillAllRequiredFieldsAlert ||
+    'You must fill all Ticket Holder required fields'
+
   const checkExtraDataValid = (): string => {
     if (isAgeRequired) {
       const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
@@ -392,7 +396,7 @@ const Billing: FC<IBillingProps> = ({
       (itm) => itm === ''
     )
       ? ''
-      : 'You must fill all Ticket Holder required fields'
+      : fillAllRequiredFieldsAlert
   }
   //#endregion
 
