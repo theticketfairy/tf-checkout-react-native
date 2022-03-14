@@ -63,7 +63,7 @@ export interface ICheckoutProps {
   onPaymentError?: (error: IError) => void
 
   onFetchOrderDetailsSuccess: (orderData: IOrderDetails) => void
-  onFetchOrderDetailsError: (error: IError) => void
+  onFetchOrderDetailsError?: (error: IError) => void
 
   onStripeInitializeError?: (error: string) => void
 
