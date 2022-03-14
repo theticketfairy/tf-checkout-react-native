@@ -715,7 +715,7 @@ const Billing: FC<IBillingProps> = ({
   }
 
   //#region Effects
-  useCallback(() => {
+  useEffect(() => {
     handleOnLoadingChange(isLoading)
   }, [isLoading, handleOnLoadingChange])
 
