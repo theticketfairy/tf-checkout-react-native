@@ -764,6 +764,7 @@ Add it to the render function.
   payment?: {
     container?: StyleProp<ViewStyle>
     title?: StyleProp<TextStyle>
+    cardBackgroundColor?: string
     cardContainer?: StyleProp<ViewStyle>
     button?: IButtonStyles
     buttonDisabled?: IButtonStyles
