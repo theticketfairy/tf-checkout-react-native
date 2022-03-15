@@ -891,7 +891,7 @@ const Billing: FC<IBillingProps> = ({
 
   const isDataValid = checkBasicDataValid()
 
-  return skipping === 'skipping' ? (
+  return skipping === 'skipping' && areLoadingIndicatorsEnabled ? (
     renderCheckingOut()
   ) : (
     <KeyboardAwareScrollView extraScrollHeight={32}>
