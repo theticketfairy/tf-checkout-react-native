@@ -57,6 +57,7 @@ import {
   IOnCheckoutSuccess,
   ITicketHolderField,
   ITicketHolderFieldError,
+  SkippingStatusType,
 } from './types'
 
 const Billing: FC<IBillingProps> = ({
@@ -175,12 +176,8 @@ const Billing: FC<IBillingProps> = ({
 
   const [countries, setCountries] = useState<IDropdownItem[]>([defaultCountry])
   const [states, setStates] = useState<IDropdownItem[]>([defaultState])
-
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
-  const [skipping, setSkippingStatus] = useState<
-    'skipping' | 'fail' | 'success' | 'false'
-  >(isBillingRequired ? 'false' : 'skipping')
-
+  const [skipping, setSkippingStatus] = useState<SkippingStatusType>(undefined)
   const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
 
   // Errors state
@@ -205,6 +202,17 @@ const Billing: FC<IBillingProps> = ({
   const [dateOfBirthError, setDateOfBirthError] = useState('')
   // End of errors state
   //#endregion
+
+  const getSkippingStatus = (numOfTickets: number): SkippingStatusType => {
+    if (isBillingRequired) {
+      return 'false'
+    }
+    if (numOfTickets > 1 || isAgeRequired) {
+      return 'false'
+    } else {
+      return 'skipping'
+    }
+  }
 
   //#region Refs
   const storedToken = useRef('')
@@ -420,9 +428,7 @@ const Billing: FC<IBillingProps> = ({
       setIsSubmittingData(false)
 
       if (checkoutError) {
-        if (onCheckoutError) {
-          onCheckoutError(checkoutError)
-        }
+        onCheckoutError?.(checkoutError)
         setSkippingStatus('false')
         return showAlert(checkoutError.message)
       }
@@ -677,6 +683,8 @@ const Billing: FC<IBillingProps> = ({
     if (onFetchCartSuccess) {
       onFetchCartSuccess()
     }
+
+    setSkippingStatus(getSkippingStatus(cartData.quantity))
 
     setNumberOfTicketHolders(cartData.quantity)
     setIsSubToBrand(cartData.isMarketingOptedIn)

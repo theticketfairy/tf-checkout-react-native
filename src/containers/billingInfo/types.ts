@@ -162,3 +162,10 @@ export interface IBillingInfoViewTexts {
     fillAllRequiredFieldsAlert?: string
   }
 }
+
+export type SkippingStatusType =
+  | 'skipping'
+  | 'fail'
+  | 'success'
+  | 'false'
+  | undefined
