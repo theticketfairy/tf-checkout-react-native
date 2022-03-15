@@ -727,6 +727,14 @@ Add it to the render function.
     exitButton?: string
     payButton?: string
     freeRegistrationButton?: string
+    providePaymentInfo?: string
+    orderReviewItems?: {
+      event?: string
+      ticketType?: string
+      numberOfTickets?: string
+      price?: string
+      total?: string
+    }
   }
 
   styles?: ICheckoutStyles

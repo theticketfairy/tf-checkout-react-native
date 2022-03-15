@@ -293,6 +293,8 @@ const Checkout = ({
       _forEach(tOrderInfo, (item) => {
         _mapKeys(orderReviewData.reviewData, (value, key) => {
           if (item.id === key) {
+            //@ts-ignore
+            item.title = texts?.orderReviewItems?.[key] ?? item.title
             if (key === 'price' || key === 'total') {
               item.value = priceWithCurrency(value, currency)
             } else {
@@ -389,7 +391,8 @@ const Checkout = ({
         {isPaymentRequired && !isStripeConfigMissing && (
           <View style={styles?.payment?.container}>
             <Text style={styles?.payment?.title}>
-              Please provide your payment information
+              {texts?.providePaymentInfo ||
+                'Please provide your payment information'}
             </Text>
             <CardForm
               onFormComplete={handleOnChangePaymentInfo}
