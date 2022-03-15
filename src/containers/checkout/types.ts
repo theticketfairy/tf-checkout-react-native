@@ -35,6 +35,8 @@ export interface IOrderDetailsTicketHolder {
   holderPhone?: string
   qrData?: string
   pdfLink?: string
+  description?: string
+  descriptionPlain?: string
 }
 
 export interface IOrderDetails {
@@ -62,7 +64,7 @@ export interface ICheckoutProps {
   onPaymentSuccess: (data: any) => void
   onPaymentError?: (error: IError) => void
 
-  onFetchOrderDetailsSuccess: (orderData: IOrderDetails) => void
+  onFetchOrderDetailsSuccess?: (orderData: IOrderDetails) => void
   onFetchOrderDetailsError?: (error: IError) => void
 
   onStripeInitializeError?: (error: string) => void

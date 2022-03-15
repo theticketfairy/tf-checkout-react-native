@@ -878,9 +878,15 @@ import { MyOrders } from 'tf-checkout-react-native'
       {
         hash: string
         ticketType: string
-        holderName: string
+        holderName?: string
+        holderEmail?: string
+        holderPhone?: string
         status: string
-        pdfLink: string
+        pdfLink?: string
+        qrData?: string
+        isSellable?: boolean
+        description?: string
+        descriptionPlain?: string
       },
       {...}
     ]

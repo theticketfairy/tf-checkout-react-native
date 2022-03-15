@@ -120,6 +120,8 @@ const Checkout = ({
         holderName: ticket.holderName,
         qrData: ticket.qrData,
         pdfLink: ticket.pdfLink,
+        description: ticket.description,
+        descriptionPlain: ticket.descriptionPlain,
       })),
     }
 

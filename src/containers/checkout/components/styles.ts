@@ -10,7 +10,7 @@ export const OrderReviewStyles = StyleSheet.create({
   },
   orderItemContainer: {
     paddingVertical: 4,
-    width: '50%',
+    width: '100%',
   },
   orderItemTitle: {
     fontWeight: '800',

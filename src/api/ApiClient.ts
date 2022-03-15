@@ -354,6 +354,8 @@ export const fetchOrderDetails = async (orderId: string) => {
           isSellable: item.is_sellable,
           holderEmail: item.holder_email,
           holderPhone: item.holder_phone,
+          description: item.description,
+          descriptionPlain: item.description_plain,
         }
       }
     )

@@ -216,6 +216,8 @@ export interface IMyOrderDetailsTicket {
   pdfLink?: string
   qrData?: string
   isSellable?: boolean
+  description?: string
+  descriptionPlain?: string
 }
 
 export interface IMyOrderDetailsHeader {
