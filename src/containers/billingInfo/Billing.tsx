@@ -97,32 +97,35 @@ const Billing: FC<IBillingProps> = ({
   const stateLabel = texts?.form?.country || 'State/County'
   const defaultCountry: IDropdownItem = { value: '-1', label: countryLabel }
   const defaultState: IDropdownItem = { value: '-1', label: stateLabel }
+  const optionalText = texts?.form?.optional || ' (optional)'
 
   const brandCheckBoxText = useMemo(() => {
-    return texts?.form?.checkbox
-      ? texts.form?.checkbox
+    return texts?.form?.isSubToBrand
+      ? texts.form?.isSubToBrand
       : 'I would like to be updated on news, events and offers.'
-  }, [texts?.form?.checkbox])
+  }, [texts?.form?.isSubToBrand])
 
   const phoneLabel = useMemo(() => {
-    const optionalPhone = isPhoneRequired ? '' : ' (optional)'
+    const optionalPhone = isPhoneRequired ? '' : optionalText
     return texts?.form?.phone
       ? `${texts?.form?.phone} ${optionalPhone}`
       : `Phone ${optionalPhone}`
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPhoneRequired, texts])
 
   const addressLabel = useMemo(() => {
     const optionalAddress = Config.IS_BILLING_STREET_NAME_REQUIRED
       ? ''
-      : ' (optional)'
+      : optionalText
 
     return texts?.form?.street
       ? `${texts.form.street} ${optionalAddress}`
       : `Street ${optionalAddress}`
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [texts])
 
   const holderLabels = useMemo(() => {
-    const optional = isNameRequired ? '' : ' (optional)'
+    const optional = isNameRequired ? '' : optionalText
     return {
       firstName: texts?.form?.holderFirstName
         ? `${texts.form.holderFirstName} ${optional}`
@@ -131,12 +134,13 @@ const Billing: FC<IBillingProps> = ({
         ? `${texts.form.holderLastName} ${optional}`
         : `Last Name ${optional}`,
       email: texts?.form?.holderEmail
-        ? `${texts.form.holderEmail} (optional)`
-        : 'Email (optional)',
+        ? `${texts.form.holderEmail} ${optionalText}`
+        : `Email ${optionalText}`,
       phone: texts?.form?.holderPhone
-        ? `${texts.form.holderPhone} (optional)`
-        : 'Phone (optional)',
+        ? `${texts.form.holderPhone} ${optionalText}`
+        : `Phone ${optionalText}`,
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isNameRequired, texts])
   //#endregion
 

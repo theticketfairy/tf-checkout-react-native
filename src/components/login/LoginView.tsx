@@ -146,10 +146,12 @@ const LoginView = ({
   const LoggedComponent = () => (
     <View style={styles?.loggedIn?.container}>
       <Text style={styles?.loggedIn?.placeholder}>
-        Logged in as:{' '}
+        {texts?.loggedIn?.loggedAs || 'Logged in as:'}{' '}
         <Text style={styles?.loggedIn?.value}>{userFirstName}</Text>
       </Text>
-      <Text style={styles?.loggedIn?.message}>Not you?</Text>
+      <Text style={styles?.loggedIn?.message}>
+        {texts?.loggedIn?.notYou || 'Not you?'}
+      </Text>
       <Button
         text={texts?.logoutButton || 'LOGOUT'}
         onPress={handleOnPressLogout}
@@ -200,7 +202,7 @@ const LoginView = ({
               <TouchableWithoutFeedback>
                 <View style={[s.dialog, styles?.dialog?.container]}>
                   <Text style={[s.dialogTitle, styles?.dialog?.title]}>
-                    LOGIN
+                    {texts?.dialog?.title || 'Login'}
                   </Text>
                   <BrandImages />
                   {!!texts?.dialog?.message && (

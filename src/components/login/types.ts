@@ -92,12 +92,17 @@ export interface ILoginViewTexts {
     message?: string
     emailLabel?: string
     passwordLabel?: string
+    title?: string
   }
   logoutDialog?: {
     title?: string
     message?: string
     confirm?: string
     cancel?: string
+  }
+  loggedIn?: {
+    loggedAs?: string
+    notYou?: string
   }
 }
 

@@ -129,7 +129,6 @@ export interface IBillingInfoViewStyles {
 
 export interface IBillingInfoViewTexts {
   loginTexts?: ILoginViewTexts
-  loginButton?: string
   checkoutButton?: string
   skippingMessage?: string
   form?: {
@@ -158,8 +157,8 @@ export interface IBillingInfoViewTexts {
     getYourTicketsTitle?: string
     emailsAdvice?: string
     choosePassword?: string
-    checkbox?: string
     fillAllRequiredFieldsAlert?: string
+    optional?: string
   }
 }
 

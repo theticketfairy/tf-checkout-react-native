@@ -296,6 +296,7 @@ interface ILoginViewStyles {
   dialog?: {
     loginButton?: string
     message?: string
+    title?: string
   }
   logoutDialog?: {
     title?: string
@@ -303,6 +304,11 @@ interface ILoginViewStyles {
     confirm?: string
     cancel?: string
   }
+  loggedIn?: {
+    loggedAs?: string
+    notYou?: string
+  }
+
 ```
 ---
 
@@ -612,7 +618,6 @@ Add it to the render function.
 ```js
 interface IBillingInfoViewTexts {
   loginTexts?: ILoginViewTexts
-  loginButton?: string
   checkoutButton?: string
   skippingMessage?: string
   form?: {
@@ -629,7 +634,7 @@ interface IBillingInfoViewTexts {
     state?: string
     zipCode?: string
     dateOfBirth?: string
-    isSubToBrand?: string
+    isSubToBrand?: string // your brand's checkbox label
     ticketHoldersTitle?: string
     ticketHolderItem?: string
     holderFirstName?: string
@@ -639,7 +644,7 @@ interface IBillingInfoViewTexts {
     getYourTicketsTitle?: string
     emailsAdvice?: string
     choosePassword?: string
-    checkbox?: string  // your brand's checkbox label
+    optional?: string
   }
 }
 ```
