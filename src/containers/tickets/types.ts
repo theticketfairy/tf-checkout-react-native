@@ -80,6 +80,9 @@ export interface ITicketsViewTexts {
   title?: string
   item?: ITicketListItemTexts
   loggedInTexts?: ILoggedInTexts
+
+  listItem?: ITicketListItemTexts
+  waitingList?: IWaitingListTexts
 }
 
 export interface IOnFetchTicketsSuccess {
