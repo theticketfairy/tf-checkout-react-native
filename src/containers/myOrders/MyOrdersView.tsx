@@ -91,7 +91,9 @@ const MyOrdersView = ({
 
   const eventsDropdown = (
     <View style={[s.eventsContainer, styles?.eventsContainer]}>
-      <Text style={[s.eventsTitle, styles?.eventsTitle]}>Events</Text>
+      <Text style={[s.eventsTitle, styles?.eventsTitle]}>
+        {texts?.title || 'Events'}
+      </Text>
       <View
         style={[s.eventsSelectionContainer, styles?.eventsSelectionContainer]}
       >

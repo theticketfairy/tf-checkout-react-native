@@ -914,6 +914,7 @@ import { MyOrders } from 'tf-checkout-react-native'
   }
   texts?: {
     selectEventPlaceholder?: string
+    title?: string
   }
 }
 ```

@@ -32,6 +32,7 @@ export interface IMyOrdersStyles {
 
 export interface IMyOrdersTexts {
   selectEventPlaceholder?: string
+  title?: string
 }
 
 export interface IMyOrdersProps {
