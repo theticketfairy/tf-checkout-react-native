@@ -502,6 +502,8 @@ const App = () => {
               },
             }}            
             texts={{
+              title: '_Get your tickets_',
+              subTitle: '_subtitle_',
               orderReviewItems: {
                 event: '_EVENTO_',
                 ticketType: '_TICKET_TYPE_',
