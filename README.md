@@ -745,6 +745,11 @@ Add it to the render function.
   styles?: ICheckoutStyles
 
   onLoadingChange?: (isLoading: boolean) => void
+  onSkippingStatusChange?: (status: | 'skipping'
+  | 'fail'
+  | 'success'
+  | 'false'
+  | undefined) => void
   areAlertsEnabled?: boolean
   areLoadingIndicatorsEnabled?: boolean
 }
