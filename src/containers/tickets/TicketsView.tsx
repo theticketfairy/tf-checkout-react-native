@@ -38,7 +38,9 @@ const TicketsView = ({
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
-  const buttonText = isButtonDisabled
+  const buttonText = texts?.getTicketsButton
+    ? texts.getTicketsButton
+    : isButtonDisabled
     ? 'Get tickets'
     : `Get ${selectedTicket?.selectedOption?.value} tickets`
   const title = texts?.title ? texts.title : 'GET TICKETS'
@@ -103,7 +105,7 @@ const TicketsView = ({
           <LoggedIn
             onPressMyOrders={onPressMyOrders}
             styles={styles?.loggedIn}
-            texts={texts?.loggedIn}
+            texts={texts?.loggedInTexts}
             onPressLogout={onPressLogout}
           />
         )}

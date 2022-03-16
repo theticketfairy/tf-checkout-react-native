@@ -37,14 +37,7 @@ export interface ITicketsViewProps {
   isPromoCodeValid?: boolean
   onSelectTicketOption: (selectedTicket: ISelectedTicket) => void
   selectedTicket?: ISelectedTicket
-  texts?: {
-    promoCode?: IPromoCodeTexts
-    getTicketsButton?: string
-    title?: string
-    waitingList?: IWaitingListTexts
-    loggedIn?: ILoggedInTexts
-    listItem?: ITicketListItemTexts
-  }
+  texts?: ITicketsViewTexts
   event?: IEvent
   isWaitingListVisible?: boolean
   isGetTicketsButtonVisible?: boolean
