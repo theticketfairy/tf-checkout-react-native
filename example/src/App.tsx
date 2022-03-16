@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
@@ -14,12 +15,15 @@ import {
   setConfig,
   ITicketsResponseData,
 } from 'tf-checkout-react-native'
+import { IOrderDetails } from '../../src/containers/checkout/types'
+import { IError } from '../../src/types'
 
 import Color from './Colors'
+import CustomLoading from './components/CustomLoading'
 import { ComponentEnum } from './enums'
 import styles from './styles'
 
-const EVENT_ID =  10915//MANA//10690 //5420 // Replace with assigned ID
+const EVENT_ID = 5420//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -28,6 +32,11 @@ const App = () => {
   const [cartProps, setCartProps] = useState<ITicketsResponseData | undefined>(
     undefined
   )
+
+  //#region Loadings
+  const [isLoading, setIsLoading] = useState(false)
+
+
   const [checkoutProps, setCheckOutProps] = useState<
     IOnCheckoutSuccess | undefined
   >(undefined)
@@ -141,11 +150,71 @@ const App = () => {
     switch (componentToShow) {
       case ComponentEnum.BillingInfo:
         return (
+          <>
           <BillingInfo
+          areLoadingIndicatorsEnabled={false}
+          onLoadingChange={(loading) => {
+            console.log('%c BILLING LOADING', 'color: #007acc;', loading);
+            setIsLoading(loading)
+          }}
             texts={{
               form: {
-                checkbox: 'This is an injected text for your brand',
+                getYourTicketsTitle: '_Get your tickets_',
+                firstName: '_First name_',
+                lastName: '_Last name_',
+                email: '_Email_',
+                phone: '_Phone_',
+                confirmEmail: '_Confirm email_',
+                street: '_Street_',
+                city: '_City_',
+                country: '_Country_',
+                zipCode: '_Zip code_',
+                state: '_State_',
+                ticketHoldersTitle: '_Ticket holders_',
+                ticketHolderItem: '_Ticket holder item_',
+                isSubToTicketFairy:'_Is sub to ticket fairy_',
+                holderEmail: '_Holder email_',
+                holderFirstName: '_Holder first name_',
+                holderLastName: '_Holder last name_',
+                holderPhone: '_Holder phone_',
+                isSubToBrand: '_Is sub to Brand_',
+                password: '_Password_',
+                confirmPassword: '_Confirm password_',
+                dateOfBirth: '_Date of birth_',
+                emailsAdvice: '_Emails advice_',
+                choosePassword: '_Choose password_',
+                fillAllRequiredFieldsAlert: '_Fill all required fields_',
+                optional: '(_Optional_)',
               },
+              checkoutButton: '_Checkout_',
+              loginTexts:{
+                loginButton:'_Login_',
+                logoutButton: '_Logout_',
+                line1: '_Line 1_',
+                line2: '_Line 2_',
+                message: '_Message_',
+                
+                logoutDialog: {
+                  title: '_Logout?_',
+                  message: '_sure to logout?_',
+                  confirm: '_yes_',
+                  cancel: '_cancel_',
+                },
+                dialog: {
+                  loginButton: '_Dialog_login_',
+                  message: '_Dialog message_',
+                  emailLabel: '_Dialog email label_',
+                  passwordLabel: '_Dialog password label_',
+                  title: '_Login title_',
+
+                },
+                loggedIn:{
+                  loggedAs: '_Logged in:_',
+                  notYou: '_Not you?_',
+                }
+                
+                
+              }
             }}
             styles={{
               datePicker: {
@@ -339,15 +408,19 @@ const App = () => {
             onLoginSuccess={handleOnLoginSuccess}
             onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}
           />
+          {/* {isLoading && <CustomLoading text='Custom loading for Billing' backgroundColor='green' />} */}
+          </>
         )
       case ComponentEnum.Checkout:
         return (
+          <>
           <Checkout
             eventId={EVENT_ID}
             checkoutData={checkoutProps!}
             onPaymentSuccess={handleOnPaymentSuccess}
             onPressExit={handleStripeError}
             areLoadingIndicatorsEnabled={false}
+            onLoadingChange={(loading) => {setIsLoading(loading)}}
             styles={{
               rootStyle: {
                 paddingHorizontal: 16,
@@ -364,7 +437,7 @@ const App = () => {
                 },
               },
 
-              
+
               title: {
                 color: Color.textMain,
               },
@@ -399,15 +472,40 @@ const App = () => {
                     backgroundColor: Color.primary,
                   },
                 },
+                cardBackgroundColor: '#FF0000',
               },
+            }}            
+            texts={{
+              orderReviewItems: {
+                event: '_EVENTO_',
+                ticketType: '_TICKET_TYPE_',
+                numberOfTickets: '_NUMBER_OF_TICKETS_',
+                price: '_PRICE_',
+                total: '_TOTAL_',
+              },
+              providePaymentInfo: '_Provide Payment Info_',
+              payButton: '_PAY_'
             }}
-          />
+            />
+            {isLoading && <CustomLoading text='Loading for checkout' backgroundColor='orange'/>}
+
+            
+          </>
         )
       case ComponentEnum.PurchaseConfirmation:
         return (
           <PurchaseConfirmation
             orderHash={checkoutProps!.hash}
             onComplete={handleOnComplete}
+            texts={{
+              title: '_Purchase Confirmation_',
+              message: {
+                line1: '_Thank you for your purchase!_',
+                line2: '_You will receive an email confirmation shortly._',
+              },
+              exitButton: '_Exit_'
+              
+            }}
             styles={{
               rootContainer: {
                 backgroundColor: Color.backgroundMain,
@@ -442,6 +540,10 @@ const App = () => {
         return (
           <View style={{ flex: 1 }}>
             <MyOrders
+              config={{
+                areActivityIndicatorsEnabled: false,
+              }}
+              onLoadingChange={(loading) => setIsLoading(loading)}
               onSelectOrder={handleOnSelectOrder}
               styles={{
                 eventsTitle: {
@@ -496,6 +598,10 @@ const App = () => {
                   },
                 },
               }}
+              texts={{
+                title: '_My Orders_',
+                selectEventPlaceholder: '_Selected Order Details_',
+              }}
             />
             <TouchableOpacity
               onPress={handleOnDismissMyOrders}
@@ -508,6 +614,7 @@ const App = () => {
             >
               <Text>Back</Text>
             </TouchableOpacity>
+            {isLoading && <CustomLoading text='Custom loading for My Orders' backgroundColor='blue'/>}
           </View>
         )
 
@@ -624,6 +731,35 @@ const App = () => {
                   },
                 },
               }}
+              texts={{
+                title: '_MY ORDERS DETAILS_',
+                subTitle: '_Sub title_',
+                referralLink: '_Referral_',
+                listItem: {
+                  title: '_Item_List_Title_',
+                  price: '_Price_',
+                  ticketType: '_Ticket_Type_',
+                  quantity: '_Quantity_',
+                  total: '_Total_',
+                },
+                ticketItem: {
+                  title: '_Ticket_List_Title_',
+                  ticketId: '_Ticket_Id_',
+                  ticketType: '_Ticket_Type_',
+                  ticketHolder: '_Ticket_Holder_',
+                  status: '_Status_',
+                  download: '_Download_',
+                },
+                copyText: {
+                  copy: '_Copy_',
+                  copied: '_Copied_',
+                },
+                referral: {
+                  soFar: '_SO FAR_',
+                  tickets: '_TICKETS_'
+                }
+
+              }}
             />
             <TouchableOpacity
               onPress={handleGoBackFromOrderDetails}
@@ -643,8 +779,9 @@ const App = () => {
         return (
           <View style={{ flex: 1 }}>
             <Tickets
+              areLoadingIndicatorsEnabled={false}
               eventId={EVENT_ID}
-              onLoadingChange={(isLoading) => {console.log('is tickets loading', isLoading)}}
+              onLoadingChange={(loading) => setIsLoading(loading)}
 
               onFetchTicketsSuccess={(tickets) => {console.log('onFetchTicketsSuccess', tickets)}}
               onFetchTicketsError={(error) => {console.log('onFetchTicketsError', error)}}
@@ -785,7 +922,35 @@ const App = () => {
                   },
                 },
               }}
+
+              texts={{
+                promoCode: {
+                  promoCodeButton: '_PROMO_CODE_',
+                  inputPlaceHolder: '_ENTER_PROMO_CODE_',
+                  apply: '_APPLY_',
+                  cancel: '_CANCEL_',
+                  mainButton: '_MAIN_BUTTON_',
+                  title: '_TITLE_'
+                },
+                getTicketsButton: '_GET_TICKETS_',
+                title:'_TITLE_',
+                item: {
+                  ticket: '_TICKET_'
+                },
+                loggedInTexts:{
+                  logOutButtonText: '_LOGOUT_',
+                  myOrderButtonText: '_MY_ORDERS_',
+                  logoutDialog: {
+                    title: '_WANT TO LOGOUT_',
+                    confirmButton: '_YES_',
+                    cancelButton: '_NO_',
+                    message: '_MESSAGE TO SHOW_'
+                  }
+                }
+                
+              }}
             />
+            {isLoading && <CustomLoading />}
           </View>
         )
     }
