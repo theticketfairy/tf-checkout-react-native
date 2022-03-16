@@ -12,7 +12,10 @@ import {
   PurchaseConfirmation,
   Tickets,
 } from './containers'
-import { IOnCheckoutSuccess } from './containers/billingInfo/types'
+import {
+  IOnCheckoutSuccess,
+  SkippingStatusType,
+} from './containers/billingInfo/types'
 import { ITicketsProps } from './containers/tickets/types'
 import { setConfig } from './helpers/Config'
 import { ITicketsResponseData, IUserProfile } from './types'
@@ -36,6 +39,7 @@ export {
   MyOrders,
   PurchaseConfirmation,
   setConfig,
+  SkippingStatusType,
   Tickets,
 }
 

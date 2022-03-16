@@ -90,6 +90,7 @@ export interface IBillingProps {
   areLoadingIndicatorsEnabled?: boolean
   areAlertsEnabled?: boolean
   onLoadingChange?: (isLoading: boolean) => void
+  onSkippingStatusChange?: (status: SkippingStatusType) => void
 }
 
 export interface ITicketHolderField {

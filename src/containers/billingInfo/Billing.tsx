@@ -91,6 +91,7 @@ const Billing: FC<IBillingProps> = ({
   onFetchStatesSuccess,
   onFetchAccessTokenError,
   onFetchAccessTokenSuccess,
+  onSkippingStatusChange,
 }) => {
   //#region Labels
   const countryLabel = texts?.form?.country || 'Country'
@@ -231,6 +232,13 @@ const Billing: FC<IBillingProps> = ({
       }
     },
     [onLoadingChange]
+  )
+
+  const handleOnSkippingStatusChange = useCallback(
+    (status: SkippingStatusType) => {
+      onSkippingStatusChange?.(status)
+    },
+    [onSkippingStatusChange]
   )
 
   const showAlert = (text: string) => {
@@ -730,6 +738,10 @@ const Billing: FC<IBillingProps> = ({
   useEffect(() => {
     handleOnLoadingChange(isLoading)
   }, [isLoading, handleOnLoadingChange])
+
+  useEffect(() => {
+    handleOnSkippingStatusChange(skipping)
+  }, [handleOnSkippingStatusChange, skipping])
 
   useEffect(() => {
     if (countries.length > 1 && countryId) {
