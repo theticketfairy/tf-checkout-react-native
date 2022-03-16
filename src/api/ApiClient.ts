@@ -490,7 +490,7 @@ export const fetchEvent = async (
     headers: HEADERS,
   }).catch((error: AxiosError) => {
     responseError = {
-      code: error.response?.status!,
+      code: error?.response?.data.status,
       message: error.response?.data.message,
     }
   })

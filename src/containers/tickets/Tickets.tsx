@@ -3,7 +3,7 @@ import jwtDecode from 'jwt-decode'
 import _get from 'lodash/get'
 import _isEmpty from 'lodash/isEmpty'
 import _some from 'lodash/some'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
 import { addToCart, fetchEvent, fetchTickets } from '../../api/ApiClient'
@@ -51,6 +51,8 @@ const Tickets = ({
     IPromoCodeResponse | undefined
   >(undefined)
   const [isFirstCall, setIsFirstCall] = useState(true)
+
+  const eventErrorCodeRef = useRef(0)
 
   const showAlert = (message: string) => {
     if (areAlertsEnabled) {
@@ -148,7 +150,8 @@ const Tickets = ({
           eventError || 'There was an error while fetching event'
         )
       }
-      showAlert(eventError)
+      eventErrorCodeRef.current = eventError.code
+      showAlert(eventError.message)
       return
     }
 
@@ -242,6 +245,13 @@ const Tickets = ({
 
   //#region Handlers
   const handleOnPressGetTickets = () => {
+    if (eventErrorCodeRef.current !== 0) {
+      showAlert('Event not found')
+      return onAddToCartError?.({
+        code: eventErrorCodeRef.current,
+        message: 'Event not found',
+      })
+    }
     performBookTickets()
   }
 
