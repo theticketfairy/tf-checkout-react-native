@@ -60,6 +60,9 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
   const copyText = texts?.copyText?.copy || 'Copy'
   const copiedText = texts?.copyText?.copied || 'Copied'
 
+  const soFarText = texts?.referral?.soFar || `So far, you've referred`
+  const ticketsText = texts?.referral?.tickets || `tickets.`
+
   const renderShareLink = () => (
     <View style={[s.shareLinkContainer, styles?.header?.shareLink?.container]}>
       <Text
@@ -97,11 +100,11 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
       <Text style={styles?.header?.shareLink?.message}>{referralLink} </Text>
       {renderShareLink()}
       <Text style={styles?.header?.shareLink?.referrals}>
-        So far, you've referred{' '}
+        {soFarText}{' '}
         <Text style={styles?.header?.shareLink?.referralValue}>
           {header.salesReferred}
         </Text>{' '}
-        tickets.
+        {ticketsText}
       </Text>
     </View>
   )
@@ -239,7 +242,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
               >
                 <Text style={styles?.section0Footer?.label}>{itemsTotal}</Text>
                 <Text style={styles?.section0Footer?.value}>
-                  {header.total}
+                  {parsedItems[0].item.currency} {header.total}
                 </Text>
               </View>
             )

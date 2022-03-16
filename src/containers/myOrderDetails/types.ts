@@ -70,6 +70,10 @@ export interface IMyOrderDetailsProps {
     title?: string
     subTitle?: string
     referralLink?: string
+    referral?: {
+      soFar?: string
+      tickets?: string
+    }
     listItem?: {
       title?: string
       ticketType?: string

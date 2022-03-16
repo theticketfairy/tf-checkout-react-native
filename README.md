@@ -969,7 +969,7 @@ import { MyOrders } from 'tf-checkout-react-native'
 
 ---
 
-## MyOrderDetails
+## MyOrder Details
 
 When user selects an order from the `MyOrders` component, will show it details.
 
@@ -1047,6 +1047,10 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
     title?: string
     subTitle?: string
     referralLink?: string
+    referral?: {
+      soFar?: string
+      tickets?: string
+    }
     listItem?: {
       title?: string
       ticketType?: string
