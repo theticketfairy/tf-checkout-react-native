@@ -14,6 +14,7 @@ import {
   IUserProfile,
   setConfig,
   ITicketsResponseData,
+  SkippingStatusType,
 } from 'tf-checkout-react-native'
 import { IOrderDetails } from '../../src/containers/checkout/types'
 import { IError } from '../../src/types'
@@ -23,7 +24,10 @@ import CustomLoading from './components/CustomLoading'
 import { ComponentEnum } from './enums'
 import styles from './styles'
 
-const EVENT_ID = 5420//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID
+const GOOGLE_IMAGE = require('./google_logo.png')
+const AMAZON_IMAGE = require('./amazon_logo.png')
+
+const EVENT_ID = 8667//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -35,6 +39,7 @@ const App = () => {
 
   //#region Loadings
   const [isLoading, setIsLoading] = useState(false)
+  const [skippingStatus, setSkippingStatus] = useState<SkippingStatusType>(undefined)
 
 
   const [checkoutProps, setCheckOutProps] = useState<
@@ -114,7 +119,7 @@ const App = () => {
   useEffect(() => {
     setConfig({
       DOMAIN: 'https://tickets.manacommon.com',
-      BRAND: 'mana-onetree-testing-brand',
+      BRAND: 'the-ticket-fairy',// 'mana-onetree-testing-brand',
       ARE_SUB_BRANDS_INCLUDED: true,
     })
   }, [])
@@ -153,6 +158,26 @@ const App = () => {
           <>
           <BillingInfo
           areLoadingIndicatorsEnabled={false}
+          onSkippingStatusChange={(status) => {console.log('%cApp.tsx line:159 status', 'color: #00FFcc;', status);
+          setSkippingStatus(status)
+        }}
+          loginBrandImages={{
+            image1: GOOGLE_IMAGE,
+            image1Style: {
+              height: 50,
+              width: 100,
+              resizeMode: 'contain',
+              tintColor: undefined
+            },
+            image2: AMAZON_IMAGE,
+            image2Style: {
+              height: 50,
+              width: 100,
+              resizeMode: 'contain',
+              tintColor: undefined,
+              marginBottom: 16
+            },
+          }}
           onLoadingChange={(loading) => {
             console.log('%c BILLING LOADING', 'color: #007acc;', loading);
             setIsLoading(loading)
@@ -408,7 +433,8 @@ const App = () => {
             onLoginSuccess={handleOnLoginSuccess}
             onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}
           />
-          {/* {isLoading && <CustomLoading text='Custom loading for Billing' backgroundColor='green' />} */}
+          {isLoading && skippingStatus !== 'skipping' && <CustomLoading text='Custom loading for Billing' backgroundColor='green' />}
+          {skippingStatus === 'skipping' && <CustomLoading text='Skipping loading for Billing' backgroundColor='black' /> }
           </>
         )
       case ComponentEnum.Checkout:
@@ -947,7 +973,6 @@ const App = () => {
                     message: '_MESSAGE TO SHOW_'
                   }
                 }
-                
               }}
             />
             {isLoading && <CustomLoading />}
