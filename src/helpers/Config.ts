@@ -49,9 +49,9 @@ export const setConfig = (configs: IConfig): string | undefined => {
   if (!Config.ARE_SUB_BRANDS_INCLUDED) {
     Config.ARE_SUB_BRANDS_INCLUDED = false
   }
-  // if (Config.IS_BILLING_STREET_NAME_REQUIRED === undefined) {
-  //   Config.IS_BILLING_STREET_NAME_REQUIRED = true
-  // }
+  if (Config.IS_BILLING_STREET_NAME_REQUIRED === undefined) {
+    Config.IS_BILLING_STREET_NAME_REQUIRED = true
+  }
 
   return undefined
 }

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
-import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
+import { Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
   IMyOrderDetailsResponse,
@@ -27,7 +27,7 @@ import styles from './styles'
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
-const EVENT_ID = 8667//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID
+const EVENT_ID = 5420//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -118,7 +118,7 @@ const App = () => {
   //#region effects
   useEffect(() => {
     setConfig({
-      DOMAIN: 'https://tickets.manacommon.com',
+      DOMAIN: 'https://manacommon.com',
       BRAND: 'the-ticket-fairy',// 'mana-onetree-testing-brand',
       ARE_SUB_BRANDS_INCLUDED: true,
     })
@@ -498,7 +498,7 @@ const App = () => {
                     backgroundColor: Color.primary,
                   },
                 },
-                cardBackgroundColor: '#FF0000',
+                cardBackgroundColor: Platform.OS === 'ios' ? Color.white : Color.gray30,
               },
             }}            
             texts={{
@@ -957,7 +957,7 @@ const App = () => {
                   inputPlaceHolder: '_ENTER_PROMO_CODE_',
                   apply: '_APPLY_',
                   cancel: '_CANCEL_',
-                  mainButton: '_MAIN_BUTTON_',
+                  mainButton: '_PROMO CODE_',
                   title: '_TITLE_'
                 },
                 getTicketsButton: '_GET_TICKETS_',

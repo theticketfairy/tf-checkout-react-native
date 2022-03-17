@@ -457,11 +457,9 @@ const Billing: FC<IBillingProps> = ({
       setIsSubmittingData(false)
       setSkippingStatus('false')
 
-      if (onCheckoutError) {
-        onCheckoutError({
-          message: 'Error while performing checkout',
-        })
-      }
+      onCheckoutError?.({
+        message: 'Error while performing checkout',
+      })
     }
   }
 
