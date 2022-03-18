@@ -209,9 +209,10 @@ const Billing: FC<IBillingProps> = ({
   //#endregion
 
   const getSkippingStatus = (numOfTickets: number): SkippingStatusType => {
-    if (isBillingRequired) {
+    if (isBillingRequired || skipping === 'fail') {
       return 'false'
     }
+
     if (numOfTickets > 1 || isAgeRequired) {
       return 'false'
     } else {
@@ -301,12 +302,10 @@ const Billing: FC<IBillingProps> = ({
     userProfile: IUserProfile,
     accessToken: string
   ) => {
-    if (onLoginSuccess) {
-      onLoginSuccess({
-        accessToken: accessToken,
-        userData: userProfile,
-      })
-    }
+    onLoginSuccess?.({
+      accessToken: accessToken,
+      userData: userProfile,
+    })
 
     if (!isBillingRequired && skipping === 'fail') {
       setSkippingStatus('skipping')
@@ -323,9 +322,7 @@ const Billing: FC<IBillingProps> = ({
   }
 
   const handleOnLoginFail = (error: IError) => {
-    if (onLoginError) {
-      onLoginError(error)
-    }
+    onLoginError?.(error)
   }
 
   const handleOnLogoutSuccess = () => {
@@ -422,9 +419,7 @@ const Billing: FC<IBillingProps> = ({
 
   //#region Submit form
   const handleOnRegisterFail = (rawError: any) => {
-    if (onRegisterError) {
-      onRegisterError(rawError)
-    }
+    onRegisterError?.(rawError)
   }
 
   const performCheckout = async (
@@ -509,9 +504,7 @@ const Billing: FC<IBillingProps> = ({
 
     storedToken.current = tokens.accessToken
 
-    if (onRegisterSuccess) {
-      onRegisterSuccess(tokens)
-    }
+    onRegisterSuccess?.(tokens)
 
     await performCheckout(checkoutBody, tokens.accessToken)
   }
@@ -629,21 +622,19 @@ const Billing: FC<IBillingProps> = ({
     setIsLoading(true)
     let usrPrfl: IUserProfile | undefined
     const usrTkn = await getData(LocalStorageKeys.ACCESS_TOKEN)
+    let skippingStatus: SkippingStatusType
 
     const { data: countriesData, error: countriesError } =
       await fetchCountries()
 
     if (countriesError) {
+      setSkippingStatus('fail')
       setIsLoading(false)
-      if (onFetchCountriesError) {
-        onFetchCountriesError(countriesError)
-      }
+      onFetchCountriesError?.(countriesError)
       return showAlert(countriesError.message || 'Error fetching countries')
     }
 
-    if (onFetchCountriesSuccess) {
-      onFetchCountriesSuccess()
-    }
+    onFetchCountriesSuccess?.()
 
     const parsedCountries: IDropdownItem[] = _map(
       countriesData,
@@ -658,24 +649,23 @@ const Billing: FC<IBillingProps> = ({
         await fetchUserProfile(usrTkn)
 
       if (userProfileError || !userProfileResponse) {
+        setSkippingStatus('fail')
         setIsLoading(false)
-        if (onFetchUserProfileError) {
-          onFetchUserProfileError(userProfileError!)
-        }
+        onFetchUserProfileError?.(userProfileError!)
+
         return showAlert(
           userProfileError?.message || 'Error fetching user profile'
         )
       }
 
-      if (onFetchUserProfileSuccess) {
-        onFetchUserProfileSuccess({
-          firstName: userProfileResponse.firstName,
-          lastName: userProfileResponse.lastName,
-        })
-      }
+      onFetchUserProfileSuccess?.({
+        firstName: userProfileResponse.firstName,
+        lastName: userProfileResponse.lastName,
+      })
 
       usrPrfl = userProfileResponse
     } else {
+      skippingStatus = 'fail'
       parsedCountries.unshift(defaultCountry)
       setSelectedCountry(defaultCountry)
     }
@@ -683,18 +673,19 @@ const Billing: FC<IBillingProps> = ({
     const { cartData, cartError } = await fetchCart()
 
     if (cartError) {
+      setSkippingStatus('fail')
       setIsLoading(false)
-      if (onFetchCartError) {
-        onFetchCartError(cartError)
-      }
+      onFetchCartError?.(cartError)
       return showAlert(cartError.message)
     }
 
-    if (onFetchCartSuccess) {
-      onFetchCartSuccess()
-    }
+    onFetchCartSuccess?.()
 
-    setSkippingStatus(getSkippingStatus(cartData.quantity))
+    if (skippingStatus === 'fail') {
+      setSkippingStatus('fail')
+    } else {
+      setSkippingStatus(getSkippingStatus(cartData.quantity))
+    }
 
     setNumberOfTicketHolders(cartData.quantity)
     setIsSubToBrand(cartData.isMarketingOptedIn)
@@ -991,6 +982,7 @@ const Billing: FC<IBillingProps> = ({
               styles={styles?.inputStyles}
               autoCapitalize='none'
               secureTextEntry={true}
+              textContentType='oneTimeCode'
             />
             <Input
               label={texts?.form?.confirmPassword || 'Confirm password'}
@@ -1000,6 +992,7 @@ const Billing: FC<IBillingProps> = ({
               styles={styles?.inputStyles}
               autoCapitalize='none'
               secureTextEntry={true}
+              textContentType='oneTimeCode'
             />
           </>
         )}
