@@ -95,7 +95,7 @@ const Billing: FC<IBillingProps> = ({
 }) => {
   //#region Labels
   const countryLabel = texts?.form?.country || 'Country'
-  const stateLabel = texts?.form?.country || 'State/County'
+  const stateLabel = texts?.form?.state || 'State/County'
   const defaultCountry: IDropdownItem = { value: '-1', label: countryLabel }
   const defaultState: IDropdownItem = { value: '-1', label: stateLabel }
   const optionalText = texts?.form?.optional || ' (optional)'
