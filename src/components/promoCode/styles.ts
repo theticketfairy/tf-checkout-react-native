@@ -5,24 +5,23 @@ import R from '../../res'
 export default StyleSheet.create({
   content: {
     flexDirection: 'row',
-    marginBottom: 16,
-    justifyContent: 'space-between',
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: R.colors.listBackground,
   },
   input: {
-    borderWidth: 1,
-    padding: 8,
+    paddingHorizontal: 8,
     minWidth: 100,
-    width: '50%',
+    flex: 0.8,
     borderColor: R.colors.black,
     color: R.colors.black,
+    height: 45,
+    fontSize: 16,
   },
   applyButton: {
     backgroundColor: R.colors.primary,
     paddingHorizontal: 8,
-  },
-  applyButtonDisabled: {
-    backgroundColor: R.colors.disabled,
-    paddingHorizontal: 8,
+    flex: 0.4,
   },
   applyText: {
     fontWeight: '400',
@@ -30,16 +29,22 @@ export default StyleSheet.create({
     color: R.colors.white,
   },
   cancelButton: {
-    borderColor: 'gray',
+    padding: 4,
+    flex: 0.2,
+    marginLeft: 4,
   },
-  cancelText: {
-    fontWeight: '400',
-    fontSize: 14,
-    color: 'gray',
+  cancelIcon: {
+    width: 20,
+    height: 20,
+    tintColor: R.colors.white,
   },
-  mainButtonContainer: {
-    marginVertical: 16,
+  errorMessage: {
+    color: R.colors.danger,
   },
+  validMessage: {
+    color: R.colors.validGreen,
+  },
+  mainButtonContainer: {},
   mainButtonText: {
     fontWeight: '400',
     fontSize: 14,
@@ -55,5 +60,4 @@ export default StyleSheet.create({
     marginVertical: 16,
     fontWeight: '600',
   },
-  contentWrapper: {},
 })

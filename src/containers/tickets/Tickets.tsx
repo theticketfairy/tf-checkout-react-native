@@ -37,6 +37,7 @@ const Tickets = ({
   onFetchEventSuccess,
   onAddToWaitingListError,
   onAddToWaitingListSuccess,
+  promoCodeCloseIcon,
 }: ITicketsProps) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
@@ -104,7 +105,13 @@ const Tickets = ({
 
     if (responseTickets && !_isEmpty(responseTickets)) {
       setTickets(responseTickets)
-      setPromoCodeResponse(promoCodeResult)
+
+      if (isFirstCall && promoCodeResult?.isValid) {
+        setPromoCodeResponse(promoCodeResult)
+      } else if (!isFirstCall) {
+        setPromoCodeResponse(promoCodeResult)
+      }
+
       if (onFetchTicketsSuccess) {
         onFetchTicketsSuccess({
           promoCodeResponse: {
@@ -132,7 +139,6 @@ const Tickets = ({
             isAccessCodeRequired,
           })
         }
-        showAlert(promoCodeResult?.message)
       }
     }
 
@@ -303,6 +309,7 @@ const Tickets = ({
       onAddToWaitingListError={onAddToWaitingListError}
       onAddToWaitingListSuccess={onAddToWaitingListSuccess}
       onLoadingChange={handleOnLoadingChange}
+      promoCodeCloseIcon={promoCodeCloseIcon}
     />
   )
 }

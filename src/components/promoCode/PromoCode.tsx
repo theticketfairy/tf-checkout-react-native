@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Text, TextInput, View } from 'react-native'
+import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 import R from '../../res'
 import Button from '../button/Button'
@@ -14,35 +14,25 @@ const PromoCode = ({
   styles,
   texts,
   isAccessCodeEnabled,
+  closeButtonIcon,
 }: IPromoCodeProps) => {
   const [isActive, setIsActive] = useState(false)
   const [promoCode, setPromoCode] = useState('')
 
   const activate = () => setIsActive(true)
-  const deactivate = () => setIsActive(false)
+  const deactivate = (): string => {
+    const code = promoCode
+    setIsActive(false)
+    setPromoCode('')
+    return code
+  }
 
   const handleOnPressPromoCode = () => {
     activate()
   }
 
   const handleOnPressApply = () => {
-    deactivate()
     onPressApply(promoCode)
-    setTimeout(() => {
-      setPromoCode('')
-    }, 300)
-  }
-
-  const applyButtonDisabledStyles: IButtonStyles = {
-    container: styles?.applyDisabledButton?.container,
-    text: [s.applyText, styles?.applyDisabledButton?.text],
-    button: [s.applyButtonDisabled, styles?.applyDisabledButton?.button],
-  }
-
-  const applyButtonStyles: IButtonStyles = {
-    container: styles?.applyButton?.container,
-    text: [s.applyText, styles?.applyButton?.text],
-    button: [s.applyButton, styles?.applyButton?.button],
   }
 
   const isCodeValid = () => {
@@ -53,38 +43,29 @@ const PromoCode = ({
     }
   }
 
-  const successComponent = () =>
-    isCodeValid() && (
-      <View style={[s.messageContainer, styles?.messageContainer]}>
-        <Text style={styles?.message}>
-          {promoCodeValidationMessage ||
-            'Your promo code was applied successfully.'}
-        </Text>
-      </View>
-    )
-
   const isApplyButtonDisabled = promoCode.length === 0
-  const inputPlaceHolder = texts?.title
-    ? texts.title
-    : isAccessCodeEnabled
-    ? 'Enter your access code'
-    : 'Promo Code'
   const submitButton = texts?.apply
     ? texts.apply
     : isAccessCodeEnabled
     ? 'ENTER'
     : 'APPLY'
 
-  return (
-    <View style={styles?.rootContainer}>
-      {successComponent()}
+  const resultMessageValidStyle = [s.validMessage, styles?.validMessage]
+  const resultMessageErrorStyle = [s.errorMessage, styles?.errorMessage]
+  const resultMessageStyle = isCodeValid()
+    ? resultMessageValidStyle
+    : resultMessageErrorStyle
+  const resultMessage = isCodeValid()
+    ? texts?.validMessage || 'Valid promo code'
+    : texts?.errorMessage || promoCodeValidationMessage
 
+  return (
+    <View style={[{}, styles?.rootContainer]}>
       {isActive || isAccessCodeEnabled ? (
-        <View style={[s.contentWrapper, styles?.contentWrapper]}>
-          <Text style={[s.title, styles?.title]}>{inputPlaceHolder}</Text>
+        <View style={styles?.contentWrapper}>
           <View style={[s.content, styles?.content]}>
             <TextInput
-              placeholder={texts?.inputPlaceHolder || inputPlaceHolder}
+              placeholder={texts?.inputPlaceHolder || 'Enter promo code'}
               placeholderTextColor={
                 styles?.inputPlaceholderColor || R.colors.disabled
               }
@@ -92,27 +73,32 @@ const PromoCode = ({
               style={[s.input, styles?.input]}
               onChangeText={(text) => setPromoCode(text)}
               autoCapitalize='none'
+              underlineColorAndroid={R.colors.transparent}
             />
+
+            <TouchableOpacity
+              style={[s.cancelButton, styles?.cancelButton]}
+              onPress={deactivate}
+            >
+              <Image
+                source={closeButtonIcon || R.icons.error}
+                style={[s.cancelIcon, styles?.cancelIcon]}
+              />
+            </TouchableOpacity>
             <Button
               text={texts?.apply || submitButton}
               styles={
                 isApplyButtonDisabled
-                  ? applyButtonDisabledStyles
-                  : applyButtonStyles
+                  ? styles?.applyDisabledButton
+                  : styles?.applyButton
               }
               onPress={handleOnPressApply}
               isDisabled={isApplyButtonDisabled}
             />
-            <Button
-              text={texts?.cancel || 'Cancel'}
-              styles={{
-                container: styles?.cancelButton?.container,
-                text: [s.cancelText, styles?.cancelButton?.text],
-                button: [s.cancelButton, styles?.cancelButton?.button],
-              }}
-              onPress={deactivate}
-            />
           </View>
+          {!!resultMessage && (
+            <Text style={resultMessageStyle}>{resultMessage}</Text>
+          )}
         </View>
       ) : (
         <Button

@@ -1,4 +1,4 @@
-import { TextStyle, ViewStyle } from 'react-native'
+import { ImageSourcePropType, TextStyle, ViewStyle } from 'react-native'
 
 import { IEventData } from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
@@ -54,6 +54,7 @@ export interface ITicketsViewProps {
   onAddToWaitingListSuccess?: () => void
   onAddToWaitingListError?: (error: IError) => void
   onLoadingChange?: (isLoading: boolean) => void
+  promoCodeCloseIcon?: ImageSourcePropType
 }
 
 export interface ITicketListStyles {
@@ -127,4 +128,6 @@ export interface ITicketsProps {
   onLoadingChange?: (isLoading: boolean) => void
   areAlertsEnabled?: boolean
   areLoadingIndicatorsEnabled?: boolean
+
+  promoCodeCloseIcon?: ImageSourcePropType
 }

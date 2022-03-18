@@ -878,32 +878,38 @@ const App = () => {
                   },
                 },
                 promoCode: {
+                  content: {
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                  },
                   inputPlaceholderColor: Color.textMain,
+
+                 
                   input: {
                     borderColor: Color.textMainOff,
                     color: Color.white,
-                  },
-                  title: {
-                    color: Color.textMain,
-                    fontSize: 18,
-                  },
-                  cancelButton: {
-                    text: {
-                      color: Color.textMain,
-                    },
-                    button: {
-                      borderRadius: 2,
-                    },
                   },
                   applyButton: {
                     button: {
                       backgroundColor: Color.primary,
                       borderRadius: 2,
+                      height: 45,
+                      paddingHorizontal: 8
                     },
                     text: {
                       fontWeight: '800',
                     },
                   },
+                  applyDisabledButton: {
+                    button: {
+                      height: 45,
+                      borderRadius: 2,
+                      paddingHorizontal: 8
+                    },
+                    text: {
+                      fontWeight: '800',
+                    },
+                    
+                  }
                 },
                 ticketList: {
                   item: {
@@ -958,7 +964,6 @@ const App = () => {
                   apply: '_APPLY_',
                   cancel: '_CANCEL_',
                   mainButton: '_PROMO CODE_',
-                  title: '_TITLE_'
                 },
                 getTicketsButton: '_GET_TICKETS_',
                 title:'_TITLE_',

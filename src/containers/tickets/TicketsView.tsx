@@ -1,6 +1,5 @@
 import React from 'react'
 import { FlatList, Text, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import { Loading, LoggedIn, PromoCode, WaitingList } from '../../components'
 import Button from '../../components/button/Button'
@@ -35,6 +34,7 @@ const TicketsView = ({
   onAddToWaitingListSuccess,
   onLoadingChange,
   areAlertsEnabled,
+  promoCodeCloseIcon,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -46,11 +46,20 @@ const TicketsView = ({
   const title = texts?.title ? texts.title : 'GET TICKETS'
 
   return (
-    <KeyboardAwareScrollView style={[s.container, styles?.rootContainer]}>
+    <View style={[s.container, styles?.rootContainer]}>
       <View style={[s.container, styles?.container]}>
         <View style={s.header}>
           <Text style={[s.headerText, styles?.title]}>{title}</Text>
         </View>
+        <PromoCode
+          onPressApply={onPressApplyPromoCode}
+          promoCodeValidationMessage={promoCodeValidationMessage}
+          isPromoCodeValid={isPromoCodeValid}
+          isAccessCodeEnabled={isAccessCodeEnabled}
+          styles={styles?.promoCode}
+          texts={texts?.promoCode}
+          closeButtonIcon={promoCodeCloseIcon}
+        />
         <FlatList
           data={tickets}
           style={styles?.ticketList?.listContainer}
@@ -79,14 +88,7 @@ const TicketsView = ({
             areAlertsEnabled={areAlertsEnabled}
           />
         )}
-        <PromoCode
-          onPressApply={onPressApplyPromoCode}
-          promoCodeValidationMessage={promoCodeValidationMessage}
-          isPromoCodeValid={isPromoCodeValid}
-          isAccessCodeEnabled={isAccessCodeEnabled}
-          styles={styles?.promoCode}
-          texts={texts?.promoCode}
-        />
+
         {isGetTicketsButtonVisible && (
           <Button
             text={buttonText}
@@ -112,7 +114,7 @@ const TicketsView = ({
         {(isGettingTickets || isGettingEvent) &&
           areLoadingIndicatorsEnabled && <Loading />}
       </View>
-    </KeyboardAwareScrollView>
+    </View>
   )
 }
 

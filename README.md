@@ -390,6 +390,8 @@ Then add it to the render function.
   onLoadingChange?: (isLoading: boolean) => void
   areAlertsEnabled?: boolean
   areLoadingIndicatorsEnabled?: boolean
+  
+  promoCodeCloseIcon?: ImageSourcePropType
 }
 ```
 
@@ -424,15 +426,16 @@ You can then call the `BillingInfo` component and pass them as props in the `car
     content?: StyleProp<ViewStyle>
     input?: TextInputProps['style']
     inputPlaceholderColor?: string
-    title?: StyleProp<TextStyle>
 
     mainButton?: IButtonStyles
-    cancelButton?: IButtonStyles
     applyButton?: IButtonStyles
     applyDisabledButton?: IButtonStyles
 
-    messageContainer?: StyleProp<ViewStyle>
-    message?: StyleProp<TextStyle>
+    errorMessage?: StyleProp<TextStyle>
+    validMessage?: StyleProp<TextStyle>
+
+    cancelButton?: StyleProp<ViewStyle>
+    cancelIcon?: StyleProp<ImageStyle>
   }
   ticketList?: {
     listContainer?: ViewStyle
