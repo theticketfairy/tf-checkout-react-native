@@ -11,7 +11,6 @@ export interface IConfig {
   TIMEOUT?: number
   BRAND?: string
   ARE_SUB_BRANDS_INCLUDED?: boolean
-  // IS_BILLING_STREET_NAME_REQUIRED?: boolean
 
   [key: string]: string | number | boolean | undefined
 }
@@ -49,9 +48,8 @@ export const setConfig = (configs: IConfig): string | undefined => {
   if (!Config.ARE_SUB_BRANDS_INCLUDED) {
     Config.ARE_SUB_BRANDS_INCLUDED = false
   }
-  if (Config.IS_BILLING_STREET_NAME_REQUIRED === undefined) {
-    Config.IS_BILLING_STREET_NAME_REQUIRED = true
-  }
+
+  Config.IS_BILLING_STREET_NAME_REQUIRED = true
 
   return undefined
 }
