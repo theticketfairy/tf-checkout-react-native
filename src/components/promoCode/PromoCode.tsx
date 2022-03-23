@@ -3,7 +3,6 @@ import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 import R from '../../res'
 import Button from '../button/Button'
-import { IButtonStyles } from '../button/types'
 import s from './styles'
 import { IPromoCodeProps } from './types'
 

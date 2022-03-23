@@ -34,7 +34,6 @@ import {
   Button,
   Checkbox,
   DatePicker,
-  Dropdown,
   DropdownMaterial,
   Input,
   Loading,
@@ -95,39 +94,8 @@ const Billing: FC<IBillingProps> = ({
   onSkippingStatusChange,
 }) => {
   //#region Labels
-  const countryLabel = texts?.form?.country || 'Country'
-  const stateLabel = texts?.form?.state || 'State/County'
-  const defaultCountry: IDropdownItem = { value: '-1', label: countryLabel }
-  const defaultState: IDropdownItem = { value: '-1', label: stateLabel }
-  const optionalText = texts?.form?.optional || ' (optional)'
-
-  const brandCheckBoxText = useMemo(() => {
-    return texts?.form?.isSubToBrand
-      ? texts.form?.isSubToBrand
-      : 'I would like to be updated on news, events and offers.'
-  }, [texts?.form?.isSubToBrand])
-
-  const phoneLabel = useMemo(() => {
-    const optionalPhone = isPhoneRequired ? '' : optionalText
-    return texts?.form?.phone
-      ? `${texts?.form?.phone} ${optionalPhone}`
-      : `Phone ${optionalPhone}`
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPhoneRequired, texts])
-
-  const addressLabel = useMemo(() => {
-    const optionalAddress = Config.IS_BILLING_STREET_NAME_REQUIRED
-      ? ''
-      : optionalText
-
-    return texts?.form?.street
-      ? `${texts.form.street} ${optionalAddress}`
-      : `Street ${optionalAddress}`
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [texts])
-
   const holderLabels = useMemo(() => {
-    const optional = isNameRequired ? '' : optionalText
+    const optional = isNameRequired ? '' : texts?.form?.optional || '(optional)'
     return {
       firstName: texts?.form?.holderFirstName
         ? `${texts.form.holderFirstName} ${optional}`
@@ -136,14 +104,37 @@ const Billing: FC<IBillingProps> = ({
         ? `${texts.form.holderLastName} ${optional}`
         : `Last Name ${optional}`,
       email: texts?.form?.holderEmail
-        ? `${texts.form.holderEmail} ${optionalText}`
-        : `Email ${optionalText}`,
+        ? `${texts.form.holderEmail} ${texts?.form?.optional || '(optional)'}`
+        : `Email ${optional}`,
       phone: texts?.form?.holderPhone
-        ? `${texts.form.holderPhone} ${optionalText}`
-        : `Phone ${optionalText}`,
+        ? `${texts.form.holderPhone} ${texts?.form?.optional || '(optional)'}`
+        : `Phone ${optional}`,
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isNameRequired, texts])
+
+  const brandCheckBoxText =
+    texts?.form?.isSubToBrand ||
+    'I would like to be updated on news, events and offers.'
+
+  const phoneLabel = useMemo(() => {
+    const optionalPhone = isPhoneRequired
+      ? ''
+      : texts?.form?.optional || ' (optional)'
+    return texts?.form?.phone
+      ? `${texts?.form?.phone} ${optionalPhone}`
+      : `Phone ${optionalPhone}`
+  }, [isPhoneRequired, texts])
+
+  const addressLabel = useMemo(() => {
+    const optionalAddress = Config.IS_BILLING_STREET_NAME_REQUIRED
+      ? ''
+      : texts?.form?.optional || ' (optional)'
+
+    return texts?.form?.street
+      ? `${texts.form.street} ${optionalAddress}`
+      : `Street ${optionalAddress}`
+  }, [texts])
+
   //#endregion
 
   //#region State
@@ -180,8 +171,9 @@ const Billing: FC<IBillingProps> = ({
     number | undefined
   >()
 
-  const [countries, setCountries] = useState<IDropdownItem[]>([defaultCountry])
-  const [states, setStates] = useState<IDropdownItem[]>([defaultState])
+  const [states, setStates] = useState<IDropdownItem[]>([])
+  const [countries, setCountries] = useState<IDropdownItem[]>([])
+
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
   const [skipping, setSkippingStatus] = useState<SkippingStatusType>(undefined)
   const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
@@ -339,8 +331,16 @@ const Billing: FC<IBillingProps> = ({
     setPasswordConfirmation('')
     setCountryId('')
     setStateId('')
-    setSelectedCountry(defaultCountry)
-    setStates([defaultState])
+    setSelectedCountry({
+      value: '-1',
+      label: texts?.form?.country || 'Country',
+    })
+    setStates([
+      {
+        value: '-1',
+        label: texts?.form?.state || 'State/County',
+      },
+    ])
     setIsSubToTicketFairy(false)
     setIsSubToBrand(false)
     storedToken.current = ''
@@ -667,8 +667,14 @@ const Billing: FC<IBillingProps> = ({
       usrPrfl = userProfileResponse
     } else {
       skippingStatus = 'fail'
-      parsedCountries.unshift(defaultCountry)
-      setSelectedCountry(defaultCountry)
+      parsedCountries.unshift({
+        value: '-1',
+        label: texts?.form?.country || 'Country',
+      })
+      setSelectedCountry({
+        value: '-1',
+        label: texts?.form?.country || 'Country',
+      })
     }
 
     const { cartData, cartError } = await fetchCart()
@@ -776,11 +782,17 @@ const Billing: FC<IBillingProps> = ({
     if (states.length > 1 && stateId) {
       const selectedStateItem = _find(states, (item) => item.value === stateId)
       if (!selectedStateItem) {
-        return setSelectedState(defaultState)
+        return setSelectedState({
+          value: '-1',
+          label: texts?.form?.state || 'State/County',
+        })
       }
       setSelectedState(selectedStateItem)
     } else {
-      setSelectedState(defaultState)
+      setSelectedState({
+        value: '-1',
+        label: texts?.form?.state || 'State/County',
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateId, states])
@@ -801,6 +813,18 @@ const Billing: FC<IBillingProps> = ({
   initTicketHoldersErrors()
 
   useEffect(() => {
+    setCountries([
+      {
+        value: '-1',
+        label: texts?.form?.country || 'Country',
+      },
+    ])
+    setStates([
+      {
+        value: '-1',
+        label: texts?.form?.state || 'State/County',
+      },
+    ])
     fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
