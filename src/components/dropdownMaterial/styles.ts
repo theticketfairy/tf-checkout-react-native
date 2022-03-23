@@ -10,25 +10,20 @@ const DIALOG = {
   minHeight: sHeight * 0.2,
 }
 
-export const DropdownStyles = StyleSheet.create({
+export const DropdownMaterialStyles = StyleSheet.create({
   rootContainer: {
-    width: 50,
+    width: '100%',
+    height: 45,
+    marginBottom: 32,
   },
   button: {
-    width: '100%',
-    borderWidth: 2,
-    height: 45,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    paddingHorizontal: 8,
-    borderColor: R.colors.black,
+    height: '120%',
   },
   icon: {
     height: 14,
     width: 14,
     resizeMode: 'contain',
-    tintColor: R.colors.black,
+    tintColor: R.colors.white,
   },
   label: {
     color: R.colors.black,

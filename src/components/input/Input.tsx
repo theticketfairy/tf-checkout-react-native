@@ -26,7 +26,7 @@ const Input = (props: IInputProps) => {
         {...props}
         label={label}
         tintColor={mainColor}
-        containerStyle={s.fieldWrapper}
+        containerStyle={[s.fieldWrapper, styles?.fieldWrapper]}
         baseColor={mainColor}
         activeLineWidth={styles?.activeLineWidth || 2}
         lineWidth={styles?.lineWidth || 1}

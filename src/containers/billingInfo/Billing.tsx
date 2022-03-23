@@ -35,6 +35,7 @@ import {
   Checkbox,
   DatePicker,
   Dropdown,
+  DropdownMaterial,
   Input,
   Loading,
   Login,
@@ -1018,11 +1019,14 @@ const Billing: FC<IBillingProps> = ({
           error={cityError}
           styles={styles?.inputStyles}
         />
-        <Dropdown
+        <DropdownMaterial
           items={countries}
           onSelectItem={setSelectedCountry}
           selectedOption={selectedCountry}
-          styles={styles?.dropdownStyles}
+          styles={styles?.dropdownMaterialStyles}
+          materialInputProps={{
+            label: texts?.form?.country || 'Country',
+          }}
         />
         <Input
           label={texts?.form?.zipCode || 'Postal Code / Zip Code'}
@@ -1031,11 +1035,14 @@ const Billing: FC<IBillingProps> = ({
           error={postalCodeError}
           styles={styles?.inputStyles}
         />
-        <Dropdown
+        <DropdownMaterial
           items={states}
           onSelectItem={setSelectedState}
           selectedOption={selectedState}
-          styles={styles?.dropdownStyles}
+          styles={styles?.dropdownMaterialStyles}
+          materialInputProps={{
+            label: texts?.form?.state || 'State',
+          }}
         />
         <Checkbox
           onPress={handleIsSubToBrandToggle}

@@ -335,6 +335,12 @@ const App = () => {
                   tintColor: Color.white,
                 },
               },
+              dropdownMaterialStyles: {
+                input: {
+                  baseColor: Color.white
+                }, 
+                
+              },
               ticketHolderItemHeader: {
                 fontSize: 28,
                 fontWeight: '800',
@@ -462,8 +468,6 @@ const App = () => {
                   },
                 },
               },
-
-
               title: {
                 color: Color.textMain,
               },

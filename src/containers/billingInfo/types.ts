@@ -11,6 +11,7 @@ import { IButtonStyles } from '../../components/button/types'
 import { ICheckboxStyles } from '../../components/checkbox/types'
 import { IDatePickerStyles } from '../../components/datePicker/types'
 import { IDropdownStyles } from '../../components/dropdown/types'
+import { IDropdownMaterialStyles } from '../../components/dropdownMaterial/types'
 import { IInputStyles } from '../../components/input/types'
 import {
   ILoginBrandImages,
@@ -114,6 +115,7 @@ export interface IBillingInfoViewStyles {
 
   inputStyles?: IInputStyles
   dropdownStyles?: IDropdownStyles
+  dropdownMaterialStyles?: IDropdownMaterialStyles
   checkboxStyles?: ICheckboxStyles
 
   screenTitle?: StyleProp<TextStyle>

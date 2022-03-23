@@ -1,12 +1,6 @@
 import { LegacyRef } from 'react'
-import {
-  ColorValue,
-  StyleProp,
-  TextInputProps,
-  TextStyle,
-  ViewStyle,
-} from 'react-native'
-import { TextField } from 'rn-material-ui-textfield'
+import { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import { TextField, TextFieldProps } from 'rn-material-ui-textfield'
 
 export interface IInputStyles {
   color?: ColorValue
@@ -16,9 +10,10 @@ export interface IInputStyles {
   activeLineWidth?: number
   baseColor?: ColorValue
   errorColor?: ColorValue
+  fieldWrapper?: StyleProp<ViewStyle>
 }
 
-export interface IInputProps extends TextInputProps {
+export interface IInputProps extends TextFieldProps {
   isSecure?: boolean
   label: string
   reference?: LegacyRef<TextField>
