@@ -1,5 +1,3 @@
-//@ts-nocheck
-
 import _map from 'lodash/map'
 import React, { useCallback, useMemo, useState } from 'react'
 import {
@@ -81,6 +79,7 @@ const LoginView = ({
     ]
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const formFields = useMemo(getFormFields, [data, email.value, password.value])
 
   const renderFormFields = useCallback(() => {
@@ -178,17 +177,26 @@ const LoginView = ({
     </>
   )
 
-  const BrandImages = () => (
-    <View style={brandImages?.containerStyle}>
-      <Image
-        source={brandImages?.image1 || R.images.brand}
-        style={[s.brand, brandImages?.image1Style]}
-      />
+  const BrandImages = useMemo(
+    () => (
+      <View style={brandImages?.containerStyle}>
+        <Image
+          source={brandImages?.image1 || R.images.brand}
+          style={[s.brand, brandImages?.image1Style]}
+        />
 
-      {brandImages?.image2 && (
-        <Image source={brandImages.image2} style={brandImages?.image2Style} />
-      )}
-    </View>
+        {brandImages?.image2 && (
+          <Image source={brandImages.image2} style={brandImages?.image2Style} />
+        )}
+      </View>
+    ),
+    [
+      brandImages?.containerStyle,
+      brandImages?.image1,
+      brandImages?.image1Style,
+      brandImages?.image2,
+      brandImages?.image2Style,
+    ]
   )
 
   return (
@@ -204,7 +212,7 @@ const LoginView = ({
                   <Text style={[s.dialogTitle, styles?.dialog?.title]}>
                     {texts?.dialog?.title || 'Login'}
                   </Text>
-                  <BrandImages />
+                  {BrandImages}
                   {!!texts?.dialog?.message && (
                     <Text style={[s.message, styles?.dialog?.message]}>
                       {texts.dialog.message}
@@ -225,6 +233,7 @@ const LoginView = ({
                     onPress={handleOnPressLogin}
                     isLoading={isLoading}
                     isDisabled={!checkIsDataValid()}
+                    //@ts-ignore
                     ref={refs?.button}
                   />
                 </View>
