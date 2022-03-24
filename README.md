@@ -664,6 +664,22 @@ interface IBillingInfoViewStyles {
 
   inputStyles?: IInputStyles
   dropdownStyles?: IDropdownStyles
+  dropdownMaterialStyles?: {
+    container?: StyleProp<ViewStyle>
+    button?: StyleProp<ViewStyle>
+    icon?: StyleProp<ImageStyle>
+    label?: StyleProp<TextStyle>
+    dialog?: StyleProp<ViewStyle>
+    flatListContainer?: StyleProp<ViewStyle>
+    listItem?: {
+      container?: StyleProp<ViewStyle>
+      button?: StyleProp<ViewStyle>
+      buttonSelected?: StyleProp<ViewStyle>
+      text?: StyleProp<TextStyle>
+      textSelected?: StyleProp<TextStyle>
+    }
+    input?: IInputStyles
+  }
   checkboxStyles?: ICheckboxStyles
 
   screenTitle?: StyleProp<TextStyle>
