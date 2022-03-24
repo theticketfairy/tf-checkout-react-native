@@ -92,7 +92,7 @@ const LoginView = ({
     if (email.value.toString().length === 0) {
       return false
     }
-    if (password.value.toString().length < 5) {
+    if (password.value.toString().length < 6) {
       return false
     }
     return true
