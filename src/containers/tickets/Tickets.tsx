@@ -272,6 +272,9 @@ const Tickets = ({
   const handleOnLogout = async () => {
     await deleteAllData()
     setIsUserLogged(false)
+
+    await getTickets()
+    await getEventData()
     if (onPressLogout) {
       onPressLogout()
     }

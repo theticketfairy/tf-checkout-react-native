@@ -24,12 +24,12 @@ const LoggedIn: FC<ILoggedInProps> = ({
   const handleLogOutPress = () => {
     if (onPressLogout) {
       Alert.alert(
-        logoutDialog?.title || 'Do you want to logout?',
+        logoutDialog?.title || 'Do you want to log out?',
         logoutDialog?.message ||
-          'You will need to enter your credentials again to purchase tickets',
+          'You will lose your selection and you will need to enter your credentials again.',
         [
           {
-            text: logoutDialog?.confirmButton || 'Yes, logout',
+            text: logoutDialog?.confirmButton || 'Yes',
             style: 'destructive',
             onPress: onPressLogout,
           },

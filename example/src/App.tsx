@@ -976,13 +976,7 @@ const App = () => {
                 },
                 loggedInTexts:{
                   logOutButtonText: '_LOGOUT_',
-                  myOrderButtonText: '_MY_ORDERS_',
-                  logoutDialog: {
-                    title: '_WANT TO LOGOUT_',
-                    confirmButton: '_YES_',
-                    cancelButton: '_NO_',
-                    message: '_MESSAGE TO SHOW_'
-                  }
+                  myOrderButtonText: '_MY_ORDERS_',  
                 }
               }}
             />
