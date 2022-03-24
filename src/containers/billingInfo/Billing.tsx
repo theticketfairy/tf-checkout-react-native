@@ -1026,7 +1026,7 @@ const Billing: FC<IBillingProps> = ({
           value={phone}
           onChangeText={setPhone}
           keyboardType='phone-pad'
-          error={phoneError}
+          error={isPhoneRequired ? phoneError : ''}
           styles={styles?.inputStyles}
         />
         <Input
