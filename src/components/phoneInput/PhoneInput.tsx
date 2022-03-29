@@ -67,6 +67,7 @@ const PhoneInput: FC<IPhoneInputProps> = ({
             style={styles?.modal}
             onBackdropPress={hideModal}
             disableBackdrop={false}
+            enableModalAvoiding={true}
           />
         </View>
       </Modal>

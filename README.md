@@ -733,6 +733,8 @@ interface IBillingInfoViewStyles {
     modal?: {
       // Styles for whole modal [View]
       modal?: StyleProp<ViewStyle>
+      // Styles for added space for KeyboardAvoidView [View]
+      modalInner?: StyleProp<ViewStyle>
       // Styles for modal backdrop [View]
       backdrop?: StyleProp<ViewStyle>
       // Styles for bottom input line [View]
