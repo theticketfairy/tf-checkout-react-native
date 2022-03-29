@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import { Modal, Text, TouchableOpacity, View } from 'react-native'
 //@ts-ignore
-import CountryPicker from 'react-native-country-codes-picker'
+import { CountryPicker } from 'react-native-country-codes-picker'
 
 import Input from '../input/Input'
 import s from './/styles'
