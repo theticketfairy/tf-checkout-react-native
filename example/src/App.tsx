@@ -453,9 +453,13 @@ const App = () => {
                   },
                 },
                 modal:{
+                  backdrop: {
+                  },
                   modal: {
                     backgroundColor: Color.backgroundMain, 
-                    zIndex: 5                 
+                  },
+                  modalInner:{
+                    backgroundColor: Color.backgroundMain, 
                   },
                     itemsList:{
                       backgroundColor: Color.oldBackground,
