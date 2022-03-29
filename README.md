@@ -57,6 +57,24 @@ npm install tf-checkout-react-native
 
 Make sure to install all the required dependencies in your project.
 
+### Metro
+Add the following to your `metro.config.js` in the resolver property:
+
+`sourceExts: ['jsx', 'js', 'ts', 'tsx']`
+
+Result: 
+````js
+module.exports = {
+  watchFolders: [moduleRoot],
+  resolver: {
+    sourceExts: ['jsx', 'js', 'ts', 'tsx'],
+    extraNodeModules: {
+      react: path.resolve(__dirname,
+    }
+    .... 
+````
+
+
 ### Required for Android
 
 Add below dependency to your `app/build.gradle` file with specified version (in our example we are using `1.4.0`).
