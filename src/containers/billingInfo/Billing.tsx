@@ -18,6 +18,9 @@ import {
   Text,
   View,
 } from 'react-native'
+//@ts-ignore
+import { countryCodes } from 'react-native-country-codes-picker'
+import DeviceCountry, { TYPE_ANY } from 'react-native-device-country'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {
@@ -38,8 +41,10 @@ import {
   Input,
   Loading,
   Login,
+  PhoneInput,
 } from '../../components'
 import { IDropdownItem } from '../../components/dropdown/types'
+import { IPhoneCountry } from '../../components/phoneInput/types'
 import { Config } from '../../helpers/Config'
 import { useDebounced } from '../../helpers/Debounced'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
@@ -48,6 +53,7 @@ import {
   validateEmail,
   validateEmpty,
   validatePasswords,
+  validatePhoneNumber,
 } from '../../helpers/Validators'
 import R from '../../res'
 import { IError, IUserProfile } from '../../types'
@@ -178,6 +184,11 @@ const Billing: FC<IBillingProps> = ({
   const [skipping, setSkippingStatus] = useState<SkippingStatusType>(undefined)
   const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
 
+  const [isCountryPickerVisible, setIsCountryPickerVisible] = useState(false)
+  const [phoneCountry, setPhoneCountry] = useState<IPhoneCountry | undefined>(
+    undefined
+  )
+
   // Errors state
   const firstNameError = useDebounced(firstName, validateEmpty)
   const lastNameError = useDebounced(lastName, validateEmpty)
@@ -193,7 +204,15 @@ const Billing: FC<IBillingProps> = ({
   const confirmPasswordError = useDebounced(passwordConfirmation, () =>
     validatePasswords(passwordConfirmation, password)
   )
-  const phoneError = useDebounced(phone, validateEmpty)
+  const phoneError = useDebounced(phone, () =>
+    !isPhoneRequired && phone.length === 0
+      ? ''
+      : validatePhoneNumber({
+          phoneNumber: phone,
+          countryCode: phoneCountry?.dial_code,
+          customErrors: texts?.form?.phoneInput?.errors,
+        })
+  )
   const streetError = useDebounced(street, validateEmpty)
   const cityError = useDebounced(city, validateEmpty)
   const postalCodeError = useDebounced(postalCode, validateEmpty)
@@ -219,6 +238,15 @@ const Billing: FC<IBillingProps> = ({
   //#endregion
 
   //#region Handlers
+  const handleOnChangePhonePickerVisibility = () => {
+    setIsCountryPickerVisible(!isCountryPickerVisible)
+  }
+
+  const handleOnSelectPhoneCountry = (_selectedCountry: IPhoneCountry) => {
+    setPhoneCountry(_selectedCountry)
+    setIsCountryPickerVisible(false)
+  }
+
   const handleOnLoadingChange = useCallback(
     (loading: boolean) => {
       if (onLoadingChange) {
@@ -378,7 +406,13 @@ const Billing: FC<IBillingProps> = ({
       return false
     }
 
-    if (isPhoneRequired && !phone) {
+    if (
+      isPhoneRequired &&
+      validatePhoneNumber({
+        phoneNumber: phone,
+        countryCode: phoneCountry?.dial_code,
+      })
+    ) {
       return false
     }
 
@@ -620,6 +654,24 @@ const Billing: FC<IBillingProps> = ({
   //#endregion
 
   const fetchData = async () => {
+    try {
+      const cc = await DeviceCountry.getCountryCode(TYPE_ANY)
+
+      if (cc.code) {
+        const foundCountry = _find(
+          countryCodes,
+          (item) => item.code.toUpperCase() === cc.code.toUpperCase()
+        )
+
+        if (foundCountry) {
+          setPhoneCountry(foundCountry)
+        } else {
+          setPhoneCountry(countryCodes[0])
+        }
+      }
+    } catch (err) {
+      setPhoneCountry(countryCodes[0])
+    }
     setIsLoading(true)
     let usrPrfl: IUserProfile | undefined
     const usrTkn = await getData(LocalStorageKeys.ACCESS_TOKEN)
@@ -1021,13 +1073,19 @@ const Billing: FC<IBillingProps> = ({
             />
           </>
         )}
-        <Input
-          label={phoneLabel}
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType='phone-pad'
-          error={isPhoneRequired ? phoneError : ''}
-          styles={styles?.inputStyles}
+        <PhoneInput
+          phoneNumber={phone}
+          onChangePhoneNumber={setPhone}
+          styles={styles?.phoneInput}
+          isPickerVisible={isCountryPickerVisible}
+          onChangePickerVisibility={handleOnChangePhonePickerVisibility}
+          onSelectCountry={handleOnSelectPhoneCountry}
+          country={phoneCountry}
+          error={phoneError}
+          texts={{
+            label: phoneLabel,
+            ...texts?.form?.phoneInput,
+          }}
         />
         <Input
           label={addressLabel}

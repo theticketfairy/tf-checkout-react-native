@@ -433,6 +433,41 @@ const App = () => {
                   },
                 },
               },
+              phoneInput: {
+                
+                country: {
+                  code: {
+                    color: Color.textMain,
+                    fontSize: 16,
+                  },
+                  container: {
+                    marginRight: 16,
+                  },
+                  
+                },
+                input: {
+                  baseColor: Color.textMain,
+                  color: Color.textMain,
+                  input: {
+                    color: Color.textMain,
+                  },
+                },
+                modal:{
+                  modal: {
+                    backgroundColor: Color.backgroundMain, 
+                    zIndex: 5                 
+                  },
+                    itemsList:{
+                      backgroundColor: Color.oldBackground,
+                    },
+                    textInput: {
+                      backgroundColor: Color.gray50,
+                    },
+                    countryButtonStyles: {
+                      backgroundColor: Color.gray80,                    }
+                }
+                
+              }
             }}
             cartProps={cartProps!}
             onCheckoutSuccess={handleOnCheckoutSuccess}

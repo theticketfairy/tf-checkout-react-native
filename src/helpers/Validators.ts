@@ -1,6 +1,9 @@
 export const emailRegex =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
+//https://www.twilio.com/docs/glossary/what-e164
+const phoneRegex = /^\+[1-9]\d{1,14}$/
+
 export const validateEmpty = (
   value?: string | number,
   message?: string
@@ -55,4 +58,30 @@ export const validateAge = (
   const today = new Date()
   const age = today.getFullYear() - dateOfBirth.getFullYear()
   return age < minimumAge ? `You must be at least ${minimumAge} years old` : ''
+}
+
+interface IValidatePhoneNumber {
+  countryCode?: string
+  phoneNumber?: string
+  customErrors?: {
+    emptyCountryCode?: string
+    emptyPhoneNumber?: string
+    invalidPhoneNumber?: string
+  }
+}
+export const validatePhoneNumber = ({
+  countryCode,
+  phoneNumber,
+  customErrors,
+}: IValidatePhoneNumber) => {
+  if (!countryCode) {
+    return customErrors?.emptyCountryCode || 'Please select a country code'
+  }
+  if (!phoneNumber) {
+    return customErrors?.emptyPhoneNumber || 'Please enter a phone number'
+  }
+
+  return !phoneRegex.test(`${countryCode}${phoneNumber}`)
+    ? customErrors?.invalidPhoneNumber || 'Please enter a valid phone number'
+    : ''
 }

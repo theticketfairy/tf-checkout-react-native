@@ -18,6 +18,10 @@ import {
   ILoginViewStyles,
   ILoginViewTexts,
 } from '../../components/login/types'
+import {
+  IPhoneInputStyles,
+  IPhoneInputTexts,
+} from '../../components/phoneInput/types'
 import { IError, ITicketsResponseData } from '../../types'
 
 export interface ITokens {
@@ -128,6 +132,8 @@ export interface IBillingInfoViewStyles {
   datePicker?: IDatePickerStyles
 
   privacyPolicyLinkStyle?: StyleProp<TextStyle>
+
+  phoneInput?: IPhoneInputStyles
 }
 
 export interface IBillingInfoViewTexts {
@@ -162,6 +168,7 @@ export interface IBillingInfoViewTexts {
     choosePassword?: string
     fillAllRequiredFieldsAlert?: string
     optional?: string
+    phoneInput?: IPhoneInputTexts
   }
 }
 
