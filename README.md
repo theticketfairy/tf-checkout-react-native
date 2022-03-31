@@ -9,7 +9,7 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 ### React Native
 
 - Suggested ReactNative version `0.66.3`
-- Suggested Flipper version `0.66`
+- Suggested Flipper version `0.99.0`
 - React version `0.17.1`
 
 ### Android

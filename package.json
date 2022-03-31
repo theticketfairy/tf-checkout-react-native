@@ -78,7 +78,12 @@
     "react-native-country-codes-picker": "https://github.com/jorgtz/react-native-country-codes-picker",
     "react-native-fs": "2.18.0",
     "react-native-modal-datetime-picker": "13.0.0",
-    "rn-material-ui-textfield": "1.0.5"
+    "rn-material-ui-textfield": "1.0.5",
+    "lodash": "4.17.21",
+    "react-native-keyboard-aware-scroll-view": "0.9.5",
+    "jwt-decode": "3.1.2",
+    "axios": "0.24.0"
+
   },
   "jest": {
     "preset": "react-native",
