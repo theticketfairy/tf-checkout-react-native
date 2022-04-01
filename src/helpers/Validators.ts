@@ -70,18 +70,14 @@ interface IValidatePhoneNumber {
   }
 }
 export const validatePhoneNumber = ({
-  countryCode,
   phoneNumber,
   customErrors,
 }: IValidatePhoneNumber) => {
-  if (!countryCode) {
-    return customErrors?.emptyCountryCode || 'Please select a country code'
-  }
   if (!phoneNumber) {
     return customErrors?.emptyPhoneNumber || 'Please enter a phone number'
   }
 
-  return !phoneRegex.test(`${countryCode}${phoneNumber}`)
+  return !phoneRegex.test(`${phoneNumber}`)
     ? customErrors?.invalidPhoneNumber || 'Please enter a valid phone number'
     : ''
 }

@@ -1,76 +1,62 @@
-import React, { FC } from 'react'
-import { Modal, Text, TouchableOpacity, View } from 'react-native'
-//@ts-ignore
-import { CountryPicker } from 'react-native-country-codes-picker'
+import InputPhone from '@sesamsolutions/phone-input'
+import React, { FC, useCallback, useEffect, useState } from 'react'
+import { Platform, View } from 'react-native'
 
+import R from '../../res'
 import Input from '../input/Input'
 import s from './/styles'
-import { IPhoneCountry, IPhoneInputProps } from './types'
+import { IOnChangePhoneNumberPayload, IPhoneInputProps } from './types'
 
 const PhoneInput: FC<IPhoneInputProps> = ({
-  isPickerVisible,
-  onSelectCountry,
-  onChangePickerVisibility,
-  country,
+  phoneNumber,
+  onChangePhoneNumber,
   styles,
   error,
   texts,
-  onChangePhoneNumber,
+  country = 'US',
 }) => {
-  const flag = country ? `${country.flag}` : '🇦🇫'
-  const countryCode = country ? `${country.dial_code}` : '+93'
+  const [localValue, setLocalValue] = useState('')
+  const setLocalValueCallback = useCallback(() => {
+    setLocalValue(phoneNumber)
+  }, [phoneNumber])
 
-  const showModal = () => {
-    onChangePickerVisibility(true)
-  }
+  useEffect(() => {
+    setLocalValueCallback()
+  }, [phoneNumber, setLocalValueCallback])
 
-  const hideModal = () => {
-    onChangePickerVisibility(false)
+  const handleOnChangeInputPhone = (payload: IOnChangePhoneNumberPayload) => {
+    setLocalValue(payload.input)
+    onChangePhoneNumber(payload)
   }
 
   return (
     <View style={[s.rootContainer, styles?.rootContainer]}>
-      <View style={[s.countryContainer, styles?.country?.container]}>
-        <TouchableOpacity
-          style={[s.countryButton, styles?.country?.button]}
-          onPress={showModal}
-        >
-          <Text style={styles?.country?.flag}>
-            {flag} <Text style={styles?.country?.code}>{countryCode}</Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
-
       <Input
-        onChangeText={onChangePhoneNumber}
+        onChangeText={setLocalValue}
         label={texts?.label || 'Phone number'}
         keyboardType='phone-pad'
         error={error}
+        value={localValue}
+        labelOffset={{
+          x1: Platform.OS === 'ios' ? -40 : -40,
+        }}
         styles={{
           container: s.phoneInputContainer,
           ...styles?.input,
+          errorColor: styles?.errorColor || R.colors.danger,
         }}
+        renderLeftAccessory={() => (
+          <View style={(s.countryContainer, styles?.country?.container)}>
+            <InputPhone
+              initialCountry={country}
+              onChange={handleOnChangeInputPhone}
+              style={s.countryButton}
+              textStyle={s.textInput}
+              value={localValue}
+            />
+          </View>
+        )}
       />
-      <Modal
-        presentationStyle='overFullScreen'
-        transparent={true}
-        visible={isPickerVisible}
-      >
-        <View style={s.modalBackground}>
-          <CountryPicker
-            show={isPickerVisible}
-            // when picker button press you will get the country object with dial code
-            inputPlaceholder={
-              texts?.countrySearchPlaceholder || 'Search country'
-            }
-            pickerButtonOnPress={(item: IPhoneCountry) => onSelectCountry(item)}
-            style={styles?.modal}
-            onBackdropPress={hideModal}
-            disableBackdrop={false}
-            enableModalAvoiding={true}
-          />
-        </View>
-      </Modal>
     </View>
   )
 }

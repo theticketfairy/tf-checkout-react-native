@@ -27,7 +27,7 @@ import styles from './styles'
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
-const EVENT_ID = 5420//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID
+const EVENT_ID = 12796//5420//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID //12796
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -434,17 +434,6 @@ const App = () => {
                 },
               },
               phoneInput: {
-                
-                country: {
-                  code: {
-                    color: Color.textMain,
-                    fontSize: 16,
-                  },
-                  container: {
-                    marginRight: 16,
-                  },
-                  
-                },
                 input: {
                   baseColor: Color.textMain,
                   color: Color.textMain,
@@ -452,24 +441,6 @@ const App = () => {
                     color: Color.textMain,
                   },
                 },
-                modal:{
-                  backdrop: {
-                  },
-                  modal: {
-                    backgroundColor: Color.backgroundMain, 
-                  },
-                  modalInner:{
-                    backgroundColor: Color.backgroundMain, 
-                  },
-                    itemsList:{
-                      backgroundColor: Color.oldBackground,
-                    },
-                    textInput: {
-                      backgroundColor: Color.gray50,
-                    },
-                    countryButtonStyles: {
-                      backgroundColor: Color.gray80,                    }
-                }
                 
               }
             }}
@@ -1009,7 +980,6 @@ const App = () => {
                   mainButton: '_PROMO CODE_',
                 },
                 getTicketsButton: '_GET_TICKETS_',
-                title:'_TITLE_',
                 item: {
                   ticket: '_TICKET_'
                 },

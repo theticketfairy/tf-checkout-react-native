@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 
 import R from '../../res'
 
@@ -8,28 +8,24 @@ export default StyleSheet.create({
     width: '100%',
   },
   countryContainer: {
-    marginRight: 8,
-    height: 55,
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: R.colors.white,
-    borderRadius: 5,
-    zIndex: 3,
+    marginBottom: 0,
+    paddingBottom: 0,
+    width: Platform.OS === 'ios' ? 32 : 16,
   },
   countryButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    flex: 1,
-    justifyContent: 'center',
+    width: Platform.OS === 'ios' ? 32 : 32,
+    overflow: 'hidden',
+    marginBottom: -8,
+    paddingBottom: 0,
+    borderBottomWidth: 0,
+    borderBottomColor: R.colors.transparent,
+    zIndex: 4,
   },
   phoneInputContainer: {
     flex: 1,
   },
-  modalBackground: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+  textInput: {
+    width: 0,
+    borderBottomWidth: 0,
   },
 })
