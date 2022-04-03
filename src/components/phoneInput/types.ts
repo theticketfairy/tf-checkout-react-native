@@ -21,10 +21,7 @@ export interface IPhoneInputProps {
 
 export interface IPhoneInputTexts {
   label?: string
-  errors?: {
-    emptyPhoneNumber?: string
-    invalidPhoneNumber?: string
-  }
+  customError?: string
 }
 
 export interface IPhoneInputStyles {

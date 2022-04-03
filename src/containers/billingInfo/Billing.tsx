@@ -334,6 +334,20 @@ const Billing: FC<IBillingProps> = ({
     if (!isBillingRequired && skipping === 'fail') {
       setSkippingStatus('skipping')
 
+      const phoneValidError = validatePhoneNumber({
+        phoneNumber: userProfile.phone,
+        customError: texts?.form?.phoneInput?.customError,
+      })
+
+      if (phoneValidError) {
+        showAlert(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
+        return setPhoneError(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
+      }
+
       await performCheckout(
         getCheckoutBodyWhenSkipping({
           userProfile: usrProfile,
@@ -413,7 +427,7 @@ const Billing: FC<IBillingProps> = ({
       isPhoneRequired &&
       validatePhoneNumber({
         phoneNumber: phone,
-        customErrors: texts?.form?.phoneInput?.errors,
+        customError: texts?.form?.phoneInput?.customError,
       })
     ) {
       return false
@@ -1076,7 +1090,7 @@ const Billing: FC<IBillingProps> = ({
           phoneNumber={phone}
           onChangePhoneNumber={handleOnChangePhoneNumber}
           styles={styles?.phoneInput}
-          error={phoneError}
+          error={isPhoneRequired && phone.length > 0 ? phoneError : ''}
           texts={{
             label: phoneLabel,
             ...texts?.form?.phoneInput,

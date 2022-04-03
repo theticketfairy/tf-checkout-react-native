@@ -140,6 +140,7 @@ export interface IBillingInfoViewTexts {
   loginTexts?: ILoginViewTexts
   checkoutButton?: string
   skippingMessage?: string
+  invalidPhoneNumberError?: string
   form?: {
     firstName?: string
     lastName?: string
