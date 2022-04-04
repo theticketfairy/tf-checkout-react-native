@@ -417,6 +417,16 @@ const Billing: FC<IBillingProps> = ({
   //#endregion
 
   //#region Form validation
+  const checkIsStoredPhoneNumberFormat = (storedPhoneNumber: string) => {
+    if (!storedPhoneNumber.includes('+')) {
+      handleSetPhoneError(
+        texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+      )
+      return false
+    }
+    return true
+  }
+
   const checkBasicDataValid = (): boolean => {
     if (
       !firstName ||
@@ -680,12 +690,14 @@ const Billing: FC<IBillingProps> = ({
 
   const fetchData = async () => {
     let phoneCountry = 'US'
+    let phoneCountryDialCode = '+1'
     setIsLoading(true)
     let usrPrfl: IUserProfile | undefined
 
     try {
       const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY)
       phoneCountry = deviceCountry.code.toUpperCase()
+      phoneCountryDialCode = getCountryDialCode(phoneCountry)
     } catch (err) {
       phoneCountry = 'US'
     }
@@ -777,25 +789,35 @@ const Billing: FC<IBillingProps> = ({
       })
     }
 
-    if (!isBillingRequired && usrTkn && usrPrfl && cartData) {
-      const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
-        userProfile: usrPrfl,
-        ticketsQuantity: cartData.quantity,
-      })
-      await performCheckout(checkoutBody, usrTkn)
-    } else {
-      if (skipping === 'skipping') {
-        setSkippingStatus('fail')
-      }
-    }
-
     if (usrPrfl) {
-      if (!usrPrfl.phone.includes('+')) {
-        usrPrfl.phone = `${getCountryDialCode(phoneCountry)}${usrPrfl.phone}`
+      if (!checkIsStoredPhoneNumberFormat(usrPrfl.phone)) {
+        showAlert(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
+        skippingStatus = 'fail'
+        setSkippingStatus('fail')
+        setIsLoading(false)
+      } else {
+        // We can perfom Checkout process since phone is valid
+        if (!isBillingRequired && usrTkn && cartData) {
+          const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
+            userProfile: usrPrfl,
+            ticketsQuantity: cartData.quantity,
+          })
+          return await performCheckout(checkoutBody, usrTkn)
+        } else {
+          if (skipping === 'skipping') {
+            setSkippingStatus('fail')
+          }
+        }
       }
-      handleSetFormDataFromUserProfile(usrPrfl)
+      handleSetFormDataFromUserProfile({
+        ...usrPrfl,
+        phone: `${phoneCountryDialCode}${usrPrfl.phone}`,
+      })
     } else {
-      setPhone(getCountryDialCode(phoneCountry))
+      // There is no user profile data
+      setPhone(phoneCountryDialCode)
     }
     setCountries(parsedCountries)
     setTicketHoldersData(tHolders)
