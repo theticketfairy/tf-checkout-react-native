@@ -237,9 +237,8 @@ const Billing: FC<IBillingProps> = ({
   const handleOnChangePhoneNumber = (payload: IOnChangePhoneNumberPayload) => {
     setPhone(payload.input)
     if (!payload.isValid && phoneErrorCounter.current > 0) {
-      return setPhoneError(
-        texts?.form?.phoneInput?.errors?.invalidPhoneNumber ||
-          'Invalid phone number'
+      return handleSetPhoneError(
+        texts?.form?.phoneInput?.customError || 'Invalid phone number'
       )
     }
     phoneErrorCounter.current = phoneErrorCounter.current + 1
@@ -352,7 +351,7 @@ const Billing: FC<IBillingProps> = ({
         showAlert(
           texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
         )
-        return setPhoneError(
+        return handleSetPhoneError(
           texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
         )
       }
@@ -1099,7 +1098,7 @@ const Billing: FC<IBillingProps> = ({
           phoneNumber={phone}
           onChangePhoneNumber={handleOnChangePhoneNumber}
           styles={styles?.phoneInput}
-          error={isPhoneRequired && phone.length > 0 ? phoneError : ''}
+          error={phoneError}
           texts={{
             label: phoneLabel,
             ...texts?.form?.phoneInput,
