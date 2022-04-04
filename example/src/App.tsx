@@ -158,9 +158,7 @@ const App = () => {
           <>
           <BillingInfo
           areLoadingIndicatorsEnabled={false}
-          onSkippingStatusChange={(status) => {console.log('%cApp.tsx line:159 status', 'color: #00FFcc;', status);
-          setSkippingStatus(status)
-        }}
+          onSkippingStatusChange={setSkippingStatus}
           loginBrandImages={{
             image1: GOOGLE_IMAGE,
             image1Style: {
@@ -178,10 +176,7 @@ const App = () => {
               marginBottom: 16
             },
           }}
-          onLoadingChange={(loading) => {
-            console.log('%c BILLING LOADING', 'color: #007acc;', loading);
-            setIsLoading(loading)
-          }}
+          onLoadingChange={setIsLoading}
             texts={{
               form: {
                 getYourTicketsTitle: '_Get your tickets_',
