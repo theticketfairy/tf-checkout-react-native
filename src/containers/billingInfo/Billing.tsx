@@ -225,6 +225,15 @@ const Billing: FC<IBillingProps> = ({
   //#endregion
 
   //#region Handlers
+  const handleSetPhoneError = useCallback(
+    (error: string) => {
+      if (isPhoneRequired && phone.length > 0) {
+        setPhoneError(error)
+      }
+    },
+    [isPhoneRequired, phone.length]
+  )
+
   const handleOnChangePhoneNumber = (payload: IOnChangePhoneNumberPayload) => {
     setPhone(payload.input)
     if (!payload.isValid && phoneErrorCounter.current > 0) {
