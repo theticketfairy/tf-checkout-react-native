@@ -53,6 +53,7 @@ const PhoneInput: FC<IPhoneInputProps> = ({
               style={s.countryButton}
               textStyle={s.textInput}
               value={localValue}
+              dismissKeyboard={false}
             />
           </View>
         )}
