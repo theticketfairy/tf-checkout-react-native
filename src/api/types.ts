@@ -30,7 +30,7 @@ export interface IAuthorizeResponse {
 
 export interface IAddToCartParams {
   attributes: {
-    alternative_view_id?: string | number
+    alternative_view_id?: string | number | null
     product_cart_quantity: number
     product_options: {
       [key: string]: number | string
@@ -39,7 +39,7 @@ export interface IAddToCartParams {
     ticket_types: {
       [key: string]: {
         product_options: {
-          [key: string]: number
+          [key: string]: number | string
           ticket_price: number
         }
         quantity: number

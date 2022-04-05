@@ -65,6 +65,6 @@ export interface IOnFetchTicketsSuccess {
     success?: boolean
     message?: string
   }
-  isInWaitingList: boolean
-  isAccessCodeRequired: boolean
+  isInWaitingList?: boolean
+  isAccessCodeRequired?: boolean
 }

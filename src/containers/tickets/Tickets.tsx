@@ -1,4 +1,3 @@
-//@ts-nocheck
 import jwtDecode from 'jwt-decode'
 import _get from 'lodash/get'
 import _isEmpty from 'lodash/isEmpty'
@@ -7,14 +6,19 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
 import { addToCart, fetchEvent, fetchTickets } from '../../api/ApiClient'
-import { IPromoCodeResponse } from '../../api/types'
+import { IAddToCartParams, IPromoCodeResponse } from '../../api/types'
 import {
   deleteAllData,
   deleteData,
   getData,
   LocalStorageKeys,
 } from '../../helpers/LocalStorage'
-import { IEvent, ISelectedTicket, ITicket } from '../../types'
+import {
+  IEvent,
+  IOnFetchTicketsSuccess,
+  ISelectedTicket,
+  ITicket,
+} from '../../types'
 import TicketsView from './TicketsView'
 import { ITicketsProps } from './types'
 
@@ -94,9 +98,7 @@ const Tickets = ({
     setIsGettingTickets(false)
 
     if (error) {
-      if (onFetchTicketsError) {
-        onFetchTicketsError(error)
-      }
+      onFetchTicketsError?.(error)
       return showAlert('Error while getting tickets, please try again')
     }
 
@@ -112,33 +114,29 @@ const Tickets = ({
         setPromoCodeResponse(promoCodeResult)
       }
 
-      if (onFetchTicketsSuccess) {
-        onFetchTicketsSuccess({
-          promoCodeResponse: {
-            success: true,
-            message: promoCodeResponse?.message,
-          },
-          tickets: responseTickets,
-          isInWaitingList,
-          isAccessCodeRequired,
-        })
+      const onFetchTicketsData: IOnFetchTicketsSuccess = {
+        promoCodeResponse: {
+          success: true,
+          message: promoCodeResponse?.message,
+        },
+        tickets: responseTickets,
+        isInWaitingList,
+        isAccessCodeRequired,
       }
+
+      onFetchTicketsSuccess?.(onFetchTicketsData)
 
       if (
         !isFirstCall &&
         (!promoCodeResult?.isValid || promoCodeResult.isValid === 0)
       ) {
-        if (onFetchTicketsSuccess) {
-          onFetchTicketsSuccess({
-            promoCodeResponse: {
-              success: false,
-              message: promoCodeResponse?.message,
-            },
-            tickets: responseTickets,
-            isInWaitingList,
-            isAccessCodeRequired,
-          })
-        }
+        onFetchTicketsSuccess?.({
+          ...onFetchTicketsData,
+          promoCodeResponse: {
+            success: false,
+            message: promoCodeResult?.message,
+          },
+        })
       }
     }
 
@@ -151,35 +149,38 @@ const Tickets = ({
     setIsGettingEvent(false)
 
     if (eventError) {
-      if (onFetchEventError) {
-        onFetchEventError(
-          eventError || 'There was an error while fetching event'
-        )
-      }
-      eventErrorCodeRef.current = eventError.code
+      eventErrorCodeRef.current = eventError.code || 400
       showAlert(eventError.message)
-      return
+      return onFetchEventError?.(
+        eventError || { message: 'There was an error while fetching event' }
+      )
     }
 
-    if (onFetchEventSuccess) {
-      onFetchEventSuccess({
-        name: eventData?.name,
-        slug: eventData?.slug,
-        description: eventData?.description,
-        title: eventData?.title,
+    if (!eventData) {
+      return onFetchEventError?.({
+        message: 'There was an error while fetching event',
       })
     }
 
+    onFetchEventSuccess?.(eventData)
     setEvent(eventData)
   }
 
   const performBookTickets = async () => {
+    if (!selectedTicket || !selectedTicket.selectedOption) {
+      onAddToCartError?.({ message: 'Please select a ticket' })
+      return showAlert('Please select a ticket')
+    }
+
     const optionName = _get(selectedTicket, 'optionName')
     const ticketId = _get(selectedTicket, 'id')
-    const ticketQuantity = selectedTicket?.selectedOption?.value
-    const ticketPrice = selectedTicket?.price
+    const ticketQuantity =
+      typeof selectedTicket.selectedOption.value === 'string'
+        ? parseInt(selectedTicket.selectedOption.value, 10)
+        : selectedTicket.selectedOption.value
+    const ticketPrice = selectedTicket.price
 
-    const data = {
+    const data: IAddToCartParams = {
       attributes: {
         alternative_view_id: null,
         product_cart_quantity: ticketQuantity,
@@ -207,15 +208,12 @@ const Tickets = ({
     setIsBooking(false)
 
     if (result) {
-      return onAddToCartSuccess(result)
+      return onAddToCartSuccess?.(result)
     }
 
     if (addToCartError) {
-      if (onAddToCartError) {
-        onAddToCartError(addToCartError)
-      }
-      showAlert(addToCartError)
-      return
+      showAlert(addToCartError.message || 'Error while adding tickets to cart')
+      return onAddToCartError?.(addToCartError)
     }
   }
   //#endregion

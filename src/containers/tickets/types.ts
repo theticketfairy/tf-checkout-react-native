@@ -35,7 +35,7 @@ export interface ITicketsViewProps {
   onPressGetTickets: () => void
   onPressApplyPromoCode: (promoCode: string) => void
   promoCodeValidationMessage?: string
-  isPromoCodeValid?: boolean
+  isPromoCodeValid?: boolean | number
   onSelectTicketOption: (selectedTicket: ISelectedTicket) => void
   selectedTicket?: ISelectedTicket
   texts?: ITicketsViewTexts
@@ -99,7 +99,7 @@ export interface ITicketsProps {
   onFetchTicketsError?: (error: IError) => void
 
   // Callbacks for fetching the Event
-  onFetchEventError?: (error: string) => void
+  onFetchEventError?: (error: IError) => void
   onFetchEventSuccess?: (data: IEventData) => void
 
   // Callbacks for Waiting list
