@@ -4,6 +4,7 @@ import { Client } from '../api/ApiClient'
 import Constants from '../api/Constants'
 
 export interface IConfig {
+  EVENT_ID: string | number
   DOMAIN?: string
   BASE_URL?: string
   CLIENT_ID?: string
