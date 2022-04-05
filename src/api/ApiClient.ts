@@ -1,4 +1,3 @@
-// ts-nocheck
 import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import axiosRetry from 'axios-retry'
 import _filter from 'lodash/filter'
@@ -22,6 +21,7 @@ import {
 } from '../types/ITicket'
 import Constants from './Constants'
 import {
+  IAddToCartParams,
   IAuthorizeResponse,
   ICartResponse,
   ICheckoutResponse,
@@ -382,7 +382,7 @@ export const fetchOrderDetails = async (orderId: string) => {
 //#region Tickets
 export const fetchTickets = async (
   id: string | number,
-  promoCode: string
+  promoCode?: string
 ): Promise<IFetchTicketsResponse> => {
   const headers = {
     'Promotion-Event': id.toString(),
@@ -399,6 +399,7 @@ export const fetchTickets = async (
   }
 
   const response = await Client.get(`v1/event/${id}/tickets/`, {
+    //@ts-ignore
     headers: headers,
   }).catch((error: AxiosError) => {
     responseError = {
@@ -440,7 +441,7 @@ export const fetchTickets = async (
 
 export const addToCart = async (
   id: string | number,
-  data: any
+  data: IAddToCartParams
 ): Promise<ITicketsResponsePayload> => {
   let responseError: IError | undefined
   let responseData: ITicketsResponseData | undefined

@@ -62,3 +62,10 @@ export interface IEvent {
   imageURLs: any
   descriptions: any
 }
+
+export interface IEventData {
+  slug: string
+  name: string
+  description?: string
+  title: string
+}

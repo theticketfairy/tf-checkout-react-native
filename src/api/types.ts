@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { AxiosInstance } from 'axios'
 
 import { IError, IEvent, ITicket } from '../types'
@@ -30,18 +29,17 @@ export interface IAuthorizeResponse {
 }
 
 export interface IAddToCartParams {
-  eventId: number | string
   attributes: {
     alternative_view_id?: string | number
     product_cart_quantity: number
     product_options: {
-      [optionName]: number | string
+      [key: string]: number | string
     }
     product_id: number
     ticket_types: {
-      [ticketId]: {
+      [key: string]: {
         product_options: {
-          [optionName]: number
+          [key: string]: number
           ticket_price: number
         }
         quantity: number

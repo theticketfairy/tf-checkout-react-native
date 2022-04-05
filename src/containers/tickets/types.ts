@@ -17,6 +17,7 @@ import {
 } from '../../components/waitingList/types'
 import {
   IEvent,
+  IOnFetchTicketsSuccess,
   ISelectedTicket,
   ITicket,
   ITicketsResponseData,
@@ -84,16 +85,6 @@ export interface ITicketsViewTexts {
 
   listItem?: ITicketListItemTexts
   waitingList?: IWaitingListTexts
-}
-
-export interface IOnFetchTicketsSuccess {
-  tickets: ITicket[]
-  promoCodeResponse: {
-    success?: boolean
-    message?: string
-  }
-  isInWaitingList: boolean
-  isAccessCodeRequired: boolean
 }
 
 export interface ITicketsProps {
