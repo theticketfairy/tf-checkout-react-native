@@ -110,7 +110,7 @@ export interface ILoginViewProps {
   showDialog: () => void
   hideDialog: () => void
   isDialogVisible: boolean
-  onPressLogin: (email: string, password: string) => void
+  onPressLogin: (fields: ILoginFields) => void
   isLoading: boolean
   userProfile?: IUserProfile
 
@@ -125,6 +125,11 @@ export interface ILoginViewProps {
   refs?: ILoginRefs
 
   brandImages?: ILoginBrandImages
+}
+
+export interface ILoginFields {
+  email: string
+  password: string
 }
 
 export interface ILoginViewState {

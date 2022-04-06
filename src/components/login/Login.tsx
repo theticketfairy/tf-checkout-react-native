@@ -16,7 +16,7 @@ import {
 } from '../../helpers/LocalStorage'
 import { IUserProfile } from '../../types'
 import LoginView from './LoginView'
-import { ILoginProps } from './types'
+import { ILoginFields, ILoginProps } from './types'
 
 const Login = ({
   onLoginSuccessful,
@@ -39,7 +39,7 @@ const Login = ({
   const [loginError, setLoginError] = useState('')
   const [userProfileData, setUserProfileData] = useState<IUserProfile>()
 
-  const handleOnPressLogin = async (email: string, password: string) => {
+  const handleOnPressLogin = async ({ email, password }: ILoginFields) => {
     if (loginError) {
       setLoginError('')
     }

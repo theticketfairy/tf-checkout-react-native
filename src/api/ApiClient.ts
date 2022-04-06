@@ -151,7 +151,7 @@ export const authorize = async (
     data
   ).catch((error: AxiosError) => {
     responseError = {
-      message: error?.response?.data.message,
+      message: error?.response?.data.message || 'Authorization failed',
       code: error?.response?.status,
     }
   })
