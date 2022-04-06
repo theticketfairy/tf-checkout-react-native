@@ -99,7 +99,10 @@ const LoginView = ({
   }
 
   const handleOnPressLogin = () => {
-    onPressLogin(email.value as string, password.value as string)
+    onPressLogin({
+      email: email.value as string,
+      password: password.value as string,
+    })
   }
 
   const logoutTitle = texts?.logoutDialog?.title

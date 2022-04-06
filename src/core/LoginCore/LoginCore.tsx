@@ -8,6 +8,7 @@ import {
 import { ILoginFields } from '../../components/login/types'
 import { Config } from '../../helpers/Config'
 import {
+  deleteAllData,
   IStoredUserData,
   LocalStorageKeys,
   storeData,
@@ -30,7 +31,12 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
         await authorize(bodyFormData)
 
       if (authorizationError) {
-        return { error: authorizationError }
+        return {
+          error: {
+            ...authorizationError,
+            extraData: { endpoint: 'authorize' },
+          },
+        }
       }
 
       const bodyFormDataToken = new FormData()
@@ -45,7 +51,14 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
       )
 
       if (tokenError) {
-        return { error: tokenError }
+        return {
+          error: {
+            ...tokenError,
+            extraData: {
+              endpoint: 'accessToken',
+            },
+          },
+        }
       }
 
       // Fetch user profile
@@ -54,13 +67,23 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
       )
 
       if (userProfileError) {
-        return { error: userProfileError }
+        return {
+          error: {
+            ...userProfileError,
+            extraData: {
+              endpoint: 'userProfile',
+            },
+          },
+        }
       }
 
       if (!userProfile) {
         return {
           error: {
             message: 'There is no user profile',
+            extraData: {
+              endpoint: 'userProfile',
+            },
           },
         }
       }
@@ -95,6 +118,10 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
       await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken)
 
       return { data: userPublicData }
+    },
+    async logout() {
+      await deleteAllData()
+      return
     },
   }))
 
