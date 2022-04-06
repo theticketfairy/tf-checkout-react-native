@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
@@ -10,14 +10,10 @@ import {
   PurchaseConfirmation,
   Tickets,
   BillingInfo,
-  Login,
-  IUserProfile,
   setConfig,
   ITicketsResponseData,
   SkippingStatusType,
 } from 'tf-checkout-react-native'
-import { IOrderDetails } from '../../src/containers/checkout/types'
-import { IError } from '../../src/types'
 
 import Color from './Colors'
 import CustomLoading from './components/CustomLoading'
@@ -49,17 +45,8 @@ const App = () => {
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false)
   const [selectedOrderDetails, setSelectedOrderDetails] =
     useState<IMyOrderDetailsResponse>()
-
-  const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
-  const [loggedUserName, setLoggedUserName] = useState('')
   
   //#region Handlers
-  const handleOnLoginDialogSuccess = (
-    userProfile: IUserProfile,
-    accessToken: string
-  ) => {
-    setLoggedUserName(userProfile.firstName)
-  }
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
     console.log('handleOnAddToCartSuccess',data)
     setCartProps(data)
@@ -111,13 +98,11 @@ const App = () => {
   }
   //#endregion
 
-  const loginEmailRef = useRef(null)
-  const loginPasswordRef = useRef(null)
-  const touchableOpacityRef = useRef(null)
 
   //#region effects
   useEffect(() => {
     setConfig({
+      EVENT_ID: '5420',
       DOMAIN: 'https://manacommon.com',
       BRAND: 'the-ticket-fairy',// 'mana-onetree-testing-brand',
       ARE_SUB_BRANDS_INCLUDED: true,
@@ -158,9 +143,7 @@ const App = () => {
           <>
           <BillingInfo
           areLoadingIndicatorsEnabled={false}
-          onSkippingStatusChange={(status) => {console.log('%cApp.tsx line:159 status', 'color: #00FFcc;', status);
-          setSkippingStatus(status)
-        }}
+          onSkippingStatusChange={setSkippingStatus}
           loginBrandImages={{
             image1: GOOGLE_IMAGE,
             image1Style: {
@@ -178,10 +161,7 @@ const App = () => {
               marginBottom: 16
             },
           }}
-          onLoadingChange={(loading) => {
-            console.log('%c BILLING LOADING', 'color: #007acc;', loading);
-            setIsLoading(loading)
-          }}
+          onLoadingChange={setIsLoading}
             texts={{
               form: {
                 getYourTicketsTitle: '_Get your tickets_',
@@ -812,7 +792,6 @@ const App = () => {
           <View style={{ flex: 1 }}>
             <Tickets
               areLoadingIndicatorsEnabled={false}
-              eventId={EVENT_ID}
               onLoadingChange={(loading) => setIsLoading(loading)}
 
               onFetchTicketsSuccess={(tickets) => {console.log('onFetchTicketsSuccess', tickets)}}
