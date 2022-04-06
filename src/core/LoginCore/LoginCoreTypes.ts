@@ -8,5 +8,5 @@ export interface ILoginCoreResponse {
 
 export type LoginCoreHandle = {
   login(fields?: ILoginFields): Promise<ILoginCoreResponse>
-  logout(): void
+  logout(): Promise<void>
 }
