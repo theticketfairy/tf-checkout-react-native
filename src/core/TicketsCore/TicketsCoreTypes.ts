@@ -1,21 +1,17 @@
-import { ReactNode } from 'react'
-
 import { IEventResponse, IFetchTicketsResponse } from '../../api/types'
-import { ITicketsResponsePayload } from '../../types'
-
-export interface ITicketsCoreProps {
-  children: ReactNode | ReactNode[]
-}
+import { IAddToCartResponse } from '../../types'
 
 export interface IBookTicketsOptions {
   optionName: string
   ticketId: string
-  quantity: string
+  quantity: number
   price: number
 }
 
 export type TicketsCoreHandle = {
-  getTickets?(promoCode?: string): Promise<IFetchTicketsResponse>
-  getEvent?(eventId: string): Promise<IEventResponse>
-  addToCart?(options: IBookTicketsOptions): Promise<ITicketsResponsePayload>
+  getTickets(promoCode?: string): Promise<IFetchTicketsResponse>
+  getEvent(): Promise<IEventResponse>
+  addToCart(options: IBookTicketsOptions): Promise<IAddToCartResponse>
+  getIsUserLoggedIn(): Promise<boolean>
+  logout(): Promise<void>
 }

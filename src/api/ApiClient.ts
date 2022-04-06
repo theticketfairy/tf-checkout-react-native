@@ -15,13 +15,14 @@ import {
 } from '../helpers/LocalStorage'
 import { IError, IEvent, IUserProfile } from '../types'
 import {
+  IAddToCartResponse,
   ITicket,
   ITicketsResponseData,
-  ITicketsResponsePayload,
 } from '../types/ITicket'
 import Constants from './Constants'
 import {
   IAddToCartParams,
+  IAddToWaitingListResponse,
   IAuthorizeResponse,
   ICartResponse,
   ICheckoutResponse,
@@ -246,9 +247,8 @@ export const registerNewUser = async (
 
 //#region Waiting List
 export const addToWaitingList = async (
-  id: number,
   values: IWaitingListFields
-) => {
+): Promise<IAddToWaitingListResponse> => {
   const requestData = {
     data: {
       attributes: values,
@@ -257,7 +257,7 @@ export const addToWaitingList = async (
 
   let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.post(
-    `/v1/event/${id}/add_to_waiting_list`,
+    `/v1/event/${Config.EVENT_ID}/add_to_waiting_list`,
     requestData
   ).catch((error: AxiosError) => {
     responseError = {
@@ -265,6 +265,8 @@ export const addToWaitingList = async (
       code: error.response?.status!,
     }
   })
+
+  console.log('add to waiting list', response)
 
   return {
     addToWaitingListError: responseError,
@@ -381,11 +383,11 @@ export const fetchOrderDetails = async (orderId: string) => {
 
 //#region Tickets
 export const fetchTickets = async (
-  id: string | number,
   promoCode?: string
 ): Promise<IFetchTicketsResponse> => {
+  const eventId = Config.EVENT_ID.toString()
   const headers = {
-    'Promotion-Event': id.toString(),
+    'Promotion-Event': eventId,
     'Promotion-Code': promoCode,
   }
 
@@ -398,7 +400,7 @@ export const fetchTickets = async (
     delete headers['Promotion-Code']
   }
 
-  const response = await Client.get(`v1/event/${id}/tickets/`, {
+  const response = await Client.get(`v1/event/${eventId}/tickets/`, {
     //@ts-ignore
     headers: headers,
   }).catch((error: AxiosError) => {
@@ -440,14 +442,13 @@ export const fetchTickets = async (
 }
 
 export const addToCart = async (
-  id: string | number,
   data: IAddToCartParams
-): Promise<ITicketsResponsePayload> => {
+): Promise<IAddToCartResponse> => {
   let responseError: IError | undefined
   let responseData: ITicketsResponseData | undefined
 
   const response: AxiosResponse | void = await Client.post(
-    `v1/event/${id}/add-to-cart/`,
+    `v1/event/${Config.EVENT_ID}/add-to-cart/`,
     {
       data,
     }
@@ -482,14 +483,15 @@ export const addToCart = async (
   }
 }
 
-export const fetchEvent = async (
-  id: string | number
-): Promise<IEventResponse> => {
+export const fetchEvent = async (): Promise<IEventResponse> => {
   let responseError: IError | undefined
   let event: IEvent | undefined
-  const response: AxiosResponse | void = await Client.get(`v1/event/${id}`, {
-    headers: HEADERS,
-  }).catch((error: AxiosError) => {
+  const response: AxiosResponse | void = await Client.get(
+    `v1/event/${Config.EVENT_ID}`,
+    {
+      headers: HEADERS,
+    }
+  ).catch((error: AxiosError) => {
     responseError = {
       code: error?.response?.data.status,
       message: error.response?.data.message,

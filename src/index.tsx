@@ -17,7 +17,12 @@ import {
   SkippingStatusType,
 } from './containers/billingInfo/types'
 import { ITicketsProps } from './containers/tickets/types'
-import { TicketsCore, TicketsCoreHandle } from './core'
+import {
+  TicketsCore,
+  TicketsCoreHandle,
+  WaitingListCore,
+  WaitingListCoreHandle,
+} from './core'
 import { setConfig } from './helpers/Config'
 import { ITicketsResponseData, IUserProfile } from './types'
 
@@ -44,6 +49,8 @@ export {
   Tickets,
   TicketsCore,
   TicketsCoreHandle,
+  WaitingListCore,
+  WaitingListCoreHandle,
 }
 
 export default NativeModules.TFCheckoutRNModule

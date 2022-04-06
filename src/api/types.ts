@@ -10,6 +10,7 @@ export interface IClientRequest extends AxiosInstance {
   setDomain: (domain: string) => void
 }
 
+//#region Tickets
 export interface IPromoCodeResponse {
   isValid: boolean | number
   message: string
@@ -47,6 +48,20 @@ export interface IAddToCartParams {
     }
   }
 }
+//#endregion
+
+//#region WaitingList
+export interface IAddToWaitingListResponse {
+  addToWaitingListError?: IError
+  addToWaitingListData?: {
+    error: boolean
+    message: string
+    status: number
+    success: boolean
+  }
+}
+
+//#endregion
 
 export interface IEventData {
   slug: string

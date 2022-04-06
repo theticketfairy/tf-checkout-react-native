@@ -86,6 +86,7 @@ Use it in your initial useEffect function:
 ```js
 useEffect(() => {
   setConfig({
+    EVENT_ID: '4344',
     DOMAIN: 'https://yourdomain.mx',
   })
 }, [])
@@ -93,8 +94,9 @@ useEffect(() => {
 
 `setConfig` set your event's configuration, with the following options:
 
-```js
+````js
 {
+  EVENT_ID: string,
   DOMAIN?: string,
   BASE_URL?: string,
   CLIENT_ID?: string,
@@ -103,10 +105,11 @@ useEffect(() => {
   BRAND?: string,
   ARE_SUB_BRANDS_INCLUDED?: boolean
 }
-```
+````
 ### Props
 | Property | Description |
 | -------- | ----------- |
+| EVENT_ID | Specify the event's ID. |
 | DOMAIN | Specify your domains name example: `https://google.com` this is important to maintain cart session active and prevent it from expiring when user login in the BillingInfo component. |
 | BASE_URL | If our dev team gives you a custom BASE_URL.|
 | CLIENT_ID | Set your CLIENT_ID. |
@@ -183,6 +186,13 @@ interface IInputStyles {
 }
 ```
 # Exported components
+Depending on your needs, you can use the UI Components or the Core Components.
+
+[UI Components](#ui-components) use the Core Components at their core but also exposes an UI that you can configure with your own styles. There is no need to create any kind of logic with them, only setConfig and implement the callbacks to get their data.
+
+[Core Components](#core-components) are wrappers that don't include any UI neither validation logics, they only act as a Middleware to retrieve and send data from the server and return it to your implementation components. They are useful when your design cannot be achieved by the UI components. You will need to use references to access their exposed functions.
+
+# UI Components
 ## Login
 
 Import the component from the library
@@ -311,7 +321,6 @@ interface ILoginViewStyles {
 
 ```
 ---
-
 ## Tickets
 
 Import the component from the library
@@ -1099,6 +1108,260 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
       copied?: string
     }
   }
+}
+```
+
+# Core Components
+**⚠️ Remember that you first need to set your configuration using the [setConfig](#set-your-configuration)
+ function. ⚠️**
+
+## TicketsCore
+This is the initial component to show. It will retrieve the tickets, event, present My Orders and Logout buttons if the user is logged in, and will add the selected tickets to the cart.
+
+Exposes the following functions: 
+
+```js
+{
+  getTickets(promoCode?: string): Promise<{
+    tickets?: {
+      sortOrder: number
+      displayTicket?: boolean
+      salesEnded: boolean
+      salesStarted: boolean
+      id: string
+      displayName: string
+      optionName: string
+      optionValue: string
+      isTable: string
+      feeIncluded: boolean
+      price: number
+      basePrice: number
+      chosen: number
+      priceCurrency: string
+      priceSymbol: string
+      taxesIncluded: boolean
+      taxName: string
+      minQuantity: number
+      maxQuantity: number
+      multiplier: number
+      tags: []
+      allowMultiplePurchases: number
+      priceReplacementText: string
+      waitingListEnabled: boolean
+      soldOut?: boolean
+      soldOutMessage: string
+      minGuests?: number
+      maxGuests?: number
+      buyButtonText?: string
+      totalStock: number
+      guestPrice?: number
+      alwaysAvailable: string
+      feeText: string
+      x_face_value: number
+      sold_out?: boolean
+      oldPrice?: number
+      oldBasePrice?: number
+      descriptionRich?: string
+    }[]
+    error?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    promoCodeResult?: {
+      isValid: boolean | number
+      message: string
+    }
+    isInWaitingList?: boolean
+    isAccessCodeRequired?: boolean
+  }>
+
+  getEvent(): Promise<{
+    eventError?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    eventData?: {
+      passwordProtected: boolean
+      passwordAuthenticated: boolean
+      name: string
+      description?: string
+      slug: string
+      redirectUrl?: string
+      facebookEvent?: string
+      title: string
+      relatedProducts: []
+      country: string
+      date: string
+      startDate: string
+      endDate: string
+      timezone: string
+      formattedDate: string
+      venueCountry: string
+      venueCity?: string
+      venueState?: string
+      hideVenueUntil?: string
+      hideVenue?: boolean
+      venueName?: string
+      venueGooglePlaceId?: string
+      venueLatitude?: string
+      venueLongitude?: string
+      venuePostalCode?: string
+      venueStreet?: string
+      venueStreetNumber?: string
+      eventType: any
+      productImage: string
+      imageUrl: string
+      imageUrlHd: string
+      backgroundImage: string
+      backgroundVideo?: string
+      twitterImage?: string
+      ogImage?: string
+      tags: []
+      preregEnabled: boolean
+      presalesStarted: boolean
+      presalesEnded: boolean
+      salesStart?: string
+      salesEnd: string
+      salesStarted: boolean
+      salesEnded: boolean
+      feeMode: string
+      feesIncluded?: any
+      minimumAge?: any
+      enableWaitingList: boolean
+      alwaysShowWaitingList?: any
+      titleReplacementImage?: any
+      titleReplacementHeight?: any
+      titleReplacementImageSvg?: any
+      fullTitleReplacement?: any
+      affirmAllowed: boolean
+      subHeading?: any
+      isTimeSlotEvent: boolean
+      preregistered: []
+      referralsEnabled: boolean
+      referrals: []
+      faq: []
+      l10nLanguages: []
+      imageURLs: any
+      descriptions: any
+    }
+  }>
+
+  addToCart(
+    options: {  
+      optionName: string
+      ticketId: string
+      quantity: number
+      price: number
+    }
+  ): Promise<{
+    error?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    data?: {
+      isBillingRequired: boolean
+      isPhoneRequired?: boolean
+      isAgeRequired?: boolean
+      minimumAge?: number
+      isNameRequired?: boolean
+    }
+  }>
+}
+```
+
+Import the component from the library
+
+```js
+import { 
+  TicketsCore 
+  TicketsCoreHandle // You can import the Handle to use it as type in the useRef hook
+  
+} from 'tf-checkout-react-native'
+```
+
+Declare a reference to pass it to the component.
+
+```js
+const ticketsCoreRef = useRef<TicketsCoreHandle>(null)
+```
+
+Then add it to the render function and assign the reference to the corresponding component.
+
+```js
+<TicketsCore ref={ticketsCoreRef}>
+  <YourComponent />
+</TicketsCore>
+```
+
+Use the reference to access the component methods.
+
+```js
+const handleGetTickets = async () => {
+  const res = await ticketsCoreRef.current.getTickets()
+}
+
+```
+
+## WaitingListCore
+This component *must* appear after getting the response from **getTickets()** and the property `isInWaitingList` is set to true.
+
+
+Exposes the following functions: 
+```js
+{
+  addToWaitingList(
+    params: {
+      firstName: string
+      lastName: string
+      email: string
+    }
+  ): Promise<{
+    addToWaitingListError?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    addToWaitingListData?: {
+      error: boolean
+      message: string
+      status: number
+      success: boolean
+    }
+  }>
+}
+```
+
+Import the component from the library
+
+```js
+import { 
+  WaitingListCore 
+  WaitingListCoreHandle // You can import the Handle to use as type it in the useRef hook
+} from 'tf-checkout-react-native'
+```
+
+Declare a reference to pass it to the component.
+
+```js
+const waitingListCoreRef = useRef<WaitingListCoreHandle>(null)
+```
+
+Then add it to the render function and assign the reference to the corresponding component.
+
+```js
+<WaitingListCore ref={waitingListCoreRef}>
+  <YourComponent />
+</WaitingListCore>
+```
+
+Use the reference to access the component methods.
+
+```js
+const handleAddToWaitingList = async (params: IAddToWaitingListCoreParams) => {
+  const res = await waitingListCoreRef.current.addToWaitingList(params)
 }
 ```
 

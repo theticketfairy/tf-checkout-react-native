@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
-import { addToWaitingList } from '../../api/ApiClient'
+import { WaitingListCore, WaitingListCoreHandle } from '../../core'
+import { IAddToWaitingListCoreParams } from '../../core/WaitingListCore/WaitingListCoreTypes'
 import { useDebounced } from '../../helpers/Debounced'
 import { validateEmail, validateEmpty } from '../../helpers/Validators'
-import { IWaitingListFields, IWaitingListProps } from './types'
+import { IWaitingListProps } from './types'
 import WaitingListView from './WaitingListView'
 
 const WaitingList = ({
   styles,
   texts,
-  eventId,
   onAddToWaitingListError,
   onAddToWaitingListSuccess,
   onLoadingChange,
@@ -30,10 +30,23 @@ const WaitingList = ({
   const handleSetLastName = (val: string) => setLastName(val)
   const handleSetEmail = (val: string) => setEmail(val)
 
+  const waitingListCoreRef = useRef<WaitingListCoreHandle>(null)
+
+  const showAlert = (message: string) => {
+    if (areAlertsEnabled) {
+      Alert.alert('', message)
+    }
+  }
+
   const handleOnPressButton = async () => {
-    const values: IWaitingListFields = {
-      ticketTypeId: '',
-      quantity: '',
+    if (!waitingListCoreRef.current) {
+      showAlert('WaitingListCore is not initialized')
+      return onAddToWaitingListError?.({
+        message: 'WaitingListCore is not initialized',
+      })
+    }
+
+    const values: IAddToWaitingListCoreParams = {
       firstName: firstName,
       lastName: lastName,
       email: email,
@@ -42,34 +55,25 @@ const WaitingList = ({
     setIsLoading(true)
 
     const { addToWaitingListData, addToWaitingListError } =
-      await addToWaitingList(eventId, values)
+      await waitingListCoreRef.current.addToWaitingList(values)
 
     setIsLoading(false)
     if (addToWaitingListError) {
       setIsSuccess(false)
-      if (areAlertsEnabled) {
-        Alert.alert('', addToWaitingListError.message)
-      }
-
-      if (onAddToWaitingListError) {
-        onAddToWaitingListError(addToWaitingListError)
-      }
+      showAlert(addToWaitingListError.message)
+      onAddToWaitingListError?.(addToWaitingListError)
       return
     }
 
     if (addToWaitingListData) {
-      if (onAddToWaitingListSuccess) {
-        onAddToWaitingListSuccess()
-      }
+      onAddToWaitingListSuccess?.()
       setIsSuccess(true)
     }
   }
 
   const onLoadingChangeCallback = useCallback(
     (loading: boolean) => {
-      if (onLoadingChange) {
-        onLoadingChange(loading)
-      }
+      onLoadingChange?.(loading)
     },
     [onLoadingChange]
   )
@@ -79,24 +83,26 @@ const WaitingList = ({
   }, [isLoading, onLoadingChangeCallback])
 
   return (
-    <WaitingListView
-      data={{
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        firstNameError: firstNameError,
-        lastNameError: lastNameError,
-        emailError: emailError,
-        onChangeEmail: handleSetEmail,
-        onChangeFirstName: handleSetFirstName,
-        onChangeLastName: handleSetLastName,
-      }}
-      onPressButton={handleOnPressButton}
-      isSuccess={isSuccess}
-      styles={styles}
-      texts={texts}
-      isLoading={isLoading}
-    />
+    <WaitingListCore ref={waitingListCoreRef}>
+      <WaitingListView
+        data={{
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          firstNameError: firstNameError,
+          lastNameError: lastNameError,
+          emailError: emailError,
+          onChangeEmail: handleSetEmail,
+          onChangeFirstName: handleSetFirstName,
+          onChangeLastName: handleSetLastName,
+        }}
+        onPressButton={handleOnPressButton}
+        isSuccess={isSuccess}
+        styles={styles}
+        texts={texts}
+        isLoading={isLoading}
+      />
+    </WaitingListCore>
   )
 }
 

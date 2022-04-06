@@ -54,7 +54,7 @@ export interface ITicketsResponseData {
   isNameRequired?: boolean
 }
 
-export interface ITicketsResponsePayload {
+export interface IAddToCartResponse {
   error?: IError
   data?: ITicketsResponseData
 }

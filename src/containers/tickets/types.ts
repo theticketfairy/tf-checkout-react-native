@@ -26,7 +26,6 @@ import { IError } from '../../types/IError'
 import { ITicketListItemStyles, ITicketListItemTexts } from './components/types'
 
 export interface ITicketsViewProps {
-  eventId: number
   isGettingTickets?: boolean
   isBookingTickets?: boolean
   isGettingEvent?: boolean
@@ -88,8 +87,6 @@ export interface ITicketsViewTexts {
 }
 
 export interface ITicketsProps {
-  eventId: number
-
   // Callbacks for when user taps on GET Tickets button
   onAddToCartSuccess: (data: ITicketsResponseData) => void
   onAddToCartError?: (error: IError) => void
