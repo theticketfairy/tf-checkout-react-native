@@ -14,9 +14,9 @@ import {
 } from '../../helpers/LocalStorage'
 import { IUserProfilePublic } from '../../types'
 import { ICoreProps } from '../CoreProps'
-import { ILoginCoreResponse } from './LoginCoreTypes'
+import { ILoginCoreResponse, LoginCoreHandle } from './LoginCoreTypes'
 
-const LoginCore = forwardRef<void, ICoreProps>((props, ref) => {
+const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
     async login({
       email,

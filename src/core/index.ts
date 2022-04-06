@@ -1,3 +1,5 @@
+export { default as LoginCore } from './LoginCore/LoginCore'
+export { LoginCoreHandle } from './LoginCore/LoginCoreTypes'
 export { default as TicketsCore } from './TicketsCore/TicketsCore'
 export { TicketsCoreHandle } from './TicketsCore/TicketsCoreTypes'
 export { default as WaitingListCore } from './WaitingListCore/WaitingListCore'

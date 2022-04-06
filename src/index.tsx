@@ -18,6 +18,8 @@ import {
 } from './containers/billingInfo/types'
 import { ITicketsProps } from './containers/tickets/types'
 import {
+  LoginCore,
+  LoginCoreHandle,
   TicketsCore,
   TicketsCoreHandle,
   WaitingListCore,
@@ -41,6 +43,8 @@ export {
   IUserProfile,
   LoggedIn,
   Login,
+  LoginCore,
+  LoginCoreHandle,
   MyOrderDetails,
   MyOrders,
   PurchaseConfirmation,
