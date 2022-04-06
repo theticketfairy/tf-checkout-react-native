@@ -1333,6 +1333,30 @@ Exposes the following functions:
   }>
 }
 ```
+**addToWaitingList** Receives params with the following properties:
+```js
+firstName: string
+lastName: string 
+email: string
+```
+
+And returns a Promise with the following object: 
+
+```js
+{
+  addToWaitingListError?: {
+    code?: number // If it was a server error, this will be the error code
+    message: string //Error message that you could use it in your UI
+    extraData?: any // If there is a relevant extra data, it will be returned here
+  }
+  addToWaitingListData?: {
+    error: boolean // If there was an error, this will be true
+    message: string // message that you could use it in your UI, could be due an error or a success message
+    status: number // Status code
+    success: boolean // If there was no error, this will be true
+  }
+}
+```
 
 Import the component from the library
 
