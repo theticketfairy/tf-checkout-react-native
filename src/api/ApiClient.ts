@@ -5,6 +5,7 @@ import _get from 'lodash/get'
 import _map from 'lodash/map'
 import _sortBy from 'lodash/sortBy'
 
+import { IOnCheckoutSuccess } from '..'
 import { IWaitingListFields } from '../components/waitingList/types'
 import { Config } from '../helpers/Config'
 import {
@@ -24,9 +25,12 @@ import {
   IAddToCartParams,
   IAddToWaitingListResponse,
   IAuthorizeResponse,
+  ICartData,
   ICartResponse,
+  ICheckoutBody,
   ICheckoutResponse,
   IClientRequest,
+  ICountriesResponse,
   IEventResponse,
   IFetchTicketsResponse,
   IFreeRegistrationData,
@@ -40,6 +44,8 @@ import {
   IOrderReviewResponse,
   IPromoCodeResponse,
   IRegisterNewUserResponse,
+  IStatesResponse,
+  IUserProfileResponse,
 } from './types'
 
 const HEADERS: { [key: string]: any } = {
@@ -179,7 +185,12 @@ export const fetchAccessToken = async (data: FormData) => {
   }
 }
 
-export const fetchUserProfile = async (accessToken: any) => {
+export const fetchUserProfile = async (): Promise<IUserProfileResponse> => {
+  const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
+  if (!accessToken) {
+    return { userProfileError: { message: 'Access token not found' } }
+  }
+
   let responseError: IError | undefined
   let userProfile: IUserProfile | undefined
 
@@ -203,8 +214,8 @@ export const fetchUserProfile = async (accessToken: any) => {
   }
 
   return {
-    error: responseError,
-    userProfile: userProfile,
+    userProfileError: responseError,
+    userProfileData: userProfile,
   }
 }
 
@@ -236,8 +247,17 @@ export const registerNewUser = async (
   if (res?.status === 200) {
     resultData.data = res.data.data.attributes
 
-    if (resultData.data?.access_token) {
-      await setAccessTokenHandler(resultData.data.access_token)
+    if (res.data.data?.attributes.access_token) {
+      await setAccessTokenHandler(res.data.data.attributes.access_token)
+
+      await storeData(
+        LocalStorageKeys.ACCESS_TOKEN,
+        res.data.data.attributes.access_token
+      )
+      await storeData(
+        LocalStorageKeys.REFRESH_TOKEN,
+        res.data.data.attributes.refresh_token
+      )
     }
   }
 
@@ -510,7 +530,7 @@ export const fetchEvent = async (): Promise<IEventResponse> => {
 //#endregion
 
 //#region Billing Information
-export const fetchCountries = async () => {
+export const fetchCountries = async (): Promise<ICountriesResponse> => {
   let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.get('/countries/').catch(
     (error: AxiosError) => {
@@ -521,17 +541,20 @@ export const fetchCountries = async () => {
     }
   )
 
+
   if (response?.status === 200) {
     setCustomHeader(response)
   }
 
   return {
-    data: response?.data.data,
-    error: responseError,
+    countriesData: response?.data.data,
+    countriesError: responseError,
   }
 }
 
-export const fetchStates = async (countryId: string) => {
+export const fetchStates = async (
+  countryId: string
+): Promise<IStatesResponse> => {
   let responseError: IError | undefined
   const response: void | AxiosResponse = await Client.get(
     `/countries/${countryId}/states/`
@@ -547,14 +570,14 @@ export const fetchStates = async (countryId: string) => {
   }
 
   return {
-    error: responseError,
-    data: response?.data?.data,
+    statesError: responseError,
+    statesData: response?.data?.data,
   }
 }
 
-export const fetchCart = async () => {
+export const fetchCart = async (): Promise<ICartResponse> => {
   let responseError: IError | undefined
-  let cartData = {} as ICartResponse
+  let cartData = {} as ICartData
   const res: AxiosResponse | void = await Client.get('v1/cart/').catch(
     (error: AxiosError) => {
       responseError = {
@@ -592,9 +615,17 @@ export const fetchCart = async () => {
 }
 
 export const checkoutOrder = async (
-  data: any,
-  accessToken: string
+  data: ICheckoutBody
 ): Promise<ICheckoutResponse> => {
+  const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
+
+  if (!accessToken) {
+    return {
+      error: {
+        message: 'Access token not found',
+      },
+    }
+  }
   let responseError: IError | undefined
   const res: AxiosResponse | void = await Client.post(
     'v1/on-checkout/',
@@ -612,9 +643,25 @@ export const checkoutOrder = async (
     }
   })
 
+
+  if (!res || !res.data) {
+    responseError = {
+      message: 'No data returned on checkout',
+    }
+
+    return { error: responseError }
+  }
+
+  const checkoutResponseData: IOnCheckoutSuccess = {
+    id: res.data.data.attributes.id,
+    hash: res.data.data.attributes.hash,
+    total: res.data.data.attributes.total,
+    status: res.data.data.attributes.status,
+  }
+
   return {
     error: responseError,
-    data: res,
+    data: checkoutResponseData,
   }
 }
 //#endregion

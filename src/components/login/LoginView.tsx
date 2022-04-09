@@ -1,5 +1,5 @@
 import _map from 'lodash/map'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { FC, useCallback, useMemo, useState } from 'react'
 import {
   Alert,
   Image,
@@ -29,7 +29,7 @@ const initialState: ILoginViewState = {
   },
 }
 
-const LoginView = ({
+const LoginView: FC<ILoginViewProps> = ({
   showDialog,
   hideDialog,
   isDialogVisible,
@@ -42,7 +42,7 @@ const LoginView = ({
   loginError,
   refs,
   brandImages,
-}: ILoginViewProps) => {
+}) => {
   const [data, setData] = useState<ILoginViewState>(initialState)
   const { email, password } = data
   const getFormFields = (): IFormFieldProps[] => {

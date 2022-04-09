@@ -18,7 +18,7 @@ import {
   ILoginViewStyles,
   ILoginViewTexts,
 } from '../../components/login/types'
-import { IError, ITicketsResponseData } from '../../types'
+import { IError, ITicketsResponseData, IUserProfilePublic } from '../../types'
 
 export interface ITokens {
   accessToken: string
@@ -36,16 +36,20 @@ export interface IBillingProps {
   cartProps: ITicketsResponseData
 
   // registerNewUser
-  onRegisterSuccess?: (tokens: ITokens) => void
-  onRegisterError?: (error: string) => void
+  onRegisterSuccess?: () => void
+  onRegisterError?: (error: IError) => void
 
   // checkoutOrder
   onCheckoutSuccess: (data: IOnCheckoutSuccess) => void
   onCheckoutError?: (error: IError) => void
 
   // login
-  onLoginSuccess: (data: any) => void
+  onLoginSuccess: (data: IUserProfilePublic) => void
   onLoginError?: (error: IError) => void
+
+  // logout
+  onLogoutSuccess?: () => void
+  onLogoutError?: (error: IError) => void
 
   //fetchUserProfile
   onFetchUserProfileSuccess?: (data: any) => void
@@ -62,10 +66,6 @@ export interface IBillingProps {
   // fetchState
   onFetchStatesError?: (error: IError) => void
   onFetchStatesSuccess?: () => void
-
-  // fetch Token
-  onFetchAccessTokenError?: (error: IError) => void
-  onFetchAccessTokenSuccess?: () => void
 
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts

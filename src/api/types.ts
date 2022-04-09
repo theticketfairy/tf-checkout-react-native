@@ -1,6 +1,7 @@
 import { AxiosInstance } from 'axios'
 
-import { IError, IEvent, ITicket } from '../types'
+import { IOnCheckoutSuccess } from '..'
+import { IError, IEvent, ITicket, IUserProfile } from '../types'
 
 export interface IClientRequest extends AxiosInstance {
   setGuestToken: (token: string) => void
@@ -127,8 +128,6 @@ export interface IRegisterNewUserResponse {
     raw?: any
   }
   data?: {
-    access_token: string
-    refresh_token: string
     token_type: string
     scope: string
     user_profile: {
@@ -142,7 +141,7 @@ export interface IRegisterNewUserResponse {
 // Billing information
 export interface ICheckoutResponse {
   error?: IError
-  data?: any
+  data?: IOnCheckoutSuccess
 }
 
 // Checkout
@@ -246,9 +245,37 @@ export interface IMyOrderDetailsResponse {
 }
 //#endregion
 
-export interface ICartResponse {
+export interface ICartData {
   quantity: number
   isTfOptInHidden?: boolean
   isTfOptIn: boolean // Ticket fairy
   isMarketingOptedIn: boolean // Brand
+}
+
+export interface ICartResponse {
+  cartError?: IError
+  cartData?: ICartData
+}
+
+export interface ICountryData {
+  [key: number | string]: string
+}
+
+export interface ICountriesResponse {
+  countriesError?: IError
+  countriesData?: ICountryData
+}
+
+export interface IStateData {
+  [key: number | string]: string
+}
+
+export interface IStatesResponse {
+  statesError?: IError
+  statesData?: IStateData
+}
+
+export interface IUserProfileResponse {
+  userProfileError?: IError
+  userProfileData?: IUserProfile
 }

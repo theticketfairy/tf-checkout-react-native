@@ -1,7 +1,7 @@
 import _get from 'lodash/get'
 import _isEmpty from 'lodash/isEmpty'
 import _some from 'lodash/some'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
 import {
@@ -21,7 +21,7 @@ import {
 import TicketsView from './TicketsView'
 import { ITicketsProps } from './types'
 
-const Tickets = ({
+const Tickets: FC<ITicketsProps> = ({
   onAddToCartSuccess,
   onAddToCartError,
   onFetchTicketsError,
@@ -40,7 +40,7 @@ const Tickets = ({
   onAddToWaitingListError,
   onAddToWaitingListSuccess,
   promoCodeCloseIcon,
-}: ITicketsProps) => {
+}) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
   const [isGettingEvent, setIsGettingEvent] = useState(false)

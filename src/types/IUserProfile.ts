@@ -1,5 +1,5 @@
-export interface IUserProfile {
-  id: string
+export interface IUserProfilePublic {
+  customerId: string
   firstName: string
   lastName: string
   email: string
@@ -11,20 +11,10 @@ export interface IUserProfile {
   state: string
   stateId: string
   city: string
-  username: string
-  screenName?: string
-  bio?: string
-  shortBio?: string
-  region?: string
-  image?: string
-  recommendedEvents: []
-  rnRoles: []
-  hasDashboardAccess: boolean
-  ticketHolders: []
 }
 
-export interface IUserProfilePublic {
-  customerId: string
+export interface IUserProfile extends IUserProfilePublic {
+  id: string
   firstName: string
   lastName: string
   email: string

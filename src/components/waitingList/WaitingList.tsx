@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
 import { WaitingListCore, WaitingListCoreHandle } from '../../core'
@@ -8,14 +8,14 @@ import { validateEmail, validateEmpty } from '../../helpers/Validators'
 import { IWaitingListProps } from './types'
 import WaitingListView from './WaitingListView'
 
-const WaitingList = ({
+const WaitingList: FC<IWaitingListProps> = ({
   styles,
   texts,
   onAddToWaitingListError,
   onAddToWaitingListSuccess,
   onLoadingChange,
   areAlertsEnabled,
-}: IWaitingListProps) => {
+}) => {
   const [isSuccess, setIsSuccess] = useState<boolean | undefined>(undefined)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [firstName, setFirstName] = useState('')

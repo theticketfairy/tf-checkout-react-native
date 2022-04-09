@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { FC, useRef, useState } from 'react'
 import { Keyboard } from 'react-native'
 
 import { LoginCore, LoginCoreHandle } from '../../core'
@@ -6,20 +6,20 @@ import { IUserProfilePublic } from '../../types'
 import LoginView from './LoginView'
 import { ILoginFields, ILoginProps } from './types'
 
-const Login = ({
+const Login: FC<ILoginProps> = ({
   onLoginSuccessful,
+  onLoginError,
   isLoginDialogVisible,
   showLoginDialog,
   hideLoginDialog,
   userFirstName,
   onLogoutSuccess,
+  onLogoutError,
   texts,
   styles,
-  onLoginError,
   refs,
   brandImages,
-  onLogoutError,
-}: ILoginProps) => {
+}) => {
   const [isLoading, setIsLoading] = useState(false)
   const [loginError, setLoginError] = useState('')
   const [userProfileData, setUserProfileData] = useState<IUserProfilePublic>()

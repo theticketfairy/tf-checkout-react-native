@@ -39,6 +39,17 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
         }
       }
 
+      if (!authorizationCode) {
+        return {
+          error: {
+            message: 'There is no authorization code',
+            extraData: { endpoint: 'authorize' },
+          },
+        }
+      }
+
+      await storeData(LocalStorageKeys.ACCESS_TOKEN, authorizationCode)
+
       const bodyFormDataToken = new FormData()
       bodyFormDataToken.append('code', authorizationCode)
       bodyFormDataToken.append('scope', 'profile')
@@ -62,9 +73,7 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
       }
 
       // Fetch user profile
-      const { error: userProfileError, userProfile } = await fetchUserProfile(
-        accessToken
-      )
+      const { userProfileError, userProfileData } = await fetchUserProfile()
 
       if (userProfileError) {
         return {
@@ -77,7 +86,7 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
         }
       }
 
-      if (!userProfile) {
+      if (!userProfileData) {
         return {
           error: {
             message: 'There is no user profile',
@@ -89,25 +98,25 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
       }
 
       const storedUserData: IStoredUserData = {
-        id: userProfile!.id,
-        firstName: userProfile!.firstName,
-        lastName: userProfile!.lastName,
-        email: userProfile!.email,
+        id: userProfileData!.id,
+        firstName: userProfileData!.firstName,
+        lastName: userProfileData!.lastName,
+        email: userProfileData!.email,
       }
 
       const userPublicData: IUserProfilePublic = {
-        customerId: userProfile.id,
-        firstName: userProfile.firstName,
-        lastName: userProfile.lastName,
-        email: userProfile.email,
-        phone: userProfile.phone,
-        streetAddress: userProfile.streetAddress,
-        zipCode: userProfile.zipCode,
-        countryId: userProfile.countryId,
-        city: userProfile.city,
-        state: userProfile.state,
-        company: userProfile.company,
-        stateId: userProfile.stateId,
+        customerId: userProfileData.id,
+        firstName: userProfileData.firstName,
+        lastName: userProfileData.lastName,
+        email: userProfileData.email,
+        phone: userProfileData.phone,
+        streetAddress: userProfileData.streetAddress,
+        zipCode: userProfileData.zipCode,
+        countryId: userProfileData.countryId,
+        city: userProfileData.city,
+        state: userProfileData.state,
+        company: userProfileData.company,
+        stateId: userProfileData.stateId,
       }
 
       await storeData(

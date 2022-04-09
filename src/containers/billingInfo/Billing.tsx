@@ -20,14 +20,6 @@ import {
 } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import {
-  checkoutOrder,
-  fetchCart,
-  fetchCountries,
-  fetchStates,
-  fetchUserProfile,
-  registerNewUser,
-} from '../../api/ApiClient'
 import Constants from '../../api/Constants'
 import { ICheckoutBody, ICheckoutTicketHolder } from '../../api/types'
 import {
@@ -40,6 +32,8 @@ import {
   Login,
 } from '../../components'
 import { IDropdownItem } from '../../components/dropdown/types'
+import BillingCore from '../../core/BillingCore/BillingCore'
+import { BillingCoreHandle } from '../../core/BillingCore/BillingCoreTypes'
 import { Config } from '../../helpers/Config'
 import { useDebounced } from '../../helpers/Debounced'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
@@ -50,11 +44,10 @@ import {
   validatePasswords,
 } from '../../helpers/Validators'
 import R from '../../res'
-import { IError, IUserProfile } from '../../types'
+import { IError, IUserProfile, IUserProfilePublic } from '../../types'
 import s from './styles'
 import {
   IBillingProps,
-  IOnCheckoutSuccess,
   ITicketHolderField,
   ITicketHolderFieldError,
   SkippingStatusType,
@@ -89,9 +82,9 @@ const Billing: FC<IBillingProps> = ({
   onFetchCountriesSuccess,
   onFetchStatesError,
   onFetchStatesSuccess,
-  onFetchAccessTokenError,
-  onFetchAccessTokenSuccess,
   onSkippingStatusChange,
+  onLogoutSuccess,
+  onLogoutError,
 }) => {
   //#region Labels
   const holderLabels = useMemo(() => {
@@ -215,16 +208,13 @@ const Billing: FC<IBillingProps> = ({
 
   //#region Refs
   const storedToken = useRef('')
-  const storedProfileData = useRef({} as IUserProfile)
+  const storedProfileData = useRef({} as IUserProfilePublic)
+  const billingCoreRef = useRef<BillingCoreHandle>(null)
   //#endregion
 
   //#region Handlers
   const handleOnLoadingChange = useCallback(
-    (loading: boolean) => {
-      if (onLoadingChange) {
-        onLoadingChange(loading)
-      }
-    },
+    (loading: boolean) => onLoadingChange?.(loading),
     [onLoadingChange]
   )
 
@@ -260,7 +250,7 @@ const Billing: FC<IBillingProps> = ({
   }
 
   const handleSetFormDataFromUserProfile = (
-    userProfile: IUserProfile,
+    userProfile: IUserProfilePublic,
     accessToken?: string
   ) => {
     storedProfileData.current = userProfile
@@ -291,14 +281,9 @@ const Billing: FC<IBillingProps> = ({
     }
   }
 
-  const handleOnLoginSuccess = async (
-    userProfile: IUserProfile,
-    accessToken: string
-  ) => {
-    onLoginSuccess?.({
-      accessToken: accessToken,
-      userData: userProfile,
-    })
+  const handleOnLoginSuccess = async (userProfile: IUserProfilePublic) => {
+    const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
+    onLoginSuccess?.(userProfile)
 
     if (!isBillingRequired && skipping === 'fail') {
       setSkippingStatus('skipping')
@@ -307,14 +292,13 @@ const Billing: FC<IBillingProps> = ({
         getCheckoutBodyWhenSkipping({
           userProfile: userProfile,
           ticketsQuantity: numberOfTicketHolders || 1,
-        }),
-        accessToken
+        })
       )
     }
     handleSetFormDataFromUserProfile(userProfile, accessToken)
   }
 
-  const handleOnLoginFail = (error: IError) => {
+  const handleOnLoginError = (error: IError) => {
     onLoginError?.(error)
   }
 
@@ -354,6 +338,7 @@ const Billing: FC<IBillingProps> = ({
       th.phone = ''
     })
     setTicketHoldersData(thData)
+    onLogoutSuccess?.()
   }
 
   const handleOnSelectDate = (newDate: Date) => {
@@ -423,40 +408,30 @@ const Billing: FC<IBillingProps> = ({
     onRegisterError?.(rawError)
   }
 
-  const performCheckout = async (
-    checkoutBody: ICheckoutBody,
-    pToken: string
-  ) => {
-    try {
-      setIsSubmittingData(true)
-      const { error: checkoutError, data: checkoutData } = await checkoutOrder(
-        checkoutBody,
-        pToken
-      )
-      setIsSubmittingData(false)
-
-      if (checkoutError) {
-        onCheckoutError?.(checkoutError)
-        setSkippingStatus('false')
-        return showAlert(checkoutError.message)
-      }
-
-      const checkoutResponseData: IOnCheckoutSuccess = {
-        id: checkoutData.data.data.attributes.id,
-        hash: checkoutData.data.data.attributes.hash,
-        total: checkoutData.data.data.attributes.total,
-        status: checkoutData.data.data.attributes.status,
-      }
-      setSkippingStatus('success')
-      onCheckoutSuccess(checkoutResponseData)
-    } catch (err) {
-      setIsSubmittingData(false)
-      setSkippingStatus('false')
-
-      onCheckoutError?.({
-        message: 'Error while performing checkout',
-      })
+  const performCheckout = async (checkoutBody: ICheckoutBody) => {
+    if (!billingCoreRef.current) {
+      return onCheckoutError?.({ message: 'BillingCore is not ready' })
     }
+
+    setIsSubmittingData(true)
+    const { error: checkoutError, data: checkoutData } =
+      await billingCoreRef.current.checkoutOrder(checkoutBody)
+    setIsSubmittingData(false)
+
+    if (checkoutError) {
+      onCheckoutError?.(checkoutError)
+      setSkippingStatus('false')
+      return showAlert(checkoutError.message)
+    }
+
+    if (!checkoutData) {
+      onCheckoutError?.({ message: 'Checkout returned not data' })
+      setSkippingStatus('false')
+      return showAlert('Checkout returned not data')
+    }
+
+    setSkippingStatus('success')
+    onCheckoutSuccess(checkoutData)
   }
 
   const getRegisterFormData = (checkoutBody: ICheckoutBody): FormData => {
@@ -476,10 +451,15 @@ const Billing: FC<IBillingProps> = ({
   }
 
   const performNewUserRegister = async (checkoutBody: ICheckoutBody) => {
+    if (!billingCoreRef.current) {
+      showAlert('BillingCore is not ready')
+      return onRegisterError?.({ message: 'BillingCore is not initialized' })
+    }
+
     const registerForm = getRegisterFormData(checkoutBody)
     setIsSubmittingData(true)
     const { data: registerResponseData, error: registerResponseError } =
-      await registerNewUser(registerForm)
+      await billingCoreRef.current.registerNewUser(registerForm)
 
     if (registerResponseError) {
       setIsSubmittingData(false)
@@ -498,16 +478,21 @@ const Billing: FC<IBillingProps> = ({
       return showAlert('Register returned no data')
     }
 
+    const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
+    const refreshToken = await getData(LocalStorageKeys.REFRESH_TOKEN)
+
     const tokens = {
-      accessToken: registerResponseData.access_token,
-      refreshToken: registerResponseData.refresh_token,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     }
 
-    storedToken.current = tokens.accessToken
+    console.log('Saved tokens', tokens)
 
-    onRegisterSuccess?.(tokens)
+    storedToken.current = tokens.accessToken!
 
-    await performCheckout(checkoutBody, tokens.accessToken)
+    onRegisterSuccess?.()
+
+    await performCheckout(checkoutBody)
   }
 
   const getCheckoutBody = (): ICheckoutBody => {
@@ -555,7 +540,7 @@ const Billing: FC<IBillingProps> = ({
     userProfile,
     ticketsQuantity,
   }: {
-    userProfile: IUserProfile
+    userProfile: IUserProfilePublic
     ticketsQuantity: number
   }): ICheckoutBody => {
     let parsedTicketHolders: ICheckoutTicketHolder[] = []
@@ -612,7 +597,7 @@ const Billing: FC<IBillingProps> = ({
 
     const checkoutBody = getCheckoutBody()
     if (loggedUserFirstName && storedToken.current) {
-      await performCheckout(checkoutBody, storedToken.current)
+      await performCheckout(checkoutBody)
     } else {
       await performNewUserRegister(checkoutBody)
     }
@@ -620,13 +605,18 @@ const Billing: FC<IBillingProps> = ({
   //#endregion
 
   const fetchData = async () => {
+    if (!billingCoreRef.current) {
+      onFetchCartError?.({ message: 'BillingCoreRef not initialized' })
+      return showAlert('BillingCoreRef not initialized')
+    }
+
     setIsLoading(true)
     let usrPrfl: IUserProfile | undefined
     const usrTkn = await getData(LocalStorageKeys.ACCESS_TOKEN)
     let skippingStatus: SkippingStatusType
 
-    const { data: countriesData, error: countriesError } =
-      await fetchCountries()
+    const { countriesData, countriesError } =
+      await billingCoreRef.current.getCountries()
 
     if (countriesError) {
       setSkippingStatus('fail')
@@ -646,10 +636,10 @@ const Billing: FC<IBillingProps> = ({
 
     if (usrTkn) {
       storedToken.current = usrTkn
-      const { error: userProfileError, userProfile: userProfileResponse } =
-        await fetchUserProfile(usrTkn)
+      const { userProfileError, userProfileData } =
+        await billingCoreRef.current.getUserProfile()
 
-      if (userProfileError || !userProfileResponse) {
+      if (userProfileError || !userProfileData) {
         setSkippingStatus('fail')
         setIsLoading(false)
         onFetchUserProfileError?.(userProfileError!)
@@ -660,11 +650,11 @@ const Billing: FC<IBillingProps> = ({
       }
 
       onFetchUserProfileSuccess?.({
-        firstName: userProfileResponse.firstName,
-        lastName: userProfileResponse.lastName,
+        firstName: userProfileData.firstName,
+        lastName: userProfileData.lastName,
       })
 
-      usrPrfl = userProfileResponse
+      usrPrfl = userProfileData
     } else {
       skippingStatus = 'fail'
       parsedCountries.unshift({
@@ -677,13 +667,13 @@ const Billing: FC<IBillingProps> = ({
       })
     }
 
-    const { cartData, cartError } = await fetchCart()
+    const { cartData, cartError } = await billingCoreRef.current.getCart()
 
-    if (cartError) {
+    if (cartError || !cartData) {
       setSkippingStatus('fail')
       setIsLoading(false)
-      onFetchCartError?.(cartError)
-      return showAlert(cartError.message)
+      onFetchCartError?.(cartError || { message: 'Error fetching cart' })
+      return showAlert(cartError?.message || 'Error fetching cart')
     }
 
     onFetchCartSuccess?.()
@@ -714,7 +704,7 @@ const Billing: FC<IBillingProps> = ({
         userProfile: usrPrfl,
         ticketsQuantity: cartData.quantity,
       })
-      await performCheckout(checkoutBody, usrTkn)
+      await performCheckout(checkoutBody)
     } else {
       if (skipping === 'skipping') {
         setSkippingStatus('fail')
@@ -751,14 +741,19 @@ const Billing: FC<IBillingProps> = ({
 
   useEffect(() => {
     const getStates = async () => {
-      const { data: statesData, error: statesError } = await fetchStates(
-        selectedCountry!.value as string
-      )
+      if (!selectedCountry) {
+        return
+      }
+      if (!billingCoreRef.current) {
+        onFetchCartError?.({ message: 'BillingCoreRef not initialized' })
+        return showAlert('BillingCoreRef not initialized')
+      }
+
+      const { statesData, statesError } =
+        await billingCoreRef.current.getStates(selectedCountry.value.toString())
 
       if (statesError) {
-        if (onFetchStatesError) {
-          onFetchStatesError(statesError!)
-        }
+        onFetchStatesError?.(statesError!)
         return showAlert(statesError?.message || 'Error fetching states')
       }
 
@@ -766,9 +761,7 @@ const Billing: FC<IBillingProps> = ({
         return { label: item, value: index }
       })
 
-      if (onFetchStatesSuccess) {
-        onFetchStatesSuccess()
-      }
+      onFetchStatesSuccess?.()
       setStates(parsedStates)
     }
 
@@ -924,211 +917,210 @@ const Billing: FC<IBillingProps> = ({
   return skipping === 'skipping' && areLoadingIndicatorsEnabled ? (
     renderCheckingOut()
   ) : (
-    <KeyboardAwareScrollView extraScrollHeight={32}>
-      <View style={styles?.rootContainer}>
-        <Login
-          onLoginSuccessful={handleOnLoginSuccess}
-          onLogoutSuccess={handleOnLogoutSuccess}
-          isLoginDialogVisible={isLoginDialogVisible}
-          showLoginDialog={showLoginDialog}
-          hideLoginDialog={hideLoginDialog}
-          userFirstName={loggedUserFirstName}
-          onLoginError={handleOnLoginFail}
-          texts={texts?.loginTexts}
-          styles={styles?.loginStyles}
-          brandImages={loginBrandImages}
-          onFetchAccessTokenError={onFetchAccessTokenError}
-          onFetchAccessTokenSuccess={onFetchAccessTokenSuccess}
-          onFetchUserProfileError={onFetchUserProfileError}
-          onFetchUserProfileSuccess={onFetchUserProfileSuccess}
-        />
-        <Text style={styles?.screenTitle}>
-          {texts?.form?.getYourTicketsTitle || 'Get Your Tickets'}
-        </Text>
-
-        <Input
-          label={texts?.form?.firstName || 'First name'}
-          value={firstName}
-          onChangeText={setFirstName}
-          error={firstNameError}
-          styles={styles?.inputStyles}
-        />
-        <Input
-          label={texts?.form?.lastName || 'Last name'}
-          value={lastName}
-          onChangeText={setLastName}
-          error={lastNameError}
-          styles={styles?.inputStyles}
-        />
-
-        <Text style={styles?.texts}>
-          {texts?.form?.emailsAdvice ||
-            `IMPORTANT: Please double check that your email address is correct.\nIt's where we send your confirmation and e-tickets to!`}
-        </Text>
-
-        <Input
-          label={texts?.form?.email || 'Email'}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType='email-address'
-          error={emailError}
-          styles={styles?.inputStyles}
-          autoCapitalize='none'
-        />
-        <Input
-          label={texts?.form?.confirmEmail || 'Confirm email'}
-          value={emailConfirmation}
-          onChangeText={setEmailConfirmation}
-          keyboardType='email-address'
-          error={confirmEmailError}
-          styles={styles?.inputStyles}
-          autoCapitalize='none'
-        />
-        {isAgeRequired && (
-          <DatePicker
-            text={texts?.form?.dateOfBirth || 'Date of Birth'}
-            onSelectDate={handleOnSelectDate}
-            selectedDate={dateOfBirth}
-            styles={styles?.datePicker}
-            error={dateOfBirthError}
+    <BillingCore ref={billingCoreRef}>
+      <KeyboardAwareScrollView extraScrollHeight={32}>
+        <View style={styles?.rootContainer}>
+          <Login
+            onLoginSuccessful={handleOnLoginSuccess}
+            onLoginError={handleOnLoginError}
+            onLogoutSuccess={handleOnLogoutSuccess}
+            onLogoutError={onLogoutError}
+            isLoginDialogVisible={isLoginDialogVisible}
+            showLoginDialog={showLoginDialog}
+            hideLoginDialog={hideLoginDialog}
+            userFirstName={loggedUserFirstName}
+            texts={{ ...texts?.loginTexts, message: loginMessage }}
+            styles={styles?.loginStyles}
+            brandImages={loginBrandImages}
           />
-        )}
-        {!loggedUserFirstName && (
-          <>
-            <Text style={styles?.passwordTitle}>
-              {texts?.form?.choosePassword ||
-                'Choose a password for your new TICKETFAIRY account'}
-            </Text>
-            <Input
-              label={texts?.form?.password || 'Password'}
-              isSecure
-              onChangeText={setPassword}
-              error={passwordError}
-              styles={styles?.inputStyles}
-              autoCapitalize='none'
-              secureTextEntry={true}
-              textContentType='oneTimeCode'
-            />
-            <Input
-              label={texts?.form?.confirmPassword || 'Confirm password'}
-              isSecure
-              onChangeText={setPasswordConfirmation}
-              error={confirmPasswordError}
-              styles={styles?.inputStyles}
-              autoCapitalize='none'
-              secureTextEntry={true}
-              textContentType='oneTimeCode'
-            />
-          </>
-        )}
-        <Input
-          label={phoneLabel}
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType='phone-pad'
-          error={isPhoneRequired ? phoneError : ''}
-          styles={styles?.inputStyles}
-        />
-        <Input
-          label={addressLabel}
-          value={street}
-          onChangeText={setStreet}
-          error={streetError}
-          styles={styles?.inputStyles}
-        />
-        <Input
-          label={texts?.form?.city || 'City'}
-          value={city}
-          onChangeText={setCity}
-          error={cityError}
-          styles={styles?.inputStyles}
-        />
-        <DropdownMaterial
-          items={countries}
-          onSelectItem={setSelectedCountry}
-          selectedOption={selectedCountry}
-          styles={styles?.dropdownMaterialStyles}
-          materialInputProps={{
-            label: texts?.form?.country || 'Country',
-          }}
-        />
-        <Input
-          label={texts?.form?.zipCode || 'Postal Code / Zip Code'}
-          value={postalCode}
-          onChangeText={setPostalCode}
-          error={postalCodeError}
-          styles={styles?.inputStyles}
-        />
-        <DropdownMaterial
-          items={states}
-          onSelectItem={setSelectedState}
-          selectedOption={selectedState}
-          styles={styles?.dropdownMaterialStyles}
-          materialInputProps={{
-            label: texts?.form?.state || 'State',
-          }}
-        />
-        <Checkbox
-          onPress={handleIsSubToBrandToggle}
-          text={brandCheckBoxText}
-          isActive={isSubToBrand}
-          styles={styles?.checkboxStyles}
-        />
+          <Text style={styles?.screenTitle}>
+            {texts?.form?.getYourTicketsTitle || 'Get Your Tickets'}
+          </Text>
 
-        {!isTtfCheckboxHidden && (
-          <Checkbox
-            onPress={handleIsSubToTicketFairyToggle}
-            isActive={isSubToTicketFairy}
-            customTextComp={
-              <Text style={styles?.customCheckbox?.text}>
-                {texts?.form?.isSubToTicketFairy ||
-                  `I agree that The Ticket Fairy may use the personal data that have provided for marketing purposes, such as recommending events that I might be interested in, in accordance with its `}
-                <Text
-                  style={styles?.privacyPolicyLinkStyle}
-                  onPress={handleOpenPrivacyLink}
-                >
-                  {texts?.form?.privacyPolicy || 'Privacy Policy'}
-                </Text>
-                .
+          <Input
+            label={texts?.form?.firstName || 'First name'}
+            value={firstName}
+            onChangeText={setFirstName}
+            error={firstNameError}
+            styles={styles?.inputStyles}
+          />
+          <Input
+            label={texts?.form?.lastName || 'Last name'}
+            value={lastName}
+            onChangeText={setLastName}
+            error={lastNameError}
+            styles={styles?.inputStyles}
+          />
+
+          <Text style={styles?.texts}>
+            {texts?.form?.emailsAdvice ||
+              `IMPORTANT: Please double check that your email address is correct.\nIt's where we send your confirmation and e-tickets to!`}
+          </Text>
+
+          <Input
+            label={texts?.form?.email || 'Email'}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType='email-address'
+            error={emailError}
+            styles={styles?.inputStyles}
+            autoCapitalize='none'
+          />
+          <Input
+            label={texts?.form?.confirmEmail || 'Confirm email'}
+            value={emailConfirmation}
+            onChangeText={setEmailConfirmation}
+            keyboardType='email-address'
+            error={confirmEmailError}
+            styles={styles?.inputStyles}
+            autoCapitalize='none'
+          />
+          {isAgeRequired && (
+            <DatePicker
+              text={texts?.form?.dateOfBirth || 'Date of Birth'}
+              onSelectDate={handleOnSelectDate}
+              selectedDate={dateOfBirth}
+              styles={styles?.datePicker}
+              error={dateOfBirthError}
+            />
+          )}
+          {!loggedUserFirstName && (
+            <>
+              <Text style={styles?.passwordTitle}>
+                {texts?.form?.choosePassword ||
+                  'Choose a password for your new TICKETFAIRY account'}
               </Text>
-            }
+              <Input
+                label={texts?.form?.password || 'Password'}
+                isSecure
+                onChangeText={setPassword}
+                error={passwordError}
+                styles={styles?.inputStyles}
+                autoCapitalize='none'
+                secureTextEntry={true}
+                textContentType='oneTimeCode'
+              />
+              <Input
+                label={texts?.form?.confirmPassword || 'Confirm password'}
+                isSecure
+                onChangeText={setPasswordConfirmation}
+                error={confirmPasswordError}
+                styles={styles?.inputStyles}
+                autoCapitalize='none'
+                secureTextEntry={true}
+                textContentType='oneTimeCode'
+              />
+            </>
+          )}
+          <Input
+            label={phoneLabel}
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType='phone-pad'
+            error={isPhoneRequired ? phoneError : ''}
+            styles={styles?.inputStyles}
+          />
+          <Input
+            label={addressLabel}
+            value={street}
+            onChangeText={setStreet}
+            error={streetError}
+            styles={styles?.inputStyles}
+          />
+          <Input
+            label={texts?.form?.city || 'City'}
+            value={city}
+            onChangeText={setCity}
+            error={cityError}
+            styles={styles?.inputStyles}
+          />
+          <DropdownMaterial
+            items={countries}
+            onSelectItem={setSelectedCountry}
+            selectedOption={selectedCountry}
+            styles={styles?.dropdownMaterialStyles}
+            materialInputProps={{
+              label: texts?.form?.country || 'Country',
+            }}
+          />
+          <Input
+            label={texts?.form?.zipCode || 'Postal Code / Zip Code'}
+            value={postalCode}
+            onChangeText={setPostalCode}
+            error={postalCodeError}
+            styles={styles?.inputStyles}
+          />
+          <DropdownMaterial
+            items={states}
+            onSelectItem={setSelectedState}
+            selectedOption={selectedState}
+            styles={styles?.dropdownMaterialStyles}
+            materialInputProps={{
+              label: texts?.form?.state || 'State',
+            }}
+          />
+          <Checkbox
+            onPress={handleIsSubToBrandToggle}
+            text={brandCheckBoxText}
+            isActive={isSubToBrand}
             styles={styles?.checkboxStyles}
           />
-        )}
 
-        {ticketHoldersData.length > 0 && (
-          <>
-            <Text style={styles?.ticketHoldersTitle}>
-              {texts?.form?.ticketHoldersTitle || 'Ticket Holders'}
-            </Text>
-            {renderTicketHolders()}
-          </>
-        )}
+          {!isTtfCheckboxHidden && (
+            <Checkbox
+              onPress={handleIsSubToTicketFairyToggle}
+              isActive={isSubToTicketFairy}
+              customTextComp={
+                <Text style={styles?.customCheckbox?.text}>
+                  {texts?.form?.isSubToTicketFairy ||
+                    `I agree that The Ticket Fairy may use the personal data that have provided for marketing purposes, such as recommending events that I might be interested in, in accordance with its `}
+                  <Text
+                    style={styles?.privacyPolicyLinkStyle}
+                    onPress={handleOpenPrivacyLink}
+                  >
+                    {texts?.form?.privacyPolicy || 'Privacy Policy'}
+                  </Text>
+                  .
+                </Text>
+              }
+              styles={styles?.checkboxStyles}
+            />
+          )}
 
-        <Button
-          onPress={onSubmit}
-          text={texts?.checkoutButton || 'CHECKOUT'}
-          isDisabled={!isDataValid}
-          isLoading={isSubmittingData}
-          styles={
-            !isDataValid
-              ? {
-                  button: s.submitButtonDisabled,
-                  ...styles?.checkoutButtonDisabled,
-                }
-              : {
-                  container: [
-                    s.submitButton,
-                    styles?.checkoutButton?.container,
-                  ],
-                  text: styles?.checkoutButton?.text,
-                  button: styles?.checkoutButton?.button,
-                }
-          }
-        />
-      </View>
-      {areLoadingIndicatorsEnabled && isLoading && <Loading />}
-    </KeyboardAwareScrollView>
+          {ticketHoldersData.length > 0 && (
+            <>
+              <Text style={styles?.ticketHoldersTitle}>
+                {texts?.form?.ticketHoldersTitle || 'Ticket Holders'}
+              </Text>
+              {renderTicketHolders()}
+            </>
+          )}
+
+          <Button
+            onPress={onSubmit}
+            text={texts?.checkoutButton || 'CHECKOUT'}
+            isDisabled={!isDataValid}
+            isLoading={isSubmittingData}
+            styles={
+              !isDataValid
+                ? {
+                    button: s.submitButtonDisabled,
+                    ...styles?.checkoutButtonDisabled,
+                  }
+                : {
+                    container: [
+                      s.submitButton,
+                      styles?.checkoutButton?.container,
+                    ],
+                    text: styles?.checkoutButton?.text,
+                    button: styles?.checkoutButton?.button,
+                  }
+            }
+          />
+        </View>
+        {areLoadingIndicatorsEnabled && isLoading && <Loading />}
+      </KeyboardAwareScrollView>
+    </BillingCore>
   )
   //#endregion
 }
