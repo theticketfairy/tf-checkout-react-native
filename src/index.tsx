@@ -2,7 +2,7 @@
 import * as React from 'react' //Needed to render
 import { LogBox, NativeModules } from 'react-native'
 
-import { IMyOrderDetailsResponse, IMyOrdersOrder } from './api/types'
+import { IMyOrderDetailsData, IMyOrdersOrder } from './api/types'
 import { LoggedIn, Login } from './components'
 import {
   BillingInfo,
@@ -35,7 +35,7 @@ console.reportErrorsAsExceptions = false
 export {
   BillingInfo,
   Checkout,
-  IMyOrderDetailsResponse,
+  IMyOrderDetailsData,
   IMyOrdersOrder,
   IOnCheckoutSuccess,
   ITicketsProps,

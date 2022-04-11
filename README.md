@@ -1016,7 +1016,7 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
 
 ```js
 {
-  data: IMyOrderDetailsResponse
+  data: IMyOrderDetailsData
   config?: {
     areActivityIndicatorsEnabled?: boolean
     areAlertsEnabled?: boolean

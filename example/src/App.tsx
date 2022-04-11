@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
-  IMyOrderDetailsResponse,
+  IMyOrderDetailsData,
   IOnCheckoutSuccess,
   MyOrderDetails,
   MyOrders,
@@ -14,6 +14,8 @@ import {
   ITicketsResponseData,
   SkippingStatusType,
 } from 'tf-checkout-react-native'
+import { Button } from '../../src/components'
+import { deleteAllData } from '../../src/helpers/LocalStorage'
 
 import Color from './Colors'
 import CustomLoading from './components/CustomLoading'
@@ -24,6 +26,13 @@ const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
 const EVENT_ID = 5420//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID
+
+const config = {
+  EVENT_ID: EVENT_ID,
+  DOMAIN: 'https://manacommon.com', //https://www.ticketfairy.com',
+  BRAND: 'the-ticket-fairy',// 'mana-onetree-testing-brand',
+  ARE_SUB_BRANDS_INCLUDED: true,
+}
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -44,7 +53,7 @@ const App = () => {
 
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false)
   const [selectedOrderDetails, setSelectedOrderDetails] =
-    useState<IMyOrderDetailsResponse>()
+    useState<IMyOrderDetailsData>()
   
   //#region Handlers
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
@@ -73,7 +82,7 @@ const App = () => {
     console.log('Exit')
   }
 
-  const handleOnSelectOrder = (order: IMyOrderDetailsResponse) => {
+  const handleOnSelectOrder = (order: IMyOrderDetailsData) => {
     setSelectedOrderDetails(order)
   }
 
@@ -101,12 +110,7 @@ const App = () => {
 
   //#region effects
   useEffect(() => {
-    setConfig({
-      EVENT_ID: '5420',
-      DOMAIN: 'https://manacommon.com',
-      BRAND: 'the-ticket-fairy',// 'mana-onetree-testing-brand',
-      ARE_SUB_BRANDS_INCLUDED: true,
-    })
+    setConfig(config)
   }, [])
   useEffect(() => {
     if (cartProps) {
@@ -793,16 +797,7 @@ const App = () => {
             <Tickets
               areLoadingIndicatorsEnabled={false}
               onLoadingChange={(loading) => setIsLoading(loading)}
-
-              onFetchTicketsSuccess={(tickets) => {console.log('onFetchTicketsSuccess', tickets)}}
-              onFetchTicketsError={(error) => {console.log('onFetchTicketsError', error)}}
-
               onAddToCartSuccess={handleOnAddToCartSuccess}
-              onAddToCartError={(error)=> {console.log('onAddToCartError', error)}}
-
-              onFetchEventError={(error)=> {console.log('onFetchEventError', error)}}
-              onFetchEventSuccess={(event)=> {console.log('onFetchEventSuccess', event)}}
-
               onPressLogout={handleOnPressLogout}
 
               onPressMyOrders={handleOnPressMyOrders}
@@ -960,6 +955,8 @@ const App = () => {
               }}
             />
             {isLoading && <CustomLoading />}
+            <Button text={'RESET'} onPress={deleteAllData} />
+
           </View>
         )
     }

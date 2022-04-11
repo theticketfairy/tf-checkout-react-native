@@ -6,7 +6,11 @@ import {
   ViewStyle,
 } from 'react-native'
 
-import { IMyOrderDetailsResponse } from '../../api/types'
+import {
+  IMyOrderDetailsData,
+  IMyOrderDetailsItem,
+  IMyOrderDetailsTicket,
+} from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
 import { INotificationIcons } from './components/Notification'
 
@@ -16,7 +20,7 @@ export interface IMyOrdersDetailsConfig {
 }
 
 export interface IMyOrderDetailsProps {
-  data: IMyOrderDetailsResponse
+  data: IMyOrderDetailsData
   config?: IMyOrdersDetailsConfig
   onDownloadStatusChange?: (status?: DownloadStatus) => void
   downloadStatusIcons?: INotificationIcons
@@ -107,4 +111,14 @@ export interface IMyOrderDetailsView extends IMyOrderDetailsProps {
   onPressCopyLink: () => void
   onPressTicketDownload: (link: string, hash: string) => void
   downloadStatus?: DownloadStatus
+}
+
+export interface IOrderDetailsSectionData {
+  id: string
+  item: IMyOrderDetailsItem
+}
+
+export interface IOrderDetailsSectionTickets {
+  id: string
+  item: IMyOrderDetailsTicket
 }

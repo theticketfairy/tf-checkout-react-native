@@ -35,6 +35,7 @@ import {
   IFetchTicketsResponse,
   IFreeRegistrationData,
   IFreeRegistrationResponse,
+  IMyOrderDetailsData,
   IMyOrderDetailsItem,
   IMyOrderDetailsResponse,
   IMyOrderDetailsTicket,
@@ -333,10 +334,14 @@ export const fetchMyOrders = async (
     myOrdersData: data,
   }
 }
+//#endregion
 
-export const fetchOrderDetails = async (orderId: string) => {
+//#region OrderDetails
+export const fetchOrderDetails = async (
+  orderId: string
+): Promise<IMyOrderDetailsResponse> => {
   let responseError: IError | undefined
-  let responseData: IMyOrderDetailsResponse | undefined
+  let responseData: IMyOrderDetailsData | undefined
   const response = await Client.get(`/v1/account/order/${orderId}`).catch(
     (error: AxiosError) => {
       responseError = {
@@ -541,7 +546,6 @@ export const fetchCountries = async (): Promise<ICountriesResponse> => {
     }
   )
 
-
   if (response?.status === 200) {
     setCustomHeader(response)
   }
@@ -642,7 +646,6 @@ export const checkoutOrder = async (
       message: error.response?.data.message,
     }
   })
-
 
   if (!res || !res.data) {
     responseError = {

@@ -238,10 +238,15 @@ export interface IMyOrderDetailsHeader {
   total: string
   salesReferred: string
 }
-export interface IMyOrderDetailsResponse {
+export interface IMyOrderDetailsData {
   header: IMyOrderDetailsHeader
   items: IMyOrderDetailsItem[]
   tickets: IMyOrderDetailsTicket[]
+}
+
+export interface IMyOrderDetailsResponse {
+  orderDetailsError?: IError
+  orderDetailsData?: IMyOrderDetailsData
 }
 //#endregion
 

@@ -32,8 +32,7 @@ import {
   Login,
 } from '../../components'
 import { IDropdownItem } from '../../components/dropdown/types'
-import BillingCore from '../../core/BillingCore/BillingCore'
-import { BillingCoreHandle } from '../../core/BillingCore/BillingCoreTypes'
+import { BillingCore, BillingCoreHandle } from '../../core'
 import { Config } from '../../helpers/Config'
 import { useDebounced } from '../../helpers/Debounced'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
