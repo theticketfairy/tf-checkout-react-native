@@ -1389,3 +1389,8 @@ const handleAddToWaitingList = async (params: IAddToWaitingListCoreParams) => {
 }
 ```
 
+
+## Utils
+
+`deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
+

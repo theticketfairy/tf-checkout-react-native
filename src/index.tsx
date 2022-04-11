@@ -18,14 +18,19 @@ import {
 } from './containers/billingInfo/types'
 import { ITicketsProps } from './containers/tickets/types'
 import {
+  BillingCore,
+  BillingCoreHandle,
   LoginCore,
   LoginCoreHandle,
+  MyOrdersCore,
+  MyOrdersCoreHandle,
   TicketsCore,
   TicketsCoreHandle,
   WaitingListCore,
   WaitingListCoreHandle,
 } from './core'
 import { setConfig } from './helpers/Config'
+import { deleteAllData } from './helpers/LocalStorage'
 import { ITicketsResponseData, IUserProfile } from './types'
 
 LogBox.ignoreAllLogs()
@@ -33,8 +38,11 @@ LogBox.ignoreAllLogs()
 console.reportErrorsAsExceptions = false
 
 export {
+  BillingCore,
+  BillingCoreHandle,
   BillingInfo,
   Checkout,
+  deleteAllData,
   IMyOrderDetailsData,
   IMyOrdersOrder,
   IOnCheckoutSuccess,
@@ -47,6 +55,8 @@ export {
   LoginCoreHandle,
   MyOrderDetails,
   MyOrders,
+  MyOrdersCore,
+  MyOrdersCoreHandle,
   PurchaseConfirmation,
   setConfig,
   SkippingStatusType,
