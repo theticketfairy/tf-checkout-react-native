@@ -96,7 +96,7 @@ useEffect(() => {
 ```js
 {
   DOMAIN?: string,
-  ENV?: string,
+  ENV?: 'PROD' | 'DEV' | 'STAG',
   CLIENT_ID?: string,
   CLIENT_SECRET?: string,
   TIMEOUT?: number,
