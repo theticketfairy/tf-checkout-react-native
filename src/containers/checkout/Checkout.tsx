@@ -94,7 +94,7 @@ const Checkout: FC<ICheckoutProps> = ({
   const handleFetchOrderDetails = async () => {
     showLoading()
     const { orderDetailsData, orderDetailsError } =
-      await checkoutCoreRef.current!.getOrderDetails(checkoutData.id)
+      await checkoutCoreRef.current!.getPurchaseOrderDetails(checkoutData.id)
     hideLoading()
 
     if (orderDetailsError) {
