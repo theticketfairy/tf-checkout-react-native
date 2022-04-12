@@ -828,7 +828,28 @@ export const fetchPurchaseConfirmation = async (
     }
   })
 
-  console.log('purchase confirmation', response)
+  if (response?.data?.data.attributes) {
+    const resData = response.data.data.attributes
+    data = {
+      conversionPixels: resData.conversion_pixels,
+      currency: resData.currency,
+      customConfirmationPageText: resData.custom_confirmation_page_text,
+      customerId: resData.customer_id,
+      isReferralDisabled: resData.disable_referral,
+      eventDate: resData.event_date,
+      eventDescription: resData.event_description,
+      eventType: resData.event_type,
+      message: resData.message,
+      orderTotal: resData.order_total,
+      personalShareLink: resData.personal_share_link,
+      productId: resData.product_id,
+      productName: resData.product_name,
+      productImage: resData.product_image,
+      productPrice: resData.product_price,
+      productUrl: resData.product_url,
+      personalShareSales: resData.personal_share_sales,
+    }
+  }
 
   return {
     purchaseConfirmationError: responseError,

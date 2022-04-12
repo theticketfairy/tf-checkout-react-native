@@ -292,7 +292,7 @@ export interface IUserProfileResponse {
 }
 
 export interface IPurchaseConfirmationData {
-  conversion_pixels?: any
+  conversionPixels?: any
   currency: { currency: string; decimalPlaces: number; symbol: string }
   customConfirmationPageText?: string
   customerId: string
