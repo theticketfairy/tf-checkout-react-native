@@ -178,8 +178,8 @@ export interface IOrderReview {
 }
 
 export interface IOrderReviewResponse {
-  error?: IError
-  data?: IOrderReview
+  orderReviewError?: IError
+  orderReviewData?: IOrderReview
 }
 
 //#region MyOrders
@@ -210,26 +210,31 @@ export interface IMyOrdersResponse {
 
 //#region My Order Details
 export interface IMyOrderDetailsItem {
-  name: string
+  isActive: boolean
   currency: string
-  price: string
   discount: string
+  name: string
+  price: string
   quantity: string
   total: string
 }
 
 export interface IMyOrderDetailsTicket {
-  hash: string
-  ticketType: string
-  holderName?: string
-  holderEmail?: string
-  holderPhone?: string
-  status: string
-  pdfLink?: string
-  qrData?: string
-  isSellable?: boolean
-  description?: string
+  currency: string
+  description: string
   descriptionPlain?: string
+  eventName: string
+  hash: string
+  holderEmail?: string
+  holderName: string
+  holderPhone?: string
+  isOnSale: boolean
+  isSellable: true
+  pdfLink: string
+  qrData: string
+  resaleFeeAmount: number
+  status: string
+  ticketType: string
 }
 
 export interface IMyOrderDetailsHeader {
@@ -238,6 +243,7 @@ export interface IMyOrderDetailsHeader {
   total: string
   salesReferred: string
 }
+
 export interface IMyOrderDetailsData {
   header: IMyOrderDetailsHeader
   items: IMyOrderDetailsItem[]
@@ -283,4 +289,33 @@ export interface IStatesResponse {
 export interface IUserProfileResponse {
   userProfileError?: IError
   userProfileData?: IUserProfile
+}
+
+export interface IPurchaseConfirmationData {
+  conversion_pixels?: any
+  currency: { currency: string; decimalPlaces: number; symbol: string }
+  customConfirmationPageText?: string
+  customerId: string
+  isReferralDisabled: boolean
+  eventDate: string
+  eventDescription: string
+  eventType: string
+  message: string
+  orderTotal: number
+  personalShareLink: string
+  productId: string
+  productImage: string
+  productName: string
+  productPrice: number
+  productUrl: string
+  twitterHashtag?: string
+  personalShareSales: {
+    price: number
+    sales: number
+  }[]
+}
+
+export interface IPurchaseConfirmationResponse {
+  purchaseConfirmationError?: IError
+  purchaseConfirmationData?: IPurchaseConfirmationData
 }

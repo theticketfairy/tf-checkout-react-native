@@ -1,17 +1,17 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { Text, View } from 'react-native'
 
 import { Button, Loading } from '../../components'
 import s from './styles'
 import { IPurchaseConfirmationViewProps } from './types'
 
-const PurchaseConfirmationView = ({
+const PurchaseConfirmationView: FC<IPurchaseConfirmationViewProps> = ({
   texts,
   styles,
   onComplete,
   areActivityIndicatorsEnabled,
   isLoading,
-}: IPurchaseConfirmationViewProps) => (
+}) => (
   <View style={[s.rootContainer, styles?.rootContainer]}>
     <Text style={[s.title, styles?.title]}>
       {texts?.title || 'Your Tickets are Confirmed!'}

@@ -73,6 +73,6 @@ export const checkStoredData = async () => {
     ])
     return values
   } catch (ex) {
-    console.log('Local Storage GetData Error - checkStoredData', ex)
+    console.log('Local Storage GetData Error - checkStoredData')
   }
 }

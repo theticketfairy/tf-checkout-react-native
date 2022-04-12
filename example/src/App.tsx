@@ -57,29 +57,24 @@ const App = () => {
   
   //#region Handlers
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
-    console.log('handleOnAddToCartSuccess',data)
     setCartProps(data)
   }
 
   const handleOnLoginSuccess = (data: any) => {
-    console.log('handleOnLoginSuccess')
   }
 
   const handleOnFetchUserProfileSuccess = () => {}
 
   const handleOnCheckoutSuccess = (data: IOnCheckoutSuccess) => {
-    console.log('handleOnCheckoutSuccess', data) // here is the order ID
     setCheckOutProps(data)
   }
 
   const handleOnPaymentSuccess = (data: IOnCheckoutSuccess) => {
-    console.log('handleOnPaymentSuccess', data)
     setIsPaymentSuccess(true)
   }
 
   const handleOnComplete = () => {
     setComponentToShow(ComponentEnum.Tickets)
-    console.log('Exit')
   }
 
   const handleOnSelectOrder = (order: IMyOrderDetailsData) => {
@@ -91,7 +86,6 @@ const App = () => {
   }
 
   const handleOnPressLogout = () => {
-    console.log('Logout')
   }
 
   const handleOnDismissMyOrders = () => {
@@ -114,7 +108,6 @@ const App = () => {
   }, [])
   useEffect(() => {
     if (cartProps) {
-      console.log('cartProps', cartProps)
       setComponentToShow(ComponentEnum.BillingInfo)
     }
   }, [cartProps])

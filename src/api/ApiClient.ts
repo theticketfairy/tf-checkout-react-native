@@ -44,6 +44,8 @@ import {
   IOrderReview,
   IOrderReviewResponse,
   IPromoCodeResponse,
+  IPurchaseConfirmationData,
+  IPurchaseConfirmationResponse,
   IRegisterNewUserResponse,
   IStatesResponse,
   IUserProfileResponse,
@@ -92,7 +94,7 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
   }
 
   if (Config.BASE_URL) {
-    config.baseURL = Config.BASE_URL + '/api'
+    config.baseURL = Config.BASE_URL
   }
 
   return config
@@ -115,8 +117,7 @@ Client.setGuestToken = (token: string) =>
 Client.setAccessToken = (token: string) =>
   (Client.defaults.headers.common.Authorization = token)
 
-Client.setBaseUrl = (baseUrl: string) =>
-  (Client.defaults.baseURL = baseUrl + '/api')
+Client.setBaseUrl = (baseUrl: string) => (Client.defaults.baseURL = baseUrl)
 
 Client.setTimeOut = (timeOut: number) => (Client.defaults.timeout = timeOut)
 
@@ -287,8 +288,6 @@ export const addToWaitingList = async (
     }
   })
 
-  console.log('add to waiting list', response)
-
   return {
     addToWaitingListError: responseError,
     addToWaitingListData: response?.data,
@@ -364,6 +363,7 @@ export const fetchOrderDetails = async (
           discount: item.discount,
           quantity: item.quantity,
           total: item.total,
+          isActive: item.active,
         }
       }
     )
@@ -383,6 +383,10 @@ export const fetchOrderDetails = async (
           holderPhone: item.holder_phone,
           description: item.description,
           descriptionPlain: item.description_plain,
+          currency: item.currency,
+          eventName: item.event_name,
+          isOnSale: item.is_on_sale,
+          resaleFeeAmount: item.resale_fee_amount,
         }
       }
     )
@@ -752,8 +756,8 @@ export const fetchOrderReview = async (
     }
   }
   return {
-    error: responseError,
-    data: resData,
+    orderReviewError: responseError,
+    orderReviewData: resData,
   }
 }
 
@@ -806,12 +810,15 @@ export const postOnFreeRegistration = async (
     freeRegistrationData: responseData,
   }
 }
-
 //#endregion
 
 //#region Purchase Confirmation
-export const fetchPurchaseConfirmation = async (orderHash: string) => {
+export const fetchPurchaseConfirmation = async (
+  orderHash: string
+): Promise<IPurchaseConfirmationResponse> => {
   let responseError: IError | undefined
+  let data: IPurchaseConfirmationData | undefined
+
   const response: AxiosResponse | void = await Client.get(
     `/v1/order/${orderHash}/payment/complete`
   ).catch((error: AxiosError) => {
@@ -821,9 +828,11 @@ export const fetchPurchaseConfirmation = async (orderHash: string) => {
     }
   })
 
+  console.log('purchase confirmation', response)
+
   return {
-    error: responseError,
-    data: response,
+    purchaseConfirmationError: responseError,
+    purchaseConfirmationData: data,
   }
 }
 //#endregion

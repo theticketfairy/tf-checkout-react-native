@@ -485,8 +485,6 @@ const Billing: FC<IBillingProps> = ({
       refreshToken: refreshToken,
     }
 
-    console.log('Saved tokens', tokens)
-
     storedToken.current = tokens.accessToken!
 
     onRegisterSuccess?.()
