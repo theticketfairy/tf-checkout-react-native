@@ -96,7 +96,7 @@ useEffect(() => {
 ```js
 {
   DOMAIN?: string,
-  BASE_URL?: string,
+  ENV?: string,
   CLIENT_ID?: string,
   CLIENT_SECRET?: string,
   TIMEOUT?: number,
@@ -108,7 +108,7 @@ useEffect(() => {
 | Property | Description |
 | -------- | ----------- |
 | DOMAIN | Specify your domains name example: `https://google.com` this is important to maintain cart session active and prevent it from expiring when user login in the BillingInfo component. |
-| BASE_URL | If our dev team gives you a custom BASE_URL.|
+| ENV | Sets the environment to any of the following environments: Production, Staging or Development. Receives the following values: `PROD`, `DEV`, `STAG`. Defaults to `PROD`.|
 | CLIENT_ID | Set your CLIENT_ID. |
 | CLIENT_SECRET | Set your CLIENT_SECRET. |
 | BRAND | Set your BRAND so users can only see this brand in their orders. |
