@@ -1290,10 +1290,9 @@
   resolved "https://registry.yarnpkg.com/@react-native/polyfills/-/polyfills-2.0.0.tgz#4c40b74655c83982c8cf47530ee7dc13d957b6aa"
   integrity sha512-K0aGNn1TjalKj+65D7ycc1//H9roAQ51GJVk5ZJQFb2teECGmzd86bYDC0aYdbRf7gtovescq4Zt6FR0tgXiHQ==
 
-"@sesamsolutions/phone-input@1.0.9":
+"@sesamsolutions/phone-input@jorgtz/react-native-phone-input":
   version "1.0.9"
-  resolved "https://registry.yarnpkg.com/@sesamsolutions/phone-input/-/phone-input-1.0.9.tgz#61716f3d2fc3726cc699b874e00f6eb9adb3361a"
-  integrity sha512-dIFnwhxyxlhB5Huk/U6RALu1KUY/kxHqwD8GbihX8Awm/tYrzhpf8sI0g4/XR6GnlNUYSK14I5Caf6Y1Vuk2/g==
+  resolved "https://codeload.github.com/jorgtz/react-native-phone-input/tar.gz/57003652ef93610bf6b8d6d1d185f2e9ee58a457"
   dependencies:
     google-libphonenumber "^3.2.26"
 
