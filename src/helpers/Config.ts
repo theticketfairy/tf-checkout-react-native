@@ -6,7 +6,7 @@ import Constants from '../api/Constants'
 export interface IConfig {
   EVENT_ID: string | number
   DOMAIN?: string
-  BASE_URL?: string
+  ENV?: 'PROD' | 'DEV' | 'STAG'
   CLIENT_ID?: string
   CLIENT_SECRET?: string
   TIMEOUT?: number
@@ -23,8 +23,16 @@ export const setConfig = (configs: IConfig): string | undefined => {
     Config[key] = value
   })
 
-  if (Config.BASE_URL) {
-    Client.setBaseUrl(Config.BASE_URL)
+  if (Config.ENV) {
+    if (Config.ENV === 'PROD') {
+      Client.setBaseUrl(Constants.BASE_URL)
+    } else if (Config.ENV === 'DEV') {
+      Client.setBaseUrl(Constants.BASE_URL_DEV)
+    } else if (Config.ENV === 'STAG') {
+      Client.setBaseUrl(Constants.BASE_URL_STAG)
+    }
+  } else {
+    Client.setBaseUrl(Constants.BASE_URL)
   }
 
   if (Config.TIMEOUT) {
