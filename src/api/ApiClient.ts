@@ -93,10 +93,6 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
     config.headers = updatedHeaders
   }
 
-  if (Config.BASE_URL) {
-    config.baseURL = Config.BASE_URL
-  }
-
   return config
 })
 

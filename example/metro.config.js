@@ -13,6 +13,7 @@ const moduleRoot = path.resolve(__dirname, '..')
 module.exports = {
   watchFolders: [moduleRoot],
   resolver: {
+    sourceExts: ['jsx', 'js', 'ts', 'tsx'],
     extraNodeModules: {
       react: path.resolve(__dirname, 'node_modules/react'),
       'react-native': path.resolve(__dirname, 'node_modules/react-native'),

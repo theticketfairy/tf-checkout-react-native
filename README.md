@@ -9,7 +9,7 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 ### React Native
 
 - Suggested ReactNative version `0.66.3`
-- Suggested Flipper version `0.66`
+- Suggested Flipper version `0.99.0`
 - React version `0.17.1`
 
 ### Android
@@ -56,6 +56,24 @@ npm install tf-checkout-react-native
 ```
 
 Make sure to install all the required dependencies in your project.
+
+### Metro
+Add the following to your `metro.config.js` in the resolver property:
+
+`sourceExts: ['jsx', 'js', 'ts', 'tsx']`
+
+Result: 
+````js
+module.exports = {
+  watchFolders: [moduleRoot],
+  resolver: {
+    sourceExts: ['jsx', 'js', 'ts', 'tsx'],
+    extraNodeModules: {
+      react: path.resolve(__dirname,
+    }
+    .... 
+````
+
 
 ### Required for Android
 
@@ -566,7 +584,6 @@ Add it to the render function.
   onLoginSuccess: (data: any) => void
   onLoginError?: (error: IError) => void
 
-
   onFetchUserProfileSuccess?: (data: any) => void
   onFetchUserProfileError?: (error: IError) => void
 
@@ -632,6 +649,7 @@ interface IBillingInfoViewTexts {
   loginTexts?: ILoginViewTexts
   checkoutButton?: string
   skippingMessage?: string
+  invalidPhoneNumberError?: string
   form?: {
     firstName?: string
     lastName?: string
@@ -657,6 +675,10 @@ interface IBillingInfoViewTexts {
     emailsAdvice?: string
     choosePassword?: string
     optional?: string
+    phoneInput?: {
+      label?: string
+      customError?: string
+    }
   }
 }
 ```
@@ -701,9 +723,18 @@ interface IBillingInfoViewStyles {
   datePicker?: IDatePickerStyles
   
   privacyPolicyLinkStyle?: StyleProp<TextStyle>
+
+  phoneInput?: {
+    rootContainer?: StyleProp<ViewStyle>
+    errorColor?: ColorValue
+    country?: {
+      container?: StyleProp<ViewStyle>
+      button?: StyleProp<ViewStyle>
+    }
+    input?: IInputStyles
+  }
 }
 ```
-
 ---
 
 ## Checkout

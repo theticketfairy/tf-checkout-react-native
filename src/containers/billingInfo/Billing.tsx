@@ -18,6 +18,7 @@ import {
   Text,
   View,
 } from 'react-native'
+import DeviceCountry, { TYPE_ANY } from 'react-native-device-country'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import Constants from '../../api/Constants'
@@ -30,10 +31,13 @@ import {
   Input,
   Loading,
   Login,
+  PhoneInput,
 } from '../../components'
 import { IDropdownItem } from '../../components/dropdown/types'
+import { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
 import { BillingCore, BillingCoreHandle } from '../../core'
 import { Config } from '../../helpers/Config'
+import { getCountryDialCode } from '../../helpers/CountryCodes'
 import { useDebounced } from '../../helpers/Debounced'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import {
@@ -41,6 +45,7 @@ import {
   validateEmail,
   validateEmpty,
   validatePasswords,
+  validatePhoneNumber,
 } from '../../helpers/Validators'
 import R from '../../res'
 import { IError, IUserProfile, IUserProfilePublic } from '../../types'
@@ -185,7 +190,7 @@ const Billing: FC<IBillingProps> = ({
   const confirmPasswordError = useDebounced(passwordConfirmation, () =>
     validatePasswords(passwordConfirmation, password)
   )
-  const phoneError = useDebounced(phone, validateEmpty)
+  const [phoneError, setPhoneError] = useState('')
   const streetError = useDebounced(street, validateEmpty)
   const cityError = useDebounced(city, validateEmpty)
   const postalCodeError = useDebounced(postalCode, validateEmpty)
@@ -208,12 +213,37 @@ const Billing: FC<IBillingProps> = ({
   //#region Refs
   const storedToken = useRef('')
   const storedProfileData = useRef({} as IUserProfilePublic)
+  const phoneErrorCounter = useRef(0)
   const billingCoreRef = useRef<BillingCoreHandle>(null)
   //#endregion
 
   //#region Handlers
+  const handleSetPhoneError = useCallback(
+    (error: string) => {
+      if (isPhoneRequired && phone.length > 0) {
+        setPhoneError(error)
+      }
+    },
+    [isPhoneRequired, phone.length]
+  )
+
+  const handleOnChangePhoneNumber = (payload: IOnChangePhoneNumberPayload) => {
+    setPhone(payload.input)
+    if (!payload.isValid && phoneErrorCounter.current > 0) {
+      return handleSetPhoneError(
+        texts?.form?.phoneInput?.customError || 'Invalid phone number'
+      )
+    }
+    phoneErrorCounter.current = phoneErrorCounter.current + 1
+    setPhoneError('')
+  }
+
   const handleOnLoadingChange = useCallback(
-    (loading: boolean) => onLoadingChange?.(loading),
+    (loading: boolean) => {
+      if (onLoadingChange) {
+        onLoadingChange(loading)
+      }
+    },
     [onLoadingChange]
   )
 
@@ -281,20 +311,48 @@ const Billing: FC<IBillingProps> = ({
   }
 
   const handleOnLoginSuccess = async (userProfile: IUserProfilePublic) => {
+    let phoneCountry = 'US'
     const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
-    onLoginSuccess?.(userProfile)
+    const usrProfile = { ...userProfile }
+    onLoginSuccess?.(usrProfile)
+
+    try {
+      const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY)
+      phoneCountry = deviceCountry.code.toUpperCase()
+    } catch (err) {
+      phoneCountry = 'US'
+    }
+    if (!usrProfile.phone.includes('+')) {
+      usrProfile.phone = `${getCountryDialCode(phoneCountry)}${
+        usrProfile.phone
+      }`
+    }
 
     if (!isBillingRequired && skipping === 'fail') {
       setSkippingStatus('skipping')
 
+      const phoneValidError = validatePhoneNumber({
+        phoneNumber: userProfile.phone,
+        customError: texts?.form?.phoneInput?.customError,
+      })
+
+      if (phoneValidError) {
+        showAlert(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
+        return handleSetPhoneError(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
+      }
+
       await performCheckout(
         getCheckoutBodyWhenSkipping({
-          userProfile: userProfile,
+          userProfile: usrProfile,
           ticketsQuantity: numberOfTicketHolders || 1,
         })
       )
     }
-    handleSetFormDataFromUserProfile(userProfile, accessToken)
+    handleSetFormDataFromUserProfile(usrProfile, accessToken)
   }
 
   const handleOnLoginError = (error: IError) => {
@@ -348,6 +406,16 @@ const Billing: FC<IBillingProps> = ({
   //#endregion
 
   //#region Form validation
+  const checkIsStoredPhoneNumberFormat = (storedPhoneNumber: string) => {
+    if (!storedPhoneNumber.includes('+')) {
+      handleSetPhoneError(
+        texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+      )
+      return false
+    }
+    return true
+  }
+
   const checkBasicDataValid = (): boolean => {
     if (
       !firstName ||
@@ -362,7 +430,13 @@ const Billing: FC<IBillingProps> = ({
       return false
     }
 
-    if (isPhoneRequired && !phone) {
+    if (
+      isPhoneRequired &&
+      validatePhoneNumber({
+        phoneNumber: phone,
+        customError: texts?.form?.phoneInput?.customError,
+      })
+    ) {
       return false
     }
 
@@ -455,8 +529,9 @@ const Billing: FC<IBillingProps> = ({
       return onRegisterError?.({ message: 'BillingCore is not initialized' })
     }
 
-    const registerForm = getRegisterFormData(checkoutBody)
     setIsSubmittingData(true)
+
+    const registerForm = getRegisterFormData(checkoutBody)
     const { data: registerResponseData, error: registerResponseError } =
       await billingCoreRef.current.registerNewUser(registerForm)
 
@@ -608,7 +683,19 @@ const Billing: FC<IBillingProps> = ({
     }
 
     setIsLoading(true)
+
+    let phoneCountry = 'US'
+    let phoneCountryDialCode = '+1'
     let usrPrfl: IUserProfile | undefined
+
+    try {
+      const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY)
+      phoneCountry = deviceCountry.code.toUpperCase()
+      phoneCountryDialCode = getCountryDialCode(phoneCountry)
+    } catch (err) {
+      phoneCountry = 'US'
+    }
+
     const usrTkn = await getData(LocalStorageKeys.ACCESS_TOKEN)
     let skippingStatus: SkippingStatusType
 
@@ -696,22 +783,36 @@ const Billing: FC<IBillingProps> = ({
       })
     }
 
-    if (!isBillingRequired && usrTkn && usrPrfl && cartData) {
-      const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
-        userProfile: usrPrfl,
-        ticketsQuantity: cartData.quantity,
-      })
-      await performCheckout(checkoutBody)
-    } else {
-      if (skipping === 'skipping') {
-        setSkippingStatus('fail')
-      }
-    }
-
     if (usrPrfl) {
-      handleSetFormDataFromUserProfile(usrPrfl)
+      if (!checkIsStoredPhoneNumberFormat(usrPrfl.phone)) {
+        showAlert(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
+        skippingStatus = 'fail'
+        setSkippingStatus('fail')
+        setIsLoading(false)
+      } else {
+        // We can perfom Checkout process since phone is valid
+        if (!isBillingRequired && usrTkn && cartData) {
+          const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
+            userProfile: usrPrfl,
+            ticketsQuantity: cartData.quantity,
+          })
+          return await performCheckout(checkoutBody)
+        } else {
+          if (skipping === 'skipping') {
+            setSkippingStatus('fail')
+          }
+        }
+      }
+      handleSetFormDataFromUserProfile({
+        ...usrPrfl,
+        phone: `${phoneCountryDialCode}${usrPrfl.phone}`,
+      })
+    } else {
+      // There is no user profile data
+      setPhone(phoneCountryDialCode)
     }
-
     setCountries(parsedCountries)
     setTicketHoldersData(tHolders)
     setIsLoading(false)
@@ -741,6 +842,7 @@ const Billing: FC<IBillingProps> = ({
       if (!selectedCountry) {
         return
       }
+
       if (!billingCoreRef.current) {
         onFetchCartError?.({ message: 'BillingCoreRef not initialized' })
         return showAlert('BillingCoreRef not initialized')
@@ -1009,13 +1111,16 @@ const Billing: FC<IBillingProps> = ({
               />
             </>
           )}
-          <Input
-            label={phoneLabel}
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType='phone-pad'
-            error={isPhoneRequired ? phoneError : ''}
-            styles={styles?.inputStyles}
+
+          <PhoneInput
+            phoneNumber={phone}
+            onChangePhoneNumber={handleOnChangePhoneNumber}
+            styles={styles?.phoneInput}
+            error={phoneError}
+            texts={{
+              label: phoneLabel,
+              ...texts?.form?.phoneInput,
+            }}
           />
           <Input
             label={addressLabel}
