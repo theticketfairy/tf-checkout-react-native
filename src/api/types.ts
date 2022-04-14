@@ -114,6 +114,7 @@ export interface IFreeRegistrationData {
   currency: string
   orderHash: string
 }
+
 export interface IFreeRegistrationResponse {
   freeRegistrationError?: IError
   freeRegistrationData?: IFreeRegistrationData
