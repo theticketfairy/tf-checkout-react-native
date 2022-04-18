@@ -18,7 +18,6 @@ import { Button } from '../../src/components'
 import { deleteAllData } from '../../src/helpers/LocalStorage'
 
 import Color from './Colors'
-import CustomLoading from './components/CustomLoading'
 import { ComponentEnum } from './enums'
 import styles from './styles'
 
@@ -69,7 +68,7 @@ const App = () => {
     setCheckOutProps(data)
   }
 
-  const handleOnPaymentSuccess = (data: IOnCheckoutSuccess) => {
+  const handleOnPaymentSuccess = () => {
     setIsPaymentSuccess(true)
   }
 
@@ -139,7 +138,6 @@ const App = () => {
         return (
           <>
           <BillingInfo
-          areLoadingIndicatorsEnabled={false}
           onSkippingStatusChange={setSkippingStatus}
           loginBrandImages={{
             image1: GOOGLE_IMAGE,
@@ -426,8 +424,6 @@ const App = () => {
             onLoginSuccess={handleOnLoginSuccess}
             onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}
           />
-          {isLoading && skippingStatus !== 'skipping' && <CustomLoading text='Custom loading for Billing' backgroundColor='green' />}
-          {skippingStatus === 'skipping' && <CustomLoading text='Skipping loading for Billing' backgroundColor='black' /> }
           </>
         )
       case ComponentEnum.Checkout:
@@ -438,7 +434,6 @@ const App = () => {
             checkoutData={checkoutProps!}
             onPaymentSuccess={handleOnPaymentSuccess}
             onPressExit={handleStripeError}
-            areLoadingIndicatorsEnabled={false}
             onLoadingChange={(loading) => {setIsLoading(loading)}}
             styles={{
               rootStyle: {
@@ -506,9 +501,6 @@ const App = () => {
               payButton: '_PAY_'
             }}
             />
-            {isLoading && <CustomLoading text='Loading for checkout' backgroundColor='orange'/>}
-
-            
           </>
         )
       case ComponentEnum.PurchaseConfirmation:
@@ -633,7 +625,6 @@ const App = () => {
             >
               <Text>Back</Text>
             </TouchableOpacity>
-            {isLoading && <CustomLoading text='Custom loading for My Orders' backgroundColor='blue'/>}
           </View>
         )
 
@@ -798,7 +789,6 @@ const App = () => {
         return (
           <View style={{ flex: 1 }}>
             <Tickets
-              areLoadingIndicatorsEnabled={false}
               onLoadingChange={(loading) => setIsLoading(loading)}
               onAddToCartSuccess={handleOnAddToCartSuccess}
               onPressLogout={handleOnPressLogout}
@@ -956,9 +946,6 @@ const App = () => {
                 }
               }}
             />
-            {isLoading && <CustomLoading />}
-            <Button text={'RESET'} onPress={deleteAllData} />
-
           </View>
         )
     }
