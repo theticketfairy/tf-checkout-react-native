@@ -6,7 +6,7 @@ import {
   ViewStyle,
 } from 'react-native'
 
-import { IMyOrderDetailsResponse, IMyOrdersOrder } from '../../api/types'
+import { IMyOrderDetailsData, IMyOrdersOrder } from '../../api/types'
 import { IDropdownItem, IDropdownStyles } from '../../components/dropdown/types'
 import { IError } from '../../types'
 import { IOrderListItemStyles } from './components/types'
@@ -36,7 +36,7 @@ export interface IMyOrdersTexts {
 }
 
 export interface IMyOrdersProps {
-  onSelectOrder: (order: IMyOrderDetailsResponse) => void
+  onSelectOrder: (order: IMyOrderDetailsData) => void
 
   onFetchMyOrdersSuccess?: () => void
   onFetchMyOrdersError?: (error: IError) => void

@@ -1,7 +1,7 @@
-//@ts-nocheck
 import { AxiosInstance } from 'axios'
 
-import { IError, IEvent, ITicket } from '../types'
+import { IOnCheckoutSuccess } from '..'
+import { IError, IEvent, ITicket, IUserProfile } from '../types'
 
 export interface IClientRequest extends AxiosInstance {
   setGuestToken: (token: string) => void
@@ -11,6 +11,7 @@ export interface IClientRequest extends AxiosInstance {
   setDomain: (domain: string) => void
 }
 
+//#region Tickets
 export interface IPromoCodeResponse {
   isValid: boolean | number
   message: string
@@ -30,18 +31,17 @@ export interface IAuthorizeResponse {
 }
 
 export interface IAddToCartParams {
-  eventId: number | string
   attributes: {
-    alternative_view_id?: string | number
+    alternative_view_id?: string | number | null
     product_cart_quantity: number
     product_options: {
-      [optionName]: number | string
+      [key: string]: number | string
     }
     product_id: number
     ticket_types: {
-      [ticketId]: {
+      [key: string]: {
         product_options: {
-          [optionName]: number
+          [key: string]: number | string
           ticket_price: number
         }
         quantity: number
@@ -49,6 +49,20 @@ export interface IAddToCartParams {
     }
   }
 }
+//#endregion
+
+//#region WaitingList
+export interface IAddToWaitingListResponse {
+  addToWaitingListError?: IError
+  addToWaitingListData?: {
+    error: boolean
+    message: string
+    status: number
+    success: boolean
+  }
+}
+
+//#endregion
 
 export interface IEventData {
   slug: string
@@ -100,6 +114,7 @@ export interface IFreeRegistrationData {
   currency: string
   orderHash: string
 }
+
 export interface IFreeRegistrationResponse {
   freeRegistrationError?: IError
   freeRegistrationData?: IFreeRegistrationData
@@ -114,8 +129,6 @@ export interface IRegisterNewUserResponse {
     raw?: any
   }
   data?: {
-    access_token: string
-    refresh_token: string
     token_type: string
     scope: string
     user_profile: {
@@ -129,7 +142,7 @@ export interface IRegisterNewUserResponse {
 // Billing information
 export interface ICheckoutResponse {
   error?: IError
-  data?: any
+  data?: IOnCheckoutSuccess
 }
 
 // Checkout
@@ -166,8 +179,8 @@ export interface IOrderReview {
 }
 
 export interface IOrderReviewResponse {
-  error?: IError
-  data?: IOrderReview
+  orderReviewError?: IError
+  orderReviewData?: IOrderReview
 }
 
 //#region MyOrders
@@ -198,26 +211,31 @@ export interface IMyOrdersResponse {
 
 //#region My Order Details
 export interface IMyOrderDetailsItem {
-  name: string
+  isActive: boolean
   currency: string
-  price: string
   discount: string
+  name: string
+  price: string
   quantity: string
   total: string
 }
 
 export interface IMyOrderDetailsTicket {
-  hash: string
-  ticketType: string
-  holderName?: string
-  holderEmail?: string
-  holderPhone?: string
-  status: string
-  pdfLink?: string
-  qrData?: string
-  isSellable?: boolean
-  description?: string
+  currency: string
+  description: string
   descriptionPlain?: string
+  eventName: string
+  hash: string
+  holderEmail?: string
+  holderName: string
+  holderPhone?: string
+  isOnSale: boolean
+  isSellable: true
+  pdfLink: string
+  qrData: string
+  resaleFeeAmount: number
+  status: string
+  ticketType: string
 }
 
 export interface IMyOrderDetailsHeader {
@@ -226,16 +244,79 @@ export interface IMyOrderDetailsHeader {
   total: string
   salesReferred: string
 }
-export interface IMyOrderDetailsResponse {
+
+export interface IMyOrderDetailsData {
   header: IMyOrderDetailsHeader
   items: IMyOrderDetailsItem[]
   tickets: IMyOrderDetailsTicket[]
 }
+
+export interface IMyOrderDetailsResponse {
+  orderDetailsError?: IError
+  orderDetailsData?: IMyOrderDetailsData
+}
 //#endregion
 
-export interface ICartResponse {
+export interface ICartData {
   quantity: number
   isTfOptInHidden?: boolean
   isTfOptIn: boolean // Ticket fairy
   isMarketingOptedIn: boolean // Brand
+}
+
+export interface ICartResponse {
+  cartError?: IError
+  cartData?: ICartData
+}
+
+export interface ICountryData {
+  [key: number | string]: string
+}
+
+export interface ICountriesResponse {
+  countriesError?: IError
+  countriesData?: ICountryData
+}
+
+export interface IStateData {
+  [key: number | string]: string
+}
+
+export interface IStatesResponse {
+  statesError?: IError
+  statesData?: IStateData
+}
+
+export interface IUserProfileResponse {
+  userProfileError?: IError
+  userProfileData?: IUserProfile
+}
+
+export interface IPurchaseConfirmationData {
+  conversionPixels?: any
+  currency: { currency: string; decimalPlaces: number; symbol: string }
+  customConfirmationPageText?: string
+  customerId: string
+  isReferralDisabled: boolean
+  eventDate: string
+  eventDescription: string
+  eventType: string
+  message: string
+  orderTotal: number
+  personalShareLink: string
+  productId: string
+  productImage: string
+  productName: string
+  productPrice: number
+  productUrl: string
+  twitterHashtag?: string
+  personalShareSales: {
+    price: number
+    sales: number
+  }[]
+}
+
+export interface IPurchaseConfirmationResponse {
+  purchaseConfirmationError?: IError
+  purchaseConfirmationData?: IPurchaseConfirmationData
 }

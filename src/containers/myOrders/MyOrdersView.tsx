@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { FC, useCallback, useMemo, useRef } from 'react'
 import {
   FlatList,
   Image,
@@ -16,7 +16,7 @@ import OrderListItem from './components/OrderListItem'
 import { MyOrdersViewStyles as s } from './styles'
 import { IMyOrdersViewProps } from './types'
 
-const MyOrdersView = ({
+const MyOrdersView: FC<IMyOrdersViewProps> = ({
   myEvents,
   onChangeEvent,
   selectedEvent,
@@ -29,7 +29,7 @@ const MyOrdersView = ({
   config,
   onFetchMoreOrders,
   texts,
-}: IMyOrdersViewProps) => {
+}) => {
   const onEndReachedCalledDuringMomentum = useRef(false)
   const handleOnSelectOrder = (order: IMyOrdersOrder) => {
     if (onSelectOrder) {

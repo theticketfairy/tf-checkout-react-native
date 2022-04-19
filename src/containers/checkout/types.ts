@@ -61,7 +61,7 @@ export interface ICheckoutProps {
   onCheckoutCompletedSuccess?: (data: IOnCheckoutSuccess) => void
   onCheckoutCompletedError?: (error: IError) => void
 
-  onPaymentSuccess: (data: any) => void
+  onPaymentSuccess: () => void
   onPaymentError?: (error: IError) => void
 
   onFetchOrderDetailsSuccess?: (orderData: IOrderDetails) => void

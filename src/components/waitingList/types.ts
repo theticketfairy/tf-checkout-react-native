@@ -49,7 +49,6 @@ export interface IWaitingListViewProps {
 }
 
 export interface IWaitingListProps {
-  eventId: number
   styles?: IWaitingListStyles
   texts?: IWaitingListTexts
 

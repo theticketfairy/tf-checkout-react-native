@@ -1,25 +1,27 @@
-//@ts-nocheck
-import jwtDecode from 'jwt-decode'
 import _get from 'lodash/get'
 import _isEmpty from 'lodash/isEmpty'
 import _some from 'lodash/some'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
-import { addToCart, fetchEvent, fetchTickets } from '../../api/ApiClient'
-import { IPromoCodeResponse } from '../../api/types'
 import {
-  deleteAllData,
-  deleteData,
-  getData,
-  LocalStorageKeys,
-} from '../../helpers/LocalStorage'
-import { IEvent, ISelectedTicket, ITicket } from '../../types'
+  IEventResponse,
+  IFetchTicketsResponse,
+  IPromoCodeResponse,
+} from '../../api/types'
+import { TicketsCore, TicketsCoreHandle } from '../../core'
+import { IBookTicketsOptions } from '../../core/TicketsCore/TicketsCoreTypes'
+import {
+  IAddToCartResponse,
+  IEvent,
+  IOnFetchTicketsSuccess,
+  ISelectedTicket,
+  ITicket,
+} from '../../types'
 import TicketsView from './TicketsView'
 import { ITicketsProps } from './types'
 
-const Tickets = ({
-  eventId,
+const Tickets: FC<ITicketsProps> = ({
   onAddToCartSuccess,
   onAddToCartError,
   onFetchTicketsError,
@@ -38,7 +40,7 @@ const Tickets = ({
   onAddToWaitingListError,
   onAddToWaitingListSuccess,
   promoCodeCloseIcon,
-}: ITicketsProps) => {
+}) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
   const [isGettingEvent, setIsGettingEvent] = useState(false)
@@ -53,7 +55,10 @@ const Tickets = ({
   >(undefined)
   const [isFirstCall, setIsFirstCall] = useState(true)
 
+  //#region Refs
   const eventErrorCodeRef = useRef(0)
+  const ticketsCoreRef = useRef<TicketsCoreHandle>(null)
+  //#endregion
 
   const showAlert = (message: string) => {
     if (areAlertsEnabled) {
@@ -68,18 +73,39 @@ const Tickets = ({
 
   //#region Api calls
   const retrieveStoredAccessToken = async () => {
-    const token = await getData(LocalStorageKeys.ACCESS_TOKEN)
-    if (!token) {
-      return setIsUserLogged(false)
+    if (!ticketsCoreRef.current) {
+      return { eventError: { message: 'Ticket core is not initialized' } }
     }
 
-    const decodedToken = jwtDecode<{ exp: number }>(token)
-    if (decodedToken && decodedToken.exp < Date.now() / 1000) {
-      await deleteData(LocalStorageKeys.ACCESS_TOKEN)
-      await deleteData(LocalStorageKeys.USER_DATA)
-      return setIsUserLogged(false)
+    setIsUserLogged(await ticketsCoreRef.current.getIsUserLoggedIn())
+  }
+
+  const getTicketsCore = async (
+    promoCode?: string
+  ): Promise<IFetchTicketsResponse> => {
+    if (!ticketsCoreRef.current) {
+      return { error: { message: 'Ticket core is not initialized' } }
     }
-    setIsUserLogged(true)
+
+    return await ticketsCoreRef.current.getTickets(promoCode)
+  }
+
+  const getEventCore = async (): Promise<IEventResponse> => {
+    if (!ticketsCoreRef.current) {
+      return { eventError: { message: 'Ticket core is not initialized' } }
+    }
+
+    return await ticketsCoreRef.current.getEvent()
+  }
+
+  const addToCartCore = async (
+    data: IBookTicketsOptions
+  ): Promise<IAddToCartResponse> => {
+    if (!ticketsCoreRef.current) {
+      return { error: { message: 'Ticket core is not initialized' } }
+    }
+
+    return await ticketsCoreRef.current.addToCart(data)
   }
 
   const getTickets = async (promoCode: string = '') => {
@@ -90,13 +116,11 @@ const Tickets = ({
       promoCodeResult,
       isInWaitingList,
       isAccessCodeRequired,
-    } = await fetchTickets(eventId, promoCode)
+    } = await getTicketsCore(promoCode)
     setIsGettingTickets(false)
 
     if (error) {
-      if (onFetchTicketsError) {
-        onFetchTicketsError(error)
-      }
+      onFetchTicketsError?.(error)
       return showAlert('Error while getting tickets, please try again')
     }
 
@@ -112,33 +136,29 @@ const Tickets = ({
         setPromoCodeResponse(promoCodeResult)
       }
 
-      if (onFetchTicketsSuccess) {
-        onFetchTicketsSuccess({
-          promoCodeResponse: {
-            success: true,
-            message: promoCodeResponse?.message,
-          },
-          tickets: responseTickets,
-          isInWaitingList,
-          isAccessCodeRequired,
-        })
+      const onFetchTicketsData: IOnFetchTicketsSuccess = {
+        promoCodeResponse: {
+          success: true,
+          message: promoCodeResponse?.message,
+        },
+        tickets: responseTickets,
+        isInWaitingList,
+        isAccessCodeRequired,
       }
+
+      onFetchTicketsSuccess?.(onFetchTicketsData)
 
       if (
         !isFirstCall &&
         (!promoCodeResult?.isValid || promoCodeResult.isValid === 0)
       ) {
-        if (onFetchTicketsSuccess) {
-          onFetchTicketsSuccess({
-            promoCodeResponse: {
-              success: false,
-              message: promoCodeResponse?.message,
-            },
-            tickets: responseTickets,
-            isInWaitingList,
-            isAccessCodeRequired,
-          })
-        }
+        onFetchTicketsSuccess?.({
+          ...onFetchTicketsData,
+          promoCodeResponse: {
+            success: false,
+            message: promoCodeResult?.message,
+          },
+        })
       }
     }
 
@@ -147,75 +167,58 @@ const Tickets = ({
 
   const getEventData = async () => {
     setIsGettingEvent(true)
-    const { eventError, eventData } = await fetchEvent(eventId)
+    const { eventError, eventData } = await getEventCore()
     setIsGettingEvent(false)
 
     if (eventError) {
-      if (onFetchEventError) {
-        onFetchEventError(
-          eventError || 'There was an error while fetching event'
-        )
-      }
-      eventErrorCodeRef.current = eventError.code
+      eventErrorCodeRef.current = eventError.code || 400
       showAlert(eventError.message)
-      return
+      return onFetchEventError?.(
+        eventError || { message: 'There was an error while fetching event' }
+      )
     }
 
-    if (onFetchEventSuccess) {
-      onFetchEventSuccess({
-        name: eventData?.name,
-        slug: eventData?.slug,
-        description: eventData?.description,
-        title: eventData?.title,
+    if (!eventData) {
+      return onFetchEventError?.({
+        message: 'There was an error while fetching event',
       })
     }
 
+    onFetchEventSuccess?.(eventData)
     setEvent(eventData)
   }
 
   const performBookTickets = async () => {
-    const optionName = _get(selectedTicket, 'optionName')
-    const ticketId = _get(selectedTicket, 'id')
-    const ticketQuantity = selectedTicket?.selectedOption?.value
-    const ticketPrice = selectedTicket?.price
+    if (!selectedTicket || !selectedTicket.selectedOption) {
+      onAddToCartError?.({ message: 'Please select a ticket' })
+      return showAlert('Please select a ticket')
+    }
 
-    const data = {
-      attributes: {
-        alternative_view_id: null,
-        product_cart_quantity: ticketQuantity,
-        product_options: {
-          [optionName]: ticketId,
-        },
-        product_id: eventId,
-        ticket_types: {
-          [ticketId]: {
-            product_options: {
-              [optionName]: ticketId,
-              ticket_price: ticketPrice,
-            },
-            quantity: ticketQuantity,
-          },
-        },
-      },
+    const ticketQuantity =
+      typeof selectedTicket.selectedOption.value === 'string'
+        ? parseInt(selectedTicket.selectedOption.value, 10)
+        : selectedTicket.selectedOption.value
+
+    const ticketsOptions: IBookTicketsOptions = {
+      quantity: ticketQuantity,
+      optionName: _get(selectedTicket, 'optionName'),
+      ticketId: _get(selectedTicket, 'id'),
+      price: selectedTicket.price,
     }
 
     setIsBooking(true)
-    const { data: result, error: addToCartError } = await addToCart(
-      eventId,
-      data
+    const { data: result, error: addToCartError } = await addToCartCore(
+      ticketsOptions
     )
     setIsBooking(false)
 
     if (result) {
-      return onAddToCartSuccess(result)
+      return onAddToCartSuccess?.(result)
     }
 
     if (addToCartError) {
-      if (onAddToCartError) {
-        onAddToCartError(addToCartError)
-      }
-      showAlert(addToCartError)
-      return
+      showAlert(addToCartError.message || 'Error while adding tickets to cart')
+      return onAddToCartError?.(addToCartError)
     }
   }
   //#endregion
@@ -270,7 +273,11 @@ const Tickets = ({
   }
 
   const handleOnLogout = async () => {
-    await deleteAllData()
+    if (!ticketsCoreRef.current) {
+      return { error: { message: 'Ticket core is not initialized' } }
+    }
+
+    await ticketsCoreRef.current.logout()
     setIsUserLogged(false)
 
     await getTickets()
@@ -286,34 +293,35 @@ const Tickets = ({
   //#endregion
 
   return (
-    <TicketsView
-      eventId={eventId}
-      isGettingTickets={isGettingTickets}
-      tickets={tickets}
-      onPressGetTickets={handleOnPressGetTickets}
-      onPressApplyPromoCode={handleOnPressApplyPromoCode}
-      promoCodeValidationMessage={promoCodeResponse?.message}
-      isPromoCodeValid={promoCodeResponse?.isValid}
-      onSelectTicketOption={handleOnSelectTicketOption}
-      selectedTicket={selectedTicket}
-      isBookingTickets={isBooking}
-      styles={styles}
-      isGettingEvent={isGettingEvent}
-      texts={texts}
-      event={event}
-      isWaitingListVisible={isWaitingListVisible}
-      isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
-      isAccessCodeEnabled={isAccessCodeEnabled || isAccessCode}
-      isPromoEnabled={isPromoEnabled}
-      isUserLogged={isUserLogged}
-      onPressMyOrders={onPressMyOrders}
-      onPressLogout={handleOnLogout}
-      areLoadingIndicatorsEnabled={areLoadingIndicatorsEnabled}
-      onAddToWaitingListError={onAddToWaitingListError}
-      onAddToWaitingListSuccess={onAddToWaitingListSuccess}
-      onLoadingChange={handleOnLoadingChange}
-      promoCodeCloseIcon={promoCodeCloseIcon}
-    />
+    <TicketsCore ref={ticketsCoreRef}>
+      <TicketsView
+        isGettingTickets={isGettingTickets}
+        tickets={tickets}
+        onPressGetTickets={handleOnPressGetTickets}
+        onPressApplyPromoCode={handleOnPressApplyPromoCode}
+        promoCodeValidationMessage={promoCodeResponse?.message}
+        isPromoCodeValid={promoCodeResponse?.isValid}
+        onSelectTicketOption={handleOnSelectTicketOption}
+        selectedTicket={selectedTicket}
+        isBookingTickets={isBooking}
+        styles={styles}
+        isGettingEvent={isGettingEvent}
+        texts={texts}
+        event={event}
+        isWaitingListVisible={isWaitingListVisible}
+        isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
+        isAccessCodeEnabled={isAccessCodeEnabled || isAccessCode}
+        isPromoEnabled={isPromoEnabled}
+        isUserLogged={isUserLogged}
+        onPressMyOrders={onPressMyOrders}
+        onPressLogout={handleOnLogout}
+        areLoadingIndicatorsEnabled={areLoadingIndicatorsEnabled}
+        onAddToWaitingListError={onAddToWaitingListError}
+        onAddToWaitingListSuccess={onAddToWaitingListSuccess}
+        onLoadingChange={handleOnLoadingChange}
+        promoCodeCloseIcon={promoCodeCloseIcon}
+      />
+    </TicketsCore>
   )
 }
 

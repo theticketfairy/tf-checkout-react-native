@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 import R from '../../res'
@@ -6,7 +6,7 @@ import Button from '../button/Button'
 import s from './styles'
 import { IPromoCodeProps } from './types'
 
-const PromoCode = ({
+const PromoCode: FC<IPromoCodeProps> = ({
   onPressApply,
   promoCodeValidationMessage,
   isPromoCodeValid,
@@ -14,7 +14,7 @@ const PromoCode = ({
   texts,
   isAccessCodeEnabled,
   closeButtonIcon,
-}: IPromoCodeProps) => {
+}) => {
   const [isActive, setIsActive] = useState(false)
   const [promoCode, setPromoCode] = useState('')
 

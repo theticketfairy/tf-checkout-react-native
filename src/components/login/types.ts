@@ -2,7 +2,7 @@ import { ImageSourcePropType, ImageStyle } from 'react-native'
 import { TextStyle } from 'react-native'
 import { StyleProp, ViewStyle } from 'react-native'
 
-import { IError, IUserProfile } from '../../types'
+import { IError, IUserProfilePublic } from '../../types'
 import { IButtonStyles } from '../button/types'
 import { IFormField } from '../formField/types'
 import { IInputStyles } from '../input/types'
@@ -30,14 +30,8 @@ export interface ILoginBrandImages {
 }
 
 export interface ILoginProps {
-  onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
+  onLoginSuccessful: (userProfile: IUserProfilePublic) => void
   onLoginError?: (error: IError) => void
-
-  onFetchUserProfileError?: (error: IError) => void
-  onFetchUserProfileSuccess?: (data: any) => void
-
-  onFetchAccessTokenError?: (error: IError) => void
-  onFetchAccessTokenSuccess?: () => void
 
   isLoginDialogVisible: boolean
   showLoginDialog: () => void
@@ -45,7 +39,7 @@ export interface ILoginProps {
 
   //Logout
   onLogoutSuccess?: () => void
-  onLogoutError?: () => void
+  onLogoutError?: (error: IError) => void
 
   styles?: ILoginViewStyles
   texts?: ILoginViewTexts
@@ -110,9 +104,9 @@ export interface ILoginViewProps {
   showDialog: () => void
   hideDialog: () => void
   isDialogVisible: boolean
-  onPressLogin: (email: string, password: string) => void
+  onPressLogin: (fields: ILoginFields) => void
   isLoading: boolean
-  userProfile?: IUserProfile
+  userProfile?: IUserProfilePublic
 
   onPressLogout: () => void
 
@@ -125,6 +119,11 @@ export interface ILoginViewProps {
   refs?: ILoginRefs
 
   brandImages?: ILoginBrandImages
+}
+
+export interface ILoginFields {
+  email: string
+  password: string
 }
 
 export interface ILoginViewState {

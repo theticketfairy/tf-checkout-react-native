@@ -1,33 +1,37 @@
 import _ from 'lodash'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
-  IMyOrderDetailsResponse,
+  IMyOrderDetailsData,
   IOnCheckoutSuccess,
   MyOrderDetails,
   MyOrders,
   PurchaseConfirmation,
   Tickets,
   BillingInfo,
-  Login,
-  IUserProfile,
   setConfig,
   ITicketsResponseData,
   SkippingStatusType,
 } from 'tf-checkout-react-native'
-import { IOrderDetails } from '../../src/containers/checkout/types'
-import { IError } from '../../src/types'
+import { Button } from '../../src/components'
+import { deleteAllData } from '../../src/helpers/LocalStorage'
 
 import Color from './Colors'
-import CustomLoading from './components/CustomLoading'
 import { ComponentEnum } from './enums'
 import styles from './styles'
 
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
-const EVENT_ID = 5420//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID
+const EVENT_ID = 5420//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID //12796
+
+const config = {
+  EVENT_ID: EVENT_ID,
+  DOMAIN: 'https://manacommon.com', //https://www.ticketfairy.com',
+  BRAND: 'the-ticket-fairy',// 'mana-onetree-testing-brand',
+  ARE_SUB_BRANDS_INCLUDED: true,
+}
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -48,45 +52,31 @@ const App = () => {
 
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false)
   const [selectedOrderDetails, setSelectedOrderDetails] =
-    useState<IMyOrderDetailsResponse>()
-
-  const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
-  const [loggedUserName, setLoggedUserName] = useState('')
+    useState<IMyOrderDetailsData>()
   
   //#region Handlers
-  const handleOnLoginDialogSuccess = (
-    userProfile: IUserProfile,
-    accessToken: string
-  ) => {
-    setLoggedUserName(userProfile.firstName)
-  }
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
-    console.log('handleOnAddToCartSuccess',data)
     setCartProps(data)
   }
 
   const handleOnLoginSuccess = (data: any) => {
-    console.log('handleOnLoginSuccess')
   }
 
   const handleOnFetchUserProfileSuccess = () => {}
 
   const handleOnCheckoutSuccess = (data: IOnCheckoutSuccess) => {
-    console.log('handleOnCheckoutSuccess', data) // here is the order ID
     setCheckOutProps(data)
   }
 
-  const handleOnPaymentSuccess = (data: IOnCheckoutSuccess) => {
-    console.log('handleOnPaymentSuccess', data)
+  const handleOnPaymentSuccess = () => {
     setIsPaymentSuccess(true)
   }
 
   const handleOnComplete = () => {
     setComponentToShow(ComponentEnum.Tickets)
-    console.log('Exit')
   }
 
-  const handleOnSelectOrder = (order: IMyOrderDetailsResponse) => {
+  const handleOnSelectOrder = (order: IMyOrderDetailsData) => {
     setSelectedOrderDetails(order)
   }
 
@@ -95,7 +85,6 @@ const App = () => {
   }
 
   const handleOnPressLogout = () => {
-    console.log('Logout')
   }
 
   const handleOnDismissMyOrders = () => {
@@ -111,21 +100,13 @@ const App = () => {
   }
   //#endregion
 
-  const loginEmailRef = useRef(null)
-  const loginPasswordRef = useRef(null)
-  const touchableOpacityRef = useRef(null)
 
   //#region effects
   useEffect(() => {
-    setConfig({
-      DOMAIN: 'https://manacommon.com',
-      BRAND: 'the-ticket-fairy',// 'mana-onetree-testing-brand',
-      ARE_SUB_BRANDS_INCLUDED: true,
-    })
+    setConfig(config)
   }, [])
   useEffect(() => {
     if (cartProps) {
-      console.log('cartProps', cartProps)
       setComponentToShow(ComponentEnum.BillingInfo)
     }
   }, [cartProps])
@@ -157,10 +138,7 @@ const App = () => {
         return (
           <>
           <BillingInfo
-          areLoadingIndicatorsEnabled={false}
-          onSkippingStatusChange={(status) => {console.log('%cApp.tsx line:159 status', 'color: #00FFcc;', status);
-          setSkippingStatus(status)
-        }}
+          onSkippingStatusChange={setSkippingStatus}
           loginBrandImages={{
             image1: GOOGLE_IMAGE,
             image1Style: {
@@ -178,10 +156,7 @@ const App = () => {
               marginBottom: 16
             },
           }}
-          onLoadingChange={(loading) => {
-            console.log('%c BILLING LOADING', 'color: #007acc;', loading);
-            setIsLoading(loading)
-          }}
+          onLoadingChange={setIsLoading}
             texts={{
               form: {
                 getYourTicketsTitle: '_Get your tickets_',
@@ -433,14 +408,22 @@ const App = () => {
                   },
                 },
               },
+              phoneInput: {
+                input: {
+                  baseColor: Color.textMain,
+                  color: Color.textMain,
+                  input: {
+                    color: Color.textMain,
+                  },
+                },
+                
+              }
             }}
             cartProps={cartProps!}
             onCheckoutSuccess={handleOnCheckoutSuccess}
             onLoginSuccess={handleOnLoginSuccess}
             onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}
           />
-          {isLoading && skippingStatus !== 'skipping' && <CustomLoading text='Custom loading for Billing' backgroundColor='green' />}
-          {skippingStatus === 'skipping' && <CustomLoading text='Skipping loading for Billing' backgroundColor='black' /> }
           </>
         )
       case ComponentEnum.Checkout:
@@ -451,7 +434,6 @@ const App = () => {
             checkoutData={checkoutProps!}
             onPaymentSuccess={handleOnPaymentSuccess}
             onPressExit={handleStripeError}
-            areLoadingIndicatorsEnabled={false}
             onLoadingChange={(loading) => {setIsLoading(loading)}}
             styles={{
               rootStyle: {
@@ -519,9 +501,6 @@ const App = () => {
               payButton: '_PAY_'
             }}
             />
-            {isLoading && <CustomLoading text='Loading for checkout' backgroundColor='orange'/>}
-
-            
           </>
         )
       case ComponentEnum.PurchaseConfirmation:
@@ -646,7 +625,6 @@ const App = () => {
             >
               <Text>Back</Text>
             </TouchableOpacity>
-            {isLoading && <CustomLoading text='Custom loading for My Orders' backgroundColor='blue'/>}
           </View>
         )
 
@@ -811,19 +789,8 @@ const App = () => {
         return (
           <View style={{ flex: 1 }}>
             <Tickets
-              areLoadingIndicatorsEnabled={false}
-              eventId={EVENT_ID}
               onLoadingChange={(loading) => setIsLoading(loading)}
-
-              onFetchTicketsSuccess={(tickets) => {console.log('onFetchTicketsSuccess', tickets)}}
-              onFetchTicketsError={(error) => {console.log('onFetchTicketsError', error)}}
-
               onAddToCartSuccess={handleOnAddToCartSuccess}
-              onAddToCartError={(error)=> {console.log('onAddToCartError', error)}}
-
-              onFetchEventError={(error)=> {console.log('onFetchEventError', error)}}
-              onFetchEventSuccess={(event)=> {console.log('onFetchEventSuccess', event)}}
-
               onPressLogout={handleOnPressLogout}
 
               onPressMyOrders={handleOnPressMyOrders}
@@ -970,7 +937,6 @@ const App = () => {
                   mainButton: '_PROMO CODE_',
                 },
                 getTicketsButton: '_GET_TICKETS_',
-                title:'_TITLE_',
                 item: {
                   ticket: '_TICKET_'
                 },
@@ -980,7 +946,6 @@ const App = () => {
                 }
               }}
             />
-            {isLoading && <CustomLoading />}
           </View>
         )
     }

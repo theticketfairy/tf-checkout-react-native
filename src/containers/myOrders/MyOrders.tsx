@@ -4,9 +4,9 @@ import _uniqBy from 'lodash/uniqBy'
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
-import { fetchMyOrders, fetchOrderDetails } from '../../api/ApiClient'
 import { IMyOrdersOrder } from '../../api/types'
 import { IDropdownItem } from '../../components/dropdown/types'
+import { MyOrdersCore, MyOrdersCoreHandle } from '../../core'
 import { IError } from '../../types'
 import MyOrdersView from './MyOrdersView'
 import { IMyOrdersProps } from './types'
@@ -22,6 +22,7 @@ const MyOrders: FC<IMyOrdersProps> = ({
   texts,
   config,
 }) => {
+  //#region State
   const [isLoading, setIsLoading] = useState(true)
   const [isGettingEventDetails, setIsGettingEventDetails] = useState(false)
   const [myEvents, setMyEvents] = useState<IDropdownItem[]>([])
@@ -30,7 +31,12 @@ const MyOrders: FC<IMyOrdersProps> = ({
     value: '-1',
   })
   const [myOrders, setMyOrders] = useState<IMyOrdersOrder[]>([])
+  //#endregion
+
+  //#region Refs
   const currentPage = useRef(1)
+  const myOrdersCoreRef = useRef<MyOrdersCoreHandle>(null)
+  //#endregion
 
   const showAlert = (text: string) => {
     if (config?.areAlertsEnabled) {
@@ -38,14 +44,33 @@ const MyOrders: FC<IMyOrdersProps> = ({
     }
   }
 
+  const isMyOrdersCoreRefReady = (): boolean => {
+    if (!myOrdersCoreRef.current) {
+      onFetchMyOrdersError?.({
+        message: 'MyOrdersCore is not initialized',
+      })
+      showAlert('MyOrdersCore is not initialized')
+      return false
+    }
+
+    return true
+  }
+
   const getOrdersAsync = async (): Promise<undefined | IMyOrdersOrder[]> => {
+    if (!isMyOrdersCoreRefReady()) {
+      return
+    }
+
     setIsLoading(true)
     const validSelectedEvent =
       selectedEvent.value === '-1' ? null : selectedEvent
-    const { myOrdersData, myOrdersError } = await fetchMyOrders(
-      currentPage.current,
-      validSelectedEvent?.value.toString()
-    )
+
+    const { myOrdersData, myOrdersError } =
+      await myOrdersCoreRef.current!.getMyOrders(
+        currentPage.current,
+        validSelectedEvent?.value.toString()
+      )
+
     setIsLoading(false)
 
     if (myOrdersError) {
@@ -123,11 +148,17 @@ const MyOrders: FC<IMyOrdersProps> = ({
   }
 
   const handleOnSelectOrder = async (order: IMyOrdersOrder) => {
+    if (!isMyOrdersCoreRefReady()) {
+      return
+    }
+
     setIsGettingEventDetails(true)
-    const { orderDetailsData, orderDetailsError } = await fetchOrderDetails(
-      order.id
-    )
+
+    const { orderDetailsData, orderDetailsError } =
+      await myOrdersCoreRef.current!.getOrderDetails(order.id)
+
     setIsGettingEventDetails(false)
+
     if ((!orderDetailsData || orderDetailsError) && onFetchOrderDetailsError) {
       showAlert(orderDetailsError?.message ?? 'Error fetching order details')
       return onFetchOrderDetailsError(
@@ -159,20 +190,22 @@ const MyOrders: FC<IMyOrdersProps> = ({
   //#endregion
 
   return (
-    <MyOrdersView
-      myEvents={myEvents}
-      selectedEvent={selectedEvent}
-      onChangeEvent={handleOnChangeEvent}
-      myOrders={myOrders}
-      onSelectOrder={handleOnSelectOrder}
-      onRefresh={getOrders}
-      isLoading={isLoading}
-      isGettingEventDetails={isGettingEventDetails}
-      styles={styles}
-      config={config}
-      onFetchMoreOrders={handleOnFetchMoreOrders}
-      texts={texts}
-    />
+    <MyOrdersCore ref={myOrdersCoreRef}>
+      <MyOrdersView
+        myEvents={myEvents}
+        selectedEvent={selectedEvent}
+        onChangeEvent={handleOnChangeEvent}
+        myOrders={myOrders}
+        onSelectOrder={handleOnSelectOrder}
+        onRefresh={getOrders}
+        isLoading={isLoading}
+        isGettingEventDetails={isGettingEventDetails}
+        styles={styles}
+        config={config}
+        onFetchMoreOrders={handleOnFetchMoreOrders}
+        texts={texts}
+      />
+    </MyOrdersCore>
   )
 }
 

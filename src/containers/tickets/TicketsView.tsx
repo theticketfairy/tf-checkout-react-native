@@ -24,7 +24,6 @@ const TicketsView = ({
   event,
   isWaitingListVisible,
   isGetTicketsButtonVisible,
-  eventId,
   isAccessCodeEnabled,
   isUserLogged,
   onPressMyOrders,
@@ -79,7 +78,6 @@ const TicketsView = ({
         />
         {isWaitingListVisible && event?.salesStarted && (
           <WaitingList
-            eventId={eventId}
             styles={styles?.waitingList}
             texts={texts?.waitingList}
             onAddToWaitingListSuccess={onAddToWaitingListSuccess}

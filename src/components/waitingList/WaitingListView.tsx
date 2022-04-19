@@ -1,18 +1,18 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { Text, View } from 'react-native'
 
 import { Button, Input } from '..'
 import s from './styles'
 import { IWaitingListViewProps } from './types'
 
-const WaitingListView = ({
+const WaitingListView: FC<IWaitingListViewProps> = ({
   styles,
   texts,
   onPressButton,
   data,
   isSuccess,
   isLoading,
-}: IWaitingListViewProps) => {
+}) => {
   const {
     firstName,
     lastName,

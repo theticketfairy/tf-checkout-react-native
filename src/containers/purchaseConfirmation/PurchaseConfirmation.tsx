@@ -1,11 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
-import { fetchPurchaseConfirmation } from '../../api/ApiClient'
+import {
+  PurchaseConfirmationCore,
+  PurchaseConfirmationCoreHandle,
+} from '../../core'
 import PurchaseConfirmationView from './PurchaseConfirmationView'
 import { IPurchaseConfirmationProps } from './types'
 
-const PurchaseConfirmation = ({
+const PurchaseConfirmation: FC<IPurchaseConfirmationProps> = ({
   orderHash,
   onComplete,
   styles,
@@ -15,16 +18,31 @@ const PurchaseConfirmation = ({
   onLoadingChange,
   areActivityIndicatorsEnabled,
   areAlertsEnabled,
-}: IPurchaseConfirmationProps) => {
+}) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const showAlert = (text: string) => {
     areAlertsEnabled && Alert.alert(text)
   }
 
+  const isPurchaseConfirmationCoreRefReady = (): boolean => {
+    if (!purchaseConfirmationCoreRef.current) {
+      onFetchPurchaseConfirmationError?.({
+        message: 'PurchaseConfirmationCore is not initialized',
+      })
+      showAlert('PurchaseConfirmationCore is not initialized')
+      return false
+    }
+
+    return true
+  }
+
+  const purchaseConfirmationCoreRef =
+    useRef<PurchaseConfirmationCoreHandle>(null)
+
   const handleOnLoadingChange = useCallback(
     (loading: boolean) => {
-      onLoadingChange && onLoadingChange(loading)
+      onLoadingChange?.(loading)
     },
     [onLoadingChange]
   )
@@ -35,14 +53,20 @@ const PurchaseConfirmation = ({
 
   useEffect(() => {
     const getInitialData = async () => {
+      if (!isPurchaseConfirmationCoreRefReady()) {
+        return
+      }
+
       setIsLoading(true)
-      const { data: purchaseData, error: purchaseError } =
-        await fetchPurchaseConfirmation(orderHash)
+      const { purchaseConfirmationError } =
+        await purchaseConfirmationCoreRef.current!.getPurchaseConfirmation(
+          orderHash
+        )
       setIsLoading(false)
 
-      if (purchaseError) {
-        onFetchPurchaseConfirmationError?.(purchaseError)
-        return showAlert(purchaseError.message)
+      if (purchaseConfirmationError) {
+        onFetchPurchaseConfirmationError?.(purchaseConfirmationError)
+        return showAlert(purchaseConfirmationError.message)
       }
 
       onFetchPurchaseConfirmationSuccess?.()
@@ -53,13 +77,15 @@ const PurchaseConfirmation = ({
   }, [])
 
   return (
-    <PurchaseConfirmationView
-      orderHash={orderHash}
-      onComplete={onComplete}
-      styles={styles}
-      texts={texts}
-      areActivityIndicatorsEnabled={areActivityIndicatorsEnabled}
-    />
+    <PurchaseConfirmationCore ref={purchaseConfirmationCoreRef}>
+      <PurchaseConfirmationView
+        orderHash={orderHash}
+        onComplete={onComplete}
+        styles={styles}
+        texts={texts}
+        areActivityIndicatorsEnabled={areActivityIndicatorsEnabled}
+      />
+    </PurchaseConfirmationCore>
   )
 }
 

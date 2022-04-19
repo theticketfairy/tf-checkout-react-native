@@ -9,7 +9,7 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 ### React Native
 
 - Suggested ReactNative version `0.66.3`
-- Suggested Flipper version `0.66`
+- Suggested Flipper version `0.99.0`
 - React version `0.17.1`
 
 ### Android
@@ -57,6 +57,24 @@ npm install tf-checkout-react-native
 
 Make sure to install all the required dependencies in your project.
 
+### Metro
+Add the following to your `metro.config.js` in the resolver property:
+
+`sourceExts: ['jsx', 'js', 'ts', 'tsx']`
+
+Result: 
+````js
+module.exports = {
+  watchFolders: [moduleRoot],
+  resolver: {
+    sourceExts: ['jsx', 'js', 'ts', 'tsx'],
+    extraNodeModules: {
+      react: path.resolve(__dirname,
+    }
+    .... 
+````
+
+
 ### Required for Android
 
 Add below dependency to your `app/build.gradle` file with specified version (in our example we are using `1.4.0`).
@@ -86,6 +104,7 @@ Use it in your initial useEffect function:
 ```js
 useEffect(() => {
   setConfig({
+    EVENT_ID: '4344',
     DOMAIN: 'https://yourdomain.mx',
   })
 }, [])
@@ -93,8 +112,9 @@ useEffect(() => {
 
 `setConfig` set your event's configuration, with the following options:
 
-```js
+````js
 {
+  EVENT_ID: string,
   DOMAIN?: string,
   ENV?: 'PROD' | 'DEV' | 'STAG',
   CLIENT_ID?: string,
@@ -103,10 +123,11 @@ useEffect(() => {
   BRAND?: string,
   ARE_SUB_BRANDS_INCLUDED?: boolean
 }
-```
+````
 ### Props
 | Property | Description |
 | -------- | ----------- |
+| EVENT_ID | Specify the event's ID. |
 | DOMAIN | Specify your domains name example: `https://google.com` this is important to maintain cart session active and prevent it from expiring when user login in the BillingInfo component. |
 | ENV | Sets the environment to any of the following environments: Production, Staging or Development. Receives the following values: `PROD`, `DEV`, `STAG`. Defaults to `PROD`.|
 | CLIENT_ID | Set your CLIENT_ID. |
@@ -183,6 +204,13 @@ interface IInputStyles {
 }
 ```
 # Exported components
+Depending on your needs, you can use the UI Components or the Core Components.
+
+[UI Components](#ui-components) use the Core Components at their core but also exposes an UI that you can configure with your own styles. There is no need to create any kind of logic with them, only setConfig and implement the callbacks to get their data.
+
+[Core Components](#core-components) are wrappers that don't include any UI neither validation logics, they only act as a Middleware to retrieve and send data from the server and return it to your implementation components. They are useful when your design cannot be achieved by the UI components. You will need to use references to access their exposed functions.
+
+# UI Components
 ## Login
 
 Import the component from the library
@@ -311,7 +339,6 @@ interface ILoginViewStyles {
 
 ```
 ---
-
 ## Tickets
 
 Import the component from the library
@@ -557,7 +584,6 @@ Add it to the render function.
   onLoginSuccess: (data: any) => void
   onLoginError?: (error: IError) => void
 
-
   onFetchUserProfileSuccess?: (data: any) => void
   onFetchUserProfileError?: (error: IError) => void
 
@@ -623,6 +649,7 @@ interface IBillingInfoViewTexts {
   loginTexts?: ILoginViewTexts
   checkoutButton?: string
   skippingMessage?: string
+  invalidPhoneNumberError?: string
   form?: {
     firstName?: string
     lastName?: string
@@ -648,6 +675,10 @@ interface IBillingInfoViewTexts {
     emailsAdvice?: string
     choosePassword?: string
     optional?: string
+    phoneInput?: {
+      label?: string
+      customError?: string
+    }
   }
 }
 ```
@@ -692,9 +723,18 @@ interface IBillingInfoViewStyles {
   datePicker?: IDatePickerStyles
   
   privacyPolicyLinkStyle?: StyleProp<TextStyle>
+
+  phoneInput?: {
+    rootContainer?: StyleProp<ViewStyle>
+    errorColor?: ColorValue
+    country?: {
+      container?: StyleProp<ViewStyle>
+      button?: StyleProp<ViewStyle>
+    }
+    input?: IInputStyles
+  }
 }
 ```
-
 ---
 
 ## Checkout
@@ -1007,7 +1047,7 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
 
 ```js
 {
-  data: IMyOrderDetailsResponse
+  data: IMyOrderDetailsData
   config?: {
     areActivityIndicatorsEnabled?: boolean
     areAlertsEnabled?: boolean
@@ -1101,4 +1141,723 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
   }
 }
 ```
+
+# Core Components
+**⚠️ Remember that you first need to set your configuration using the [setConfig](#set-your-configuration)
+ function. ⚠️**
+
+ ### Index
+
+[TicketsCore](#ticketscore)
+
+[WaitingListCore](#waitinglistcore)
+
+[BillingCore](#billingcore)
+
+[CheckoutCore](#checkoutcore)
+
+[PurchaseConfirmationCore](#purchaseconfirmationcore)
+
+[MyOrdersCore](#myorderscore)
+
+[LoginCore](#logincore)
+ 
+---
+
+## TicketsCore
+This is the initial component to show. It will retrieve the tickets, event, present My Orders and Logout buttons if the user is logged in, and will add the selected tickets to the cart.
+
+Exposes the following functions: 
+
+`getTickets` Fetches the tickets from the event set in the config function. It receives a promoCode parameter to apply to the tickets.
+
+`getEvent` Fetches the event from the eventId set in the config function.
+
+`addToCart` Adds the selected tickets to the cart.
+
+```js
+{
+  // Fetches the tickets from the event set in the config function. It receives a promoCode parameter to apply to the tickets.
+  getTickets(promoCode?: string): Promise<{
+    tickets?: {
+      sortOrder: number
+      displayTicket?: boolean
+      salesEnded: boolean
+      salesStarted: boolean
+      id: string
+      displayName: string
+      optionName: string
+      optionValue: string
+      isTable: string
+      feeIncluded: boolean
+      price: number
+      basePrice: number
+      chosen: number
+      priceCurrency: string
+      priceSymbol: string
+      taxesIncluded: boolean
+      taxName: string
+      minQuantity: number
+      maxQuantity: number
+      multiplier: number
+      tags: []
+      allowMultiplePurchases: number
+      priceReplacementText: string
+      waitingListEnabled: boolean
+      soldOut?: boolean
+      soldOutMessage: string
+      minGuests?: number
+      maxGuests?: number
+      buyButtonText?: string
+      totalStock: number
+      guestPrice?: number
+      alwaysAvailable: string
+      feeText: string
+      x_face_value: number
+      sold_out?: boolean
+      oldPrice?: number
+      oldBasePrice?: number
+      descriptionRich?: string
+    }[]
+    error?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    promoCodeResult?: {
+      isValid: boolean | number
+      message: string
+    }
+    isInWaitingList?: boolean
+    isAccessCodeRequired?: boolean
+  }>
+
+  // Fetches the event from the eventId set in the config function.
+  getEvent(): Promise<{
+    eventError?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    eventData?: {
+      passwordProtected: boolean
+      passwordAuthenticated: boolean
+      name: string
+      description?: string
+      slug: string
+      redirectUrl?: string
+      facebookEvent?: string
+      title: string
+      relatedProducts: []
+      country: string
+      date: string
+      startDate: string
+      endDate: string
+      timezone: string
+      formattedDate: string
+      venueCountry: string
+      venueCity?: string
+      venueState?: string
+      hideVenueUntil?: string
+      hideVenue?: boolean
+      venueName?: string
+      venueGooglePlaceId?: string
+      venueLatitude?: string
+      venueLongitude?: string
+      venuePostalCode?: string
+      venueStreet?: string
+      venueStreetNumber?: string
+      eventType: any
+      productImage: string
+      imageUrl: string
+      imageUrlHd: string
+      backgroundImage: string
+      backgroundVideo?: string
+      twitterImage?: string
+      ogImage?: string
+      tags: []
+      preregEnabled: boolean
+      presalesStarted: boolean
+      presalesEnded: boolean
+      salesStart?: string
+      salesEnd: string
+      salesStarted: boolean
+      salesEnded: boolean
+      feeMode: string
+      feesIncluded?: any
+      minimumAge?: any
+      enableWaitingList: boolean
+      alwaysShowWaitingList?: any
+      titleReplacementImage?: any
+      titleReplacementHeight?: any
+      titleReplacementImageSvg?: any
+      fullTitleReplacement?: any
+      affirmAllowed: boolean
+      subHeading?: any
+      isTimeSlotEvent: boolean
+      preregistered: []
+      referralsEnabled: boolean
+      referrals: []
+      faq: []
+      l10nLanguages: []
+      imageURLs: any
+      descriptions: any
+    }
+  }>
+
+  // Adds selected tickets to the cart.
+  addToCart(
+    options: {  
+      optionName: string
+      ticketId: string
+      quantity: number
+      price: number
+    }
+  ): Promise<{
+    error?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    data?: {
+      isBillingRequired: boolean
+      isPhoneRequired?: boolean
+      isAgeRequired?: boolean
+      minimumAge?: number
+      isNameRequired?: boolean
+    }
+  }>
+}
+```
+
+Import the component from the library
+
+```js
+import { 
+  TicketsCore 
+  TicketsCoreHandle // You can import the Handle to use it as type in the useRef hook
+  
+} from 'tf-checkout-react-native'
+```
+
+Declare a reference to pass it to the component.
+
+```js
+const ticketsCoreRef = useRef<TicketsCoreHandle>(null)
+```
+
+Then add it to the render function and assign the reference to the corresponding component.
+
+```js
+<TicketsCore ref={ticketsCoreRef}>
+  <YourComponent />
+</TicketsCore>
+```
+
+Use the reference to access the component methods.
+
+```js
+const handleGetTickets = async () => {
+  const res = await ticketsCoreRef.current.getTickets()
+}
+
+```
+
+## WaitingListCore
+This component *must* appear after getting the response from **getTickets()** and the property `isInWaitingList` is set to true.
+
+
+Exposes the following functions: 
+```js
+{
+  addToWaitingList(
+    params: {
+      firstName: string
+      lastName: string
+      email: string
+    }
+  ): Promise<{
+    addToWaitingListError?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    addToWaitingListData?: {
+      error: boolean
+      message: string
+      status: number
+      success: boolean
+    }
+  }>
+}
+```
+**addToWaitingList** Receives params with the following properties:
+```js
+firstName: string
+lastName: string 
+email: string
+```
+
+And returns a Promise with the following object: 
+
+```js
+{
+  addToWaitingListError?: {
+    code?: number // If it was a server error, this will be the error code
+    message: string //Error message that you could use it in your UI
+    extraData?: any // If there is a relevant extra data, it will be returned here
+  }
+  addToWaitingListData?: {
+    error: boolean // If there was an error, this will be true
+    message: string // message that you could use it in your UI, could be due an error or a success message
+    status: number // Status code
+    success: boolean // If there was no error, this will be true
+  }
+}
+```
+
+Import the component from the library
+
+```js
+import { 
+  WaitingListCore 
+  WaitingListCoreHandle // You can import the Handle to use as type it in the useRef hook
+} from 'tf-checkout-react-native'
+```
+
+Declare a reference to pass it to the component.
+
+```js
+const waitingListCoreRef = useRef<WaitingListCoreHandle>(null)
+```
+
+Then add it to the render function and assign the reference to the corresponding component.
+
+```js
+<WaitingListCore ref={waitingListCoreRef}>
+  <YourComponent />
+</WaitingListCore>
+```
+
+Use the reference to access the component methods.
+
+```js
+const handleAddToWaitingList = async (params: IAddToWaitingListCoreParams) => {
+  const res = await waitingListCoreRef.current.addToWaitingList(params)
+}
+```
+
+## BillingCore
+This component collects user's billing information and checks the order out. If the entered user data is already in the system it will perform checkout, other wise it will perform a registration and then the checkout.
+
+Exposes the following functions: 
+
+`getCart` Fetches the current cart information, needed to know how many ticket holders data is needed.
+
+`getCountries` Fetches the countries list.
+
+`getStates` Fetches the states list.
+
+`getUserProfile` Fetches the user profile information.
+
+`registerNewUser` Registers a new user.
+
+`checkoutOrder` Performs the checkout.
+
+
+```ts
+{
+  // Fetches the current cart information, needed to know how many ticket holders data is needed.
+  getCart(): Promise<{
+    cartError?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    cartData?: {
+      quantity: number
+      isTfOptInHidden?: boolean
+      isTfOptIn: boolean // Ticket fairy
+      isMarketingOptedIn: boolean // Brand
+    }
+  }>
+
+  // Performs the checkout.
+  checkoutOrder(body: ICheckoutBody): Promise<{
+    error?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    data?: {
+      id: string
+      hash: string
+      total: string
+      status: string
+    }
+  }>
+
+  // Fetches the country list.
+  getCountries(): Promise<{
+     countriesError?: {
+       code?: number
+       message: string
+       extraData?: any
+     }
+    countriesData?: {
+      [key: number | string]: string
+    }
+  }>
+
+  // Fetches the states list.
+  getStates(countryId: string): Promise<{
+    statesError?: {
+       code?: number
+       message: string
+       extraData?: any
+     }
+    statesData?: {
+      [key: number | string]: string
+    }
+  }>
+
+  // Fetches the user profile information.
+  getUserProfile(): Promise<{
+    userProfileError?: {
+       code?: number
+       message: string
+       extraData?: any
+     }
+    userProfileData?: {
+      customerId: string
+      firstName: string
+      lastName: string
+      email: string
+      phone: string
+      streetAddress: string
+      zipCode: string
+      countryId: string
+      company?: string
+      state: string
+      stateId: string
+      city: string
+    }
+  }>
+
+  // Registers a new user.
+  registerNewUser(data: FormData): Promise<{
+    error?: {
+      isAlreadyRegistered?: boolean
+      message?: string
+      raw?: any
+    }
+    data?: {
+      token_type: string
+      scope: string
+      user_profile: {
+        first_name: string
+        last_name: string
+        email: string
+      }
+    }
+  }>
+}
+
+```
+
+## CheckoutCore
+Shows the event conditions, purchase details and process the payment and free registration to an event.
+
+You will need to install and use the [ReactNative Stripe SDK](https://github.com/stripe/stripe-react-native) (we recommend version 0.2.3). Follow their documentation to implement it. Our backend is already prepared to process the payments. 
+
+Remember that you will need the `publishableKey`. 
+
+After you collect the card information and call the `confirmPayment` function, you will need to call the `paymentSuccess` function to complete the payment.
+
+
+Exposes the following functions:
+
+`getEventConditions` Get event conditions for the current event.
+
+`getPurchaseOrderDetails` Get purchase order details for the current event.
+
+`getOrderReview`  Get order review for the current event.
+
+`freeRegistration` Free registration to an event.
+
+`paymentSuccess` Payment success.
+
+
+```ts
+// Get event conditions for the current event.
+getEventConditions(eventId: string): Promise<any>
+
+// Get purchase order details for the current event.
+getPurchaseOrderDetails(orderId: string): Promise<{
+  orderDetailsError?: {
+    code?: number
+    message: string
+    extraData?: any
+  }
+  orderDetailsData?: {
+    header: {
+      isReferralDisabled: boolean
+      shareLink: string
+      total: string
+      salesReferred: string
+    }
+    items: {
+      isActive: boolean
+      currency: string
+      discount: string
+      name: string
+      price: string
+      quantity: string
+      total: string
+    }[]
+    tickets: {
+      currency: string
+      description: string
+      descriptionPlain?: string
+      eventName: string
+      hash: string
+      holderEmail?: string
+      holderName: string
+      holderPhone?: string
+      isOnSale: boolean
+      isSellable: true
+      pdfLink: string
+      qrData: string
+      resaleFeeAmount: number
+      status: string
+      ticketType: string
+    }[]
+  }
+}>
+
+// Get order review for the current event.
+getOrderReview(orderHash: string): Promise<{
+  orderReviewError?: {
+    code?: number
+    message: string
+    extraData?: any
+  }
+  orderReviewData?: {
+    reviewData: {
+      event: string
+      price: string
+      ticketType: string
+      total: string
+      numberOfTickets: string
+      currency: string
+    }
+    paymentData: {
+      id: string
+      name: string
+      stripeClientSecret?: string
+      stripeConnectedAccount?: string
+      stripePublishableKey?: string
+    }
+    addressData: {
+      city: string
+      line1: string
+      state: string
+      postalCode: string
+    }
+    billingData: {
+      firstName: string
+      lastName: string
+    }
+  }
+}>
+
+// Free registration to an event.
+freeRegistration(orderHash: string): Promise<{
+  freeRegistrationError?: {
+    code?: number
+    message: string
+    extraData?: any
+  }
+  freeRegistrationData?: {
+    id: string
+    customerId: string
+    total: string
+    currency: string
+    orderHash: string
+  }
+}>
+
+// Payment success.
+paymentSuccess(orderHash: string): Promise<any>
+```
+
+## PurchaseConfirmationCore
+Shows the purchase confirmation information.
+
+It exposes the following functions:
+
+`getPurchaseConfirmation` Get purchase confirmation for the current event.
+
+```ts
+getPurchaseConfirmation(
+    orderHash: string
+  ): Promise<{
+    purchaseConfirmationError?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    purchaseConfirmationData?: {
+      conversionPixels?: any
+      currency: { 
+        currency: string; 
+        decimalPlaces: number; 
+        symbol: string 
+      }
+      customConfirmationPageText?: string
+      customerId: string
+      isReferralDisabled: boolean
+      eventDate: string
+      eventDescription: string
+      eventType: string
+      message: string
+      orderTotal: number
+      personalShareLink: string
+      productId: string
+      productImage: string
+      productName: string
+      productPrice: number
+      productUrl: string
+      twitterHashtag?: string
+      personalShareSales: {
+        price: number
+        sales: number
+      }[]
+    }
+  }>
+```
+
+## MyOrdersCore
+Shows the purchased orders from the user. It can also show the sub-brands if the `ARE_SUB_BRANDS_INCLUDED` was set to true and the `BRAND` was set to an existing brand. 
+
+Exposes the following functions:
+
+`getMyOrders` Get the orders purchased from the current user.
+
+`getOrderDetails` Get the details from a specific order.
+
+
+```ts
+getMyOrders(page: number, filter: string): Promise<{
+  myOrdersData?: {
+    events: {
+      url_name: string
+      event_name: string
+    }[]
+
+    orders: {
+      id: string
+      date: string
+      currency: string
+      amount: string
+      eventName: string
+      eventUrl: string
+      image: string
+    }[]
+  }
+
+  myOrdersError?: {
+    code?: number
+    message: string
+    extraData?: any
+  }
+}>
+
+
+getOrderDetails(orderId: string): Promise<{
+  orderDetailsError?: {
+    code?: number
+    message: string
+    extraData?: any
+  }
+  orderDetailsData?: {
+    header: {
+      isReferralDisabled: boolean
+      shareLink: string
+      total: string
+      salesReferred: string
+    }
+    items: {
+      isActive: boolean
+      currency: string
+      discount: string
+      name: string
+      price: string
+      quantity: string
+      total: string
+    }[]
+    tickets: {
+      currency: string
+      description: string
+      descriptionPlain?: string
+      eventName: string
+      hash: string
+      holderEmail?: string
+      holderName: string
+      holderPhone?: string
+      isOnSale: boolean
+      isSellable: true
+      pdfLink: string
+      qrData: string
+      resaleFeeAmount: number
+      status: string
+      ticketType: string
+    }[]
+  }
+}>
+```
+
+## LoginCore
+Handles the login and logout process.
+
+Exposes the following functions:
+
+`login` Logs in the user.
+
+`logout` Logs out the user.
+
+```ts
+login(fields?: {
+  email: string
+  password: string
+}): Promise<{
+  error?: {
+    code?: number
+    message: string
+    extraData?: any
+  }
+
+  data?: {
+    customerId: string
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    streetAddress: string
+    zipCode: string
+    countryId: string
+    company?: string
+    state: string
+    stateId: string
+    city: string
+  }
+}>
+
+logout(): Promise<void>
+```
+
+
+# Utils
+
+`deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 

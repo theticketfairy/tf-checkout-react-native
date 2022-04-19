@@ -17,6 +17,7 @@ import {
 } from '../../components/waitingList/types'
 import {
   IEvent,
+  IOnFetchTicketsSuccess,
   ISelectedTicket,
   ITicket,
   ITicketsResponseData,
@@ -25,7 +26,6 @@ import { IError } from '../../types/IError'
 import { ITicketListItemStyles, ITicketListItemTexts } from './components/types'
 
 export interface ITicketsViewProps {
-  eventId: number
   isGettingTickets?: boolean
   isBookingTickets?: boolean
   isGettingEvent?: boolean
@@ -34,7 +34,7 @@ export interface ITicketsViewProps {
   onPressGetTickets: () => void
   onPressApplyPromoCode: (promoCode: string) => void
   promoCodeValidationMessage?: string
-  isPromoCodeValid?: boolean
+  isPromoCodeValid?: boolean | number
   onSelectTicketOption: (selectedTicket: ISelectedTicket) => void
   selectedTicket?: ISelectedTicket
   texts?: ITicketsViewTexts
@@ -86,19 +86,7 @@ export interface ITicketsViewTexts {
   waitingList?: IWaitingListTexts
 }
 
-export interface IOnFetchTicketsSuccess {
-  tickets: ITicket[]
-  promoCodeResponse: {
-    success?: boolean
-    message?: string
-  }
-  isInWaitingList: boolean
-  isAccessCodeRequired: boolean
-}
-
 export interface ITicketsProps {
-  eventId: number
-
   // Callbacks for when user taps on GET Tickets button
   onAddToCartSuccess: (data: ITicketsResponseData) => void
   onAddToCartError?: (error: IError) => void
@@ -108,7 +96,7 @@ export interface ITicketsProps {
   onFetchTicketsError?: (error: IError) => void
 
   // Callbacks for fetching the Event
-  onFetchEventError?: (error: string) => void
+  onFetchEventError?: (error: IError) => void
   onFetchEventSuccess?: (data: IEventData) => void
 
   // Callbacks for Waiting list

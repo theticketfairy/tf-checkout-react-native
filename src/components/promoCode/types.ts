@@ -40,7 +40,7 @@ export interface IPromoCodeTexts {
 export interface IPromoCodeProps {
   onPressApply: (promoCode: string) => void
   promoCodeValidationMessage?: string
-  isPromoCodeValid?: boolean
+  isPromoCodeValid?: boolean | number
   styles?: IPromoCodeStyles
   texts?: IPromoCodeTexts
   isAccessCodeEnabled?: boolean

@@ -1,5 +1,3 @@
-import { AxiosError } from 'axios'
-
 import { IDropdownItem } from '../components/dropdown/types'
 import { IError } from './IError'
 
@@ -56,7 +54,17 @@ export interface ITicketsResponseData {
   isNameRequired?: boolean
 }
 
-export interface ITicketsResponsePayload {
+export interface IAddToCartResponse {
   error?: IError
   data?: ITicketsResponseData
+}
+
+export interface IOnFetchTicketsSuccess {
+  tickets: ITicket[]
+  promoCodeResponse: {
+    success?: boolean
+    message?: string
+  }
+  isInWaitingList?: boolean
+  isAccessCodeRequired?: boolean
 }

@@ -1,22 +1,14 @@
-//@ts-nocheck
 import Clipboard from '@react-native-clipboard/clipboard'
 import _map from 'lodash/map'
 import React, { FC } from 'react'
-import {
-  Image,
-  SectionList,
-  SectionListProps,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Image, SectionList, Text, TouchableOpacity, View } from 'react-native'
 
-import { IMyOrderDetailsTicket } from '../../api/types'
+import { IMyOrderDetailsItem, IMyOrderDetailsTicket } from '../../api/types'
 import { Button } from '../../components'
 import R from '../../res'
 import Notification from './components/Notification'
 import s from './styles'
-import { IMyOrderDetailsView } from './types'
+import { IMyOrderDetailsView, IOrderDetailsSectionData } from './types'
 
 const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
   data: { header, items, tickets },
@@ -109,7 +101,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
     </View>
   )
 
-  const parsedItems = _map(items, (item) => {
+  const parsedItems: IOrderDetailsSectionData[] = _map(items, (item) => {
     return {
       id: `${item.name}.${item.price}`,
       item: item,
@@ -123,22 +115,22 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
     }
   })
 
-  const itemsData: SectionListProps = [
+  const itemsData = [
     {
       title: texts?.listItem?.title || 'Items',
       data: parsedItems,
-      renderItem: ({ item }) => renderItemComp(item),
+      renderItem: ({ item }: any) => renderItemComp(item),
       id: 0,
     },
     {
       title: ticketsTitle,
       data: parsedTickets,
-      renderItem: ({ item }) => renderTicketComp(item),
+      renderItem: ({ item }: any) => renderTicketComp(item),
       id: 1,
     },
   ]
 
-  const renderItemComp = ({ item }) => (
+  const renderItemComp = ({ item }: { item: IMyOrderDetailsItem }) => (
     <View style={[s.listItemContainer, styles?.listItem?.container]}>
       <View style={styles?.listItem?.innerLeftContainer}>
         <Text style={styles?.listItem?.rowPlaceholder}>
@@ -216,7 +208,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
               },
               ...styles?.downloadButton,
             }}
-            onPress={() => onPressTicketDownload(item.pdfLink, item.hash)}
+            onPress={() => onPressTicketDownload(item.pdfLink!, item.hash)}
           />
         )}
       </View>
@@ -227,6 +219,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
     <View style={[s.rootContainer, styles?.rootContainer]}>
       <SectionList
         ListHeaderComponent={renderHeader}
+        //@ts-ignore
         sections={[...itemsData]}
         renderSectionHeader={({ section }) => (
           <Text style={styles?.sectionHeader}>{section.title}</Text>
