@@ -10,6 +10,7 @@ import {
   MyOrderDetails,
   MyOrders,
   PurchaseConfirmation,
+  ResaleTickets,
   Tickets,
 } from './containers'
 import {
@@ -66,6 +67,7 @@ export {
   PurchaseConfirmation,
   PurchaseConfirmationCore,
   PurchaseConfirmationCoreHandle,
+  ResaleTickets,
   setConfig,
   SkippingStatusType,
   Tickets,

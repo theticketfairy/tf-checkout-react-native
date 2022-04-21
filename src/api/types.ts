@@ -230,7 +230,7 @@ export interface IMyOrderDetailsTicket {
   holderName: string
   holderPhone?: string
   isOnSale: boolean
-  isSellable: true
+  isSellable: boolean
   pdfLink: string
   qrData: string
   resaleFeeAmount: number
@@ -319,4 +319,22 @@ export interface IPurchaseConfirmationData {
 export interface IPurchaseConfirmationResponse {
   purchaseConfirmationError?: IError
   purchaseConfirmationData?: IPurchaseConfirmationData
+}
+
+export interface IResaleTicketData {
+  message: string
+}
+
+export interface IResaleTicketResponse {
+  resaleTicketError?: IError
+  resaleTicketData?: IResaleTicketData
+}
+
+export interface IRemoveTicketFromResaleData {
+  message: string
+}
+
+export interface IRemoveTicketFromResaleResponse {
+  removeTicketFromResaleError?: IError
+  removeTicketFromResaleData?: IRemoveTicketFromResaleData
 }

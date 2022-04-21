@@ -4,13 +4,13 @@ import React, { FC } from 'react'
 import { Image, SectionList, Text, TouchableOpacity, View } from 'react-native'
 
 import { IMyOrderDetailsItem, IMyOrderDetailsTicket } from '../../api/types'
-import { Button } from '../../components'
+import { Button, Loading } from '../../components'
 import R from '../../res'
 import Notification from './components/Notification'
 import s from './styles'
-import { IMyOrderDetailsView, IOrderDetailsSectionData } from './types'
+import { IMyOrderDetailsViewProps, IOrderDetailsSectionData } from './types'
 
-const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
+const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
   data: { header, items, tickets },
   styles,
   texts,
@@ -18,7 +18,10 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
   onPressCopyLink,
   onPressTicketDownload,
   downloadStatus,
+  onPressResaleTicket,
+  onPressRemoveTicketFromResale,
   config,
+  isLoading,
 }) => {
   //#region Handlers
   const onCopyLinkHandler = () => {
@@ -27,6 +30,16 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
     }
     Clipboard.setString(header.shareLink)
     onPressCopyLink()
+  }
+
+  const handleOnPressSellTicket = (ticket: IMyOrderDetailsTicket) => {
+    onPressResaleTicket(ticket)
+  }
+
+  const handleOnPressRemoveFromResale = async (
+    ticket: IMyOrderDetailsTicket
+  ) => {
+    onPressRemoveTicketFromResale(ticket)
   }
   //#endregion
 
@@ -165,53 +178,81 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
   )
 
   const renderTicketComp = ({ item }: { item: IMyOrderDetailsTicket }) => (
-    <View style={[s.ticketItemContainer, styles?.ticketItem?.container]}>
-      <View style={styles?.ticketItem?.innerLeftContainer}>
-        <View style={s.rowContainer}>
-          <Text style={styles?.ticketItem?.rowPlaceholder}>{ticketsId}</Text>
-          <Text style={styles?.ticketItem?.rowValue}>{item.hash}</Text>
+    <View>
+      <View style={[s.ticketItemContainer, styles?.ticketItem?.container]}>
+        <View style={styles?.ticketItem?.innerLeftContainer}>
+          <View style={s.rowContainer}>
+            <Text style={styles?.ticketItem?.rowPlaceholder}>{ticketsId}</Text>
+            <Text style={styles?.ticketItem?.rowValue}>{item.hash}</Text>
+          </View>
+          <View style={s.rowContainer}>
+            <Text style={styles?.ticketItem?.rowPlaceholder}>
+              {ticketsType}
+            </Text>
+            <Text style={styles?.ticketItem?.rowValue}>{item.ticketType}</Text>
+          </View>
+          <View style={s.rowContainer}>
+            <Text style={styles?.ticketItem?.rowPlaceholder}>
+              {ticketsHolderName}
+            </Text>
+            <Text style={styles?.ticketItem?.rowValue}>{item.holderName}</Text>
+          </View>
         </View>
-        <View style={s.rowContainer}>
-          <Text style={styles?.ticketItem?.rowPlaceholder}>{ticketsType}</Text>
-          <Text style={styles?.ticketItem?.rowValue}>{item.ticketType}</Text>
-        </View>
-        <View style={s.rowContainer}>
+
+        <View
+          style={[
+            s.ticketItemInnerRightContainer,
+            styles?.ticketItem?.innerRightContainer,
+          ]}
+        >
           <Text style={styles?.ticketItem?.rowPlaceholder}>
-            {ticketsHolderName}
+            {ticketsStatus}
+            <Text style={styles?.ticketItem?.rowValue}>{item.status}</Text>
           </Text>
-          <Text style={styles?.ticketItem?.rowValue}>{item.holderName}</Text>
+
+          {item.pdfLink && (
+            <Button
+              isLoading={downloadStatus === 'downloading'}
+              text={ticketsDownload}
+              styles={{
+                text: {
+                  fontSize: 12,
+                },
+                button: {
+                  height: 30,
+                  marginVertical: 8,
+                },
+                ...styles?.downloadButton,
+              }}
+              onPress={() => onPressTicketDownload(item.pdfLink!, item.hash)}
+            />
+          )}
         </View>
       </View>
-
-      <View
-        style={[
-          s.ticketItemInnerRightContainer,
-          styles?.ticketItem?.innerRightContainer,
-        ]}
-      >
-        <Text style={styles?.ticketItem?.rowPlaceholder}>
-          {ticketsStatus}
-          <Text style={styles?.ticketItem?.rowValue}>{item.status}</Text>
-        </Text>
-
-        {item.pdfLink && (
-          <Button
-            isLoading={downloadStatus === 'downloading'}
-            text={ticketsDownload}
-            styles={{
-              text: {
-                fontSize: 12,
-              },
-              button: {
-                height: 30,
-                marginVertical: 8,
-              },
-              ...styles?.downloadButton,
-            }}
-            onPress={() => onPressTicketDownload(item.pdfLink!, item.hash)}
-          />
-        )}
-      </View>
+      {item.isSellable && !item.isOnSale && (
+        <Button
+          onPress={() => handleOnPressSellTicket(item)}
+          text={'Sell Ticket'}
+          // styles={{
+          //   container: s.resaleButtonContainer,
+          //   button: s.resaleButton,
+          //   text: s.resaleButtonText,
+          //   ...styles?.resaleButton,
+          // }}
+        />
+      )}
+      {!item.isSellable && item.isOnSale && (
+        <Button
+          onPress={() => handleOnPressRemoveFromResale(item)}
+          text={'Remove from Resale'}
+          // styles={{
+          //   container: s.resaleButtonContainer,
+          //   button: s.resaleButton,
+          //   text: s.resaleButtonText,
+          //   ...styles?.resaleButton,
+          // }}
+        />
+      )}
     </View>
   )
 
@@ -251,6 +292,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsView> = ({
             textError={texts?.downloadNotification?.errorMessage}
           />
         )}
+      {isLoading && <Loading />}
     </View>
   )
 }

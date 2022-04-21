@@ -13,10 +13,9 @@ import {
   setConfig,
   ITicketsResponseData,
   SkippingStatusType,
+  ResaleTickets,
 } from 'tf-checkout-react-native'
-import { Button } from '../../src/components'
-import { deleteAllData } from '../../src/helpers/LocalStorage'
-
+import { IMyOrderDetailsTicket } from '../../src/api/types'
 import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles from './styles'
@@ -53,8 +52,18 @@ const App = () => {
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false)
   const [selectedOrderDetails, setSelectedOrderDetails] =
     useState<IMyOrderDetailsData>()
+
+  const [ticketToSell, setTicketToSell] = useState<
+    undefined | IMyOrderDetailsTicket
+  >(undefined)
   
   //#region Handlers
+  const handleOnPressSellTicket = (ticket: IMyOrderDetailsTicket) => {
+    setTicketToSell(ticket)
+    setComponentToShow(ComponentEnum.ResaleTickets)
+  }
+
+
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
     setCartProps(data)
   }
@@ -89,6 +98,10 @@ const App = () => {
 
   const handleOnDismissMyOrders = () => {
     setComponentToShow(ComponentEnum.Tickets)
+  }
+
+  const handleOnDismissResaleTickets = () => {
+    setComponentToShow(ComponentEnum.MyOrderDetails)
   }
 
   const handleStripeError = () => {
@@ -768,11 +781,152 @@ const App = () => {
                   soFar: '_SO FAR_',
                   tickets: '_TICKETS_'
                 }
-
               }}
+              onPressResaleTicket={handleOnPressSellTicket} onRemoveTicketFromResaleSuccess={(message) => {
+                console.log('onRemoveTicketFromResaleSuccess', message)
+              }} 
+                         
             />
             <TouchableOpacity
               onPress={handleGoBackFromOrderDetails}
+              style={{
+                backgroundColor: Color.blueGray,
+                height: 40,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Text>Back</Text>
+            </TouchableOpacity>
+          </View>
+        )
+
+        case ComponentEnum.ResaleTickets:
+        return (
+          <View style={{flex: 1}}>
+          <ResaleTickets
+            texts={{
+              title: '_Resale Tickets_',
+            }}
+            ticket={ticketToSell!}
+            styles={{
+              title: {
+                color: Color.textMain,
+                fontSize: 20,
+                fontWeight: '700',
+                marginLeft: 16,
+              },
+              ticketOrderDetails: {
+                rootContainer: {
+                  marginVertical: 16,
+                  paddingHorizontal: 16,
+                },
+                title: {
+                  color: Color.textMain,
+                  fontSize: 18,
+                },
+                label: {
+                  color: Color.textMainOff,
+                },
+                value: {
+                  color: Color.textMain,
+                },
+              },
+              termsCheckbox: {
+                text: {
+                  color: Color.textMain,
+                },
+                indicator: {
+                  backgroundColor: Color.validationGreen,
+                },
+                indicatorDisabled: {
+                  borderColor: Color.white
+                }
+              },
+              ticketBuyerForm: {
+                rootContainer: {
+                  paddingHorizontal: 16,
+                  marginBottom: 16,
+                },
+                inputs: {
+                  baseColor: Color.textMain,
+                  input: {
+                    color: Color.textMain,
+                  },
+                  errorColor: Color.danger,
+                },
+                radioButtons: {
+                  rootContainer: {
+                    marginVertical: 8,
+                  },
+                  indicator: {
+                    backgroundColor: Color.textMain,
+                  },
+                  radio: {
+                    borderColor: Color.textMainOff,
+                  },
+                  text: {
+                    color: Color.textMain,
+                  },
+                },
+                title: {
+                  fontSize: 20,
+                  fontWeight: '700',
+                  marginBottom: 16,
+                  color: Color.textMain,
+                },
+                formContainer: {
+                  marginVertical: 16,
+                },
+              },
+              resaleTicketsButton: {
+                button: {
+                  backgroundColor: Color.primary,
+                  width: '70%',
+                  borderRadius: 2,
+                },
+              },
+              resaleTicketsButtonDisabled: {
+                button: {
+                  backgroundColor: Color.gray20,
+                  width: '70%',
+                  borderRadius: 2,
+                },
+              },
+              terms: {
+                rootContainer: {
+                  paddingHorizontal: 16,
+                },
+                title: {
+                  color: Color.textMain,
+                  fontSize: 20,
+                  fontWeight: '700',
+                  marginBottom: 16,
+                },
+                item: {
+                  color: Color.textMain,
+                },
+                itemBold: {
+                  fontWeight: '900',
+                },
+              },
+            }}
+            onResaleTicketsSuccess={(resaleTicketData, ticket) => {
+              const newOrderDetails: IMyOrderDetailsData = {...selectedOrderDetails!}
+             _.forEach(newOrderDetails.tickets, (itm) => {
+                if (itm.hash === ticket.hash) {
+                  itm.isOnSale = true
+                  itm.isSellable = false  
+                }
+              })
+              
+              setSelectedOrderDetails(newOrderDetails)
+              setComponentToShow(ComponentEnum.MyOrderDetails)
+              }}
+            
+          />
+            <TouchableOpacity
+              onPress={handleOnDismissResaleTickets}
               style={{
                 backgroundColor: Color.blueGray,
                 height: 40,

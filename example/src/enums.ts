@@ -5,4 +5,5 @@ export enum ComponentEnum {
   PurchaseConfirmation,
   MyOrders,
   MyOrderDetails,
+  ResaleTickets
 }

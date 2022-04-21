@@ -44,6 +44,9 @@ export interface IMyOrdersProps {
   onFetchOrderDetailsSuccess?: () => void
   onFetchOrderDetailsError?: (error: IError) => void
 
+  onRemoveTicketFromResaleSuccess?: (orderHash: string) => void
+  onRemoveTicketFromResaleError?: (orderHash: string) => void
+
   onLoadingChange?: (isLoading: boolean) => void
 
   styles?: IMyOrdersStyles

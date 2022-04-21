@@ -47,6 +47,10 @@ import {
   IPurchaseConfirmationData,
   IPurchaseConfirmationResponse,
   IRegisterNewUserResponse,
+  IRemoveTicketFromResaleData,
+  IRemoveTicketFromResaleResponse,
+  IResaleTicketData,
+  IResaleTicketResponse,
   IStatesResponse,
   IUserProfileResponse,
 } from './types'
@@ -850,6 +854,60 @@ export const fetchPurchaseConfirmation = async (
   return {
     purchaseConfirmationError: responseError,
     purchaseConfirmationData: data,
+  }
+}
+//#endregion
+
+//#region Resale Tickets
+export const resaleTicket = async (
+  data: FormData,
+  orderHash: string
+): Promise<IResaleTicketResponse> => {
+  let responseError: IError | undefined
+  let responseData: IResaleTicketData | undefined
+
+  const response = await Client.post(`v1/ticket/${orderHash}/sell`, data).catch(
+    (error: AxiosError) => {
+      responseError = {
+        message: error.response?.data.message || 'Error while re-sale ticket',
+      }
+    }
+  )
+
+  if (response?.data && response.data.status) {
+    responseData = {
+      message: response.data.message,
+    }
+  }
+
+  return {
+    resaleTicketData: responseData,
+    resaleTicketError: responseError,
+  }
+}
+
+export const removeTicketFromResale = async (
+  orderHash: string
+): Promise<IRemoveTicketFromResaleResponse> => {
+  let responseError: IError | undefined
+  let responseData: IRemoveTicketFromResaleData | undefined
+
+  const response = await Client.delete(`v1/ticket/${orderHash}/sell`).catch(
+    (error: AxiosError) => {
+      responseError =
+        error.response?.data.message || 'Error removing ticket from resale'
+    }
+  )
+
+  if (response?.data.message && response.data.status === 200) {
+    responseData = {
+      message: response.data.message,
+    }
+  }
+
+  return {
+    removeTicketFromResaleData: responseData,
+    removeTicketFromResaleError: responseError,
   }
 }
 //#endregion
