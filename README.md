@@ -95,13 +95,13 @@ Set appropriate style in your styles.xml file.
 
 Import the function from the library.
 
-```js
+```ts
 import { setConfig } from 'tf-checkout-react-native'
 ```
 
 Use it in your initial useEffect function:
 
-```js
+```ts
 useEffect(() => {
   setConfig({
     EVENT_ID: '4344',
@@ -112,7 +112,7 @@ useEffect(() => {
 
 `setConfig` set your event's configuration, with the following options:
 
-````js
+````ts
 {
   EVENT_ID: string,
   DOMAIN?: string,
@@ -182,9 +182,13 @@ Will show the purchased orders for the logged user.
 
 Will show the details for the selected Order, it also allows the user to download the Ticket PDF.
 
+### Tickets Resale
+
+Let the user to resale their tickets. They can choose between selling them to a friend or to any other user.
+
 # Component styling
 ### Button
-```js
+```ts
 interface IButtonStyles {
   container?: StyleProp<ViewStyle>
   button?: StyleProp<ViewStyle>
@@ -192,7 +196,7 @@ interface IButtonStyles {
 }
 ```
 ### Input
-```js
+```ts
 interface IInputStyles {
   color?: ColorValue
   container?: StyleProp<ViewStyle>
@@ -203,6 +207,22 @@ interface IInputStyles {
   errorColor?: ColorValue
 }
 ```
+
+### Checkbox
+
+```ts
+interface ICheckboxStyles {
+  container?: StyleProp<ViewStyle>
+  content?: StyleProp<ViewStyle>
+  indicator?: StyleProp<ViewStyle>
+  indicatorDisabled?: StyleProp<ViewStyle>
+  text?: StyleProp<TextStyle>
+  box?: StyleProp<ViewStyle>
+  icon?: StyleProp<ImageStyle>
+}
+```
+
+
 # Exported components
 Depending on your needs, you can use the UI Components or the Core Components.
 
@@ -211,17 +231,35 @@ Depending on your needs, you can use the UI Components or the Core Components.
 [Core Components](#core-components) are wrappers that don't include any UI neither validation logics, they only act as a Middleware to retrieve and send data from the server and return it to your implementation components. They are useful when your design cannot be achieved by the UI components. You will need to use references to access their exposed functions.
 
 # UI Components
-## Login
+
+[Login](#login-ui)
+
+[Tickets](#tickets-ui)
+
+[BillingInfo](#billinginfo-ui)
+
+[Checkout](#checkout-ui)
+
+[Purchase Confirmation](#purchase-confirmation-ui)
+
+[My Orders](#my-orders-ui)
+
+[My Order Details](#myorder-details-ui)
+
+[Resale](#resale-tickets-ui)
+
+---
+## Login UI
 
 Import the component from the library
 
-```js
+```tsx
 import { Login } from 'tf-checkout-react-native'
 ```
 
 Then add it to the render function.
 
-```js
+```tsx
 <Login
   onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
   onLoginError?: (error: IError) => void
@@ -339,7 +377,7 @@ interface ILoginViewStyles {
 
 ```
 ---
-## Tickets
+## Tickets UI 
 
 Import the component from the library
 
@@ -550,7 +588,7 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 }
 ```
 ---
-## BillingInfo
+## BillingInfo UI
 
 Import the component from the library
 
@@ -737,7 +775,7 @@ interface IBillingInfoViewStyles {
 ```
 ---
 
-## Checkout
+## Checkout UI
 
 Import the component from the library
 
@@ -859,7 +897,7 @@ Currently, Stripe card is not customizable. Please see the open issues in their 
 Additionally, if you are encountering problems with building your project, please take a look at the [Stripe troubleshooting](https://github.com/stripe/stripe-react-native#troubleshooting).
 
 ---
-## Purchase Confirmation
+## Purchase Confirmation UI
 
 Import the component from the library
 
@@ -910,7 +948,7 @@ Add it to the render function.
 
 
 ---
-## My Orders
+## My Orders UI
 If there is a valid session, there will appear a button to access `MyOrders` in the `Tickets` component.
 
 Import the component from the library.
@@ -1033,7 +1071,7 @@ import { MyOrders } from 'tf-checkout-react-native'
 
 ---
 
-## MyOrder Details
+## MyOrder Details UI
 
 When user selects an order from the `MyOrders` component, will show it details.
 
@@ -1142,6 +1180,116 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
 }
 ```
 
+## Resale Tickets UI
+
+Allows the user to resale the tickets they bought. They can decide wether sell it to a friend or to any other user.
+
+
+Import the component from the library.
+
+```js
+import { ResaleTickets } from 'tf-checkout-react-native'
+```
+
+### Props
+
+```ts
+{
+  ticket: {
+    currency: string
+    description: string
+    descriptionPlain?: string
+    eventName: string
+    hash: string
+    holderEmail?: string
+    holderName: string
+    holderPhone?: string
+    isOnSale: boolean
+    isSellable: boolean
+    pdfLink: string
+    qrData: string
+    resaleFeeAmount: number
+    status: string
+    ticketType: string
+  }
+  styles?: {
+    rootContainer?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+    terms?: IResaleTermsStyles
+    resaleTicketsButton?: IButtonStyles
+    resaleTicketsButtonDisabled?: IButtonStyles
+    resaleTicketsButtonLoading?: IButtonStyles
+    ticketOrderDetails?: ITicketOrderDetailsStyles
+    ticketBuyerForm?: ITicketBuyerFormStyles
+    termsCheckbox?: ICheckboxStyles
+  }
+  onResaleTicketsSuccess: (
+    resaleTicketData: {
+      message: string
+    },
+    ticket: {
+      currency: string
+      description: string
+      descriptionPlain?: string
+      eventName: string
+      hash: string
+      holderEmail?: string
+      holderName: string
+      holderPhone?: string
+      isOnSale: boolean
+      isSellable: boolean
+      pdfLink: string
+      qrData: string
+      resaleFeeAmount: number
+      status: string
+      ticketType: string
+    }
+  ) => void
+  onResaleTicketsError?: (error: {
+    code?: number
+    message: string
+    extraData?: any
+  }) => void
+  config?: {
+    areAlertsEnabled?: boolean
+    areActivityIndicatorsEnabled?: boolean
+  }
+  texts?: {
+    title?: string
+    orderDetails?: {
+      title?: string
+      eventName?: string
+      orderedBy?: string
+      orderId?: string
+    }
+    sellToWhom?: {
+      title?: string
+      friend?: string
+      anyone?: string
+    }
+    friendForm?: {
+      firstName?: string
+      lastName?: string
+      email?: string
+      emailConfirm?: string
+    }
+    terms?: {
+      title?: string
+      paragraph1?: string
+      paragraph2_1?: string
+      paragraph2_2?: string
+      paragraph3_1?: string
+      paragraph3_2?: string
+    }
+    agree?: string
+    resaleTicketsButton?: string
+  }
+}
+```
+
+
+
+
 # Core Components
 **⚠️ Remember that you first need to set your configuration using the [setConfig](#set-your-configuration)
  function. ⚠️**
@@ -1159,6 +1307,8 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
 [PurchaseConfirmationCore](#purchaseconfirmationcore)
 
 [MyOrdersCore](#myorderscore)
+
+[OrderDetailsCore](#orderdetailscore)
 
 [LoginCore](#logincore)
  
@@ -1815,6 +1965,74 @@ getOrderDetails(orderId: string): Promise<{
     }[]
   }
 }>
+```
+
+## OrderDetailsCore
+Allows to re-sale the tickets or to remove them from the re-sale system.
+
+Import it from the library.
+```ts
+import { OrderDetailsCore, OrderDetailsCoreHandle } from 'tf-checkout-react-native';
+```
+
+Create a ref
+
+```ts
+const myOrderDetailsCoreRef = useRef<OrderDetailsCoreHandle>(null)
+```
+
+Assign the ref to the wrapper component.
+
+```tsx
+ <OrderDetailsCore ref={myOrderDetailsCoreRef}>
+```
+
+Access the exposed function through the current value.
+```ts
+await myOrderDetailsCoreRef.current.removeTicketFromResale(ticket.hash)
+```
+
+
+```ts
+resaleTicket(
+/*  
+    formData.append('to', toWhom)
+    formData.append('first_name', firstName)
+    formData.append('last_name', lastName)
+    formData.append('email', email)
+    formData.append('confirm_email', emailConfirm)
+    formData.append('confirm', String(isTermsAgreed)) 
+*/
+
+    data: FormData,
+    orderHash: string
+  ): Promise<{
+    {
+      resaleTicketError?: {
+        code?: number
+        message: string
+        extraData?: any
+      }
+      resaleTicketData?: {
+        message: string
+      }
+    }
+  }>
+```
+
+```ts
+  removeTicketFromResale(
+    orderHash: string
+  ): Promise<{
+      removeTicketFromResaleError?: {
+        code?: number
+        message: string
+        extraData?: any
+      }
+      removeTicketFromResaleData?: {
+        message: string
+      }
+  }>
 ```
 
 ## LoginCore
