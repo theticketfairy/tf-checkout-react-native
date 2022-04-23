@@ -249,7 +249,7 @@ export interface IMyOrderDetailsHeader {
 
 export interface IMyOrderDetailsData {
   header: IMyOrderDetailsHeader
-  items: IMyOrderDetailsItem[]
+  items?: IMyOrderDetailsItem[]
   tickets: IMyOrderDetailsTicket[]
 }
 

@@ -354,9 +354,10 @@ export const fetchOrderDetails = async (
 
   if (!responseError && response) {
     const { attributes } = response.data.data
-    const items: IMyOrderDetailsItem[] = _map(
-      attributes.items.ticket_types,
-      (item) => {
+    let items: IMyOrderDetailsItem[] | undefined
+
+    if (attributes.items?.ticket_types) {
+      items = _map(attributes.items.ticket_types, (item) => {
         return {
           name: item.name,
           currency: item.currency,
@@ -367,8 +368,8 @@ export const fetchOrderDetails = async (
           isActive: item.active,
           hash: item.hash,
         }
-      }
-    )
+      })
+    }
 
     const tickets: IMyOrderDetailsTicket[] = _map(
       attributes.tickets,

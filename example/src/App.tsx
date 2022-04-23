@@ -838,6 +838,9 @@ const App = () => {
                   },
                 },
                 termsCheckbox: {
+                  container: {
+                    marginTop: 16
+                  },
                   text: {
                     color: Color.textMain,
                   },
@@ -890,8 +893,14 @@ const App = () => {
                     width: '70%',
                     borderRadius: 2,
                   },
+                  container: {
+                    marginBottom: 32
+                  },
                 },
                 resaleTicketsButtonDisabled: {
+                  container: {
+                    marginBottom: 32
+                  },
                   button: {
                     backgroundColor: Color.gray20,
                     width: '70%',
@@ -900,6 +909,7 @@ const App = () => {
                 },
                 terms: {
                   rootContainer: {
+                    marginTop: 16,
                     paddingHorizontal: 16,
                   },
                   title: {
@@ -915,6 +925,8 @@ const App = () => {
                     fontWeight: '900',
                   },
                 },
+               
+                
               }}
               onResaleTicketsSuccess={(resaleTicketData, ticket) => {
                 const newOrderDetails: IMyOrderDetailsData = { ...selectedOrderDetails! }
