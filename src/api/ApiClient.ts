@@ -341,6 +341,7 @@ export const fetchOrderDetails = async (
 ): Promise<IMyOrderDetailsResponse> => {
   let responseError: IError | undefined
   let responseData: IMyOrderDetailsData | undefined
+
   const response = await Client.get(`/v1/account/order/${orderId}`).catch(
     (error: AxiosError) => {
       responseError = {
@@ -364,6 +365,7 @@ export const fetchOrderDetails = async (
           quantity: item.quantity,
           total: item.total,
           isActive: item.active,
+          hash: item.hash,
         }
       }
     )
@@ -387,6 +389,7 @@ export const fetchOrderDetails = async (
           eventName: item.event_name,
           isOnSale: item.is_on_sale,
           resaleFeeAmount: item.resale_fee_amount,
+          ticketTypeHash: item.ticket_type_hash,
         }
       }
     )

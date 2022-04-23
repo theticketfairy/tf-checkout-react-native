@@ -56,10 +56,15 @@ const App = () => {
   const [ticketToSell, setTicketToSell] = useState<
     undefined | IMyOrderDetailsTicket
   >(undefined)
+
+  const [isTicketToSellActive, setIsTicketToSellActive] = useState<
+    boolean | undefined
+  >(undefined)
   
   //#region Handlers
-  const handleOnPressSellTicket = (ticket: IMyOrderDetailsTicket) => {
+  const handleOnPressSellTicket = (ticket: IMyOrderDetailsTicket, isActive: boolean) => {
     setTicketToSell(ticket)
+    setIsTicketToSellActive(isActive)
     setComponentToShow(ComponentEnum.ResaleTickets)
   }
 
@@ -805,125 +810,125 @@ const App = () => {
         return (
           <View style={{flex: 1}}>
           <ResaleTickets
-            texts={{
-              title: '_Resale Tickets_',
-            }}
-            ticket={ticketToSell!}
-            styles={{
-              title: {
-                color: Color.textMain,
-                fontSize: 20,
-                fontWeight: '700',
-                marginLeft: 16,
-              },
-              ticketOrderDetails: {
-                rootContainer: {
-                  marginVertical: 16,
-                  paddingHorizontal: 16,
-                },
+              texts={{
+                title: '_Resale Tickets_',
+              }}
+              ticket={ticketToSell!}
+              styles={{
                 title: {
                   color: Color.textMain,
-                  fontSize: 18,
+                  fontSize: 20,
+                  fontWeight: '700',
+                  marginLeft: 16,
                 },
-                label: {
-                  color: Color.textMainOff,
-                },
-                value: {
-                  color: Color.textMain,
-                },
-              },
-              termsCheckbox: {
-                text: {
-                  color: Color.textMain,
-                },
-                indicator: {
-                  backgroundColor: Color.validationGreen,
-                },
-                indicatorDisabled: {
-                  borderColor: Color.white
-                }
-              },
-              ticketBuyerForm: {
-                rootContainer: {
-                  paddingHorizontal: 16,
-                  marginBottom: 16,
-                },
-                inputs: {
-                  baseColor: Color.textMain,
-                  input: {
+                ticketOrderDetails: {
+                  rootContainer: {
+                    marginVertical: 16,
+                    paddingHorizontal: 16,
+                  },
+                  title: {
+                    color: Color.textMain,
+                    fontSize: 18,
+                  },
+                  label: {
+                    color: Color.textMainOff,
+                  },
+                  value: {
                     color: Color.textMain,
                   },
-                  errorColor: Color.danger,
                 },
-                radioButtons: {
-                  rootContainer: {
-                    marginVertical: 8,
-                  },
-                  indicator: {
-                    backgroundColor: Color.textMain,
-                  },
-                  radio: {
-                    borderColor: Color.textMainOff,
-                  },
+                termsCheckbox: {
                   text: {
                     color: Color.textMain,
                   },
+                  indicator: {
+                    backgroundColor: Color.validationGreen,
+                  },
+                  indicatorDisabled: {
+                    borderColor: Color.white
+                  }
                 },
-                title: {
-                  fontSize: 20,
-                  fontWeight: '700',
-                  marginBottom: 16,
-                  color: Color.textMain,
+                ticketBuyerForm: {
+                  rootContainer: {
+                    paddingHorizontal: 16,
+                    marginBottom: 16,
+                  },
+                  inputs: {
+                    baseColor: Color.textMain,
+                    input: {
+                      color: Color.textMain,
+                    },
+                    errorColor: Color.danger,
+                  },
+                  radioButtons: {
+                    rootContainer: {
+                      marginVertical: 8,
+                    },
+                    indicator: {
+                      backgroundColor: Color.textMain,
+                    },
+                    radio: {
+                      borderColor: Color.textMainOff,
+                    },
+                    text: {
+                      color: Color.textMain,
+                    },
+                  },
+                  title: {
+                    fontSize: 20,
+                    fontWeight: '700',
+                    marginBottom: 16,
+                    color: Color.textMain,
+                  },
+                  formContainer: {
+                    marginVertical: 16,
+                  },
                 },
-                formContainer: {
-                  marginVertical: 16,
+                resaleTicketsButton: {
+                  button: {
+                    backgroundColor: Color.primary,
+                    width: '70%',
+                    borderRadius: 2,
+                  },
                 },
-              },
-              resaleTicketsButton: {
-                button: {
-                  backgroundColor: Color.primary,
-                  width: '70%',
-                  borderRadius: 2,
+                resaleTicketsButtonDisabled: {
+                  button: {
+                    backgroundColor: Color.gray20,
+                    width: '70%',
+                    borderRadius: 2,
+                  },
                 },
-              },
-              resaleTicketsButtonDisabled: {
-                button: {
-                  backgroundColor: Color.gray20,
-                  width: '70%',
-                  borderRadius: 2,
+                terms: {
+                  rootContainer: {
+                    paddingHorizontal: 16,
+                  },
+                  title: {
+                    color: Color.textMain,
+                    fontSize: 20,
+                    fontWeight: '700',
+                    marginBottom: 16,
+                  },
+                  item: {
+                    color: Color.textMain,
+                  },
+                  itemBold: {
+                    fontWeight: '900',
+                  },
                 },
-              },
-              terms: {
-                rootContainer: {
-                  paddingHorizontal: 16,
-                },
-                title: {
-                  color: Color.textMain,
-                  fontSize: 20,
-                  fontWeight: '700',
-                  marginBottom: 16,
-                },
-                item: {
-                  color: Color.textMain,
-                },
-                itemBold: {
-                  fontWeight: '900',
-                },
-              },
-            }}
-            onResaleTicketsSuccess={(resaleTicketData, ticket) => {
-              const newOrderDetails: IMyOrderDetailsData = {...selectedOrderDetails!}
-             _.forEach(newOrderDetails.tickets, (itm) => {
-                if (itm.hash === ticket.hash) {
-                  itm.isOnSale = true
-                  itm.isSellable = false  
-                }
-              })
-              
-              setSelectedOrderDetails(newOrderDetails)
-              setComponentToShow(ComponentEnum.MyOrderDetails)
               }}
-            
+              onResaleTicketsSuccess={(resaleTicketData, ticket) => {
+                const newOrderDetails: IMyOrderDetailsData = { ...selectedOrderDetails! }
+                _.forEach(newOrderDetails.tickets, (itm) => {
+                  if (itm.hash === ticket.hash) {
+                    itm.isOnSale = true
+                    itm.isSellable = false
+                  }
+                })
+
+                setSelectedOrderDetails(newOrderDetails)
+                setComponentToShow(ComponentEnum.MyOrderDetails)
+              } } 
+              isTicketTypeActive={isTicketToSellActive}            
           />
             <TouchableOpacity
               onPress={handleOnDismissResaleTickets}

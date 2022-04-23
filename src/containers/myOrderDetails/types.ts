@@ -24,7 +24,10 @@ export interface IMyOrderDetailsProps {
   data: IMyOrderDetailsData
 
   // Used to navigate to the Resale Tickets screen
-  onPressResaleTicket: (ticket: IMyOrderDetailsTicket) => void
+  onPressResaleTicket: (
+    ticket: IMyOrderDetailsTicket,
+    isTicketTypeActive: boolean
+  ) => void
 
   onRemoveTicketFromResaleSuccess: (message: string) => void
   onRemoveTicketFromResaleError?: (error: IError) => void

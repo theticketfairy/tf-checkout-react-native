@@ -31,6 +31,7 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({
     areActivityIndicatorsEnabled: true,
     areAlertsEnabled: true,
   },
+  isTicketTypeActive,
 }) => {
   //#region refs
   const orderDetailsCoreRef = useRef<OrderDetailsCoreHandle>(null)
@@ -196,6 +197,7 @@ const ResaleTickets: FC<IResaleTicketsProps> = ({
         onResaleToWhomDataChanged={handleSellToWhomDataChange}
         onPressResaleTickets={handleOnPressSellTickets}
         ticket={ticket}
+        isTicketsTypeActive={isTicketTypeActive}
       />
     </OrderDetailsCore>
   )

@@ -1,3 +1,4 @@
+import _find from 'lodash/find'
 import _forEach from 'lodash/forEach'
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { Alert, PermissionsAndroid, Platform } from 'react-native'
@@ -145,7 +146,12 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
   }
 
   const handleOnPressResaleTicket = (ticket: IMyOrderDetailsTicket) => {
-    return onPressResaleTicket(ticket)
+    const activeTicketType = _find(
+      data.items,
+      (ticketType) => ticketType.hash === ticket.ticketTypeHash
+    )
+
+    return onPressResaleTicket(ticket, activeTicketType!.isActive)
   }
   //#endregion
 

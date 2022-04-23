@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useRef } from 'react'
+import React, { FC, useEffect, useMemo, useRef } from 'react'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { TextField } from 'rn-material-ui-textfield'
@@ -20,6 +20,7 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
   ticket,
   isLoading,
   texts,
+  isTicketsTypeActive,
 }) => {
   //#region Texts
   const txt: IResaleTicketsViewTexts = {
@@ -183,15 +184,17 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
         <Text style={ticketBuyerFormStyles?.title}>
           {txt.sellToWhom?.title}
         </Text>
-        <RadioButton
-          styles={ticketBuyerFormStyles?.radioButtons}
-          index={0}
-          text={txt.sellToWhom!.friend!}
-          value={toWhom === 'friend'}
-          onValueChange={() =>
-            onResaleToWhomDataChanged(ResaleToWhomFieldIdEnum.radioIndex, 0)
-          }
-        />
+        {isTicketsTypeActive && (
+          <RadioButton
+            styles={ticketBuyerFormStyles?.radioButtons}
+            index={0}
+            text={txt.sellToWhom!.friend!}
+            value={toWhom === 'friend'}
+            onValueChange={() =>
+              onResaleToWhomDataChanged(ResaleToWhomFieldIdEnum.radioIndex, 0)
+            }
+          />
+        )}
         {toWhom === 'friend' && (
           <View style={ticketBuyerFormStyles?.formContainer}>
             <Input
@@ -271,15 +274,17 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
             />
           </View>
         )}
-        <RadioButton
-          styles={ticketBuyerFormStyles?.radioButtons}
-          index={1}
-          text={txt.sellToWhom!.anyone!}
-          value={toWhom === 'anyone'}
-          onValueChange={() =>
-            onResaleToWhomDataChanged(ResaleToWhomFieldIdEnum.radioIndex, 1)
-          }
-        />
+        {isTicketsTypeActive && (
+          <RadioButton
+            styles={ticketBuyerFormStyles?.radioButtons}
+            index={1}
+            text={txt.sellToWhom!.anyone!}
+            value={toWhom === 'anyone'}
+            onValueChange={() =>
+              onResaleToWhomDataChanged(ResaleToWhomFieldIdEnum.radioIndex, 1)
+            }
+          />
+        )}
       </View>
     ),
     [
@@ -289,6 +294,7 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
       emailError,
       firstName,
       firstNameError,
+      isTicketsTypeActive,
       lastName,
       lastNameError,
       onResaleToWhomDataChanged,
@@ -302,6 +308,13 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
       txt.sellToWhom,
     ]
   )
+
+  useEffect(() => {
+    if (!isTicketsTypeActive) {
+      onResaleToWhomDataChanged(ResaleToWhomFieldIdEnum.radioIndex, 0)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <KeyboardAwareScrollView extraScrollHeight={32}>

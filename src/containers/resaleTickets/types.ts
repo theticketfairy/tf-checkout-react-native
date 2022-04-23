@@ -82,6 +82,7 @@ export interface IResaleTicketsStyles {
 
 export interface IResaleTicketsProps {
   ticket: IMyOrderDetailsTicket
+  isTicketTypeActive?: boolean
   styles?: IResaleTicketsStyles
   onResaleTicketsSuccess: (
     resaleTicketData: IResaleTicketData,
@@ -150,4 +151,5 @@ export interface IResaleTicketsViewProps {
   texts?: IResaleTicketsViewTexts
   onPressResaleTickets: () => void
   ticket: IMyOrderDetailsTicket
+  isTicketsTypeActive?: boolean
 }

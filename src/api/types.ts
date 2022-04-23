@@ -218,6 +218,7 @@ export interface IMyOrderDetailsItem {
   price: string
   quantity: string
   total: string
+  hash: string
 }
 
 export interface IMyOrderDetailsTicket {
@@ -236,6 +237,7 @@ export interface IMyOrderDetailsTicket {
   resaleFeeAmount: number
   status: string
   ticketType: string
+  ticketTypeHash: string
 }
 
 export interface IMyOrderDetailsHeader {
