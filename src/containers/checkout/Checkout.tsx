@@ -112,11 +112,18 @@ const Checkout: FC<ICheckoutProps> = ({
       return showAlert('No order data found')
     }
 
+    if (!orderDetailsData.items) {
+      onFetchOrderDetailsError?.({
+        message: 'No items found in order',
+      })
+      return showAlert('No items found in order')
+    }
+
     const orderDetails: IOrderDetails = {
       eventId: eventId,
-      ticketName: orderDetailsData.items[0]?.name,
-      ticketCost: orderDetailsData.items[0]?.price,
-      numberOfTickets: parseInt(orderDetailsData.items[0]?.quantity, 10),
+      ticketName: orderDetailsData.items[0].name,
+      ticketCost: orderDetailsData.items[0].price,
+      numberOfTickets: parseInt(orderDetailsData.items[0].quantity, 10),
       eventUserTickets: _map(orderDetailsData.tickets, (ticket) => ({
         hash: ticket.hash,
         ticketType: ticket.ticketType,
