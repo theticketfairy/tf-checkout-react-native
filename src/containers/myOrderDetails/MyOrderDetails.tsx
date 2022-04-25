@@ -1,5 +1,7 @@
-import React, { FC, useCallback, useEffect, useState } from 'react'
-import { PermissionsAndroid, Platform } from 'react-native'
+import _find from 'lodash/find'
+import _forEach from 'lodash/forEach'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
+import { Alert, PermissionsAndroid, Platform } from 'react-native'
 import {
   DocumentDirectoryPath,
   DownloadDirectoryPath,
@@ -7,6 +9,9 @@ import {
   DownloadFileOptions,
 } from 'react-native-fs'
 
+import { IMyOrderDetailsData, IMyOrderDetailsTicket } from '../../api/types'
+import { OrderDetailsCore } from '../../core'
+import OrderDetailsCoreHandle from '../../core/OrderDetailsCore/OrderDetailsCoreTypes'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import MyOrderDetailsView from './MyOrderDetailsView'
 import { DownloadStatus, IMyOrderDetailsProps } from './types'
@@ -20,6 +25,10 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
   downloadStatusIcons,
   onAndroidWritePermission,
   onLinkCopied,
+  onPressResaleTicket,
+
+  onRemoveTicketFromResaleSuccess,
+  onRemoveTicketFromResaleError,
 }) => {
   const [isWriteStorageEnabled, setIsWriteStorageEnabled] = useState<
     boolean | undefined
@@ -28,6 +37,12 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
   const [downloadStatus, setDownloadStatus] = useState<
     DownloadStatus | undefined
   >(undefined)
+  const [orderInfo, setOrderInfo] = useState<IMyOrderDetailsData>(data)
+  const [isLoading, setIsLoading] = useState(false)
+
+  //#region refs
+  const myOrderDetailsCoreRef = useRef<OrderDetailsCoreHandle>(null)
+  //#endregion
 
   //#region Handlers
   const handleOnDownloadStatusChange = useCallback(
@@ -82,6 +97,62 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
       setDownloadStatus(undefined)
     }, 5000)
   }
+
+  const handleRemoveTicketFromResale = async (
+    ticket: IMyOrderDetailsTicket
+  ) => {
+    if (!myOrderDetailsCoreRef.current) {
+      return Alert.alert('MyOrderDetailsCoreRef is not initialized')
+    }
+
+    setIsLoading(true)
+    const { removeTicketFromResaleData, removeTicketFromResaleError } =
+      await myOrderDetailsCoreRef.current.removeTicketFromResale(ticket.hash)
+    setIsLoading(false)
+
+    if (removeTicketFromResaleError || !removeTicketFromResaleData) {
+      onRemoveTicketFromResaleError?.(removeTicketFromResaleError!)
+      return Alert.alert('', removeTicketFromResaleError?.message)
+    }
+
+    const updatedOrderInfo = { ...orderInfo }
+    _forEach(updatedOrderInfo.tickets, (item) => {
+      if (item.hash === ticket.hash) {
+        item.isSellable = true
+        item.isOnSale = false
+      }
+    })
+
+    Alert.alert('', removeTicketFromResaleData.message)
+
+    setOrderInfo(updatedOrderInfo)
+    onRemoveTicketFromResaleSuccess?.(removeTicketFromResaleData.message)
+  }
+
+  const askToRemoveTicketFromResale = (ticket: IMyOrderDetailsTicket) => {
+    Alert.alert(
+      'Withdraw ticket confirmation',
+      'Are you sure you want to withdraw your ticket from resale?',
+      [
+        {
+          text: 'No',
+        },
+        {
+          text: 'Yes, withdraw',
+          onPress: () => handleRemoveTicketFromResale(ticket),
+        },
+      ]
+    )
+  }
+
+  const handleOnPressResaleTicket = (ticket: IMyOrderDetailsTicket) => {
+    const activeTicketType = _find(
+      data.items,
+      (ticketType) => ticketType.hash === ticket.ticketTypeHash
+    )
+
+    return onPressResaleTicket(ticket, activeTicketType!.isActive)
+  }
   //#endregion
 
   //#region Effects
@@ -119,17 +190,22 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
 
   //#region Render
   return (
-    <MyOrderDetailsView
-      data={data}
-      styles={styles}
-      texts={texts}
-      isLinkCopied={isLinkCopied}
-      onPressCopyLink={handleOnPressCopyLink}
-      onPressTicketDownload={handleOnPressTicketDownload}
-      downloadStatus={downloadStatus}
-      config={config}
-      downloadStatusIcons={downloadStatusIcons}
-    />
+    <OrderDetailsCore ref={myOrderDetailsCoreRef}>
+      <MyOrderDetailsView
+        data={data}
+        styles={styles}
+        texts={texts}
+        isLinkCopied={isLinkCopied}
+        onPressCopyLink={handleOnPressCopyLink}
+        onPressTicketDownload={handleOnPressTicketDownload}
+        downloadStatus={downloadStatus}
+        config={config}
+        downloadStatusIcons={downloadStatusIcons}
+        onPressResaleTicket={handleOnPressResaleTicket}
+        onPressRemoveTicketFromResale={askToRemoveTicketFromResale}
+        isLoading={isLoading}
+      />
+    </OrderDetailsCore>
   )
   //#endregion
 }

@@ -10,6 +10,7 @@ export interface ICheckboxStyles {
   box?: StyleProp<ViewStyle>
   icon?: StyleProp<ImageStyle>
 }
+
 export interface ICheckboxProps {
   onPress: () => void
   text?: string

@@ -218,6 +218,7 @@ export interface IMyOrderDetailsItem {
   price: string
   quantity: string
   total: string
+  hash: string
 }
 
 export interface IMyOrderDetailsTicket {
@@ -230,12 +231,13 @@ export interface IMyOrderDetailsTicket {
   holderName: string
   holderPhone?: string
   isOnSale: boolean
-  isSellable: true
+  isSellable: boolean
   pdfLink: string
   qrData: string
   resaleFeeAmount: number
   status: string
   ticketType: string
+  ticketTypeHash: string
 }
 
 export interface IMyOrderDetailsHeader {
@@ -247,7 +249,7 @@ export interface IMyOrderDetailsHeader {
 
 export interface IMyOrderDetailsData {
   header: IMyOrderDetailsHeader
-  items: IMyOrderDetailsItem[]
+  items?: IMyOrderDetailsItem[]
   tickets: IMyOrderDetailsTicket[]
 }
 
@@ -319,4 +321,22 @@ export interface IPurchaseConfirmationData {
 export interface IPurchaseConfirmationResponse {
   purchaseConfirmationError?: IError
   purchaseConfirmationData?: IPurchaseConfirmationData
+}
+
+export interface IResaleTicketData {
+  message: string
+}
+
+export interface IResaleTicketResponse {
+  resaleTicketError?: IError
+  resaleTicketData?: IResaleTicketData
+}
+
+export interface IRemoveTicketFromResaleData {
+  message: string
+}
+
+export interface IRemoveTicketFromResaleResponse {
+  removeTicketFromResaleError?: IError
+  removeTicketFromResaleData?: IRemoveTicketFromResaleData
 }
