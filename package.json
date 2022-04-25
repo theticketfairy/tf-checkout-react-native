@@ -1,6 +1,6 @@
 {
   "name": "tf-checkout-react-native",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "TheTicketFairy ReactNative Checkout library",
   "homepage": "https://github.com/theticketfairy/tf-checkout-react-native",
   "main": "lib/index.js",
