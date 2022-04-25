@@ -107,6 +107,8 @@ export interface IMyOrderDetailsTexts {
     copy?: string
     copied?: string
   }
+  sellTicket?: string
+  removeTicketFromResale?: string
 }
 
 export interface IMyOrderDetailsStyles {

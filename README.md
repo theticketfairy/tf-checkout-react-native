@@ -1176,6 +1176,8 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
       copy?: string
       copied?: string
     }
+    sellTicket?: string
+    removeTicketFromResale?: string
   }
 }
 ```

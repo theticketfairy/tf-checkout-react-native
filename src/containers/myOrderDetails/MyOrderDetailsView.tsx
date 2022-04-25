@@ -67,6 +67,9 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
 
   const soFarText = texts?.referral?.soFar || `So far, you've referred`
   const ticketsText = texts?.referral?.tickets || `tickets.`
+  const sellTicket = texts?.sellTicket || 'Sell Ticket'
+  const removeTicketFromResale =
+    texts?.removeTicketFromResale || 'Remove from resale'
 
   const renderShareLink = () => (
     <View style={[s.shareLinkContainer, styles?.header?.shareLink?.container]}>
@@ -237,7 +240,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
       {item.isSellable && !item.isOnSale && (
         <Button
           onPress={() => handleOnPressSellTicket(item)}
-          text={'Sell Ticket'}
+          text={sellTicket}
           // styles={{
           //   container: s.resaleButtonContainer,
           //   button: s.resaleButton,
@@ -249,7 +252,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
       {!item.isSellable && item.isOnSale && (
         <Button
           onPress={() => handleOnPressRemoveFromResale(item)}
-          text={'Remove from Resale'}
+          text={removeTicketFromResale}
           // styles={{
           //   container: s.resaleButtonContainer,
           //   button: s.resaleButton,
