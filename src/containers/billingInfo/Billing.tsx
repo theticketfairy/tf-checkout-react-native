@@ -25,6 +25,7 @@ import Constants from '../../api/Constants'
 import { ICheckoutBody, ICheckoutTicketHolder } from '../../api/types'
 import {
   Button,
+  CartTimer,
   Checkbox,
   DatePicker,
   DropdownMaterial,
@@ -89,6 +90,8 @@ const Billing: FC<IBillingProps> = ({
   onSkippingStatusChange,
   onLogoutSuccess,
   onLogoutError,
+  onCartExpired,
+  shouldCartTimerNotMinimizeOnTap,
 }) => {
   //#region Labels
   const holderLabels = useMemo(() => {
@@ -174,6 +177,9 @@ const Billing: FC<IBillingProps> = ({
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
   const [skipping, setSkippingStatus] = useState<SkippingStatusType>(undefined)
   const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
+
+  // Cart expiration timer
+  const [secondsLeft, setSecondsLeft] = React.useState(420)
 
   // Errors state
   const firstNameError = useDebounced(firstName, validateEmpty)
@@ -417,6 +423,10 @@ const Billing: FC<IBillingProps> = ({
   }
 
   const checkBasicDataValid = (): boolean => {
+    if (secondsLeft === 0) {
+      return false
+    }
+
     if (
       !firstName ||
       !lastName ||
@@ -1016,7 +1026,11 @@ const Billing: FC<IBillingProps> = ({
   return skipping === 'skipping' && areLoadingIndicatorsEnabled ? (
     renderCheckingOut()
   ) : (
-    <BillingCore ref={billingCoreRef}>
+    <BillingCore
+      ref={billingCoreRef}
+      onSecondsLeftChange={setSecondsLeft}
+      onCartExpired={onCartExpired}
+    >
       <KeyboardAwareScrollView extraScrollHeight={32}>
         <View style={styles?.rootContainer}>
           <Login
@@ -1222,6 +1236,12 @@ const Billing: FC<IBillingProps> = ({
         </View>
         {areLoadingIndicatorsEnabled && isLoading && <Loading />}
       </KeyboardAwareScrollView>
+      <CartTimer
+        secondsLeft={secondsLeft}
+        styles={styles?.cartTimer}
+        texts={texts?.cartTimer}
+        shouldNotMinimize={shouldCartTimerNotMinimizeOnTap}
+      />
     </BillingCore>
   )
   //#endregion

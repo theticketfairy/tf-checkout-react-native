@@ -8,6 +8,7 @@ import {
   IUserProfileResponse,
 } from '../../api/types'
 import { IError } from '../../types'
+import { ICoreProps } from '../CoreProps'
 
 export interface ICheckoutResponse {
   error?: IError
@@ -21,4 +22,9 @@ export type BillingCoreHandle = {
   getStates(countryId: string): Promise<IStatesResponse>
   getUserProfile(): Promise<IUserProfileResponse>
   registerNewUser(data: FormData): Promise<IRegisterNewUserResponse>
+}
+
+export interface IBillingCoreProps extends ICoreProps {
+  onCartExpired: () => void
+  onSecondsLeftChange?: (secondsLeft: number) => void
 }

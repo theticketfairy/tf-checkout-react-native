@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React, { useEffect, useState } from 'react'
-import { Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
   IMyOrderDetailsData,
@@ -116,8 +116,14 @@ const App = () => {
   const handleGoBackFromOrderDetails = () => {
     setComponentToShow(ComponentEnum.MyOrders)
   }
-  //#endregion
 
+  const handleOnCartExpired = () => {
+    Alert.alert('Cart Expired', 'Your cart has expired. Please select your tickets again.')
+    setComponentToShow(ComponentEnum.Tickets)
+    setSkippingStatus(undefined)
+    setCartProps(undefined)
+  }
+  //#endregion
 
   //#region effects
   useEffect(() => {
@@ -156,6 +162,7 @@ const App = () => {
         return (
           <>
           <BillingInfo
+          onCartExpired={handleOnCartExpired}
           onSkippingStatusChange={setSkippingStatus}
           loginBrandImages={{
             image1: GOOGLE_IMAGE,

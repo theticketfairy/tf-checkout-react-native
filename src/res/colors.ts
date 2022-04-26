@@ -10,6 +10,7 @@ const colors = {
   listBackground: 'rgba(0,0,0,0.1)',
   validGreen: '#139679',
   fff: '#fff',
+  timerBackground: '#f4daa3',
 }
 
 export default colors
