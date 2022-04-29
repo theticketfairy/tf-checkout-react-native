@@ -337,11 +337,9 @@ const Billing: FC<IBillingProps> = ({
       })
 
       if (phoneValidError) {
-        showAlert(
-          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
-        )
+        showAlert(texts?.invalidPhoneNumberError || phoneValidError)
         return handleSetPhoneError(
-          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+          texts?.invalidPhoneNumberError || phoneValidError
         )
       }
 
@@ -431,11 +429,12 @@ const Billing: FC<IBillingProps> = ({
     }
 
     if (
-      isPhoneRequired &&
-      validatePhoneNumber({
-        phoneNumber: phone,
-        customError: texts?.form?.phoneInput?.customError,
-      })
+      isPhoneRequired ||
+      (phone.length > 0 &&
+        validatePhoneNumber({
+          phoneNumber: phone,
+          customError: texts?.form?.phoneInput?.customError,
+        }))
     ) {
       return false
     }
