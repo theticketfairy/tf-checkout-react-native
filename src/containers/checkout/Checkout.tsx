@@ -54,6 +54,7 @@ const Checkout: FC<ICheckoutProps> = ({
   const [paymentInfo, setPaymentInfo] = useState<CardFormView.Details>()
   const [isStripeConfigMissing, setIsStripeConfigMissing] = useState(false)
   const [isPaymentRequired, setIsPaymentRequired] = useState(false)
+  const [secondsLeft, setSecondsLeft] = useState<number>(420)
 
   const checkoutCoreRef = useRef<CheckoutCoreHandle>(null)
 

@@ -162,6 +162,7 @@ export interface IPaymentAddress {
 }
 
 export interface IOrderReview {
+  expiresAt: number
   reviewData: {
     event: string
     price: string
@@ -264,6 +265,7 @@ export interface ICartData {
   isTfOptInHidden?: boolean
   isTfOptIn: boolean // Ticket fairy
   isMarketingOptedIn: boolean // Brand
+  expiresAt: number
 }
 
 export interface ICartResponse {

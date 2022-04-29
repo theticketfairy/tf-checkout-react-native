@@ -106,7 +106,10 @@ Client.interceptors.response.use(
     if (error?.response?.status === 401) {
       await deleteAllData()
       error.message = error.response.data.error_description
+    } else if (error.message) {
+      error.message = error.message
     }
+
     return Promise.reject(error)
   }
 )
@@ -352,6 +355,8 @@ export const fetchOrderDetails = async (
     }
   )
 
+  console.log('fetch order details', response)
+
   if (!responseError && response) {
     const { attributes } = response.data.data
     let items: IMyOrderDetailsItem[] | undefined
@@ -437,11 +442,19 @@ export const fetchTickets = async (
     //@ts-ignore
     headers: headers,
   }).catch((error: AxiosError) => {
-    responseError = {
-      code: error.response?.status!,
-      message: error.response?.data.message,
+    if (error.message) {
+      responseError = {
+        message: error.message,
+      }
+    } else {
+      responseError = {
+        code: error.response?.status!,
+        message: error.response?.data.message,
+      }
     }
   })
+
+  console.log('fetch tickets', response)
 
   if (responseError) {
     return {
@@ -491,6 +504,8 @@ export const addToCart = async (
       message: error.response?.data.message,
     }
   })
+
+  console.log('add to cart', response)
 
   if (!responseError) {
     setCustomHeader(response)
@@ -554,6 +569,8 @@ export const fetchCountries = async (): Promise<ICountriesResponse> => {
     }
   )
 
+  console.log('fetch countries', response)
+
   if (response?.status === 200) {
     setCustomHeader(response)
   }
@@ -577,6 +594,8 @@ export const fetchStates = async (
     }
   })
 
+  console.log('fetch states', response)
+
   if (response?.status === 200) {
     setCustomHeader(response)
   }
@@ -599,11 +618,14 @@ export const fetchCart = async (): Promise<ICartResponse> => {
     }
   )
 
+  console.log('Fetch cart', res)
+
   if (res?.data?.data?.attributes) {
     const attr = res?.data?.data?.attributes
     const quantityString = _get(attr, 'cart[0].quantity', '1')
     const tfOptIn = _get(attr, 'ttfOptIn', false)
     const isMarketingOptedIn = _get(attr, 'optedIn', false)
+    const expiresAt = _get(attr, 'expires_at', 420)
 
     cartData = {
       quantity: parseInt(quantityString, 10),
@@ -613,6 +635,7 @@ export const fetchCart = async (): Promise<ICartResponse> => {
           : isMarketingOptedIn,
       isTfOptInHidden: _get(attr, 'hide_ttf_opt_in', false),
       isTfOptIn: typeof tfOptIn === 'number' ? tfOptIn > 0 : tfOptIn,
+      expiresAt: expiresAt,
     }
   } else {
     responseError = {
@@ -649,17 +672,17 @@ export const checkoutOrder = async (
       },
     }
   ).catch((error: AxiosError) => {
+    console.log('responseError', error.response)
+
     responseError = {
       code: error.response?.status!,
       message: error.response?.data.message,
     }
   })
 
-  if (!res || !res.data) {
-    responseError = {
-      message: 'No data returned on checkout',
-    }
+  console.log('checkout order', res)
 
+  if (!res || !res.data) {
     return { error: responseError }
   }
 
@@ -709,6 +732,8 @@ export const fetchOrderReview = async (
     }
   })
 
+  console.log('Order review', response)
+
   let resData: IOrderReview | undefined
 
   if (!responseError) {
@@ -728,6 +753,7 @@ export const fetchOrderReview = async (
       } = order_details
 
       resData = {
+        expiresAt: attributes.expires_at,
         reviewData: {
           event: cart[0]?.product_name,
           price: ticket?.price,

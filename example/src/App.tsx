@@ -16,6 +16,7 @@ import {
   ResaleTickets,
 } from 'tf-checkout-react-native'
 import { IMyOrderDetailsTicket } from '../../src/api/types'
+import { IConfig } from '../../src/helpers/Config'
 import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles from './styles'
@@ -23,13 +24,14 @@ import styles from './styles'
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
-const EVENT_ID = 5420//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID //12796
+const EVENT_ID = 9860//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID //12796
 
-const config = {
+const config: IConfig = {
   EVENT_ID: EVENT_ID,
   DOMAIN: 'https://manacommon.com', //https://www.ticketfairy.com',
   BRAND: 'the-ticket-fairy',// 'mana-onetree-testing-brand',
   ARE_SUB_BRANDS_INCLUDED: true,
+  ENV: 'DEV'
 }
 
 const App = () => {
