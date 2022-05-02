@@ -415,8 +415,8 @@ const Billing: FC<IBillingProps> = ({
   //#endregion
 
   //#region Form validation
-  const checkIsStoredPhoneNumberFormat = (storedPhoneNumber?: string) => {
-    if (!storedPhoneNumber?.includes('+')) {
+  const checkIsStoredPhoneNumberFormat = (storedPhoneNumber: string) => {
+    if (!storedPhoneNumber.includes('+')) {
       handleSetPhoneError(
         texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
       )
@@ -427,7 +427,7 @@ const Billing: FC<IBillingProps> = ({
 
   const checkBasicDataValid = (): boolean => {
     if (secondsLeft === 0) {
-      return true
+      return false
     }
 
     if (
@@ -787,7 +787,10 @@ const Billing: FC<IBillingProps> = ({
     setIsSubToBrand(cartData.isMarketingOptedIn)
     setIsSubToTicketFairy(cartData.isTfOptIn)
     setIsTtfCheckboxHidden(cartData.isTfOptInHidden || false)
-    setSecondsLeft(cartData.expiresAt)
+
+    if (cartData.expiresAt) {
+      setSecondsLeft(cartData.expiresAt)
+    }
 
     const tHolders: ITicketHolderField[] = []
     for (let i = 0; i < cartData.quantity; i++) {
