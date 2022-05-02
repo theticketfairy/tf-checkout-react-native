@@ -163,6 +163,7 @@ const Billing: FC<IBillingProps> = ({
   const [selectedState, setSelectedState] = useState<IDropdownItem | undefined>(
     undefined
   )
+
   const [ticketHoldersData, setTicketHoldersData] = useState<
     ITicketHolderField[]
   >([])
@@ -782,8 +783,6 @@ const Billing: FC<IBillingProps> = ({
       setSkippingStatus(getSkippingStatus(cartData.quantity))
     }
 
-    console.log('billing cart', cartData)
-
     setNumberOfTicketHolders(cartData.quantity)
     setIsSubToBrand(cartData.isMarketingOptedIn)
     setIsSubToTicketFairy(cartData.isTfOptIn)
@@ -1251,7 +1250,7 @@ const Billing: FC<IBillingProps> = ({
     <BillingCore
       ref={billingCoreRef}
       onSecondsLeftChange={setSecondsLeft}
-      onCartExpired={() => console.log('expired stuff')}
+      onCartExpired={onCartExpired}
     >
       {skippingStatus === 'skipping' && areLoadingIndicatorsEnabled
         ? renderCheckingOut()

@@ -67,13 +67,22 @@ const BillingCore = forwardRef<BillingCoreHandle, IBillingCoreProps>(
 
     useImperativeHandle(ref, () => ({
       async checkoutOrder(body: ICheckoutBody): Promise<ICheckoutResponse> {
-        BackgroundTimer.stopBackgroundTimer()
-        return await checkoutOrder(body)
+        const checkout = await checkoutOrder(body)
+        if (!checkout.error) {
+          BackgroundTimer.stopBackgroundTimer()
+        }
+        return checkout
       },
 
       async getCart(): Promise<ICartResponse> {
-        setTimerOn(true)
-        return await fetchCart()
+        const cart = await fetchCart()
+
+        if (cart.cartData?.expiresAt) {
+          setSecondsLeft(cart.cartData.expiresAt)
+          setTimerOn(true)
+        }
+
+        return cart
       },
 
       async getCountries(): Promise<ICountriesResponse> {

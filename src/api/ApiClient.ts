@@ -355,8 +355,6 @@ export const fetchOrderDetails = async (
     }
   )
 
-  console.log('fetch order details', response)
-
   if (!responseError && response) {
     const { attributes } = response.data.data
     let items: IMyOrderDetailsItem[] | undefined
@@ -454,8 +452,6 @@ export const fetchTickets = async (
     }
   })
 
-  console.log('fetch tickets', response)
-
   if (responseError) {
     return {
       error: responseError,
@@ -504,8 +500,6 @@ export const addToCart = async (
       message: error.response?.data.message,
     }
   })
-
-  console.log('add to cart', response)
 
   if (!responseError) {
     setCustomHeader(response)
@@ -569,8 +563,6 @@ export const fetchCountries = async (): Promise<ICountriesResponse> => {
     }
   )
 
-  console.log('fetch countries', response)
-
   if (response?.status === 200) {
     setCustomHeader(response)
   }
@@ -594,8 +586,6 @@ export const fetchStates = async (
     }
   })
 
-  console.log('fetch states', response)
-
   if (response?.status === 200) {
     setCustomHeader(response)
   }
@@ -617,8 +607,6 @@ export const fetchCart = async (): Promise<ICartResponse> => {
       }
     }
   )
-
-  console.log('Fetch cart', res)
 
   if (res?.data?.data?.attributes) {
     const attr = res?.data?.data?.attributes
@@ -672,15 +660,11 @@ export const checkoutOrder = async (
       },
     }
   ).catch((error: AxiosError) => {
-    console.log('responseError', error.response)
-
     responseError = {
       code: error.response?.status!,
       message: error.response?.data.message,
     }
   })
-
-  console.log('checkout order', res)
 
   if (!res || !res.data) {
     return { error: responseError }
@@ -731,8 +715,6 @@ export const fetchOrderReview = async (
       code: error.response?.status!,
     }
   })
-
-  console.log('Order review', response)
 
   let resData: IOrderReview | undefined
 
