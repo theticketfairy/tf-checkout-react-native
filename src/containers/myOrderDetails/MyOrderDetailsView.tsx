@@ -7,6 +7,7 @@ import { IMyOrderDetailsItem, IMyOrderDetailsTicket } from '../../api/types'
 import { Button, Loading } from '../../components'
 import R from '../../res'
 import Notification from './components/Notification'
+import TicketListItem from './components/TicketListItem/TicketListItem'
 import s from './styles'
 import { IMyOrderDetailsViewProps, IOrderDetailsSectionData } from './types'
 
@@ -55,11 +56,11 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
   const itemsPrice = texts?.listItem?.price || 'Price: '
   const itemsQuantity = texts?.listItem?.quantity || 'Quantity: '
 
-  const ticketsTitle = texts?.ticketItem?.title || 'Your Tickets: '
+  const ticketsTitle = texts?.ticketsTitle || 'Your Tickets: '
   const ticketsId = texts?.ticketItem?.ticketId || 'Ticket ID: '
   const ticketsType = texts?.ticketItem?.ticketType || 'Ticket Type: '
   const ticketsHolderName =
-    texts?.ticketItem?.ticketHolder || 'Ticket Holder Name: '
+    texts?.ticketItem?.holderName || 'Ticket Holder Name: '
   const ticketsStatus = texts?.ticketItem?.status || 'Status: '
   const ticketsDownload = texts?.ticketItem?.download || 'Download'
   const copyText = texts?.copyText?.copy || 'Copy'
@@ -70,6 +71,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
   const sellTicket = texts?.sellTicket || 'Sell Ticket'
   const removeTicketFromResale =
     texts?.removeTicketFromResale || 'Remove from resale'
+  const download = texts?.ticketItem?.download || `Download`
 
   const renderShareLink = () => (
     <View style={[s.shareLinkContainer, styles?.header?.shareLink?.container]}>
@@ -143,7 +145,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
     {
       title: ticketsTitle,
       data: parsedTickets,
-      renderItem: ({ item }: any) => renderTicketComp(item),
+      renderItem: ({ item }: any) => _renderTicket(item),
       id: 1,
     },
   ]
@@ -184,6 +186,26 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
         </View>
       </View>
     ) : null
+
+  const _renderTicket = ({ item }: { item: IMyOrderDetailsTicket }) => (
+    <TicketListItem
+      data={item}
+      isLoading={downloadStatus === 'downloading'}
+      onPressSellTicket={handleOnPressSellTicket}
+      onPressRemoveTicketFromResale={onPressRemoveTicketFromResale}
+      onPressTicketDownload={onPressTicketDownload}
+      styles={styles?.ticketItem}
+      texts={{
+        ticketType: ticketsType,
+        holderName: ticketsHolderName,
+        ticketId: ticketsId,
+        status: ticketsStatus,
+        download: download,
+        sellTicket: sellTicket,
+        removeTicketFromResale: removeTicketFromResale,
+      }}
+    />
+  )
 
   const renderTicketComp = ({ item }: { item: IMyOrderDetailsTicket }) => (
     <View>
