@@ -4,9 +4,11 @@ import React, { FC } from 'react'
 import { Image, SectionList, Text, TouchableOpacity, View } from 'react-native'
 
 import { IMyOrderDetailsItem, IMyOrderDetailsTicket } from '../../api/types'
-import { Button, Loading } from '../../components'
+import { BottomSheetModal, Loading } from '../../components'
 import R from '../../res'
 import Notification from './components/Notification'
+import TicketActions from './components/TicketActions/TicketActions'
+import { TicketActionType } from './components/TicketActions/TicketActionsTypes'
 import TicketListItem from './components/TicketListItem/TicketListItem'
 import s from './styles'
 import { IMyOrderDetailsViewProps, IOrderDetailsSectionData } from './types'
@@ -17,12 +19,19 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
   texts,
   isLinkCopied,
   onPressCopyLink,
-  onPressTicketDownload,
   downloadStatus,
-  onPressResaleTicket,
-  onPressRemoveTicketFromResale,
-  config,
+  config = {
+    areActivityIndicatorsEnabled: true,
+    areAlertsEnabled: true,
+  },
   isLoading,
+
+  onTicketSelection,
+  selectedTicket,
+  onActionSelected,
+  ticketActionsIcons,
+  bottomSheetModalRef,
+  moreButtonIcon,
 }) => {
   //#region Handlers
   const onCopyLinkHandler = () => {
@@ -33,14 +42,16 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
     onPressCopyLink()
   }
 
-  const handleOnPressSellTicket = (ticket: IMyOrderDetailsTicket) => {
-    onPressResaleTicket(ticket)
+  const handleOnTicketSelection = (ticket: IMyOrderDetailsTicket) => {
+    onTicketSelection(ticket)
   }
 
-  const handleOnPressRemoveFromResale = async (
-    ticket: IMyOrderDetailsTicket
-  ) => {
-    onPressRemoveTicketFromResale(ticket)
+  const handleHideActionsModal = () => {
+    onTicketSelection(undefined)
+  }
+
+  const handleOnActionSelected = (actionType: TicketActionType) => {
+    onActionSelected(actionType)
   }
   //#endregion
 
@@ -62,7 +73,6 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
   const ticketsHolderName =
     texts?.ticketItem?.holderName || 'Ticket Holder Name: '
   const ticketsStatus = texts?.ticketItem?.status || 'Status: '
-  const ticketsDownload = texts?.ticketItem?.download || 'Download'
   const copyText = texts?.copyText?.copy || 'Copy'
   const copiedText = texts?.copyText?.copied || 'Copied'
 
@@ -190,10 +200,6 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
   const _renderTicket = ({ item }: { item: IMyOrderDetailsTicket }) => (
     <TicketListItem
       data={item}
-      isLoading={downloadStatus === 'downloading'}
-      onPressSellTicket={handleOnPressSellTicket}
-      onPressRemoveTicketFromResale={onPressRemoveTicketFromResale}
-      onPressTicketDownload={onPressTicketDownload}
       styles={styles?.ticketItem}
       texts={{
         ticketType: ticketsType,
@@ -204,86 +210,9 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
         sellTicket: sellTicket,
         removeTicketFromResale: removeTicketFromResale,
       }}
+      onPressActionsButton={handleOnTicketSelection}
+      moreButtonIcon={moreButtonIcon || R.icons.more}
     />
-  )
-
-  const renderTicketComp = ({ item }: { item: IMyOrderDetailsTicket }) => (
-    <View>
-      <View style={[s.ticketItemContainer, styles?.ticketItem?.container]}>
-        <View style={styles?.ticketItem?.innerLeftContainer}>
-          <View style={s.rowContainer}>
-            <Text style={styles?.ticketItem?.rowPlaceholder}>{ticketsId}</Text>
-            <Text style={styles?.ticketItem?.rowValue}>{item.hash}</Text>
-          </View>
-          <View style={s.rowContainer}>
-            <Text style={styles?.ticketItem?.rowPlaceholder}>
-              {ticketsType}
-            </Text>
-            <Text style={styles?.ticketItem?.rowValue}>{item.ticketType}</Text>
-          </View>
-          <View style={s.rowContainer}>
-            <Text style={styles?.ticketItem?.rowPlaceholder}>
-              {ticketsHolderName}
-            </Text>
-            <Text style={styles?.ticketItem?.rowValue}>{item.holderName}</Text>
-          </View>
-        </View>
-
-        <View
-          style={[
-            s.ticketItemInnerRightContainer,
-            styles?.ticketItem?.innerRightContainer,
-          ]}
-        >
-          <Text style={styles?.ticketItem?.rowPlaceholder}>
-            {ticketsStatus}
-            <Text style={styles?.ticketItem?.rowValue}>{item.status}</Text>
-          </Text>
-
-          {item.pdfLink && (
-            <Button
-              isLoading={downloadStatus === 'downloading'}
-              text={ticketsDownload}
-              styles={{
-                text: {
-                  fontSize: 12,
-                },
-                button: {
-                  height: 30,
-                  marginVertical: 8,
-                },
-                ...styles?.downloadButton,
-              }}
-              onPress={() => onPressTicketDownload(item.pdfLink!, item.hash)}
-            />
-          )}
-        </View>
-      </View>
-      {item.isSellable && !item.isOnSale && (
-        <Button
-          onPress={() => handleOnPressSellTicket(item)}
-          text={sellTicket}
-          // styles={{
-          //   container: s.resaleButtonContainer,
-          //   button: s.resaleButton,
-          //   text: s.resaleButtonText,
-          //   ...styles?.resaleButton,
-          // }}
-        />
-      )}
-      {!item.isSellable && item.isOnSale && (
-        <Button
-          onPress={() => handleOnPressRemoveFromResale(item)}
-          text={removeTicketFromResale}
-          // styles={{
-          //   container: s.resaleButtonContainer,
-          //   button: s.resaleButton,
-          //   text: s.resaleButtonText,
-          //   ...styles?.resaleButton,
-          // }}
-        />
-      )}
-    </View>
   )
 
   return (
@@ -329,6 +258,24 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
           />
         )}
       {isLoading && <Loading />}
+
+      {selectedTicket && (
+        <BottomSheetModal
+          onClose={handleHideActionsModal}
+          styles={styles?.bottomSheetModal}
+          texts={texts?.bottomSheetModal}
+          ref={bottomSheetModalRef}
+          content={
+            <TicketActions
+              onSelectAction={handleOnActionSelected}
+              ticket={selectedTicket}
+              styles={styles?.ticketActions}
+              texts={texts?.ticketActions}
+              icons={ticketActionsIcons}
+            />
+          }
+        />
+      )}
     </View>
   )
 }

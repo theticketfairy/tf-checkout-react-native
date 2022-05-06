@@ -11,9 +11,19 @@ import {
   IMyOrderDetailsItem,
   IMyOrderDetailsTicket,
 } from '../../api/types'
+import {
+  IBottomSheetModalStyles,
+  IBottomSheetModalTexts,
+} from '../../components/bottomSheetModal/BottomSheetModalTypes'
 import { IButtonStyles } from '../../components/button/types'
 import { IError } from '../../types'
 import { INotificationIcons } from './components/Notification'
+import {
+  ITicketActionIcons,
+  ITicketActionsStyles,
+  ITicketActionTexts,
+  TicketActionType,
+} from './components/TicketActions/TicketActionsTypes'
 import { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem'
 import {
   ITicketListItemStyles,
@@ -47,6 +57,8 @@ export interface IMyOrderDetailsProps {
 
   styles?: IMyOrderDetailsStyles
   texts?: IMyOrderDetailsTexts
+
+  ticketActionsIcons?: ITicketActionIcons
 }
 
 export type DownloadStatus = 'downloading' | 'downloaded' | 'failed'
@@ -73,6 +85,13 @@ export interface IMyOrderDetailsViewProps {
   texts?: IMyOrderDetailsTexts
 
   moreButtonIcon?: StyleProp<ImageStyle>
+  onTicketSelection: (ticket?: IMyOrderDetailsTicket) => void
+  selectedTicket?: IMyOrderDetailsTicket
+  onActionSelected: (action: TicketActionType) => void
+
+  ticketActionsIcons?: ITicketActionIcons
+
+  bottomSheetModalRef?: any
 }
 
 export interface IOrderDetailsSectionData {
@@ -112,6 +131,9 @@ export interface IMyOrderDetailsTexts {
   sellTicket?: string
   removeTicketFromResale?: string
   ticketsTitle?: string
+
+  bottomSheetModal?: IBottomSheetModalTexts
+  ticketActions?: ITicketActionTexts
 }
 
 export interface IMyOrderDetailsStyles {
@@ -151,4 +173,7 @@ export interface IMyOrderDetailsStyles {
   }
   ticketItem?: ITicketListItemStyles
   downloadButton?: IButtonStyles
+
+  bottomSheetModal?: IBottomSheetModalStyles
+  ticketActions?: ITicketActionsStyles
 }
