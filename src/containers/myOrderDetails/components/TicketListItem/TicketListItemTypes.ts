@@ -8,7 +8,6 @@ import {
 
 import { IMyOrderDetailsTicket } from '../../../../api/types'
 import { IButtonStyles } from '../../../../components/button/types'
-import { IOnPressTicketDownload } from './TicketListItem'
 
 export interface ITicketListItemTexts {
   ticketType: string
@@ -32,10 +31,7 @@ export interface ITicketListItemStyles {
 }
 
 export interface ITicketListItemProps {
-  onPressSellTicket: (ticket: IMyOrderDetailsTicket) => void
-  onPressRemoveTicketFromResale: (ticket: IMyOrderDetailsTicket) => void
-  onPressTicketDownload: (payload: IOnPressTicketDownload) => void
-  isLoading?: boolean
+  onPressActionsButton: (ticket: IMyOrderDetailsTicket) => void
   data: IMyOrderDetailsTicket
   styles?: ITicketListItemStyles
   texts: ITicketListItemTexts

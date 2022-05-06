@@ -16,6 +16,8 @@ import {
   ResaleTickets,
 } from 'tf-checkout-react-native'
 import { IMyOrderDetailsTicket } from '../../src/api/types'
+import { IConfig } from '../../src/helpers/Config'
+import R from '../../src/res'
 import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles from './styles'
@@ -23,7 +25,7 @@ import styles from './styles'
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
-const EVENT_ID = 5420//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID //12796
+const EVENT_ID = 12908//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID //12796
 
 const config = {
   EVENT_ID: EVENT_ID,
@@ -116,8 +118,14 @@ const App = () => {
   const handleGoBackFromOrderDetails = () => {
     setComponentToShow(ComponentEnum.MyOrders)
   }
-  //#endregion
 
+  const handleOnCartExpired = () => {
+    Alert.alert('Cart Expired', 'Your cart has expired. Please select your tickets again.')
+    setComponentToShow(ComponentEnum.Tickets)
+    setSkippingStatus(undefined)
+    setCartProps(undefined)
+  }
+  //#endregion
 
   //#region effects
   useEffect(() => {
@@ -156,6 +164,7 @@ const App = () => {
         return (
           <>
           <BillingInfo
+          onCartExpired={handleOnCartExpired}
           onSkippingStatusChange={setSkippingStatus}
           loginBrandImages={{
             image1: GOOGLE_IMAGE,
@@ -453,6 +462,7 @@ const App = () => {
             onPaymentSuccess={handleOnPaymentSuccess}
             onPressExit={handleStripeError}
             onLoadingChange={(loading) => {setIsLoading(loading)}}
+            onCartExpired={handleOnCartExpired}
             styles={{
               rootStyle: {
                 paddingHorizontal: 16,
@@ -652,6 +662,33 @@ const App = () => {
             <MyOrderDetails
               data={selectedOrderDetails!}
               styles={{
+                bottomSheetModal:{
+                  content: {
+                    backgroundColor: R.colors.primary
+                  },
+                  headerContainer: {
+                    justifyContent: 'space-between',
+                  },
+                  title: {
+                    color: R.colors.white,
+                  },
+                },
+                
+                ticketActions:{
+                  buttonContainer:{
+                    height: 50,
+                    marginVertical: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderBottomColor: R.colors.disabled,
+                    borderBottomWidth: 1
+                  },
+                  text: {
+                    color: R.colors.white,
+                    fontSize: 20,
+                    textAlignVertical: 'center',
+                  }
+                },
                 downloadButton: {
                   button: {
                     backgroundColor: Color.primary,
@@ -698,6 +735,9 @@ const App = () => {
                     marginVertical: 2,
                     fontWeight: '600',
                   },
+                  moreButtonIcon: {
+                    tintColor: R.colors.timerBackground
+                  }
                 },
                 sectionHeader: {
                   color: Color.textMain,
@@ -788,6 +828,13 @@ const App = () => {
                 referral: {
                   soFar: '_SO FAR_',
                   tickets: '_TICKETS_'
+                },
+                bottomSheetModal: {
+                  title: '_Ticket_Actions_',
+                },
+                ticketActions: {
+                  downloadPdf: '_Download_PDF_',
+                  sell: '_Sell_Ticket_',
                 }
               }}
               onPressResaleTicket={handleOnPressSellTicket} onRemoveTicketFromResaleSuccess={(message) => {
