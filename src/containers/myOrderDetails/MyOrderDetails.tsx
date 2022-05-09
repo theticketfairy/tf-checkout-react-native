@@ -13,6 +13,7 @@ import { IMyOrderDetailsData, IMyOrderDetailsTicket } from '../../api/types'
 import { OrderDetailsCore } from '../../core'
 import OrderDetailsCoreHandle from '../../core/OrderDetailsCore/OrderDetailsCoreTypes'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
+import { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem'
 import MyOrderDetailsView from './MyOrderDetailsView'
 import { DownloadStatus, IMyOrderDetailsProps } from './types'
 
@@ -29,6 +30,7 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
 
   onRemoveTicketFromResaleSuccess,
   onRemoveTicketFromResaleError,
+  moreButtonIcon,
 }) => {
   const [isWriteStorageEnabled, setIsWriteStorageEnabled] = useState<
     boolean | undefined
@@ -61,10 +63,16 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
     }, 3000)
   }
 
-  const handleOnPressTicketDownload = async (link: string, hash: string) => {
+  const handleOnPressTicketDownload = async ({
+    hash,
+    pdfLink,
+  }: IOnPressTicketDownload) => {
     const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
     if (!accessToken) {
       return setDownloadStatus(undefined)
+    }
+    if (!pdfLink) {
+      return setDownloadStatus('failed')
     }
 
     //Define path to store file along with the extension
@@ -80,7 +88,7 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
     }
     //Define options
     const options: DownloadFileOptions = {
-      fromUrl: link,
+      fromUrl: pdfLink,
       toFile: path,
       headers: headers,
     }
@@ -204,6 +212,7 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
         onPressResaleTicket={handleOnPressResaleTicket}
         onPressRemoveTicketFromResale={askToRemoveTicketFromResale}
         isLoading={isLoading}
+        moreButtonIcon={moreButtonIcon}
       />
     </OrderDetailsCore>
   )

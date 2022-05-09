@@ -682,7 +682,7 @@ const App = () => {
                   },
                 },
                 ticketItem: {
-                  container: {
+                  rootContainer: {
                     paddingHorizontal: 8,
                     borderWidth: 0,
                     backgroundColor: Color.gray80,
@@ -763,6 +763,8 @@ const App = () => {
                 title: '_MY ORDERS DETAILS_',
                 subTitle: '_Sub title_',
                 referralLink: '_Referral_',
+                ticketsTitle: '_Ticket_List_Title_',
+
                 listItem: {
                   title: '_Item_List_Title_',
                   price: '_Price_',
@@ -771,12 +773,13 @@ const App = () => {
                   total: '_Total_',
                 },
                 ticketItem: {
-                  title: '_Ticket_List_Title_',
                   ticketId: '_Ticket_Id_',
                   ticketType: '_Ticket_Type_',
-                  ticketHolder: '_Ticket_Holder_',
+                  holderName: '_Ticket_Holder_',
                   status: '_Status_',
                   download: '_Download_',
+                  sellTicket: '_Sell_Ticket_',
+                  removeTicketFromResale: 'removeTicketFromResale',
                 },
                 copyText: {
                   copy: '_Copy_',

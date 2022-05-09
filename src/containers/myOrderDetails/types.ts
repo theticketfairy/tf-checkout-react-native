@@ -14,6 +14,11 @@ import {
 import { IButtonStyles } from '../../components/button/types'
 import { IError } from '../../types'
 import { INotificationIcons } from './components/Notification'
+import { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem'
+import {
+  ITicketListItemStyles,
+  ITicketListItemTexts,
+} from './components/TicketListItem/TicketListItemTypes'
 
 export interface IMyOrdersDetailsConfig {
   areActivityIndicatorsEnabled?: boolean
@@ -38,6 +43,8 @@ export interface IMyOrderDetailsProps {
   onAndroidWritePermission?: (permission?: boolean) => void
   onLinkCopied?: (copied?: boolean) => void
 
+  moreButtonIcon?: StyleProp<ImageStyle>
+
   styles?: IMyOrderDetailsStyles
   texts?: IMyOrderDetailsTexts
 }
@@ -51,7 +58,7 @@ export interface IMyOrderDetailsViewProps {
 
   isLinkCopied?: boolean
   onPressCopyLink: () => void
-  onPressTicketDownload: (link: string, hash: string) => void
+  onPressTicketDownload: (payload: IOnPressTicketDownload) => void
 
   // Used to navigate to the Resale Tickets screen
   onPressResaleTicket: (ticket: IMyOrderDetailsTicket) => void
@@ -64,6 +71,8 @@ export interface IMyOrderDetailsViewProps {
 
   styles?: IMyOrderDetailsStyles
   texts?: IMyOrderDetailsTexts
+
+  moreButtonIcon?: StyleProp<ImageStyle>
 }
 
 export interface IOrderDetailsSectionData {
@@ -91,14 +100,7 @@ export interface IMyOrderDetailsTexts {
     quantity?: string
     total?: string
   }
-  ticketItem?: {
-    title?: string
-    ticketId?: string
-    ticketType?: string
-    ticketHolder?: string
-    status?: string
-    download?: string
-  }
+  ticketItem?: ITicketListItemTexts
   downloadNotification?: {
     successMessage?: string
     errorMessage?: string
@@ -109,6 +111,7 @@ export interface IMyOrderDetailsTexts {
   }
   sellTicket?: string
   removeTicketFromResale?: string
+  ticketsTitle?: string
 }
 
 export interface IMyOrderDetailsStyles {
@@ -146,12 +149,6 @@ export interface IMyOrderDetailsStyles {
     rowPlaceholder?: StyleProp<TextStyle>
     rowValue?: StyleProp<TextStyle>
   }
-  ticketItem?: {
-    container?: StyleProp<ViewStyle>
-    innerLeftContainer?: StyleProp<ViewStyle>
-    innerRightContainer?: StyleProp<ViewStyle>
-    rowPlaceholder?: StyleProp<TextStyle>
-    rowValue?: StyleProp<TextStyle>
-  }
+  ticketItem?: ITicketListItemStyles
   downloadButton?: IButtonStyles
 }
