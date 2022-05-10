@@ -1083,9 +1083,21 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
 
 ### Props
 
-```js
+```tsx
 {
   data: IMyOrderDetailsData
+
+  // Used to navigate to the Resale Tickets screen
+  onPressResaleTicket: (
+    ticket: IMyOrderDetailsTicket,
+    isTicketTypeActive: boolean
+  ) => void
+
+  onRemoveTicketFromResaleSuccess: (message: string) => void
+
+  onRemoveTicketFromResaleError?: (error: IError) => void
+
+
   config?: {
     areActivityIndicatorsEnabled?: boolean
     areAlertsEnabled?: boolean
@@ -1101,6 +1113,16 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
   }
   onAndroidWritePermission?: (permission?: boolean) => void
   onLinkCopied?: (copied?: boolean) => void
+
+  moreButtonIcon?: StyleProp<ImageStyle>
+
+  ticketActionsIcons?: {
+    downloadPdf?: ImageSourcePropType
+    sell?: ImageSourcePropType
+    removeFromSale?: ImageSourcePropType
+    refund?: ImageSourcePropType
+  }
+
   styles?: {
     rootContainer?: StyleProp<ViewStyle>
     header?: {
@@ -1137,13 +1159,35 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
       rowValue?: StyleProp<TextStyle>
     }
     ticketItem?: {
-      container?: StyleProp<ViewStyle>
-      innerLeftContainer?: StyleProp<ViewStyle>
-      innerRightContainer?: StyleProp<ViewStyle>
+      rootContainer?: StyleProp<ViewStyle>
+      leftContent?: StyleProp<ViewStyle>
+      rightContent?: StyleProp<ViewStyle>
       rowPlaceholder?: StyleProp<TextStyle>
       rowValue?: StyleProp<TextStyle>
+      downloadButton?: IButtonStyles
+      moreButton?: StyleProp<ViewStyle>
+      moreButtonIcon?: StyleProp<ImageStyle>
     }
-    downloadButton?: IButtonStyles
+    downloadButton?: {
+      container?: StyleProp<ViewStyle>
+      button?: StyleProp<ViewStyle>
+      text?: StyleProp<TextStyle>
+    }
+    bottomSheetModal?: {
+      rootContainer?: StyleProp<ViewStyle>
+      headerContainer?: StyleProp<ViewStyle>
+      content?: StyleProp<ViewStyle>
+      title?: StyleProp<TextStyle>
+      closeButton?: StyleProp<ViewStyle>
+      closeButtonIcon?: StyleProp<ImageStyle>
+      contentContainer?: StyleProp<ViewStyle>
+    }
+  ticketActions?: {
+    rootScrollViewContainer?: StyleProp<ViewStyle>
+    buttonContainer?: StyleProp<ViewStyle>
+    buttonContent?: StyleProp<ViewStyle>
+    icon?: StyleProp<ImageStyle>
+    text?: StyleProp<TextStyle>
   }
   texts?: {
     title?: string
@@ -1161,12 +1205,13 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
       total?: string
     }
     ticketItem?: {
-      title?: string
-      ticketId?: string
-      ticketType?: string
-      ticketHolder?: string
-      status?: string
-      download?: string
+      ticketType: string
+      holderName: string
+      ticketId: string
+      status: string
+      download: string
+      sellTicket: string
+      removeTicketFromResale: string
     }
     downloadNotification?: {
       successMessage?: string
@@ -1178,6 +1223,17 @@ import { MyOrderDetails } from 'tf-checkout-react-native'
     }
     sellTicket?: string
     removeTicketFromResale?: string
+    ticketsTitle?: string
+
+    bottomSheetModal?:  {
+      title?: string
+    }
+    ticketActions?: {
+      downloadPdf?: string
+      sell?: string
+      removeFromSale?: string
+      refund?: string
+    }
   }
 }
 ```
