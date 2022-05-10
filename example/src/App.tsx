@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React, { useEffect, useState } from 'react'
-import { Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
   IMyOrderDetailsData,
