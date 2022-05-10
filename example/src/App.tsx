@@ -736,7 +736,7 @@ const App = () => {
                     fontWeight: '600',
                   },
                   moreButtonIcon: {
-                    tintColor: R.colors.timerBackground
+                    tintColor: R.colors.white
                   }
                 },
                 sectionHeader: {
