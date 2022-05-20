@@ -717,6 +717,9 @@ interface IBillingInfoViewTexts {
       label?: string
       customError?: string
     }
+    cartTimer?: {
+      message?: string
+    }
   }
 }
 ```
@@ -770,6 +773,15 @@ interface IBillingInfoViewStyles {
       button?: StyleProp<ViewStyle>
     }
     input?: IInputStyles
+  }
+
+  cartTimer?:  {
+    rootContainer?: StyleProp<ViewStyle>
+    contentContainer?: StyleProp<ViewStyle>
+    textsContainer?: StyleProp<ViewStyle>
+    icon?: StyleProp<ImageStyle>
+    message?: StyleProp<TextStyle>
+    time?: StyleProp<TextStyle>
   }
 }
 ```
@@ -837,6 +849,9 @@ Add it to the render function.
       price?: string
       total?: string
     }
+    cartTimer?: {
+      message?: string
+    }
   }
 
   styles?: ICheckoutStyles
@@ -883,6 +898,14 @@ Add it to the render function.
     cardContainer?: StyleProp<ViewStyle>
     button?: IButtonStyles
     buttonDisabled?: IButtonStyles
+  }
+  cartTimer?: {
+    rootContainer?: StyleProp<ViewStyle>
+    contentContainer?: StyleProp<ViewStyle>
+    textsContainer?: StyleProp<ViewStyle>
+    icon?: StyleProp<ImageStyle>
+    message?: StyleProp<TextStyle>
+    time?: StyleProp<TextStyle>
   }
 }
 ```
