@@ -10,9 +10,12 @@ import {
 } from 'react-native-fs'
 
 import { IMyOrderDetailsData, IMyOrderDetailsTicket } from '../../api/types'
+import { BottomSheetHandle } from '../../components/bottomSheetModal/BottomSheetModal'
 import { OrderDetailsCore } from '../../core'
 import OrderDetailsCoreHandle from '../../core/OrderDetailsCore/OrderDetailsCoreTypes'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
+import { TicketActionType } from './components/TicketActions/TicketActionsTypes'
+import { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem'
 import MyOrderDetailsView from './MyOrderDetailsView'
 import { DownloadStatus, IMyOrderDetailsProps } from './types'
 
@@ -29,6 +32,8 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
 
   onRemoveTicketFromResaleSuccess,
   onRemoveTicketFromResaleError,
+  moreButtonIcon,
+  ticketActionsIcons,
 }) => {
   const [isWriteStorageEnabled, setIsWriteStorageEnabled] = useState<
     boolean | undefined
@@ -40,11 +45,15 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
   const [orderInfo, setOrderInfo] = useState<IMyOrderDetailsData>(data)
   const [isLoading, setIsLoading] = useState(false)
 
+  const [selectedTicket, setSelectedTicket] = useState<
+    IMyOrderDetailsTicket | undefined
+  >(undefined)
+
   //#region refs
   const myOrderDetailsCoreRef = useRef<OrderDetailsCoreHandle>(null)
+  const bottomSheetModalRef = useRef<BottomSheetHandle>(null)
   //#endregion
 
-  //#region Handlers
   const handleOnDownloadStatusChange = useCallback(
     (status?: DownloadStatus) => {
       onDownloadStatusChange?.(status)
@@ -52,19 +61,17 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
     [onDownloadStatusChange]
   )
 
-  const handleOnPressCopyLink = () => {
-    setIsLinkCopied(true)
-    onLinkCopied?.(true)
-    setTimeout(() => {
-      setIsLinkCopied(false)
-      onLinkCopied?.(false)
-    }, 3000)
-  }
-
-  const handleOnPressTicketDownload = async (link: string, hash: string) => {
+  //#region Handlers
+  const handleOnPressTicketDownload = async ({
+    hash,
+    pdfLink,
+  }: IOnPressTicketDownload) => {
     const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
     if (!accessToken) {
       return setDownloadStatus(undefined)
+    }
+    if (!pdfLink) {
+      return setDownloadStatus('failed')
     }
 
     //Define path to store file along with the extension
@@ -80,7 +87,7 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
     }
     //Define options
     const options: DownloadFileOptions = {
-      fromUrl: link,
+      fromUrl: pdfLink,
       toFile: path,
       headers: headers,
     }
@@ -153,6 +160,54 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
 
     return onPressResaleTicket(ticket, activeTicketType!.isActive)
   }
+
+  const handleCloseBottomSheet = () => {
+    if (bottomSheetModalRef.current) {
+      bottomSheetModalRef.current.close()
+    }
+    setSelectedTicket(undefined)
+  }
+
+  const handleOnActionSelected = async (action: TicketActionType) => {
+    if (!selectedTicket) {
+      return
+    }
+
+    switch (action) {
+      case 'download-pdf':
+        handleOnPressTicketDownload({
+          hash: selectedTicket.hash,
+          pdfLink: selectedTicket.pdfLink,
+        })
+        handleCloseBottomSheet()
+        break
+
+      case 'refund':
+        break
+
+      case 'sell':
+        handleOnPressResaleTicket(selectedTicket)
+        handleCloseBottomSheet()
+        break
+
+      case 'remove-from-sale':
+        await handleRemoveTicketFromResale(selectedTicket)
+        handleCloseBottomSheet()
+        break
+
+      default:
+        console.log('Nothing is selected')
+    }
+  }
+
+  const handleOnPressCopyLink = () => {
+    setIsLinkCopied(true)
+    onLinkCopied?.(true)
+    setTimeout(() => {
+      setIsLinkCopied(false)
+      onLinkCopied?.(false)
+    }, 3000)
+  }
   //#endregion
 
   //#region Effects
@@ -204,6 +259,12 @@ const MyOrderDetails: FC<IMyOrderDetailsProps> = ({
         onPressResaleTicket={handleOnPressResaleTicket}
         onPressRemoveTicketFromResale={askToRemoveTicketFromResale}
         isLoading={isLoading}
+        moreButtonIcon={moreButtonIcon}
+        onTicketSelection={setSelectedTicket}
+        selectedTicket={selectedTicket}
+        onActionSelected={handleOnActionSelected}
+        ticketActionsIcons={ticketActionsIcons}
+        bottomSheetModalRef={bottomSheetModalRef}
       />
     </OrderDetailsCore>
   )
