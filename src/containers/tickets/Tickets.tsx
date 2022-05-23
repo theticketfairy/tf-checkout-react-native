@@ -111,6 +111,7 @@ const Tickets: FC<ITicketsProps> = ({
 
   const getTickets = async (promoCode: string = '') => {
     setIsGettingTickets(true)
+    isApiErrorRef.current = false
     const {
       error,
       tickets: responseTickets,
