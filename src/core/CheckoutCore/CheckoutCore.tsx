@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { forwardRef, useImperativeHandle } from 'react'
+import BackgroundTimer from 'react-native-background-timer'
 
 import {
   fetchEventConditions,
@@ -13,11 +14,49 @@ import {
   IMyOrderDetailsResponse,
   IOrderReviewResponse,
 } from '../../api/types'
-import { ICoreProps } from '../CoreProps'
-import { CheckoutCoreHandle } from './CheckoutCoreTypes'
+import { CheckoutCoreHandle, ICheckoutCoreProps } from './CheckoutCoreTypes'
 
-const CheckoutCore = forwardRef<CheckoutCoreHandle, ICoreProps>(
+const CheckoutCore = forwardRef<CheckoutCoreHandle, ICheckoutCoreProps>(
   (props, ref) => {
+    const [secondsLeft, setSecondsLeft] = useState(420)
+    const [timerOn, setTimerOn] = useState(false)
+
+    const handleStartTimer = useCallback(() => {
+      BackgroundTimer.runBackgroundTimer(() => {
+        setSecondsLeft((secs) => {
+          if (secs > 0) {
+            return secs - 1
+          } else {
+            return 0
+          }
+        })
+      }, 1000)
+    }, [])
+
+    const handleTimeIsUp = () => {
+      BackgroundTimer.stopBackgroundTimer()
+      props.onCartExpired?.()
+    }
+
+    useEffect(() => {
+      if (secondsLeft === 0) {
+        handleTimeIsUp()
+      }
+      props.onSecondsLeftChange?.(secondsLeft)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [secondsLeft])
+
+    useEffect(() => {
+      if (timerOn) {
+        handleStartTimer()
+      } else {
+        BackgroundTimer.stopBackgroundTimer()
+      }
+      return () => {
+        BackgroundTimer.stopBackgroundTimer()
+      }
+    }, [handleStartTimer, timerOn])
+
     useImperativeHandle(ref, () => ({
       async getEventConditions(eventId: string): Promise<any> {
         return await fetchEventConditions(eventId)
@@ -28,7 +67,12 @@ const CheckoutCore = forwardRef<CheckoutCoreHandle, ICoreProps>(
         return await fetchOrderDetails(orderId)
       },
       async getOrderReview(orderHash: string): Promise<IOrderReviewResponse> {
-        return await fetchOrderReview(orderHash)
+        const res = await fetchOrderReview(orderHash)
+        if (res.orderReviewData) {
+          setSecondsLeft(res.orderReviewData.expiresAt)
+          setTimerOn(true)
+        }
+        return res
       },
       async freeRegistration(
         orderHash: string

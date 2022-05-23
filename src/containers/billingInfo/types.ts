@@ -8,6 +8,10 @@ import {
 } from 'react-native'
 
 import { IButtonStyles } from '../../components/button/types'
+import {
+  ICartTimerStyles,
+  ICartTimerTexts,
+} from '../../components/cartTimer/types'
 import { ICheckboxStyles } from '../../components/checkbox/types'
 import { IDatePickerStyles } from '../../components/datePicker/types'
 import { IDropdownStyles } from '../../components/dropdown/types'
@@ -55,11 +59,11 @@ export interface IBillingProps {
   onLogoutSuccess?: () => void
   onLogoutError?: (error: IError) => void
 
-  //fetchUserProfile
+  // fetchUserProfile
   onFetchUserProfileSuccess?: (data: any) => void
   onFetchUserProfileError?: (error: IError) => void
 
-  //fetchCart
+  // fetchCart
   onFetchCartError?: (error: IError) => void
   onFetchCartSuccess?: () => void
 
@@ -70,6 +74,9 @@ export interface IBillingProps {
   // fetchState
   onFetchStatesError?: (error: IError) => void
   onFetchStatesSuccess?: () => void
+
+  // cartExpired
+  onCartExpired: () => void
 
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
@@ -96,6 +103,8 @@ export interface IBillingProps {
   areAlertsEnabled?: boolean
   onLoadingChange?: (isLoading: boolean) => void
   onSkippingStatusChange?: (status: SkippingStatusType) => void
+
+  shouldCartTimerNotMinimizeOnTap?: boolean
 }
 
 export interface ITicketHolderField {
@@ -134,6 +143,8 @@ export interface IBillingInfoViewStyles {
   privacyPolicyLinkStyle?: StyleProp<TextStyle>
 
   phoneInput?: IPhoneInputStyles
+
+  cartTimer?: ICartTimerStyles
 }
 
 export interface IBillingInfoViewTexts {
@@ -171,6 +182,7 @@ export interface IBillingInfoViewTexts {
     optional?: string
     phoneInput?: IPhoneInputTexts
   }
+  cartTimer?: ICartTimerTexts
 }
 
 export type SkippingStatusType =

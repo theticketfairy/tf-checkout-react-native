@@ -25,6 +25,7 @@ import Constants from '../../api/Constants'
 import { ICheckoutBody, ICheckoutTicketHolder } from '../../api/types'
 import {
   Button,
+  CartTimer,
   Checkbox,
   DatePicker,
   DropdownMaterial,
@@ -89,6 +90,8 @@ const Billing: FC<IBillingProps> = ({
   onSkippingStatusChange,
   onLogoutSuccess,
   onLogoutError,
+  onCartExpired,
+  shouldCartTimerNotMinimizeOnTap,
 }) => {
   //#region Labels
   const holderLabels = useMemo(() => {
@@ -160,6 +163,7 @@ const Billing: FC<IBillingProps> = ({
   const [selectedState, setSelectedState] = useState<IDropdownItem | undefined>(
     undefined
   )
+
   const [ticketHoldersData, setTicketHoldersData] = useState<
     ITicketHolderField[]
   >([])
@@ -172,8 +176,12 @@ const Billing: FC<IBillingProps> = ({
   const [countries, setCountries] = useState<IDropdownItem[]>([])
 
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
-  const [skipping, setSkippingStatus] = useState<SkippingStatusType>(undefined)
+  const [skippingStatus, setSkippingStatus] =
+    useState<SkippingStatusType>(undefined)
   const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
+
+  // Cart expiration timer
+  const [secondsLeft, setSecondsLeft] = React.useState(420)
 
   // Errors state
   const firstNameError = useDebounced(firstName, validateEmpty)
@@ -199,7 +207,7 @@ const Billing: FC<IBillingProps> = ({
   //#endregion
 
   const getSkippingStatus = (numOfTickets: number): SkippingStatusType => {
-    if (isBillingRequired || skipping === 'fail') {
+    if (isBillingRequired || skippingStatus === 'fail') {
       return 'false'
     }
 
@@ -322,13 +330,13 @@ const Billing: FC<IBillingProps> = ({
     } catch (err) {
       phoneCountry = 'US'
     }
-    if (!usrProfile.phone.includes('+')) {
+    if (!usrProfile.phone?.includes('+')) {
       usrProfile.phone = `${getCountryDialCode(phoneCountry)}${
         usrProfile.phone
       }`
     }
 
-    if (!isBillingRequired && skipping === 'fail') {
+    if (!isBillingRequired && skippingStatus === 'fail') {
       setSkippingStatus('skipping')
 
       const phoneValidError = validatePhoneNumber({
@@ -337,9 +345,12 @@ const Billing: FC<IBillingProps> = ({
       })
 
       if (phoneValidError) {
-        showAlert(texts?.invalidPhoneNumberError || phoneValidError)
+        setIsLoading(false)
+        showAlert(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
         return handleSetPhoneError(
-          texts?.invalidPhoneNumberError || phoneValidError
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
         )
       }
 
@@ -415,6 +426,10 @@ const Billing: FC<IBillingProps> = ({
   }
 
   const checkBasicDataValid = (): boolean => {
+    if (secondsLeft === 0) {
+      return false
+    }
+
     if (
       !firstName ||
       !lastName ||
@@ -429,17 +444,18 @@ const Billing: FC<IBillingProps> = ({
     }
 
     if (
-      isPhoneRequired ||
-      (phone.length > 0 &&
-        validatePhoneNumber({
-          phoneNumber: phone,
-          customError: texts?.form?.phoneInput?.customError,
-        }))
+      isPhoneRequired &&
+      validatePhoneNumber({
+        phoneNumber: phone,
+        customError: texts?.form?.phoneInput?.customError,
+      })
     ) {
+      setIsLoading(false)
       return false
     }
 
     if (Config.IS_BILLING_STREET_NAME_REQUIRED && !street) {
+      setIsLoading(false)
       return false
     }
 
@@ -772,6 +788,10 @@ const Billing: FC<IBillingProps> = ({
     setIsSubToTicketFairy(cartData.isTfOptIn)
     setIsTtfCheckboxHidden(cartData.isTfOptInHidden || false)
 
+    if (cartData.expiresAt) {
+      setSecondsLeft(cartData.expiresAt)
+    }
+
     const tHolders: ITicketHolderField[] = []
     for (let i = 0; i < cartData.quantity; i++) {
       tHolders.push({
@@ -799,7 +819,7 @@ const Billing: FC<IBillingProps> = ({
           })
           return await performCheckout(checkoutBody)
         } else {
-          if (skipping === 'skipping') {
+          if (skippingStatus === 'skipping') {
             setSkippingStatus('fail')
           }
         }
@@ -812,6 +832,7 @@ const Billing: FC<IBillingProps> = ({
       // There is no user profile data
       setPhone(phoneCountryDialCode)
     }
+
     setCountries(parsedCountries)
     setTicketHoldersData(tHolders)
     setIsLoading(false)
@@ -823,8 +844,8 @@ const Billing: FC<IBillingProps> = ({
   }, [isLoading, handleOnLoadingChange])
 
   useEffect(() => {
-    handleOnSkippingStatusChange(skipping)
-  }, [handleOnSkippingStatusChange, skipping])
+    handleOnSkippingStatusChange(skippingStatus)
+  }, [handleOnSkippingStatusChange, skippingStatus])
 
   useEffect(() => {
     if (countries.length > 1 && countryId) {
@@ -1010,12 +1031,8 @@ const Billing: FC<IBillingProps> = ({
     )
   }
 
-  const isDataValid = checkBasicDataValid()
-
-  return skipping === 'skipping' && areLoadingIndicatorsEnabled ? (
-    renderCheckingOut()
-  ) : (
-    <BillingCore ref={billingCoreRef}>
+  const renderContent = () => (
+    <>
       <KeyboardAwareScrollView extraScrollHeight={32}>
         <View style={styles?.rootContainer}>
           <Login
@@ -1221,6 +1238,26 @@ const Billing: FC<IBillingProps> = ({
         </View>
         {areLoadingIndicatorsEnabled && isLoading && <Loading />}
       </KeyboardAwareScrollView>
+      <CartTimer
+        secondsLeft={secondsLeft}
+        styles={styles?.cartTimer}
+        texts={texts?.cartTimer}
+        shouldNotMinimize={shouldCartTimerNotMinimizeOnTap}
+      />
+    </>
+  )
+
+  const isDataValid = checkBasicDataValid()
+
+  return (
+    <BillingCore
+      ref={billingCoreRef}
+      onSecondsLeftChange={setSecondsLeft}
+      onCartExpired={onCartExpired}
+    >
+      {skippingStatus === 'skipping' && areLoadingIndicatorsEnabled
+        ? renderCheckingOut()
+        : renderContent()}
     </BillingCore>
   )
   //#endregion

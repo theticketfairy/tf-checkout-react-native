@@ -1,5 +1,6 @@
 export { default as BottomSheetModal } from './bottomSheetModal/BottomSheetModal'
 export { default as Button } from './button/Button'
+export { default as CartTimer } from './cartTimer/CartTimer'
 export { default as Checkbox } from './checkbox/Checkbox'
 export { default as DatePicker } from './datePicker/DatePicker'
 export { default as Dropdown } from './dropdown/Dropdown'

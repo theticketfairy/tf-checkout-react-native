@@ -13,7 +13,7 @@ import { Alert, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import { IOrderReview } from '../../api/types'
-import { Loading } from '../../components'
+import { CartTimer, Loading } from '../../components'
 import Button from '../../components/button/Button'
 import { IFormFieldProps } from '../../components/formField/types'
 import { CheckoutCore, CheckoutCoreHandle } from '../../core'
@@ -44,6 +44,8 @@ const Checkout: FC<ICheckoutProps> = ({
   onLoadingChange,
   onFetchOrderDetailsError,
   onFetchOrderDetailsSuccess,
+  onCartExpired,
+  shouldCartTimerNotMinimizeOnTap,
 }) => {
   const { confirmPayment, loading: isLoadingPayment } = useConfirmPayment()
   const [isLoading, setIsLoading] = useState(true)
@@ -54,6 +56,7 @@ const Checkout: FC<ICheckoutProps> = ({
   const [paymentInfo, setPaymentInfo] = useState<CardFormView.Details>()
   const [isStripeConfigMissing, setIsStripeConfigMissing] = useState(false)
   const [isPaymentRequired, setIsPaymentRequired] = useState(false)
+  const [secondsLeft, setSecondsLeft] = useState<number | undefined>(undefined)
 
   const checkoutCoreRef = useRef<CheckoutCoreHandle>(null)
 
@@ -294,6 +297,7 @@ const Checkout: FC<ICheckoutProps> = ({
 
       hideLoading()
       onFetchOrderReviewSuccess?.(orderReviewData)
+      setSecondsLeft(orderReviewData.expiresAt)
 
       const tOrderInfo = [...orderInfo]
       const currency = orderReviewData.reviewData.currency
@@ -352,6 +356,9 @@ const Checkout: FC<ICheckoutProps> = ({
   //#endregion
 
   const getIsDataValid = () => {
+    if (secondsLeft === 0) {
+      return false
+    }
     const paymentValid = paymentInfo?.complete
     return paymentValid && _every(conditionsValues, (item) => item === true)
   }
@@ -380,7 +387,11 @@ const Checkout: FC<ICheckoutProps> = ({
       />
     </View>
   ) : (
-    <CheckoutCore ref={checkoutCoreRef}>
+    <CheckoutCore
+      ref={checkoutCoreRef}
+      onSecondsLeftChange={setSecondsLeft}
+      onCartExpired={onCartExpired}
+    >
       <KeyboardAwareScrollView extraScrollHeight={32}>
         <View style={styles?.rootStyle}>
           <View>
@@ -428,11 +439,20 @@ const Checkout: FC<ICheckoutProps> = ({
               onPress={handleOnPressFreeRegistration}
               isLoading={isLoading || isLoadingPayment}
               styles={styles?.freeRegistrationButton}
+              isDisabled={secondsLeft === 0}
             />
           )}
         </View>
         {isLoading && areLoadingIndicatorsEnabled && <Loading />}
       </KeyboardAwareScrollView>
+      {secondsLeft !== undefined && (
+        <CartTimer
+          secondsLeft={secondsLeft!}
+          styles={styles?.cartTimer}
+          texts={texts?.cartTimer}
+          shouldNotMinimize={shouldCartTimerNotMinimizeOnTap}
+        />
+      )}
     </CheckoutCore>
   )
 }

@@ -2,6 +2,10 @@ import { CardFormView } from '@stripe/stripe-react-native'
 import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 import { IButtonStyles } from '../../components/button/types'
+import {
+  ICartTimerStyles,
+  ICartTimerTexts,
+} from '../../components/cartTimer/types'
 import { IFormFieldProps } from '../../components/formField/types'
 import { IError } from '../../types'
 import { IOnCheckoutSuccess } from '../billingInfo/types'
@@ -25,6 +29,7 @@ export interface ICheckoutStyles {
     button?: IButtonStyles
     buttonDisabled?: IButtonStyles
   }
+  cartTimer?: ICartTimerStyles
 }
 
 export interface IOrderDetailsTicketHolder {
@@ -85,6 +90,7 @@ export interface ICheckoutProps {
       price?: string
       total?: string
     }
+    cartTimer?: ICartTimerTexts
   }
 
   styles?: ICheckoutStyles
@@ -92,6 +98,9 @@ export interface ICheckoutProps {
   onLoadingChange?: (isLoading: boolean) => void
   areAlertsEnabled?: boolean
   areLoadingIndicatorsEnabled?: boolean
+
+  onCartExpired?: () => void
+  shouldCartTimerNotMinimizeOnTap?: boolean
 }
 
 // Components
@@ -125,6 +134,8 @@ export interface ICheckoutViewProps {
     subTitle?: string
     missingStripeConfigMessage?: string
     exitButton?: string
+
+    cartTimer?: ICartTimerTexts
   }
   styles?: ICheckoutStyles
   orderReviewDataItems: IOrderItem[]
