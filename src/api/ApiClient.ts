@@ -440,14 +440,14 @@ export const fetchTickets = async (
     //@ts-ignore
     headers: headers,
   }).catch((error: AxiosError) => {
-    if (error.message) {
+    if (error.response) {
       responseError = {
-        message: error.message,
+        code: error.response.status!,
+        message: error.response.data.message,
       }
     } else {
       responseError = {
-        code: error.response?.status!,
-        message: error.response?.data.message,
+        message: error.message,
       }
     }
   })
