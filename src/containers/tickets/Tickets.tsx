@@ -58,6 +58,7 @@ const Tickets: FC<ITicketsProps> = ({
   //#region Refs
   const eventErrorCodeRef = useRef(0)
   const ticketsCoreRef = useRef<TicketsCoreHandle>(null)
+  const isApiErrorRef = useRef<boolean>(false)
   //#endregion
 
   const showAlert = (message: string) => {
@@ -121,6 +122,7 @@ const Tickets: FC<ITicketsProps> = ({
 
     if (error) {
       onFetchTicketsError?.(error)
+      isApiErrorRef.current = true
       return showAlert('Error while getting tickets, please try again')
     }
 
@@ -166,6 +168,9 @@ const Tickets: FC<ITicketsProps> = ({
   }
 
   const getEventData = async () => {
+    if (isApiErrorRef.current === true) {
+      return
+    }
     setIsGettingEvent(true)
     const { eventError, eventData } = await getEventCore()
     setIsGettingEvent(false)
