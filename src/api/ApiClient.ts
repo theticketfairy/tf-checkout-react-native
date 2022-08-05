@@ -4,6 +4,12 @@ import _filter from 'lodash/filter'
 import _get from 'lodash/get'
 import _map from 'lodash/map'
 import _sortBy from 'lodash/sortBy'
+import {
+  getBrand,
+  getDeviceType,
+  getProduct,
+  getSystemName,
+} from 'react-native-device-info'
 
 import { IOnCheckoutSuccess } from '..'
 import { IWaitingListFields } from '../components/waitingList/types'
@@ -71,6 +77,40 @@ axiosRetry(Client, { retries: 3 })
 Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
   const guestToken = await getData(LocalStorageKeys.AUTH_GUEST_TOKEN)
   const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
+
+  const switchGetDeviceType = () => {
+    const deviceType = getDeviceType()
+    switch (deviceType) {
+      case 'Tablet':
+        return 'Tablet'
+      case 'Handset':
+        return 'Mobile Device'
+      case 'Desktop':
+        return 'Desktop'
+      default:
+        return 'unknown'
+    }
+  }
+
+  const switchGetSystemName = () => {
+    const deviceType = getSystemName()
+    switch (deviceType) {
+      case 'Android':
+        return 'Android OS'
+      default:
+        return 'iPod, iPhone & iPad'
+    }
+  }
+
+  if (config.headers) {
+    config.headers['Device-Info'] = JSON.stringify({
+      browser: 'TF Checkout React Native',
+      device_type: switchGetDeviceType(),
+      platform_description: switchGetSystemName(),
+      device_brand_name: getBrand(),
+      device_name: await getProduct(),
+    })
+  }
 
   if (accessToken) {
     const updatedHeaders = {
