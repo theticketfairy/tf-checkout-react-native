@@ -1,7 +1,10 @@
-import { getDeviceType, getSystemName } from 'react-native-device-info'
+import {
+  getDeviceType as getDeviceTypeInfo,
+  getSystemName as getSystemNameInfo,
+} from 'react-native-device-info'
 
-export const switchGetDeviceType = () => {
-  const deviceType = getDeviceType()
+export const getDeviceType = () => {
+  const deviceType = getDeviceTypeInfo()
   switch (deviceType) {
     case 'Tablet':
       return 'Tablet'
@@ -14,8 +17,8 @@ export const switchGetDeviceType = () => {
   }
 }
 
-export const switchGetSystemName = () => {
-  const deviceType = getSystemName()
+export const getSystemName = () => {
+  const deviceType = getSystemNameInfo()
   switch (deviceType) {
     case 'Android':
       return 'Android OS'

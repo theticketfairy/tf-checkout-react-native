@@ -9,7 +9,7 @@ import { getBrand, getProduct } from 'react-native-device-info'
 import { IOnCheckoutSuccess } from '..'
 import { IWaitingListFields } from '../components/waitingList/types'
 import { Config } from '../helpers/Config'
-import { switchGetDeviceType, switchGetSystemName } from '../helpers/Device'
+import { getDeviceType, getSystemName } from '../helpers/Device'
 import {
   deleteAllData,
   getData,
@@ -77,8 +77,8 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
   if (config.headers) {
     config.headers['Device-Info'] = JSON.stringify({
       browser: 'TF Checkout React Native',
-      device_type: switchGetDeviceType(),
-      platform_description: switchGetSystemName(),
+      device_type: getDeviceType(),
+      platform_description: getSystemName(),
       device_brand_name: getBrand(),
       device_name: await getProduct(),
     })
