@@ -1,4 +1,8 @@
-import { IEventResponse, IFetchTicketsResponse } from '../../api/types'
+import {
+  IEventResponse,
+  IFetchTicketsResponse,
+  IPostReferralResponse,
+} from '../../api/types'
 import { IAddToCartResponse } from '../../types'
 
 export interface IBookTicketsOptions {
@@ -14,4 +18,5 @@ export type TicketsCoreHandle = {
   addToCart(options: IBookTicketsOptions): Promise<IAddToCartResponse>
   getIsUserLoggedIn(): Promise<boolean>
   logout(): Promise<void>
+  postReferralVisit(referralId: string): Promise<IPostReferralResponse>
 }
