@@ -1406,6 +1406,8 @@ Exposes the following functions:
 
 `addToCart` Adds the selected tickets to the cart.
 
+`postReferralVisit` Posts a referral visit to the server.
+
 ```js
 {
   // Fetches the tickets from the event set in the config function. It receives a promoCode parameter to apply to the tickets.
@@ -1557,6 +1559,18 @@ Exposes the following functions:
       minimumAge?: number
       isNameRequired?: boolean
     }
+
+    postReferralVisit(referralId: string): Promise<
+    postReferralError?: {
+      code?: number
+      message: string
+      extraData?: any
+    }
+    postReferralData?: {
+    message: string
+    status: number
+  }
+    >
   }>
 }
 ```
