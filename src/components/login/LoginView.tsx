@@ -42,6 +42,7 @@ const LoginView: FC<ILoginViewProps> = ({
   loginError,
   refs,
   brandImages,
+  isShowPasswordButtonVisible,
 }) => {
   const [data, setData] = useState<ILoginViewState>(initialState)
   const { email, password } = data
@@ -72,8 +73,13 @@ const LoginView: FC<ILoginViewProps> = ({
           onTextChanged: setInputData,
           label: texts?.dialog?.passwordLabel || 'Password',
           secureTextEntry: true,
-          styles: styles?.dialog?.input,
+          styles: {
+            input: styles?.dialog?.input,
+            showPasswordIcon: styles?.dialog?.showPasswordIcon,
+            ...styles,
+          },
           reference: refs?.inputs?.password,
+          isShowPasswordButtonVisible: isShowPasswordButtonVisible,
         },
       },
     ]

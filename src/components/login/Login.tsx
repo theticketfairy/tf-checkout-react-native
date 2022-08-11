@@ -19,6 +19,7 @@ const Login: FC<ILoginProps> = ({
   styles,
   refs,
   brandImages,
+  isShowPasswordButtonVisible,
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [loginError, setLoginError] = useState('')
@@ -81,6 +82,7 @@ const Login: FC<ILoginProps> = ({
         loginError={loginError}
         refs={refs}
         brandImages={brandImages}
+        isShowPasswordButtonVisible={isShowPasswordButtonVisible}
       />
     </LoginCore>
   )

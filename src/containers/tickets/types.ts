@@ -1,4 +1,10 @@
-import { ImageSourcePropType, TextStyle, ViewStyle } from 'react-native'
+import {
+  ImageSourcePropType,
+  ImageStyle,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 
 import { IEventData } from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
@@ -55,6 +61,10 @@ export interface ITicketsViewProps {
   onAddToWaitingListError?: (error: IError) => void
   onLoadingChange?: (isLoading: boolean) => void
   promoCodeCloseIcon?: ImageSourcePropType
+
+  isLoginDialogVisible: boolean
+  showLoginDialog: () => void
+  hideLoginDialog: () => void
 }
 
 export interface ITicketListStyles {
@@ -73,6 +83,7 @@ export interface ITicketsViewStyles {
   loading?: ILoadingStyles
   waitingList?: IWaitingListStyles
   loggedIn?: ILoggedInStyles
+  showPasswordIcon?: StyleProp<ImageStyle>
 }
 
 export interface ITicketsViewTexts {

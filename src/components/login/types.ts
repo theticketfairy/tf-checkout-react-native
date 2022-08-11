@@ -27,6 +27,10 @@ export interface ILoginBrandImages {
   image1Style?: StyleProp<ImageStyle>
   image2?: ImageSourcePropType
   image2Style?: StyleProp<ImageStyle>
+  showPassword?: ImageSourcePropType
+  hidePassword?: ImageSourcePropType
+  showPasswordStyle?: StyleProp<ImageStyle>
+  hidePasswordStyle?: StyleProp<ImageStyle>
 }
 
 export interface ILoginProps {
@@ -48,6 +52,7 @@ export interface ILoginProps {
   refs?: ILoginRefs
 
   brandImages?: ILoginBrandImages
+  isShowPasswordButtonVisible?: boolean
 }
 
 export interface ILoginViewStyles {
@@ -65,6 +70,7 @@ export interface ILoginViewStyles {
     input?: IInputStyles
     title?: StyleProp<TextStyle>
     message?: StyleProp<TextStyle>
+    showPasswordIcon?: StyleProp<ImageStyle>
   }
   loggedIn?: {
     container?: StyleProp<ViewStyle>
@@ -119,6 +125,8 @@ export interface ILoginViewProps {
   refs?: ILoginRefs
 
   brandImages?: ILoginBrandImages
+
+  isShowPasswordButtonVisible?: boolean
 }
 
 export interface ILoginFields {

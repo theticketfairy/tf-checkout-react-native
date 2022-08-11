@@ -1,5 +1,12 @@
 import { LegacyRef } from 'react'
-import { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import {
+  ColorValue,
+  ImageSourcePropType,
+  ImageStyle,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 import { TextField, TextFieldProps } from 'rn-material-ui-textfield'
 
 export interface IInputStyles {
@@ -11,6 +18,7 @@ export interface IInputStyles {
   baseColor?: ColorValue
   errorColor?: ColorValue
   fieldWrapper?: StyleProp<ViewStyle>
+  showPasswordIcon?: StyleProp<ImageStyle>
 }
 
 export interface IInputProps extends TextFieldProps {
@@ -25,4 +33,9 @@ export interface IInputProps extends TextFieldProps {
   onTextChanged?: (key: string, value: string) => void
 
   styles?: IInputStyles
+  isShowPasswordButtonVisible?: boolean
+  showPasswordImages?: {
+    show: ImageSourcePropType
+    hide: ImageSourcePropType
+  }
 }
