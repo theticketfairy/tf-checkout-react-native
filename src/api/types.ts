@@ -352,3 +352,19 @@ export interface IPostReferralResponse {
   postReferralError?: IError
   postReferralData?: IPostReferralData
 }
+
+export interface IResetPasswordRequestData {
+  token: string
+  password: string
+  confirmPassword: string
+}
+
+export interface IRestorePasswordSuccessData {
+  message: string
+  status?: number
+}
+
+export interface IRestorePasswordResponse {
+  data?: IRestorePasswordSuccessData
+  error?: IError
+}

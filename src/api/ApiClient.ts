@@ -53,6 +53,9 @@ import {
   IRemoveTicketFromResaleResponse,
   IResaleTicketData,
   IResaleTicketResponse,
+  IResetPasswordRequestData,
+  IRestorePasswordResponse,
+  IRestorePasswordSuccessData,
   IStatesResponse,
   IUserProfileResponse,
 } from './types'
@@ -969,4 +972,53 @@ export const removeTicketFromResale = async (
     removeTicketFromResaleError: responseError,
   }
 }
+//#endregion
+
+//#region Restore Password
+export const requestRestorePassword = async (
+  email: string
+): Promise<IRestorePasswordResponse> => {
+  let responseError: IError | undefined
+  let successData: IRestorePasswordSuccessData | undefined
+
+  const response: AxiosResponse | void = await Client.post(
+    `v1/oauth/restore-password-rn`,
+    {
+      email: email,
+    }
+  ).catch((error: AxiosError) => {
+    console.log('Restore passs error', error.response)
+    responseError = {
+      message: error.response?.data.message || 'Error while restoring password',
+      code: error.response?.status,
+    }
+  })
+
+  if (!responseError && response?.status === 200) {
+    successData = {
+      message: response.data.message,
+      status: response.data.status,
+    }
+  }
+
+  console.log('Restore Password', response)
+
+  return {
+    data: successData,
+    error: responseError,
+  }
+}
+
+export const requestResetPassword = async (data: IResetPasswordRequestData) => {
+  let responseError: IError | undefined
+  const response = await Client.post(`/auth/restore-password-rn`, data).catch(
+    (error: AxiosError) => {
+      console.log('Reset passs error', error.response)
+      //responseError?.code = 400
+    }
+  )
+
+  console.log('Reset Password', response)
+}
+
 //#endregion

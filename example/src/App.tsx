@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React, { useEffect, useState } from 'react'
-import { Alert, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
   IMyOrderDetailsData,
@@ -25,6 +25,11 @@ import styles from './styles'
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
+interface IDeepLinkUrl {
+  url: string
+}
+
+
 const EVENT_ID = 8667//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID //12796
 
 const config: IConfig = {
@@ -32,6 +37,7 @@ const config: IConfig = {
   DOMAIN: 'https://manacommon.com', //https://www.ticketfairy.com',
   BRAND: 'the-ticket-fairy',// 'mana-onetree-testing-brand',
   ARE_SUB_BRANDS_INCLUDED: true,
+  ENV: 'DEV'
 }
 
 const App = () => {
@@ -69,7 +75,6 @@ const App = () => {
     setIsTicketToSellActive(isActive)
     setComponentToShow(ComponentEnum.ResaleTickets)
   }
-
 
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
     setCartProps(data)
@@ -126,11 +131,31 @@ const App = () => {
     setCartProps(undefined)
   }
   //#endregion
+  const handleOpenUrl = ({url}: IDeepLinkUrl) =>{
+    console.log('Open urel', url)
+  }
+
+  const getInitialURL = async () => { 
+    const initialUrl = await Linking.getInitialURL();
+      console.log('initialurl', initialUrl)
+
+      if (initialUrl === null) {
+        return;
+      }
+
+      return initialUrl
+  }
 
   //#region effects
   useEffect(() => {
     setConfig(config)
+    Linking.addEventListener('url', handleOpenUrl)
+
+    return () => {
+      Linking.removeAllListeners('url')
+    }
   }, [])
+
   useEffect(() => {
     if (cartProps) {
       setComponentToShow(ComponentEnum.BillingInfo)

@@ -4,6 +4,8 @@ import {
   authorize,
   fetchAccessToken,
   fetchUserProfile,
+  requestResetPassword,
+  requestRestorePassword,
 } from '../../api/ApiClient'
 import { ILoginFields } from '../../components/login/types'
 import { Config } from '../../helpers/Config'
@@ -19,6 +21,7 @@ import { ILoginCoreResponse, LoginCoreHandle } from './LoginCoreTypes'
 
 const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
+    // #region Login
     async login({
       email,
       password,
@@ -128,10 +131,28 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
 
       return { data: userPublicData }
     },
+    // #endregion
+
+    //#region Logout
     async logout() {
       await deleteAllData()
       return
     },
+    // #endregion
+
+    // #region Restore Password
+    async restorePassword(email: string) {
+      const response = await requestRestorePassword(email)
+      return response
+    },
+    // #endregion
+
+    // #region Reset Password
+    async resetPassword(data: any) {
+      const response = await requestResetPassword(data)
+      return response
+    },
+    // #endregion
   }))
 
   return <>{props.children}</>
