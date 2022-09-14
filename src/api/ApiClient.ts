@@ -43,6 +43,8 @@ import {
   IMyOrdersResponse,
   IOrderReview,
   IOrderReviewResponse,
+  IPostReferralData,
+  IPostReferralResponse,
   IPromoCodeResponse,
   IPurchaseConfirmationData,
   IPurchaseConfirmationResponse,
@@ -157,6 +159,7 @@ export const authorize = async (
   data: FormData
 ): Promise<IAuthorizeResponse> => {
   let responseError: IError | undefined
+
   const response = await Client.post(
     `/v1/oauth/authorize-rn?client_id=${Config.CLIENT_ID}`,
     data
@@ -547,6 +550,50 @@ export const fetchEvent = async (): Promise<IEventResponse> => {
   return {
     eventError: responseError,
     eventData: event,
+  }
+}
+
+export const postReferralVisit = async (
+  referralId: string
+): Promise<IPostReferralResponse> => {
+  const eventId = Config.EVENT_ID.toString()
+  const referralIdNumber = parseInt(referralId, 10)
+  let responseError: IError | undefined
+  let responseData: IPostReferralData | undefined
+
+  const response: AxiosResponse | void = await Client.post(
+    `v1/event/${eventId}/referrer/`,
+    {
+      referrer: referralIdNumber,
+    }
+  ).catch((error: AxiosError) => {
+    if (error.response?.data.errors && error.response?.data.errors.length > 0) {
+      responseError = {
+        code: error.response?.data.errors[0].status,
+        message: error.response?.data.errors[0].details,
+      }
+    } else {
+      responseError = {
+        message: error.response?.data.message,
+        code: error.response?.status!,
+      }
+    }
+
+    if (error.response?.status === 422 && responseError.message === undefined) {
+      responseError.message = 'Cannot process request'
+    }
+  })
+
+  if (response?.data && response.data.status === 200) {
+    responseData = {
+      message: response.data.message,
+      status: response.data.status,
+    }
+  }
+
+  return {
+    postReferralData: responseData,
+    postReferralError: responseError,
   }
 }
 //#endregion

@@ -342,3 +342,13 @@ export interface IRemoveTicketFromResaleResponse {
   removeTicketFromResaleError?: IError
   removeTicketFromResaleData?: IRemoveTicketFromResaleData
 }
+
+export interface IPostReferralData {
+  message: string
+  status: number
+}
+
+export interface IPostReferralResponse {
+  postReferralError?: IError
+  postReferralData?: IPostReferralData
+}

@@ -1,11 +1,17 @@
 import jwtDecode from 'jwt-decode'
 import React, { forwardRef, useImperativeHandle } from 'react'
 
-import { addToCart, fetchEvent, fetchTickets } from '../../api/ApiClient'
+import {
+  addToCart,
+  fetchEvent,
+  fetchTickets,
+  postReferralVisit,
+} from '../../api/ApiClient'
 import {
   IAddToCartParams,
   IEventResponse,
   IFetchTicketsResponse,
+  IPostReferralResponse,
 } from '../../api/types'
 import { Config } from '../../helpers/Config'
 import {
@@ -80,6 +86,12 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
 
     async logout(): Promise<void> {
       await deleteAllData()
+    },
+
+    async postReferralVisit(
+      referralId: string
+    ): Promise<IPostReferralResponse> {
+      return await postReferralVisit(referralId)
     },
   }))
 
