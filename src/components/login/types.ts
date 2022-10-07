@@ -34,6 +34,7 @@ export interface ILoginBrandImages {
   hidePasswordStyle?: StyleProp<ImageStyle>
 }
 
+// Exported component
 export interface ILoginProps {
   onLoginSuccessful: (userProfile: IUserProfilePublic) => void
   onLoginError?: (error: IError) => void
@@ -65,7 +66,31 @@ export interface ILoginProps {
   //Restore password
   onRestorePasswordError?: (error: IError) => void
   onRestorePasswordSuccess?: () => void
-  restorePasswordViewProps?: IRestorePasswordViewProps
+  restorePasswordDialogProps?: IRestorePasswordViewProps
+
+  dialogsProps?: {
+    isShowPasswordButtonVisible?: boolean
+    brandImages?: ILoginBrandImages
+    login?: {
+      styles?: {
+        container?: StyleProp<ViewStyle>
+        loginButton?: IButtonStyles
+        loginButtonDisabled?: IButtonStyles
+        input?: IInputStyles
+        title?: StyleProp<TextStyle>
+        message?: StyleProp<TextStyle>
+        showPasswordIcon?: StyleProp<ImageStyle>
+      }
+      texts: {
+        loginButton?: string
+        message?: string
+        emailLabel?: string
+        passwordLabel?: string
+        title?: string
+      }
+    }
+    restorePassword?: {}
+  }
 }
 
 export interface ILoginViewStyles {
@@ -119,17 +144,26 @@ export interface ILoginViewTexts {
   }
 }
 
-// Restore Password
+//#region Login
+export interface ILoginDialogViewProps {
+  styles?: ILoginViewStyles
+  texts?: ILoginViewTexts
+}
+//#endregion
+
+//#region Restore Password
 export interface IRestorePasswordViewTexts {
   restorePasswordButton?: string
+  cancelButton?: string
   message?: string
-  emailLabel?: string
+  inputLabel?: string
   title?: string
 }
 
 export interface IRestorePasswordViewStyles {
   container?: StyleProp<ViewStyle>
   restorePasswordButton?: IButtonStyles
+  cancelRestorePasswordButton?: IButtonStyles
   input?: IInputStyles
   title?: StyleProp<TextStyle>
   message?: StyleProp<TextStyle>
@@ -139,25 +173,27 @@ export interface IRestorePasswordViewProps {
   styles?: IRestorePasswordViewStyles
   texts?: IRestorePasswordViewTexts
 }
+//#endregion
 
-// Restore Password Success
-export interface IRestorePasswordSuccessViewTexts {
+//#region Restore Password Success Dialog
+export interface IRestorePasswordSuccessDialogTexts {
   button?: string
   message?: string
   title?: string
 }
 
-export interface IRestorePasswordSuccessViewStyles {
+export interface IRestorePasswordSuccessDialogStyles {
   container?: StyleProp<ViewStyle>
   button?: IButtonStyles
   title?: StyleProp<TextStyle>
   message?: StyleProp<TextStyle>
 }
 
-export interface IRestorePasswordSuccessViewProps {
-  styles?: IRestorePasswordSuccessViewStyles
-  texts?: IRestorePasswordSuccessViewTexts
+export interface IRestorePasswordSuccessDialogProps {
+  styles?: IRestorePasswordSuccessDialogStyles
+  texts?: IRestorePasswordSuccessDialogTexts
 }
+//#endregion Restore Password Success Dialog
 
 export type LoginContentType =
   | 'login'
@@ -178,7 +214,7 @@ export interface ILoginViewProps {
   styles?: ILoginViewStyles
   texts?: ILoginViewTexts
 
-  loginError?: string
+  loginApiError?: string
   userFirstName?: string
 
   refs?: ILoginRefs
@@ -192,17 +228,17 @@ export interface ILoginViewProps {
   // Used to start the Forgot Password flow
   onPressForgotPassword: () => void
 
+  // Used to send the Restore password request to the server
   restorePasswordProps: {
-    // Used to send the Restore password request to the server
-    onPressRestorePassword: (email: string) => void
-    // Used to send the Reset password request to the server
+    onPressRestorePasswordButton: (email: string) => void
+    onPressCancelRestorePasswordButton: () => void
     restorePasswordViewProps?: IRestorePasswordViewProps
     isRestorePasswordLoading?: boolean
-    restorePasswordError?: string
+    restorePasswordApiError?: string
   }
 
   restorePasswordSuccessProps: {
-    restorePasswordSuccessViewProps?: IRestorePasswordSuccessViewProps
+    restorePasswordSuccessProps?: IRestorePasswordSuccessDialogProps
     restorePasswordSuccessMessage?: string
   }
 

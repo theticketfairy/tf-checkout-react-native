@@ -24,11 +24,12 @@ const Login: FC<ILoginProps> = ({
   onRestorePasswordError,
   onRestorePasswordSuccess,
   forgotPasswordViewProps,
-  restorePasswordViewProps,
+  restorePasswordDialogProps,
 }) => {
+  //#region State
   const [isLoading, setIsLoading] = useState(false)
-  const [loginError, setLoginError] = useState('')
-  const [restorePasswordError, setRestorePasswordError] = useState('')
+  const [loginApiError, setLoginApiError] = useState('')
+  const [restorePasswordApiError, setRestorePasswordApiError] = useState('')
   const [restorePasswordSuccessMessage, setRestorePasswordSuccessMessage] =
     useState('')
   const [resetPasswordError, setResetPasswordError] = useState('')
@@ -37,6 +38,7 @@ const Login: FC<ILoginProps> = ({
     useState<LoginContentType>('login')
   const [isRestorePasswordLoading, setIsRestorePasswordLoading] =
     useState(false)
+  //#endregion State
 
   const loginCoreRef = useRef<LoginCoreHandle>(null)
 
@@ -45,8 +47,8 @@ const Login: FC<ILoginProps> = ({
     setLoginContentType('restorePassword')
 
   const handleOnPressLogin = async (fields: ILoginFields) => {
-    if (loginError) {
-      setLoginError('')
+    if (loginApiError) {
+      setLoginApiError('')
     }
 
     if (!loginCoreRef.current?.login) {
@@ -61,7 +63,7 @@ const Login: FC<ILoginProps> = ({
 
     if (authorizationError || !authorizationData) {
       setIsLoading(false)
-      setLoginError(authorizationError?.message || 'Auth error')
+      setLoginApiError(authorizationError?.message || 'Auth error')
       return onLoginError?.(authorizationError!)
     }
 
@@ -83,7 +85,10 @@ const Login: FC<ILoginProps> = ({
     onLogoutSuccess?.()
   }
 
-  const handleOnPressRestorePassword = async (email: string) => {
+  const handleOnPressCancelRestorePasswordButton = () =>
+    setLoginContentType('login')
+
+  const handleOnPressRestorePasswordButton = async (email: string) => {
     if (!loginCoreRef.current?.restorePassword) {
       return onRestorePasswordError?.({
         message: 'LoginCoreRef is not initialized',
@@ -96,18 +101,19 @@ const Login: FC<ILoginProps> = ({
     setIsRestorePasswordLoading(false)
 
     if (restorePassError || !restorePasswordSuccessData) {
-      setRestorePasswordError(
+      setRestorePasswordApiError(
         restorePassError?.message || 'Restore password unknown error'
       )
       setIsRestorePasswordLoading(false)
       if (config?.areAlertsEnabled) {
-        Alert.alert('', restorePasswordError)
+        Alert.alert('', restorePasswordApiError)
       }
       onRestorePasswordError?.(restorePassError!)
       return
     }
 
     setLoginContentType('restorePasswordSuccess')
+
     setRestorePasswordSuccessMessage(restorePasswordSuccessData.message)
     onRestorePasswordSuccess?.()
   }
@@ -118,6 +124,7 @@ const Login: FC<ILoginProps> = ({
   }
   //#endregion
 
+  //#region Render Main Content
   return (
     <LoginCore ref={loginCoreRef}>
       <LoginView
@@ -131,21 +138,23 @@ const Login: FC<ILoginProps> = ({
         texts={texts}
         styles={styles}
         userFirstName={userFirstName}
-        loginError={loginError}
+        loginApiError={loginApiError}
         refs={refs}
         brandImages={brandImages}
         isShowPasswordButtonVisible={isShowPasswordButtonVisible}
         content={loginContentType}
         onPressForgotPassword={handleOnPressForgotPassword}
         restorePasswordProps={{
-          restorePasswordError: restorePasswordError,
-          onPressRestorePassword: handleOnPressRestorePassword,
+          restorePasswordApiError: restorePasswordApiError,
+          onPressRestorePasswordButton: handleOnPressRestorePasswordButton,
           restorePasswordViewProps: forgotPasswordViewProps,
           isRestorePasswordLoading: isRestorePasswordLoading,
+          onPressCancelRestorePasswordButton:
+            handleOnPressCancelRestorePasswordButton,
         }}
         restorePasswordSuccessProps={{
           restorePasswordSuccessMessage: restorePasswordSuccessMessage,
-          restorePasswordSuccessViewProps: restorePasswordViewProps,
+          restorePasswordSuccessViewProps: restorePasswordgSuccessViewProps,
         }}
         resetPasswordProps={{
           onPressResetPassword: function (
@@ -159,6 +168,7 @@ const Login: FC<ILoginProps> = ({
       />
     </LoginCore>
   )
+  //#endregion Render Main Content
 }
 
 export default Login

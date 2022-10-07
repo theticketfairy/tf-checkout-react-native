@@ -1,13 +1,5 @@
 import React, { FC, useMemo, useState } from 'react'
-import {
-  Alert,
-  Image,
-  Modal,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native'
+import { Alert, Image, Modal, Text, TouchableOpacity, View } from 'react-native'
 
 import { useDebounced } from '../../helpers/Debounced'
 import {
@@ -17,7 +9,8 @@ import {
 } from '../../helpers/Validators'
 import R from '../../res'
 import Button from '../button/Button'
-import Input from '../input/Input'
+import LoginForm from './components/LoginForm'
+import RestorePasswordForm from './components/RestorePasswordForm'
 import s from './styles'
 import { ILoginViewProps, ILoginViewState } from './types'
 
@@ -39,15 +32,15 @@ const LoginView: FC<ILoginViewProps> = ({
   styles,
   texts,
   userFirstName,
-  loginError,
-  refs,
+  loginApiError,
   brandImages,
   isShowPasswordButtonVisible,
   content,
   onPressForgotPassword,
   restorePasswordProps: {
-    onPressRestorePassword,
-    restorePasswordError,
+    onPressRestorePasswordButton,
+    onPressCancelRestorePasswordButton,
+    restorePasswordApiError,
     restorePasswordViewProps,
     isRestorePasswordLoading,
   },
@@ -127,19 +120,6 @@ const LoginView: FC<ILoginViewProps> = ({
     }
   }
 
-  const handleOnPressLogout = () => {
-    Alert.alert(logoutTitle, logoutMessage, [
-      {
-        text: logoutConfirm,
-        onPress: handleLogout,
-        style: 'destructive',
-      },
-      {
-        text: logoutCancel,
-      },
-    ])
-  }
-
   const checkIsLoginDataValid = (): boolean => {
     if (loginEmailError) {
       return false
@@ -215,101 +195,35 @@ const LoginView: FC<ILoginViewProps> = ({
     ]
   )
 
-  const ForgotPasswordButton = (
-    <Text onPress={onPressForgotPassword}>Forgot Password</Text>
-  )
-
-  const LoginForm = (
-    <View style={[s.dialog, styles?.dialog?.container]}>
-      <Text style={[s.dialogTitle, styles?.dialog?.title]}>
-        {texts?.dialog?.title || 'Login'}
-      </Text>
-      {BrandImages}
-      {!!texts?.dialog?.message && (
-        <Text style={[s.message, styles?.dialog?.message]}>
-          {texts.dialog.message}
-        </Text>
-      )}
-      <Input
-        label={texts?.dialog?.emailLabel || 'Email'}
-        error={loginEmailError}
-        keyboardType='email-address'
-        value={loginEmail}
-        onChangeText={(text: string) => setData({ ...data, loginEmail: text })}
-        autoCapitalize='none'
-      />
-      <Input
-        label={texts?.dialog?.passwordLabel || 'Password'}
-        error={loginPasswordError}
-        keyboardType='default'
-        value={loginPassword}
-        onChangeText={(text: string) =>
-          setData({ ...data, loginPassword: text })
-        }
-        autoCapitalize='none'
-        secureTextEntry={true}
-        isShowPasswordButtonVisible={isShowPasswordButtonVisible}
-      />
-      {!!loginError && <Text style={[s.error]}>{loginError}</Text>}
-      {ForgotPasswordButton}
-      <Button
-        styles={
-          !checkIsLoginDataValid()
-            ? {
-                container: [s.loginButton],
-                ...styles?.dialog?.loginButtonDisabled,
-              }
-            : {
-                container: [s.loginButton],
-                ...styles?.dialog?.loginButton,
-              }
-        }
-        text={texts?.dialog?.loginButton || 'LOGIN'}
-        onPress={handleOnPressLogin}
-        isLoading={isLoading}
-        isDisabled={!checkIsLoginDataValid()}
-        //@ts-ignore
-        ref={refs?.button}
-      />
-    </View>
-  )
-
+  //#region Button Press
   const handleOnPressRestorePassword = () => {
-    // setIsRestorePasswordLoading(true)
-    onPressRestorePassword(restorePasswordEmail)
-    //setIsRestorePasswordLoading(false)
+    onPressRestorePasswordButton(restorePasswordEmail)
   }
 
-  const RestorePasswordForm = (
-    <View style={[s.dialog, styles?.dialog?.container]}>
-      <Text style={[s.dialogTitle, styles?.dialog?.title]}>
-        {restorePasswordViewProps?.texts?.title || 'Forgot Password'}
-      </Text>
+  const handleOnPressLogout = () => {
+    Alert.alert(logoutTitle, logoutMessage, [
+      {
+        text: logoutConfirm,
+        onPress: handleLogout,
+        style: 'destructive',
+      },
+      {
+        text: logoutCancel,
+      },
+    ])
+  }
+  //#endregion Button Press
 
-      <Input
-        label={restorePasswordViewProps?.texts?.emailLabel || 'Email'}
-        error={restorePasswordEmailError}
-        keyboardType='email-address'
-        value={restorePasswordEmail}
-        onChangeText={(text: string) =>
-          setData({ ...data, restorePasswordEmail: text })
-        }
-        autoCapitalize='none'
-      />
+  //#region Text Changed
+  const handleOnRestorePasswordEmailChanged = (text: string) =>
+    setData({ ...data, restorePasswordEmail: text })
 
-      {!!restorePasswordError && <Text>{restorePasswordError}</Text>}
+  const handleOnLoginEmailChanged = (text: string) =>
+    setData({ ...data, loginEmail: text })
 
-      <Button
-        text={
-          restorePasswordViewProps?.texts?.restorePasswordButton ||
-          'Restore password'
-        }
-        onPress={handleOnPressRestorePassword}
-        isLoading={isRestorePasswordLoading}
-        isDisabled={!checkIsRestorePasswordDataValid()}
-      />
-    </View>
-  )
+  const handleOnLoginPasswordChanged = (text: string) =>
+    setData({ ...data, loginPassword: text })
+  //#endregion Text Changed
 
   const RestorePasswordSuccessForm = (
     <View
@@ -326,9 +240,7 @@ const LoginView: FC<ILoginViewProps> = ({
       )}
 
       <Button
-        text={
-          restorePasswordSuccessViewProps?.texts?.button || 'Restore password'
-        }
+        text={restorePasswordSuccessViewProps?.texts?.button || 'OK'}
         onPress={hideDialog}
       />
     </View>
@@ -342,7 +254,9 @@ const LoginView: FC<ILoginViewProps> = ({
       </Text>
 
       <Button
-        text={restorePasswordSuccessViewProps?.texts?.button || 'OK'}
+        text={
+          restorePasswordSuccessViewProps?.texts?.button || 'RESET PASSWORD'
+        }
         onPress={handleOnPressRestorePassword}
         isLoading={isRestorePasswordLoading}
       />
@@ -352,10 +266,42 @@ const LoginView: FC<ILoginViewProps> = ({
   const renderContent = () => {
     switch (content) {
       case 'login':
-        return LoginForm
+        return (
+          <LoginForm
+            email={loginEmail}
+            emailError={loginEmailError}
+            onEmailChanged={handleOnLoginEmailChanged}
+            password={loginPassword}
+            passwordError={loginPasswordError}
+            onPasswordChanged={handleOnLoginPasswordChanged}
+            onPressLoginButton={handleOnPressLogin}
+            onPressForgotPassword={onPressForgotPassword}
+            viewProps={{
+              styles: styles,
+              texts: texts,
+            }}
+            loginApiError={loginApiError}
+            isLoginButtonDisabled={!checkIsLoginDataValid()}
+            isLoading={isLoading}
+            brandImages={BrandImages}
+            isShowPasswordButtonVisible={isShowPasswordButtonVisible}
+          />
+        )
 
       case 'restorePassword':
-        return RestorePasswordForm
+        return (
+          <RestorePasswordForm
+            email={restorePasswordEmail}
+            onEmailChanged={handleOnRestorePasswordEmailChanged}
+            onPressRestorePasswordButton={handleOnPressRestorePassword}
+            restorePasswordInputError={restorePasswordEmailError}
+            isButtonDisabled={!checkIsRestorePasswordDataValid()}
+            viewProps={restorePasswordViewProps}
+            restorePasswordApiError={restorePasswordApiError}
+            isLoading={isRestorePasswordLoading}
+            onPressCancelButton={onPressCancelRestorePasswordButton}
+          />
+        )
 
       case 'restorePasswordSuccess':
         return RestorePasswordSuccessForm
@@ -368,6 +314,7 @@ const LoginView: FC<ILoginViewProps> = ({
     }
   }
 
+  //#region Render main component
   return (
     <View style={s.rootContainer}>
       {userFirstName ? LoggedComponent() : GuestComponent()}
@@ -376,15 +323,16 @@ const LoginView: FC<ILoginViewProps> = ({
         <Modal transparent={true} presentationStyle='overFullScreen'>
           <View style={s.touchableContainer}>
             <TouchableOpacity style={s.dismissibleArea} onPress={hideDialog}>
-              <TouchableWithoutFeedback>
+              <TouchableOpacity activeOpacity={1}>
                 {renderContent()}
-              </TouchableWithoutFeedback>
+              </TouchableOpacity>
             </TouchableOpacity>
           </View>
         </Modal>
       )}
     </View>
   )
+  //#endregion Render main component
 }
 
 export default LoginView
