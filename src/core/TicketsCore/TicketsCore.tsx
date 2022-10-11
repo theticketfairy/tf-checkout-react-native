@@ -3,19 +3,20 @@ import React, { forwardRef, useImperativeHandle } from 'react'
 
 import {
   addToCart,
+  closeSession,
   fetchEvent,
   fetchTickets,
   postReferralVisit,
 } from '../../api/ApiClient'
 import {
   IAddToCartParams,
+  ICloseSessionResponse,
   IEventResponse,
   IFetchTicketsResponse,
   IPostReferralResponse,
 } from '../../api/types'
 import { Config } from '../../helpers/Config'
 import {
-  deleteAllData,
   deleteData,
   getData,
   LocalStorageKeys,
@@ -84,8 +85,8 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
       return true
     },
 
-    async logout(): Promise<void> {
-      await deleteAllData()
+    async logout(): Promise<ICloseSessionResponse> {
+      return await closeSession()
     },
 
     async postReferralVisit(

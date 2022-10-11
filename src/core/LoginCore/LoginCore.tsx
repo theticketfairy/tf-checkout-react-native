@@ -2,13 +2,14 @@ import React, { forwardRef, useImperativeHandle } from 'react'
 
 import {
   authorize,
+  closeSession,
   fetchAccessToken,
   fetchUserProfile,
 } from '../../api/ApiClient'
+import { ICloseSessionResponse } from '../../api/types'
 import { ILoginFields } from '../../components/login/types'
 import { Config } from '../../helpers/Config'
 import {
-  deleteAllData,
   IStoredUserData,
   LocalStorageKeys,
   storeData,
@@ -128,9 +129,8 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
 
       return { data: userPublicData }
     },
-    async logout() {
-      await deleteAllData()
-      return
+    async logout(): Promise<ICloseSessionResponse> {
+      return await closeSession()
     },
   }))
 
