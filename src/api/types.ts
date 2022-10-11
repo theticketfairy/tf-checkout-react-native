@@ -9,6 +9,8 @@ export interface IClientRequest extends AxiosInstance {
   setBaseUrl: (baseUrl: string) => void
   setTimeOut: (timeOut: number) => void
   setDomain: (domain: string) => void
+  removeGuestToken: () => void
+  removeAccessToken: () => void
 }
 
 //#region Tickets
@@ -351,4 +353,13 @@ export interface IPostReferralData {
 export interface IPostReferralResponse {
   postReferralError?: IError
   postReferralData?: IPostReferralData
+}
+
+export interface ICloseSessionData {
+  message: string
+}
+
+export interface ICloseSessionResponse {
+  closeSessionError?: IError
+  closeSessionData?: ICloseSessionData
 }

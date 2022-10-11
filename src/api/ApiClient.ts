@@ -30,6 +30,8 @@ import {
   ICheckoutBody,
   ICheckoutResponse,
   IClientRequest,
+  ICloseSessionData,
+  ICloseSessionResponse,
   ICountriesResponse,
   IEventResponse,
   IFetchTicketsResponse,
@@ -118,6 +120,12 @@ Client.interceptors.response.use(
 
 Client.setGuestToken = (token: string) =>
   (Client.defaults.headers.common['Authorization-Guest'] = token)
+
+Client.removeGuestToken = () =>
+  delete Client.defaults.headers.common['Authorization-Guest']
+
+Client.removeAccessToken = () =>
+  delete Client.defaults.headers.common.Authorization
 
 Client.setAccessToken = (token: string) =>
   (Client.defaults.headers.common.Authorization = token)
@@ -970,3 +978,33 @@ export const removeTicketFromResale = async (
   }
 }
 //#endregion
+
+//#region Logout
+export const closeSession = async (): Promise<ICloseSessionResponse> => {
+  let responseData: ICloseSessionData | undefined
+  let responseError: IError | undefined
+
+  const response: AxiosResponse | void = await Client.delete('/auth').catch(
+    (error: AxiosError) => {
+      responseError =
+        error.response?.data.message || 'Error while closing session'
+    }
+  )
+
+  if (response?.data && response.data.status && response.data.status === 200) {
+    responseData = {
+      message: response.data.message || 'Session closed successfully',
+    }
+
+    await deleteAllData()
+
+    Client.removeGuestToken()
+    Client.removeAccessToken()
+  }
+
+  return {
+    closeSessionData: responseData,
+    closeSessionError: responseError,
+  }
+}
+//endregion Logout
