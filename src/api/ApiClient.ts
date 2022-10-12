@@ -8,6 +8,7 @@ import _sortBy from 'lodash/sortBy'
 import { IOnCheckoutSuccess } from '..'
 import { IWaitingListFields } from '../components/waitingList/types'
 import { Config } from '../helpers/Config'
+import { getDomainByClientAndEnv } from '../helpers/Domains'
 import {
   deleteAllData,
   getData,
@@ -93,10 +94,10 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
     config.headers = updatedHeaders
   }
 
-  if (Config.DOMAIN) {
+  if (Config.CLIENT) {
     const updatedHeaders = {
       ...config.headers,
-      origin: Config.DOMAIN,
+      origin: getDomainByClientAndEnv(Config.CLIENT, Config.ENV),
     }
     config.headers = updatedHeaders
   }
@@ -105,7 +106,9 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 })
 
 Client.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response: AxiosResponse) => {
+    return response
+  },
   async (error: AxiosError) => {
     if (error?.response?.status === 401) {
       await deleteAllData()

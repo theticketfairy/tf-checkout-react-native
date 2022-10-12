@@ -29,15 +29,11 @@ const EVENT_ID = 13063
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
-  DOMAIN: 'https://manacommon.com',
+  CLIENT: 'mana',
   BRAND: 'mana-onetree-testing-brand',
   ARE_SUB_BRANDS_INCLUDED: true,
-  ENV: 'STAG'
+  ENV: 'STAG',
 }
-
-// DOMAINS
-// https://www.ticketfairy.com
-// https://manacommon.com
 
 // BRANDS
 // mana-onetree-testing-brand
