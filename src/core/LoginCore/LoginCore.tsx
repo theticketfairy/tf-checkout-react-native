@@ -49,8 +49,6 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
         }
       }
 
-      await storeData(LocalStorageKeys.ACCESS_TOKEN, authorizationCode)
-
       const bodyFormDataToken = new FormData()
       bodyFormDataToken.append('code', authorizationCode)
       bodyFormDataToken.append('scope', 'profile')
@@ -72,6 +70,8 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
           },
         }
       }
+
+      await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken)
 
       // Fetch user profile
       const { userProfileError, userProfileData } = await fetchUserProfile()
