@@ -25,7 +25,7 @@ import styles from './styles'
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
-const EVENT_ID = 13063
+const EVENT_ID = 13066
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
@@ -244,11 +244,17 @@ const App = () => {
                   loggedAs: '_Logged in:_',
                   notYou: '_Not you?_',
                 }
-                
-                
               }
             }}
             styles={{
+              cartTimer: {
+              message: {
+                color: R.colors.black
+              },
+              time: {
+                color: R.colors.black
+              }
+              },
               datePicker: {
                 container: { marginBottom: 16 },
                 button: {

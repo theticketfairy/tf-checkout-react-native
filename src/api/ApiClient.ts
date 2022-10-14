@@ -69,6 +69,7 @@ export const Client: IClientRequest = Axios.create({
   baseURL: Constants.BASE_URL,
   headers: HEADERS,
   timeout: Constants.TIMEOUT,
+  data: {},
 }) as IClientRequest
 
 axiosRetry(Client, { retries: 3 })
@@ -143,6 +144,9 @@ Client.setDomain = (domain: string) =>
     //@ts-ignore
     origin: domain,
   })
+
+Client.setContentType = (contentType: string) =>
+  (Client.defaults.headers.common['Content-Type'] = contentType)
 
 export const setCustomHeader = (response: any) => {
   const guestHeaderResponseValue = _get(response, 'headers.authorization-guest')
