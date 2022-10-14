@@ -9,6 +9,7 @@ export interface IClientRequest extends AxiosInstance {
   setBaseUrl: (baseUrl: string) => void
   setTimeOut: (timeOut: number) => void
   setDomain: (domain: string) => void
+  setContentType: (contentType: string) => void
   removeGuestToken: () => void
   removeAccessToken: () => void
 }
@@ -124,6 +125,24 @@ export interface IFreeRegistrationResponse {
 //#endregion
 
 // Register New User
+export interface IRegisterNewUserBody {
+  attributes: {
+    email: string
+    password: string
+    password_confirmation: string
+    first_name: string
+    last_name: string
+    client_id: string
+    client_secret: string
+    country: number
+    city: string
+    state: number
+    street_address: string
+    zip: string
+    phone: string
+    check_cart_expiration: boolean
+  }
+}
 export interface IRegisterNewUserResponse {
   error?: {
     isAlreadyRegistered?: boolean
