@@ -1,4 +1,5 @@
 import {
+  ICloseSessionResponse,
   IEventResponse,
   IFetchTicketsResponse,
   IPostReferralResponse,
@@ -17,6 +18,6 @@ export type TicketsCoreHandle = {
   getEvent(): Promise<IEventResponse>
   addToCart(options: IBookTicketsOptions): Promise<IAddToCartResponse>
   getIsUserLoggedIn(): Promise<boolean>
-  logout(): Promise<void>
+  logout(): Promise<ICloseSessionResponse>
   postReferralVisit(referralId: string): Promise<IPostReferralResponse>
 }

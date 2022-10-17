@@ -105,7 +105,8 @@ Use it in your initial useEffect function:
 useEffect(() => {
   setConfig({
     EVENT_ID: '4344',
-    DOMAIN: 'https://yourdomain.mx',
+    CLIENT: 'ttf',
+    ENV: 'STAG'
   })
 }, [])
 ```
@@ -115,7 +116,7 @@ useEffect(() => {
 ````ts
 {
   EVENT_ID: string,
-  DOMAIN?: string,
+  CLIENT?: string,
   ENV?: 'PROD' | 'DEV' | 'STAG',
   CLIENT_ID?: string,
   CLIENT_SECRET?: string,
@@ -128,7 +129,7 @@ useEffect(() => {
 | Property | Description |
 | -------- | ----------- |
 | EVENT_ID | Specify the event's ID. |
-| DOMAIN | Specify your domains name example: `https://google.com` this is important to maintain cart session active and prevent it from expiring when user login in the BillingInfo component. |
+| CLIENT | Specify your client designated name example `ttf`. |
 | ENV | Sets the environment to any of the following environments: Production, Staging or Development. Receives the following values: `PROD`, `DEV`, `STAG`. Defaults to `PROD`.|
 | CLIENT_ID | Set your CLIENT_ID. |
 | CLIENT_SECRET | Set your CLIENT_SECRET. |
@@ -2173,4 +2174,13 @@ logout(): Promise<void>
 # Utils
 
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
+
+# Changelog
+## Version 1.0.22
+- Added cartTimer component, that will show the cart's remaining expiration time in the Billing screen.
+- setConfig not longer receives the `DOMAIN` prop, instead it receives the `CLIENT` 
+- Added a three dot button to my orders to show the possible actions.
+
+
+
 
