@@ -25,14 +25,19 @@ import styles from './styles'
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
-const EVENT_ID = 8667//10690//5420//10690//10690 //12661// 10915//MANA//10690 //5420 // Replace with assigned ID //12796
+const EVENT_ID = 13066
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
-  DOMAIN: 'https://manacommon.com', //https://www.ticketfairy.com',
-  BRAND: 'the-ticket-fairy',// 'mana-onetree-testing-brand',
+  CLIENT: 'mana',
+  BRAND: 'mana-onetree-testing-brand',
   ARE_SUB_BRANDS_INCLUDED: true,
+  ENV: 'STAG',
 }
+
+// BRANDS
+// mana-onetree-testing-brand
+// the-ticket-fairy
 
 const App = () => {
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
@@ -239,11 +244,17 @@ const App = () => {
                   loggedAs: '_Logged in:_',
                   notYou: '_Not you?_',
                 }
-                
-                
               }
             }}
             styles={{
+              cartTimer: {
+              message: {
+                color: R.colors.black
+              },
+              time: {
+                color: R.colors.black
+              }
+              },
               datePicker: {
                 container: { marginBottom: 16 },
                 button: {
