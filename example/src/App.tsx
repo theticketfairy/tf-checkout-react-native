@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _, { size } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { Alert, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
@@ -25,7 +25,9 @@ import styles from './styles'
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
-const EVENT_ID = 13066
+const EVENT_ID = 13053
+//Event with password 13053
+// Mana event 13066
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
@@ -1027,6 +1029,22 @@ const App = () => {
 
               onPressMyOrders={handleOnPressMyOrders}
               styles={{
+                enterPassword: {
+                  rootContainer: {
+                    backgroundColor: 'white', 
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }, 
+                  contentContainer: {
+                    paddingHorizontal: 32
+                  },
+                  title: {
+                    fontWeight: '900',
+                    fontSize: 30,
+                    marginBottom: 24
+                  }
+                },
                 waitingList: {
                   title: { color: Color.textMain },
                   input: {

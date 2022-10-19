@@ -19,7 +19,7 @@ import {
   ITicket,
 } from '../../types'
 import TicketsView from './TicketsView'
-import { ITicketsProps } from './types'
+import { IEventPasswordProtectedData, ITicketsProps } from './types'
 
 const Tickets: FC<ITicketsProps> = ({
   onAddToCartSuccess,
@@ -54,6 +54,9 @@ const Tickets: FC<ITicketsProps> = ({
     IPromoCodeResponse | undefined
   >(undefined)
   const [isFirstCall, setIsFirstCall] = useState(true)
+  const [eventPasswordProtectedData, setEventPasswordProtectedData] = useState<
+    IEventPasswordProtectedData | undefined
+  >()
 
   //#region Refs
   const eventErrorCodeRef = useRef(0)
@@ -176,9 +179,19 @@ const Tickets: FC<ITicketsProps> = ({
     const { eventError, eventData } = await getEventCore()
     setIsGettingEvent(false)
 
+    console.log('EVent Data', eventData)
+    console.log('EVent Error', eventError)
+
     if (eventError) {
       eventErrorCodeRef.current = eventError.code || 400
-      showAlert(eventError.message)
+      if (eventError.code === 401) {
+        setEventPasswordProtectedData({
+          isPasswordProtected: true,
+          message: eventError.message,
+        })
+      } else {
+        showAlert(eventError.message)
+      }
       return onFetchEventError?.(
         eventError || { message: 'There was an error while fetching event' }
       )
@@ -189,6 +202,8 @@ const Tickets: FC<ITicketsProps> = ({
         message: 'There was an error while fetching event',
       })
     }
+
+    await getTickets()
 
     onFetchEventSuccess?.(eventData)
     setEvent(eventData)
@@ -250,7 +265,6 @@ const Tickets: FC<ITicketsProps> = ({
   useEffect(() => {
     const fetchInitialData = async () => {
       await retrieveStoredAccessToken()
-      await getTickets()
       await getEventData()
     }
     fetchInitialData()
@@ -286,7 +300,6 @@ const Tickets: FC<ITicketsProps> = ({
     await ticketsCoreRef.current.logout()
     setIsUserLogged(false)
 
-    await getTickets()
     await getEventData()
     if (onPressLogout) {
       onPressLogout()
@@ -295,6 +308,21 @@ const Tickets: FC<ITicketsProps> = ({
 
   const handleOnLoadingChange = (loading: boolean) => {
     onLoadingChangeCallback(loading)
+  }
+
+  const handleOnSubmitEventPassword = (password: string) => {
+    //TODO: Implement submitEventPassword API call
+    console.log('handleOnSubmitEventPassword', password)
+    setEventPasswordProtectedData({
+      ...eventPasswordProtectedData,
+      isLoading: true,
+    })
+    setTimeout(() => {
+      setEventPasswordProtectedData({
+        ...eventPasswordProtectedData,
+        isLoading: false,
+      })
+    }, 1000)
   }
   //#endregion
 
@@ -326,6 +354,8 @@ const Tickets: FC<ITicketsProps> = ({
         onAddToWaitingListSuccess={onAddToWaitingListSuccess}
         onLoadingChange={handleOnLoadingChange}
         promoCodeCloseIcon={promoCodeCloseIcon}
+        eventPasswordProtectedData={eventPasswordProtectedData}
+        onPressSubmitEventPassword={handleOnSubmitEventPassword}
       />
     </TicketsCore>
   )

@@ -2,6 +2,10 @@ import { ImageSourcePropType, TextStyle, ViewStyle } from 'react-native'
 
 import { IEventData } from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
+import {
+  IEnterPasswordStyles,
+  IEnterPasswordTexts,
+} from '../../components/enterPassword/types'
 import { ILoadingStyles } from '../../components/loading/types'
 import {
   ILoggedInStyles,
@@ -55,6 +59,10 @@ export interface ITicketsViewProps {
   onAddToWaitingListError?: (error: IError) => void
   onLoadingChange?: (isLoading: boolean) => void
   promoCodeCloseIcon?: ImageSourcePropType
+
+  // Event password protected
+  onPressSubmitEventPassword?: (password: string) => void
+  eventPasswordProtectedData?: IEventPasswordProtectedData
 }
 
 export interface ITicketListStyles {
@@ -73,6 +81,7 @@ export interface ITicketsViewStyles {
   loading?: ILoadingStyles
   waitingList?: IWaitingListStyles
   loggedIn?: ILoggedInStyles
+  enterPassword?: IEnterPasswordStyles
 }
 
 export interface ITicketsViewTexts {
@@ -81,9 +90,9 @@ export interface ITicketsViewTexts {
   title?: string
   item?: ITicketListItemTexts
   loggedInTexts?: ILoggedInTexts
-
   listItem?: ITicketListItemTexts
   waitingList?: IWaitingListTexts
+  enterPassword?: IEnterPasswordTexts
 }
 
 export interface ITicketsProps {
@@ -118,4 +127,11 @@ export interface ITicketsProps {
   areLoadingIndicatorsEnabled?: boolean
 
   promoCodeCloseIcon?: ImageSourcePropType
+}
+
+export interface IEventPasswordProtectedData {
+  isPasswordProtected?: boolean
+  message?: string
+  apiError?: string
+  isLoading?: boolean
 }
