@@ -611,6 +611,45 @@ export const postReferralVisit = async (
     postReferralError: responseError,
   }
 }
+
+export const fetchPasswordProtectedEvent = async (password: string) => {
+  const eventId = Config.EVENT_ID.toString()
+  let responseError: IError | undefined
+  let responseData: any | undefined
+
+  const body = {
+    attributes: {
+      data: {
+        password,
+      },
+    },
+  }
+
+  const response: AxiosResponse | void = await Client.get(
+    `api/v1/event/${eventId}/authenticate`
+  ).catch((error: AxiosError) => {
+    responseError = {
+      message: 'errror',
+    }
+  })
+
+  if (response?.data) {
+    responseData = {
+      message: response.data.message,
+      status: response.data.status,
+    }
+
+    const guestHeaderValue = _get(response, 'headers.authorization-guest')
+    if (guestHeaderValue) {
+      setCustomHeader(response)
+    }
+  }
+
+  return {
+    passwordProtectedData: responseData,
+    passwordProtectedError: responseError,
+  }
+}
 //#endregion
 
 //#region Billing Information
