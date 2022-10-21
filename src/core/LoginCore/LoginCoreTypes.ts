@@ -1,6 +1,6 @@
 import {
   ICloseSessionResponse,
-  IResetPasswordData,
+  IResetPasswordRequestData,
   IRestorePasswordResponse,
 } from '../../api/types'
 import { ILoginFields } from '../../components/login/types'
@@ -15,5 +15,5 @@ export type LoginCoreHandle = {
   login(fields?: ILoginFields): Promise<ILoginCoreResponse>
   logout(): Promise<ICloseSessionResponse>
   restorePassword(email: string): Promise<IRestorePasswordResponse>
-  resetPassword(data: IResetPasswordData): Promise<void>
+  resetPassword(data: IResetPasswordRequestData): Promise<void>
 }
