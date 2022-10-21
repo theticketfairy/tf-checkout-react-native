@@ -62,7 +62,7 @@ export interface ITicketsViewProps {
 
   // Event password protected
   onPressSubmitEventPassword?: (password: string) => void
-  eventPasswordProtectedData?: IEventPasswordProtectedData
+  passwordProtectedEventData?: IPasswordProtectedEventData
 }
 
 export interface ITicketListStyles {
@@ -108,6 +108,10 @@ export interface ITicketsProps {
   onFetchEventError?: (error: IError) => void
   onFetchEventSuccess?: (data: IEventData) => void
 
+  // Callbacks for fetching Password Protected Event
+  onUnlockPasswordProtectedEventError?: (error: IError) => void
+  onUnlockPasswordProtectedEventSuccess?: (data: IEventData) => void
+
   // Callbacks for Waiting list
   onAddToWaitingListSuccess?: () => void
   onAddToWaitingListError?: (error: IError) => void
@@ -129,7 +133,7 @@ export interface ITicketsProps {
   promoCodeCloseIcon?: ImageSourcePropType
 }
 
-export interface IEventPasswordProtectedData {
+export interface IPasswordProtectedEventData {
   isPasswordProtected?: boolean
   message?: string
   apiError?: string

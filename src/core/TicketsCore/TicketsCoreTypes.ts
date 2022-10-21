@@ -20,4 +20,5 @@ export type TicketsCoreHandle = {
   getIsUserLoggedIn(): Promise<boolean>
   logout(): Promise<ICloseSessionResponse>
   postReferralVisit(referralId: string): Promise<IPostReferralResponse>
+  unlockPasswordProtectedEvent(password: string): Promise<IEventResponse>
 }

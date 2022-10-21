@@ -40,7 +40,7 @@ const TicketsView = ({
   onLoadingChange,
   areAlertsEnabled,
   promoCodeCloseIcon,
-  eventPasswordProtectedData,
+  passwordProtectedEventData,
   onPressSubmitEventPassword,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
@@ -52,13 +52,13 @@ const TicketsView = ({
     : `Get ${selectedTicket?.selectedOption?.value} tickets`
   const title = texts?.title ? texts.title : 'GET TICKETS'
 
-  return eventPasswordProtectedData?.isPasswordProtected ? (
+  return passwordProtectedEventData?.isPasswordProtected ? (
     <EnterPassword
       onSubmit={onPressSubmitEventPassword}
       styles={styles?.enterPassword}
       texts={texts?.enterPassword}
-      isLoading={eventPasswordProtectedData?.isLoading}
-      apiError={eventPasswordProtectedData?.apiError}
+      isLoading={passwordProtectedEventData?.isLoading}
+      apiError={passwordProtectedEventData?.apiError}
     />
   ) : (
     <View style={[s.container, styles?.rootContainer]}>

@@ -612,7 +612,9 @@ export const postReferralVisit = async (
   }
 }
 
-export const fetchPasswordProtectedEvent = async (password: string) => {
+export const unlockPasswordProtectedEvent = async (
+  password: string
+): Promise<IEventResponse> => {
   const eventId = Config.EVENT_ID.toString()
   let responseError: IError | undefined
   let responseData: any | undefined
@@ -625,29 +627,33 @@ export const fetchPasswordProtectedEvent = async (password: string) => {
     },
   }
 
-  const response: AxiosResponse | void = await Client.get(
-    `api/v1/event/${eventId}/authenticate`
-  ).catch((error: AxiosError) => {
-    responseError = {
-      message: 'errror',
-    }
-  })
+  // const response: AxiosResponse | void = await Client.get(
+  //   `api/v1/event/${eventId}/authenticate`
+  // ).catch((error: AxiosError) => {
+  //   responseError = {
+  //     message: 'err',
+  //   }
+  // })
 
-  if (response?.data) {
-    responseData = {
-      message: response.data.message,
-      status: response.data.status,
-    }
+  // if (response?.data) {
+  //   responseData = {
+  //     message: response.data.message,
+  //     status: response.data.status,
+  //   }
 
-    const guestHeaderValue = _get(response, 'headers.authorization-guest')
-    if (guestHeaderValue) {
-      setCustomHeader(response)
-    }
+  //   const guestHeaderValue = _get(response, 'headers.authorization-guest')
+  //   if (guestHeaderValue) {
+  //     setCustomHeader(response)
+  //   }
+  // }
+
+  responseError = {
+    message: 'Somethjing',
   }
 
   return {
-    passwordProtectedData: responseData,
-    passwordProtectedError: responseError,
+    eventData: responseData,
+    eventError: responseError,
   }
 }
 //#endregion

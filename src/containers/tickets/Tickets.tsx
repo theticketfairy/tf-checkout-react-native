@@ -19,7 +19,7 @@ import {
   ITicket,
 } from '../../types'
 import TicketsView from './TicketsView'
-import { IEventPasswordProtectedData, ITicketsProps } from './types'
+import { IPasswordProtectedEventData, ITicketsProps } from './types'
 
 const Tickets: FC<ITicketsProps> = ({
   onAddToCartSuccess,
@@ -54,8 +54,8 @@ const Tickets: FC<ITicketsProps> = ({
     IPromoCodeResponse | undefined
   >(undefined)
   const [isFirstCall, setIsFirstCall] = useState(true)
-  const [eventPasswordProtectedData, setEventPasswordProtectedData] = useState<
-    IEventPasswordProtectedData | undefined
+  const [passwordProtectedEventData, setPasswordProtectedEventData] = useState<
+    IPasswordProtectedEventData | undefined
   >()
 
   //#region Refs
@@ -185,7 +185,7 @@ const Tickets: FC<ITicketsProps> = ({
     if (eventError) {
       eventErrorCodeRef.current = eventError.code || 400
       if (eventError.code === 401) {
-        setEventPasswordProtectedData({
+        setPasswordProtectedEventData({
           isPasswordProtected: true,
           message: eventError.message,
         })
@@ -310,16 +310,32 @@ const Tickets: FC<ITicketsProps> = ({
     onLoadingChangeCallback(loading)
   }
 
-  const handleOnSubmitEventPassword = (password: string) => {
+  const handleOnSubmitEventPassword = async (password: string) => {
+    if (!ticketsCoreRef.current) {
+      return { error: { message: 'Ticket core is not initialized' } }
+    }
+
+    setPasswordProtectedEventData({
+      ...passwordProtectedEventData,
+      isLoading: true,
+    })
+
+    await ticketsCoreRef.current.unlockPasswordProtectedEvent(password)
+
+    setPasswordProtectedEventData({
+      ...passwordProtectedEventData,
+      isLoading: false,
+    })
+
     //TODO: Implement submitEventPassword API call
     console.log('handleOnSubmitEventPassword', password)
-    setEventPasswordProtectedData({
-      ...eventPasswordProtectedData,
+    setPasswordProtectedEventData({
+      ...passwordProtectedEventData,
       isLoading: true,
     })
     setTimeout(() => {
-      setEventPasswordProtectedData({
-        ...eventPasswordProtectedData,
+      setPasswordProtectedEventData({
+        ...passwordProtectedEventData,
         isLoading: false,
       })
     }, 1000)
@@ -354,7 +370,7 @@ const Tickets: FC<ITicketsProps> = ({
         onAddToWaitingListSuccess={onAddToWaitingListSuccess}
         onLoadingChange={handleOnLoadingChange}
         promoCodeCloseIcon={promoCodeCloseIcon}
-        eventPasswordProtectedData={eventPasswordProtectedData}
+        passwordProtectedEventData={passwordProtectedEventData}
         onPressSubmitEventPassword={handleOnSubmitEventPassword}
       />
     </TicketsCore>

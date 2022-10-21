@@ -467,7 +467,7 @@ Then add it to the render function.
 
   // Event password protected
   onPressSubmitEventPassword?: (password: string) => void
-  eventPasswordProtectedData?: {
+  passwordProtectedEventData?: {
     isPasswordProtected?: boolean
     message?: string
     apiError?: string
