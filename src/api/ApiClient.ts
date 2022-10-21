@@ -8,6 +8,7 @@ import _sortBy from 'lodash/sortBy'
 import { IOnCheckoutSuccess } from '..'
 import { IWaitingListFields } from '../components/waitingList/types'
 import { Config } from '../helpers/Config'
+import { getDomainByClientAndEnv } from '../helpers/Domains'
 import {
   deleteAllData,
   getData,
@@ -30,6 +31,8 @@ import {
   ICheckoutBody,
   ICheckoutResponse,
   IClientRequest,
+  ICloseSessionData,
+  ICloseSessionResponse,
   ICountriesResponse,
   IEventResponse,
   IFetchTicketsResponse,
@@ -69,6 +72,7 @@ export const Client: IClientRequest = Axios.create({
   baseURL: Constants.BASE_URL,
   headers: HEADERS,
   timeout: Constants.TIMEOUT,
+  data: {},
 }) as IClientRequest
 
 axiosRetry(Client, { retries: 3 })
@@ -94,10 +98,10 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
     config.headers = updatedHeaders
   }
 
-  if (Config.DOMAIN) {
+  if (Config.CLIENT) {
     const updatedHeaders = {
       ...config.headers,
-      origin: Config.DOMAIN,
+      origin: getDomainByClientAndEnv(Config.CLIENT, Config.ENV),
     }
     config.headers = updatedHeaders
   }
@@ -106,7 +110,9 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 })
 
 Client.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response: AxiosResponse) => {
+    return response
+  },
   async (error: AxiosError) => {
     if (error?.response?.status === 401) {
       await deleteAllData()
@@ -122,6 +128,12 @@ Client.interceptors.response.use(
 Client.setGuestToken = (token: string) =>
   (Client.defaults.headers.common['Authorization-Guest'] = token)
 
+Client.removeGuestToken = () =>
+  delete Client.defaults.headers.common['Authorization-Guest']
+
+Client.removeAccessToken = () =>
+  delete Client.defaults.headers.common.Authorization
+
 Client.setAccessToken = (token: string) =>
   (Client.defaults.headers.common.Authorization = token)
 
@@ -135,6 +147,9 @@ Client.setDomain = (domain: string) =>
     //@ts-ignore
     origin: domain,
   })
+
+Client.setContentType = (contentType: string) =>
+  (Client.defaults.headers.common['Content-Type'] = contentType)
 
 export const setCustomHeader = (response: any) => {
   const guestHeaderResponseValue = _get(response, 'headers.authorization-guest')
@@ -973,6 +988,36 @@ export const removeTicketFromResale = async (
   }
 }
 //#endregion
+
+//#region Logout
+export const closeSession = async (): Promise<ICloseSessionResponse> => {
+  let responseData: ICloseSessionData | undefined
+  let responseError: IError | undefined
+
+  const response: AxiosResponse | void = await Client.delete('/auth').catch(
+    (error: AxiosError) => {
+      responseError =
+        error.response?.data.message || 'Error while closing session'
+    }
+  )
+
+  if (response?.data && response.data.status && response.data.status === 200) {
+    responseData = {
+      message: response.data.message || 'Session closed successfully',
+    }
+
+    await deleteAllData()
+
+    Client.removeGuestToken()
+    Client.removeAccessToken()
+  }
+
+  return {
+    closeSessionData: responseData,
+    closeSessionError: responseError,
+  }
+}
+//endregion Logout
 
 //#region Restore Password
 export const requestRestorePassword = async (

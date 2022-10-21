@@ -2,11 +2,14 @@ import _forEach from 'lodash/forEach'
 
 import { Client } from '../api/ApiClient'
 import Constants from '../api/Constants'
+import { getDomainByClientAndEnv } from './Domains'
+
+export type EnvType = 'PROD' | 'DEV' | 'STAG'
 
 export interface IConfig {
   EVENT_ID: string | number
-  DOMAIN?: string
-  ENV?: 'PROD' | 'DEV' | 'STAG'
+  CLIENT?: string
+  ENV?: EnvType
   CLIENT_ID?: string
   CLIENT_SECRET?: string
   TIMEOUT?: number
@@ -39,12 +42,8 @@ export const setConfig = (configs: IConfig): string | undefined => {
     Client.setTimeOut(Config.TIMEOUT)
   }
 
-  if (Config.DOMAIN) {
-    Client.setDomain(Config.DOMAIN)
-  }
-
-  if (Config.CLIENT_ID) {
-    Client.setDomain(Config.CLIENT_ID)
+  if (Config.CLIENT) {
+    Client.setDomain(getDomainByClientAndEnv(Config.CLIENT, Config.ENV))
   }
 
   if (!Config.CLIENT_SECRET) {

@@ -22,7 +22,11 @@ import DeviceCountry, { TYPE_ANY } from 'react-native-device-country'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import Constants from '../../api/Constants'
-import { ICheckoutBody, ICheckoutTicketHolder } from '../../api/types'
+import {
+  ICheckoutBody,
+  ICheckoutTicketHolder,
+  IRegisterNewUserBody,
+} from '../../api/types'
 import {
   Button,
   CartTimer,
@@ -496,10 +500,12 @@ const Billing: FC<IBillingProps> = ({
     onRegisterError?.(rawError)
   }
 
-  const performCheckout = async (checkoutBody: ICheckoutBody) => {
+  const performCheckout = async (checkoutBodyWhenSkipping?: ICheckoutBody) => {
     if (!billingCoreRef.current) {
       return onCheckoutError?.({ message: 'BillingCore is not ready' })
     }
+
+    const checkoutBody = checkoutBodyWhenSkipping || getCheckoutBody()
 
     setIsSubmittingData(true)
     const { error: checkoutError, data: checkoutData } =
@@ -522,23 +528,15 @@ const Billing: FC<IBillingProps> = ({
     onCheckoutSuccess(checkoutData)
   }
 
-  const getRegisterFormData = (checkoutBody: ICheckoutBody): FormData => {
+  const getRegisterFormData = (data: IRegisterNewUserBody): FormData => {
     const bodyFormData = new FormData()
-    _forEach(checkoutBody.attributes, (item: any, key: string) => {
+    _forEach(data.attributes, (item: any, key: string) => {
       bodyFormData.append(key, item)
     })
-
-    bodyFormData.append(
-      'password_confirmation',
-      checkoutBody.attributes.password
-    )
-    bodyFormData.append('client_id', Config.CLIENT_ID)
-    bodyFormData.append('client_secret', Config.CLIENT_SECRET)
-
     return bodyFormData
   }
 
-  const performNewUserRegister = async (checkoutBody: ICheckoutBody) => {
+  const performNewUserRegister = async () => {
     if (!billingCoreRef.current) {
       showAlert('BillingCore is not ready')
       return onRegisterError?.({ message: 'BillingCore is not initialized' })
@@ -546,7 +544,9 @@ const Billing: FC<IBillingProps> = ({
 
     setIsSubmittingData(true)
 
-    const registerForm = getRegisterFormData(checkoutBody)
+    const registerUserBody = getRegisterNewUserBody()
+    const registerForm = getRegisterFormData(registerUserBody)
+
     const { data: registerResponseData, error: registerResponseError } =
       await billingCoreRef.current.registerNewUser(registerForm)
 
@@ -579,7 +579,31 @@ const Billing: FC<IBillingProps> = ({
 
     onRegisterSuccess?.()
 
-    await performCheckout(checkoutBody)
+    await performCheckout()
+  }
+
+  const getRegisterNewUserBody = (): IRegisterNewUserBody => {
+    const phoneNumber = phone.length < 5 ? '' : phone
+
+    const body: IRegisterNewUserBody = {
+      attributes: {
+        city: city,
+        country: parseInt(selectedCountry!.value as string, 10),
+        email: email,
+        first_name: firstName,
+        last_name: lastName,
+        password: password,
+        phone: phoneNumber,
+        state: parseInt(selectedState!.value as string, 10),
+        street_address: street,
+        zip: postalCode,
+        password_confirmation: passwordConfirmation,
+        client_id: Config.CLIENT_ID!,
+        client_secret: Config.CLIENT_SECRET!,
+        check_cart_expiration: true,
+      },
+    }
+    return body
   }
 
   const getCheckoutBody = (): ICheckoutBody => {
@@ -682,11 +706,10 @@ const Billing: FC<IBillingProps> = ({
       return showAlert(isExtraDataValid)
     }
 
-    const checkoutBody = getCheckoutBody()
     if (loggedUserFirstName && storedToken.current) {
-      await performCheckout(checkoutBody)
+      await performCheckout()
     } else {
-      await performNewUserRegister(checkoutBody)
+      await performNewUserRegister()
     }
   }
   //#endregion

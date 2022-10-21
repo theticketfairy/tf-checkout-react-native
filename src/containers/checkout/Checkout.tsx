@@ -55,7 +55,9 @@ const Checkout: FC<ICheckoutProps> = ({
   const [orderInfo, setOrderInfo] = useState<IOrderItem[]>(orderReviewItems)
   const [paymentInfo, setPaymentInfo] = useState<CardFormView.Details>()
   const [isStripeConfigMissing, setIsStripeConfigMissing] = useState(false)
-  const [isPaymentRequired, setIsPaymentRequired] = useState(false)
+  const [isPaymentRequired, setIsPaymentRequired] = useState<
+    boolean | undefined
+  >(undefined)
   const [secondsLeft, setSecondsLeft] = useState<number | undefined>(undefined)
 
   const checkoutCoreRef = useRef<CheckoutCoreHandle>(null)
@@ -433,7 +435,7 @@ const Checkout: FC<ICheckoutProps> = ({
               }}
             />
           )}
-          {!isPaymentRequired && (
+          {isPaymentRequired !== undefined && !isPaymentRequired && (
             <Button
               text={texts?.freeRegistrationButton || 'COMPLETE REGISTRATION'}
               onPress={handleOnPressFreeRegistration}
