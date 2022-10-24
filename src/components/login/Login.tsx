@@ -1,6 +1,7 @@
 import React, { FC, useRef, useState } from 'react'
 import { Alert, Keyboard } from 'react-native'
 
+import { IResetPasswordRequestData } from '../../api/types'
 import { LoginCore, LoginCoreHandle } from '../../core'
 import { IUserProfilePublic } from '../../types'
 import LoginView from './LoginView'

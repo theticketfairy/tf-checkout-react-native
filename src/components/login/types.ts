@@ -6,6 +6,7 @@ import { IResetPasswordRequestData } from '../../api/types'
 import { IError, IUserProfilePublic } from '../../types'
 import { IButtonStyles } from '../button/types'
 import { IInputStyles } from '../input/types'
+import { IRestorePasswordSuccessDialogProps } from './components/types'
 
 export interface ILoginRefs {
   inputs?: {
@@ -151,50 +152,6 @@ export interface ILoginDialogViewProps {
 }
 //#endregion
 
-//#region Restore Password
-export interface IRestorePasswordViewTexts {
-  restorePasswordButton?: string
-  cancelButton?: string
-  message?: string
-  inputLabel?: string
-  title?: string
-}
-
-export interface IRestorePasswordViewStyles {
-  container?: StyleProp<ViewStyle>
-  restorePasswordButton?: IButtonStyles
-  cancelRestorePasswordButton?: IButtonStyles
-  input?: IInputStyles
-  title?: StyleProp<TextStyle>
-  message?: StyleProp<TextStyle>
-}
-
-export interface IRestorePasswordViewProps {
-  styles?: IRestorePasswordViewStyles
-  texts?: IRestorePasswordViewTexts
-}
-//#endregion
-
-//#region Restore Password Success Dialog
-export interface IRestorePasswordSuccessDialogTexts {
-  button?: string
-  message?: string
-  title?: string
-}
-
-export interface IRestorePasswordSuccessDialogStyles {
-  container?: StyleProp<ViewStyle>
-  button?: IButtonStyles
-  title?: StyleProp<TextStyle>
-  message?: StyleProp<TextStyle>
-}
-
-export interface IRestorePasswordSuccessDialogProps {
-  styles?: IRestorePasswordSuccessDialogStyles
-  texts?: IRestorePasswordSuccessDialogTexts
-}
-//#endregion Restore Password Success Dialog
-
 export type LoginContentType =
   | 'login'
   | 'restorePassword'
@@ -237,16 +194,13 @@ export interface ILoginViewProps {
     restorePasswordApiError?: string
   }
 
-  restorePasswordSuccessProps: {
-    restorePasswordSuccessProps?: IRestorePasswordSuccessDialogProps
-    restorePasswordSuccessMessage?: string
-  }
-
   resetPasswordProps: {
     onPressResetPassword: (data: IResetPasswordRequestData) => void
     resetPasswordError?: string
     isResetPasswordLoading?: boolean
   }
+
+  restorePasswordSuccessDialogProps?: IRestorePasswordSuccessDialogProps
 }
 
 export interface ILoginFields {

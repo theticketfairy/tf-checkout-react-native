@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ILoginDialogViewProps, IRestorePasswordViewProps } from '../types'
+import { ILoginDialogViewProps } from '../types'
 
 //#region LoginForm
 export interface ILoginFormProps {
@@ -20,17 +20,3 @@ export interface ILoginFormProps {
   brandImages?: React.ReactNode
 }
 //#endregion LoginForm
-
-//#region RestorePasswordForm
-export interface IRestorePasswordFormProps {
-  viewProps?: IRestorePasswordViewProps
-  restorePasswordInputError?: string
-  email: string
-  onEmailChanged: (text: string) => void
-  restorePasswordApiError?: string
-  onPressRestorePasswordButton: () => void
-  onPressCancelButton: () => void
-  isButtonDisabled?: boolean
-  isLoading?: boolean
-}
-//#endregion RestorePasswordForm

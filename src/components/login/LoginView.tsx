@@ -10,7 +10,6 @@ import {
 import R from '../../res'
 import Button from '../button/Button'
 import LoginForm from './components/LoginForm'
-import RestorePasswordForm from './components/RestorePasswordForm'
 import s from './styles'
 import { ILoginViewProps, ILoginViewState } from './types'
 
@@ -44,10 +43,7 @@ const LoginView: FC<ILoginViewProps> = ({
     restorePasswordViewProps,
     isRestorePasswordLoading,
   },
-  restorePasswordSuccessProps: {
-    restorePasswordSuccessViewProps,
-    restorePasswordSuccessMessage,
-  },
+  restorePasswordSuccessDialogProps,
   resetPasswordProps: {},
 }) => {
   const [data, setData] = useState<ILoginViewState>(initialState)
@@ -196,10 +192,6 @@ const LoginView: FC<ILoginViewProps> = ({
   )
 
   //#region Button Press
-  const handleOnPressRestorePassword = () => {
-    onPressRestorePasswordButton(restorePasswordEmail)
-  }
-
   const handleOnPressLogout = () => {
     Alert.alert(logoutTitle, logoutMessage, [
       {
@@ -215,53 +207,12 @@ const LoginView: FC<ILoginViewProps> = ({
   //#endregion Button Press
 
   //#region Text Changed
-  const handleOnRestorePasswordEmailChanged = (text: string) =>
-    setData({ ...data, restorePasswordEmail: text })
-
   const handleOnLoginEmailChanged = (text: string) =>
     setData({ ...data, loginEmail: text })
 
   const handleOnLoginPasswordChanged = (text: string) =>
     setData({ ...data, loginPassword: text })
   //#endregion Text Changed
-
-  const RestorePasswordSuccessForm = (
-    <View
-      style={[s.dialog, restorePasswordSuccessViewProps?.styles?.container]}
-    >
-      <Text
-        style={[s.dialogTitle, restorePasswordSuccessViewProps?.styles?.title]}
-      >
-        {restorePasswordSuccessViewProps?.texts?.title || 'Email Sent!'}
-      </Text>
-
-      {!!restorePasswordSuccessMessage && (
-        <Text>{restorePasswordSuccessMessage}</Text>
-      )}
-
-      <Button
-        text={restorePasswordSuccessViewProps?.texts?.button || 'OK'}
-        onPress={hideDialog}
-      />
-    </View>
-  )
-
-  const ResetPassword = (
-    <View style={[s.dialog, styles?.dialog?.container]}>
-      <Text style={[s.dialogTitle, styles?.dialog?.title]}>
-        {restorePasswordSuccessViewProps?.texts?.title ||
-          'Enter your new password'}
-      </Text>
-
-      <Button
-        text={
-          restorePasswordSuccessViewProps?.texts?.button || 'RESET PASSWORD'
-        }
-        onPress={handleOnPressRestorePassword}
-        isLoading={isRestorePasswordLoading}
-      />
-    </View>
-  )
 
   const renderContent = () => {
     switch (content) {
@@ -289,25 +240,13 @@ const LoginView: FC<ILoginViewProps> = ({
         )
 
       case 'restorePassword':
-        return (
-          <RestorePasswordForm
-            email={restorePasswordEmail}
-            onEmailChanged={handleOnRestorePasswordEmailChanged}
-            onPressRestorePasswordButton={handleOnPressRestorePassword}
-            restorePasswordInputError={restorePasswordEmailError}
-            isButtonDisabled={!checkIsRestorePasswordDataValid()}
-            viewProps={restorePasswordViewProps}
-            restorePasswordApiError={restorePasswordApiError}
-            isLoading={isRestorePasswordLoading}
-            onPressCancelButton={onPressCancelRestorePasswordButton}
-          />
-        )
+        return <View />
 
       case 'restorePasswordSuccess':
-        return RestorePasswordSuccessForm
+        return <View />
 
       case 'resetPassword':
-        return ResetPassword
+        return <View />
 
       default:
         return LoginForm

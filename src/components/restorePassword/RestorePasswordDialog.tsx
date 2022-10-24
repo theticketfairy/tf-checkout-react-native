@@ -1,27 +1,30 @@
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import { Text, View } from 'react-native'
 
-import Button from '../../button/Button'
-import Input from '../../input/Input'
-import s from '../styles'
-import { IRestorePasswordFormProps } from './types'
+import Button from '../button/Button'
+import Input from '../input/Input'
+import { restorePasswordStyles as s } from './styles'
+import { IRestorePasswordDialogProps } from './types'
 
-const RestorePasswordForm: FC<IRestorePasswordFormProps> = ({
-  viewProps,
+const RestorePasswordDialog: FC<IRestorePasswordDialogProps> = ({
+  styles,
+  texts,
   restorePasswordInputError,
-  email,
-  onEmailChanged,
   isButtonDisabled,
   isLoading,
   onPressRestorePasswordButton,
   onPressCancelButton,
   restorePasswordApiError,
 }) => {
-  const { styles, texts } = viewProps || {}
+  const [email, setEmail] = useState('')
+
+  const handleOnPressRestoreButton = () => {
+    onPressRestorePasswordButton(email)
+  }
 
   return (
-    <View style={[s.dialog, styles?.container]}>
-      <Text style={[s.dialogTitle, styles?.title]}>
+    <View style={[s.rootContainer, styles?.rootContainer]}>
+      <Text style={[s.title, styles?.title]}>
         {texts?.title || 'Enter your email to restore your password'}
       </Text>
 
@@ -30,16 +33,18 @@ const RestorePasswordForm: FC<IRestorePasswordFormProps> = ({
         error={restorePasswordInputError}
         keyboardType='email-address'
         value={email}
-        onChangeText={onEmailChanged}
+        onChangeText={setEmail}
         autoCapitalize='none'
         styles={styles?.input}
       />
 
-      {!!restorePasswordApiError && <Text>{restorePasswordApiError}</Text>}
+      {!!restorePasswordApiError && (
+        <Text style={styles?.apiError}>{restorePasswordApiError}</Text>
+      )}
 
       <Button
         text={texts?.restorePasswordButton || 'RESTORE PASSWORD'}
-        onPress={onPressRestorePasswordButton}
+        onPress={handleOnPressRestoreButton}
         isLoading={isLoading}
         isDisabled={isButtonDisabled}
         styles={styles?.restorePasswordButton}
@@ -56,4 +61,4 @@ const RestorePasswordForm: FC<IRestorePasswordFormProps> = ({
   )
 }
 
-export default RestorePasswordForm
+export default RestorePasswordDialog
