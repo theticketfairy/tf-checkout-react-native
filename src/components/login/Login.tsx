@@ -24,21 +24,22 @@ const Login: FC<ILoginProps> = ({
   isShowPasswordButtonVisible,
   onRestorePasswordError,
   onRestorePasswordSuccess,
-  forgotPasswordViewProps,
-  restorePasswordDialogProps,
+  onResetPasswordError,
+  onResetPasswordSuccess,
 }) => {
   //#region State
   const [isLoading, setIsLoading] = useState(false)
   const [loginApiError, setLoginApiError] = useState('')
   const [restorePasswordApiError, setRestorePasswordApiError] = useState('')
-  const [restorePasswordSuccessMessage, setRestorePasswordSuccessMessage] =
-    useState('')
-  const [resetPasswordError, setResetPasswordError] = useState('')
+  // const [restorePasswordSuccessMessage, setRestorePasswordSuccessMessage] =
+  //   useState('')
+  const [resetPasswordApiError, setResetPasswordApiError] = useState('')
   const [userProfileData, setUserProfileData] = useState<IUserProfilePublic>()
   const [loginContentType, setLoginContentType] =
     useState<LoginContentType>('login')
   const [isRestorePasswordLoading, setIsRestorePasswordLoading] =
     useState(false)
+  const [isResetPasswordLoading, setIsResetPasswordLoading] = useState(false)
   //#endregion State
 
   const loginCoreRef = useRef<LoginCoreHandle>(null)
@@ -115,9 +116,29 @@ const Login: FC<ILoginProps> = ({
 
     setLoginContentType('restorePasswordSuccess')
 
-    setRestorePasswordSuccessMessage(restorePasswordSuccessData.message)
+    //setRestorePasswordSuccessMessage(restorePasswordSuccessData.message)
     onRestorePasswordSuccess?.()
   }
+
+  const handleOnPressResetPasswordButton = async (
+    data: IResetPasswordRequestData
+  ) => {
+    if (!loginCoreRef.current?.resetPassword) {
+      return onResetPasswordError?.({
+        message: 'LoginCoreRef is not initialized',
+      })
+    }
+
+    setIsResetPasswordLoading(true)
+    const res = await loginCoreRef.current.resetPassword(data)
+    setIsResetPasswordLoading(false)
+  }
+
+  const handleOnPressCancelResetPasswordButton = () => {
+    setLoginContentType('login')
+  }
+
+  const handleOnPressRestorePasswordSuccessButton = () => {}
 
   const handleHideDialog = () => {
     setLoginContentType('login')
@@ -146,25 +167,19 @@ const Login: FC<ILoginProps> = ({
         content={loginContentType}
         onPressForgotPassword={handleOnPressForgotPassword}
         restorePasswordProps={{
-          restorePasswordApiError: restorePasswordApiError,
+          apiError: restorePasswordApiError,
           onPressRestorePasswordButton: handleOnPressRestorePasswordButton,
-          restorePasswordViewProps: forgotPasswordViewProps,
-          isRestorePasswordLoading: isRestorePasswordLoading,
-          onPressCancelRestorePasswordButton:
-            handleOnPressCancelRestorePasswordButton,
-        }}
-        restorePasswordSuccessProps={{
-          restorePasswordSuccessMessage: restorePasswordSuccessMessage,
-          restorePasswordSuccessViewProps: restorePasswordgSuccessViewProps,
+          isLoading: isRestorePasswordLoading,
+          onPressCancelButton: handleOnPressCancelRestorePasswordButton,
         }}
         resetPasswordProps={{
-          onPressResetPassword: function (
-            data: IResetPasswordRequestData
-          ): void {
-            throw new Error('Function not implemented.')
-          },
-          resetPasswordError: undefined,
-          isResetPasswordLoading: undefined,
+          apiError: resetPasswordApiError,
+          isLoading: isResetPasswordLoading,
+          onPressResetButton: handleOnPressResetPasswordButton,
+          onPressCancelButton: handleOnPressCancelResetPasswordButton,
+        }}
+        restorePasswordSuccessProps={{
+          onPressButton: handleOnPressRestorePasswordSuccessButton,
         }}
       />
     </LoginCore>

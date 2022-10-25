@@ -1056,7 +1056,7 @@ export const requestRestorePassword = async (
 
 export const requestResetPassword = async (data: IResetPasswordRequestData) => {
   let responseError: IError | undefined
-  const response = await Client.post(`/auth/restore-password-rn`, data).catch(
+  const response = await Client.post(`/auth/reset-password`, data).catch(
     (error: AxiosError) => {
       console.log('Reset passs error', error.response)
       //responseError?.code = 400

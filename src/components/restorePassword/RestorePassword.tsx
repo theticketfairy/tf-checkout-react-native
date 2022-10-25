@@ -1,22 +1,23 @@
 import React, { FC, useState } from 'react'
 import { Text, View } from 'react-native'
 
+import { useDebounced } from '../../helpers/Debounced'
+import { validateEmail } from '../../helpers/Validators'
 import Button from '../button/Button'
 import Input from '../input/Input'
 import { restorePasswordStyles as s } from './styles'
-import { IRestorePasswordDialogProps } from './types'
+import { IRestorePasswordProps } from './types'
 
-const RestorePasswordDialog: FC<IRestorePasswordDialogProps> = ({
+const RestorePassword: FC<IRestorePasswordProps> = ({
   styles,
   texts,
-  restorePasswordInputError,
-  isButtonDisabled,
   isLoading,
   onPressRestorePasswordButton,
   onPressCancelButton,
-  restorePasswordApiError,
+  apiError,
 }) => {
   const [email, setEmail] = useState('')
+  const emailError = useDebounced(email, validateEmail)
 
   const handleOnPressRestoreButton = () => {
     onPressRestorePasswordButton(email)
@@ -30,7 +31,7 @@ const RestorePasswordDialog: FC<IRestorePasswordDialogProps> = ({
 
       <Input
         label={texts?.inputLabel || 'Email'}
-        error={restorePasswordInputError}
+        error={emailError}
         keyboardType='email-address'
         value={email}
         onChangeText={setEmail}
@@ -38,15 +39,13 @@ const RestorePasswordDialog: FC<IRestorePasswordDialogProps> = ({
         styles={styles?.input}
       />
 
-      {!!restorePasswordApiError && (
-        <Text style={styles?.apiError}>{restorePasswordApiError}</Text>
-      )}
+      {!!apiError && <Text style={styles?.apiError}>{apiError}</Text>}
 
       <Button
         text={texts?.restorePasswordButton || 'RESTORE PASSWORD'}
         onPress={handleOnPressRestoreButton}
         isLoading={isLoading}
-        isDisabled={isButtonDisabled}
+        isDisabled={isLoading || !!emailError || email.length === 0}
         styles={styles?.restorePasswordButton}
       />
 
@@ -61,4 +60,4 @@ const RestorePasswordDialog: FC<IRestorePasswordDialogProps> = ({
   )
 }
 
-export default RestorePasswordDialog
+export default RestorePassword

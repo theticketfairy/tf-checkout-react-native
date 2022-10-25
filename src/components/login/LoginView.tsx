@@ -2,13 +2,11 @@ import React, { FC, useMemo, useState } from 'react'
 import { Alert, Image, Modal, Text, TouchableOpacity, View } from 'react-native'
 
 import { useDebounced } from '../../helpers/Debounced'
-import {
-  validateEmail,
-  validateMinLength,
-  validatePasswords,
-} from '../../helpers/Validators'
+import { validateEmail, validateMinLength } from '../../helpers/Validators'
 import R from '../../res'
 import Button from '../button/Button'
+import ResetPassword from '../restorePassword/ResetPassword'
+import RestorePassword from '../restorePassword/RestorePassword'
 import LoginForm from './components/LoginForm'
 import s from './styles'
 import { ILoginViewProps, ILoginViewState } from './types'
@@ -16,9 +14,6 @@ import { ILoginViewProps, ILoginViewState } from './types'
 const initialState: ILoginViewState = {
   loginEmail: '',
   loginPassword: '',
-  restorePasswordEmail: '',
-  resetPasswordNewPassword: '',
-  resetPasswordNewPasswordConfirmation: '',
 }
 
 const LoginView: FC<ILoginViewProps> = ({
@@ -36,50 +31,15 @@ const LoginView: FC<ILoginViewProps> = ({
   isShowPasswordButtonVisible,
   content,
   onPressForgotPassword,
-  restorePasswordProps: {
-    onPressRestorePasswordButton,
-    onPressCancelRestorePasswordButton,
-    restorePasswordApiError,
-    restorePasswordViewProps,
-    isRestorePasswordLoading,
-  },
-  restorePasswordSuccessDialogProps,
-  resetPasswordProps: {},
+  restorePasswordProps,
+  resetPasswordProps,
 }) => {
   const [data, setData] = useState<ILoginViewState>(initialState)
-  const {
-    loginEmail,
-    loginPassword,
-    resetPasswordNewPassword,
-    resetPasswordNewPasswordConfirmation,
-    restorePasswordEmail,
-  } = data
+  const { loginEmail, loginPassword } = data
 
   const loginEmailError = useDebounced(loginEmail, validateEmail)
   const loginPasswordError = useDebounced(loginPassword, (value: string) =>
     validateMinLength(value, 6, 'Password')
-  )
-  const restorePasswordEmailError = useDebounced(
-    restorePasswordEmail,
-    validateEmail
-  )
-
-  const resetPasswordNewPasswordError = useDebounced(
-    resetPasswordNewPassword,
-    () =>
-      validatePasswords(
-        resetPasswordNewPassword,
-        resetPasswordNewPasswordConfirmation
-      )
-  )
-
-  const resetPasswordNewPasswordConfirmationError = useDebounced(
-    resetPasswordNewPasswordConfirmation,
-    () =>
-      validatePasswords(
-        resetPasswordNewPassword,
-        resetPasswordNewPasswordConfirmation
-      )
   )
 
   const handleOnPressLogin = () => {
@@ -123,14 +83,6 @@ const LoginView: FC<ILoginViewProps> = ({
     if (loginPasswordError) {
       return false
     }
-    return true
-  }
-
-  const checkIsRestorePasswordDataValid = (): boolean => {
-    if (restorePasswordEmailError) {
-      return false
-    }
-
     return true
   }
 
@@ -240,13 +192,32 @@ const LoginView: FC<ILoginViewProps> = ({
         )
 
       case 'restorePassword':
-        return <View />
+        return (
+          <RestorePassword
+            onPressRestorePasswordButton={
+              restorePasswordProps.onPressRestorePasswordButton
+            }
+            onPressCancelButton={restorePasswordProps.onPressCancelButton}
+            styles={styles?.restorePassword}
+            texts={texts?.restorePassword}
+            isLoading={restorePasswordProps.isLoading}
+          />
+        )
 
       case 'restorePasswordSuccess':
         return <View />
 
       case 'resetPassword':
-        return <View />
+        return (
+          <ResetPassword
+            onPressResetButton={resetPasswordProps.onPressResetButton}
+            onPressCancelButton={resetPasswordProps.onPressCancelButton}
+            isLoading={resetPasswordProps.isLoading}
+            apiError={resetPasswordProps.apiError}
+            styles={styles?.resetPassword}
+            texts={texts?.resetPassword}
+          />
+        )
 
       default:
         return LoginForm

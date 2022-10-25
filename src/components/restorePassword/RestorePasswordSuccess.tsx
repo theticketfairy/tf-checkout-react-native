@@ -3,8 +3,8 @@ import { Text, View } from 'react-native'
 
 import Button from '../button/Button'
 import { restorePasswordSuccessStyles as s } from './styles'
-import { IRestorePasswordSuccessDialogProps } from './types'
-const RestorePasswordSuccessDialog: FC<IRestorePasswordSuccessDialogProps> = ({
+import { IRestorePasswordSuccessProps } from './types'
+const RestorePasswordSuccess: FC<IRestorePasswordSuccessProps> = ({
   styles,
   texts,
   onPressButton,
@@ -20,4 +20,4 @@ const RestorePasswordSuccessDialog: FC<IRestorePasswordSuccessDialogProps> = ({
   </View>
 )
 
-export default RestorePasswordSuccessDialog
+export default RestorePasswordSuccess

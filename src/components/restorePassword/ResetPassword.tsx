@@ -6,9 +6,9 @@ import { validatePasswords } from '../../helpers/Validators'
 import Button from '../button/Button'
 import Input from '../input/Input'
 import { resetPasswordStyles as s } from './styles'
-import { IResetPasswordDialogProps } from './types'
+import { IResetPasswordProps } from './types'
 
-const ResetPassword: FC<IResetPasswordDialogProps> = ({
+const ResetPassword: FC<IResetPasswordProps> = ({
   styles,
   texts,
   onPressResetButton,
@@ -27,7 +27,10 @@ const ResetPassword: FC<IResetPasswordDialogProps> = ({
   )
 
   const handleOnPressResetButton = () => {
-    onPressResetButton(newPassword, confirmNewPassword)
+    onPressResetButton({
+      password: newPassword,
+      confirmPassword: confirmNewPassword,
+    })
   }
 
   return (

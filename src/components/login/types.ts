@@ -2,11 +2,20 @@ import { ImageSourcePropType, ImageStyle } from 'react-native'
 import { TextStyle } from 'react-native'
 import { StyleProp, ViewStyle } from 'react-native'
 
-import { IResetPasswordRequestData } from '../../api/types'
 import { IError, IUserProfilePublic } from '../../types'
 import { IButtonStyles } from '../button/types'
 import { IInputStyles } from '../input/types'
-import { IRestorePasswordSuccessDialogProps } from './components/types'
+import {
+  IResetPasswordCoreProps,
+  IResetPasswordStyles,
+  IResetPasswordTexts,
+  IRestorePasswordCoreProps,
+  IRestorePasswordStyles,
+  IRestorePasswordSuccessCoreProps,
+  IRestorePasswordSuccessStyles,
+  IRestorePasswordSuccessTexts,
+  IRestorePasswordTexts,
+} from '../restorePassword/types'
 
 export interface ILoginRefs {
   inputs?: {
@@ -62,12 +71,12 @@ export interface ILoginProps {
     areAlertsEnabled?: boolean
   }
 
-  forgotPasswordViewProps?: IRestorePasswordViewProps
-
   //Restore password
   onRestorePasswordError?: (error: IError) => void
   onRestorePasswordSuccess?: () => void
-  restorePasswordDialogProps?: IRestorePasswordViewProps
+
+  onResetPasswordError?: (error: IError) => void
+  onResetPasswordSuccess?: () => void
 
   dialogsProps?: {
     isShowPasswordButtonVisible?: boolean
@@ -118,6 +127,9 @@ export interface ILoginViewStyles {
     button?: IButtonStyles
     message?: StyleProp<TextStyle>
   }
+  resetPassword?: IResetPasswordStyles
+  restorePassword?: IRestorePasswordStyles
+  restorePasswordSuccess?: IRestorePasswordSuccessStyles
 }
 
 export interface ILoginViewTexts {
@@ -143,6 +155,9 @@ export interface ILoginViewTexts {
     loggedAs?: string
     notYou?: string
   }
+  resetPassword?: IResetPasswordTexts
+  restorePassword?: IRestorePasswordTexts
+  restorePasswordSuccess?: IRestorePasswordSuccessTexts
 }
 
 //#region Login
@@ -186,21 +201,9 @@ export interface ILoginViewProps {
   onPressForgotPassword: () => void
 
   // Used to send the Restore password request to the server
-  restorePasswordProps: {
-    onPressRestorePasswordButton: (email: string) => void
-    onPressCancelRestorePasswordButton: () => void
-    restorePasswordViewProps?: IRestorePasswordViewProps
-    isRestorePasswordLoading?: boolean
-    restorePasswordApiError?: string
-  }
-
-  resetPasswordProps: {
-    onPressResetPassword: (data: IResetPasswordRequestData) => void
-    resetPasswordError?: string
-    isResetPasswordLoading?: boolean
-  }
-
-  restorePasswordSuccessDialogProps?: IRestorePasswordSuccessDialogProps
+  restorePasswordProps: IRestorePasswordCoreProps
+  resetPasswordProps: IResetPasswordCoreProps
+  restorePasswordSuccessProps?: IRestorePasswordSuccessCoreProps
 }
 
 export interface ILoginFields {
@@ -211,7 +214,4 @@ export interface ILoginFields {
 export interface ILoginViewState {
   loginEmail: string
   loginPassword: string
-  restorePasswordEmail: string
-  resetPasswordNewPassword: string
-  resetPasswordNewPasswordConfirmation: string
 }

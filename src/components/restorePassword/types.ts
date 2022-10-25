@@ -1,10 +1,11 @@
 import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
+import { IResetPasswordRequestData } from '../../api/types'
 import { IButtonStyles } from '../button/types'
 import { IInputStyles } from '../input/types'
 
 //#region ResetPassword
-export interface IResetPasswordDialogStyles {
+export interface IResetPasswordStyles {
   rootContainer?: StyleProp<ViewStyle>
   title?: StyleProp<TextStyle>
   button?: IButtonStyles
@@ -12,23 +13,26 @@ export interface IResetPasswordDialogStyles {
   apiError?: StyleProp<TextStyle>
 }
 
-export interface IResetPasswordDialogTexts {
+export interface IResetPasswordTexts {
   title?: string
   button?: string
   inputLabel?: string
 }
 
-export interface IResetPasswordDialogProps {
-  styles?: IResetPasswordDialogStyles
-  texts?: IResetPasswordDialogTexts
+export interface IResetPasswordCoreProps {
   isLoading?: boolean
-  onPressResetButton: (newPassword: string, confirmNewPassword: string) => void
+  onPressResetButton: (data: IResetPasswordRequestData) => void
+  onPressCancelButton: () => void
   apiError?: string
+}
+export interface IResetPasswordProps extends IResetPasswordCoreProps {
+  styles?: IResetPasswordStyles
+  texts?: IResetPasswordTexts
 }
 //#endregion ResetPassword
 
-//#region RestorePasswordDialog
-export interface IRestorePasswordDialogTexts {
+//#region RestorePassword
+export interface IRestorePasswordTexts {
   restorePasswordButton?: string
   cancelButton?: string
   message?: string
@@ -36,7 +40,7 @@ export interface IRestorePasswordDialogTexts {
   title?: string
 }
 
-export interface IRestorePasswordDialogStyles {
+export interface IRestorePasswordStyles {
   rootContainer?: StyleProp<ViewStyle>
   restorePasswordButton?: IButtonStyles
   cancelRestorePasswordButton?: IButtonStyles
@@ -46,36 +50,40 @@ export interface IRestorePasswordDialogStyles {
   apiError?: StyleProp<TextStyle>
 }
 
-export interface IRestorePasswordDialogProps {
-  styles?: IRestorePasswordDialogStyles
-  texts?: IRestorePasswordDialogTexts
-
-  restorePasswordInputError?: string
-  restorePasswordApiError?: string
+export interface IRestorePasswordCoreProps {
+  apiError?: string
   onPressRestorePasswordButton: (email: string) => void
   onPressCancelButton: () => void
-  isButtonDisabled?: boolean
   isLoading?: boolean
+}
+
+export interface IRestorePasswordProps extends IRestorePasswordCoreProps {
+  styles?: IRestorePasswordStyles
+  texts?: IRestorePasswordTexts
 }
 //#endregion RestorePasswordForm
 
-//#region RestorePasswordSuccessDialog
-export interface IRestorePasswordSuccessDialogStyles {
+//#region RestorePasswordSuccess
+export interface IRestorePasswordSuccessStyles {
   rootContainer?: StyleProp<ViewStyle>
   title?: StyleProp<TextStyle>
   message?: StyleProp<TextStyle>
   button?: IButtonStyles
 }
 
-export interface IRestorePasswordSuccessDialogTexts {
+export interface IRestorePasswordSuccessTexts {
   title?: string
   message?: string
   button?: string
 }
 
-export interface IRestorePasswordSuccessDialogProps {
-  styles?: IRestorePasswordSuccessDialogStyles
-  texts?: IRestorePasswordSuccessDialogTexts
+export interface IRestorePasswordSuccessCoreProps {
   onPressButton: () => void
+}
+
+export interface IRestorePasswordSuccessProps
+  extends IRestorePasswordSuccessCoreProps {
+  styles?: IRestorePasswordSuccessStyles
+  texts?: IRestorePasswordSuccessTexts
 }
 //#endregion
