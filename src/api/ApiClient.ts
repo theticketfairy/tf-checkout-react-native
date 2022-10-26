@@ -57,6 +57,7 @@ import {
   IResaleTicketData,
   IResaleTicketResponse,
   IResetPasswordRequestData,
+  IRestorePasswordData,
   IRestorePasswordResponse,
   IRestorePasswordSuccessData,
   IStatesResponse,
@@ -1024,7 +1025,7 @@ export const requestRestorePassword = async (
   email: string
 ): Promise<IRestorePasswordResponse> => {
   let responseError: IError | undefined
-  let successData: IRestorePasswordSuccessData | undefined
+  let successData: IRestorePasswordData | undefined
 
   const response: AxiosResponse | void = await Client.post(
     `v1/oauth/restore-password-rn`,

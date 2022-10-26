@@ -1,6 +1,5 @@
 import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
-import { IResetPasswordRequestData } from '../../api/types'
 import { IButtonStyles } from '../button/types'
 import { IInputStyles } from '../input/types'
 
@@ -19,9 +18,14 @@ export interface IResetPasswordTexts {
   inputLabel?: string
 }
 
+export interface IResetPasswordButtonPayload {
+  password: string
+  confirmPassword: string
+}
+
 export interface IResetPasswordCoreProps {
   isLoading?: boolean
-  onPressResetButton: (data: IResetPasswordRequestData) => void
+  onPressResetButton: (data: IResetPasswordButtonPayload) => void
   onPressCancelButton: () => void
   apiError?: string
 }
@@ -64,26 +68,26 @@ export interface IRestorePasswordProps extends IRestorePasswordCoreProps {
 //#endregion RestorePasswordForm
 
 //#region RestorePasswordSuccess
-export interface IRestorePasswordSuccessStyles {
+export interface IResultDialogStyles {
   rootContainer?: StyleProp<ViewStyle>
   title?: StyleProp<TextStyle>
   message?: StyleProp<TextStyle>
   button?: IButtonStyles
 }
 
-export interface IRestorePasswordSuccessTexts {
+export interface IResultDialogTexts {
   title?: string
   message?: string
   button?: string
 }
 
-export interface IRestorePasswordSuccessCoreProps {
+export interface IResultDialogCoreProps {
+  message?: string
   onPressButton: () => void
 }
 
-export interface IRestorePasswordSuccessProps
-  extends IRestorePasswordSuccessCoreProps {
-  styles?: IRestorePasswordSuccessStyles
-  texts?: IRestorePasswordSuccessTexts
+export interface IResultDialogProps extends IResultDialogCoreProps {
+  styles?: IResultDialogStyles
+  texts?: IResultDialogTexts
 }
 //#endregion

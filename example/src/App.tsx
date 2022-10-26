@@ -30,7 +30,7 @@ interface IDeepLinkUrl {
 }
 
 
-const EVENT_ID = 13066
+const EVENT_ID = 13068
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
@@ -134,6 +134,7 @@ const App = () => {
     setSkippingStatus(undefined)
     setCartProps(undefined)
   }
+
   //#endregion
   const handleOpenUrl = ({url}: IDeepLinkUrl) =>{
     console.log('Open urel', url)

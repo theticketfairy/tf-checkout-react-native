@@ -7,6 +7,8 @@ import R from '../../res'
 import Button from '../button/Button'
 import ResetPassword from '../restorePassword/ResetPassword'
 import RestorePassword from '../restorePassword/RestorePassword'
+import ResultDialog from '../restorePassword/ResultDialog'
+import RestorePasswordSuccess from '../restorePassword/ResultDialog'
 import LoginForm from './components/LoginForm'
 import s from './styles'
 import { ILoginViewProps, ILoginViewState } from './types'
@@ -33,6 +35,7 @@ const LoginView: FC<ILoginViewProps> = ({
   onPressForgotPassword,
   restorePasswordProps,
   resetPasswordProps,
+  resultDialogPropsProps,
 }) => {
   const [data, setData] = useState<ILoginViewState>(initialState)
   const { loginEmail, loginPassword } = data
@@ -205,7 +208,15 @@ const LoginView: FC<ILoginViewProps> = ({
         )
 
       case 'restorePasswordSuccess':
-        return <View />
+        return (
+          <ResultDialog
+            onPressButton={() => {
+              console.log('ALV')
+              resultDialogPropsProps?.onPressButton()
+            }}
+            message={resultDialogPropsProps?.message}
+          />
+        )
 
       case 'resetPassword':
         return (

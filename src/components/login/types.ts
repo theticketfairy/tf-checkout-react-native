@@ -11,10 +11,10 @@ import {
   IResetPasswordTexts,
   IRestorePasswordCoreProps,
   IRestorePasswordStyles,
-  IRestorePasswordSuccessCoreProps,
-  IRestorePasswordSuccessStyles,
-  IRestorePasswordSuccessTexts,
   IRestorePasswordTexts,
+  IResultDialogCoreProps,
+  IResultDialogStyles,
+  IResultDialogTexts,
 } from '../restorePassword/types'
 
 export interface ILoginRefs {
@@ -129,7 +129,7 @@ export interface ILoginViewStyles {
   }
   resetPassword?: IResetPasswordStyles
   restorePassword?: IRestorePasswordStyles
-  restorePasswordSuccess?: IRestorePasswordSuccessStyles
+  restorePasswordSuccess?: IResultDialogStyles
 }
 
 export interface ILoginViewTexts {
@@ -157,7 +157,7 @@ export interface ILoginViewTexts {
   }
   resetPassword?: IResetPasswordTexts
   restorePassword?: IRestorePasswordTexts
-  restorePasswordSuccess?: IRestorePasswordSuccessTexts
+  restorePasswordSuccess?: IResultDialogTexts
 }
 
 //#region Login
@@ -203,7 +203,7 @@ export interface ILoginViewProps {
   // Used to send the Restore password request to the server
   restorePasswordProps: IRestorePasswordCoreProps
   resetPasswordProps: IResetPasswordCoreProps
-  restorePasswordSuccessProps?: IRestorePasswordSuccessCoreProps
+  resultDialogPropsProps?: IResultDialogCoreProps
 }
 
 export interface ILoginFields {

@@ -4,6 +4,7 @@ import { Alert, Keyboard } from 'react-native'
 import { IResetPasswordRequestData } from '../../api/types'
 import { LoginCore, LoginCoreHandle } from '../../core'
 import { IUserProfilePublic } from '../../types'
+import { IResetPasswordButtonPayload } from '../restorePassword/types'
 import LoginView from './LoginView'
 import { ILoginFields, ILoginProps, LoginContentType } from './types'
 
@@ -31,8 +32,8 @@ const Login: FC<ILoginProps> = ({
   const [isLoading, setIsLoading] = useState(false)
   const [loginApiError, setLoginApiError] = useState('')
   const [restorePasswordApiError, setRestorePasswordApiError] = useState('')
-  // const [restorePasswordSuccessMessage, setRestorePasswordSuccessMessage] =
-  //   useState('')
+  const [restorePasswordSuccessMessage, setRestorePasswordSuccessMessage] =
+    useState('')
   const [resetPasswordApiError, setResetPasswordApiError] = useState('')
   const [userProfileData, setUserProfileData] = useState<IUserProfilePublic>()
   const [loginContentType, setLoginContentType] =
@@ -43,6 +44,7 @@ const Login: FC<ILoginProps> = ({
   //#endregion State
 
   const loginCoreRef = useRef<LoginCoreHandle>(null)
+  const resetPasswordToken = useRef<string>(null)
 
   //#region Handlers
   const handleOnPressForgotPassword = () =>
@@ -107,21 +109,18 @@ const Login: FC<ILoginProps> = ({
         restorePassError?.message || 'Restore password unknown error'
       )
       setIsRestorePasswordLoading(false)
-      if (config?.areAlertsEnabled) {
-        Alert.alert('', restorePasswordApiError)
-      }
       onRestorePasswordError?.(restorePassError!)
       return
     }
 
     setLoginContentType('restorePasswordSuccess')
 
-    //setRestorePasswordSuccessMessage(restorePasswordSuccessData.message)
+    setRestorePasswordSuccessMessage(restorePasswordSuccessData.message)
     onRestorePasswordSuccess?.()
   }
 
   const handleOnPressResetPasswordButton = async (
-    data: IResetPasswordRequestData
+    data: IResetPasswordButtonPayload
   ) => {
     if (!loginCoreRef.current?.resetPassword) {
       return onResetPasswordError?.({
@@ -129,8 +128,18 @@ const Login: FC<ILoginProps> = ({
       })
     }
 
+    if (!resetPasswordToken.current) {
+      return onResetPasswordError?.({
+        message: 'Token not found, please request password restoration again.',
+      })
+    }
+
     setIsResetPasswordLoading(true)
-    const res = await loginCoreRef.current.resetPassword(data)
+
+    const res = await loginCoreRef.current.resetPassword({
+      ...data,
+      token: resetPasswordToken.current!,
+    })
     setIsResetPasswordLoading(false)
   }
 
@@ -138,7 +147,9 @@ const Login: FC<ILoginProps> = ({
     setLoginContentType('login')
   }
 
-  const handleOnPressRestorePasswordSuccessButton = () => {}
+  const handleOnPressRestorePasswordSuccessButton = () => {
+    handleHideDialog()
+  }
 
   const handleHideDialog = () => {
     setLoginContentType('login')
@@ -178,7 +189,8 @@ const Login: FC<ILoginProps> = ({
           onPressResetButton: handleOnPressResetPasswordButton,
           onPressCancelButton: handleOnPressCancelResetPasswordButton,
         }}
-        restorePasswordSuccessProps={{
+        resultDialogPropsProps={{
+          message: restorePasswordSuccessMessage,
           onPressButton: handleOnPressRestorePasswordSuccessButton,
         }}
       />

@@ -389,12 +389,12 @@ export interface IResetPasswordRequestData {
   confirmPassword: string
 }
 
-export interface IRestorePasswordSuccessData {
+export interface IRestorePasswordData {
   message: string
   status?: number
 }
 
 export interface IRestorePasswordResponse {
-  data?: IRestorePasswordSuccessData
+  data?: IRestorePasswordData
   error?: IError
 }
