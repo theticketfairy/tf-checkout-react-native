@@ -1393,6 +1393,8 @@ import { ResaleTickets } from 'tf-checkout-react-native'
 [OrderDetailsCore](#orderdetailscore)
 
 [LoginCore](#logincore)
+
+// TODO: [ResetPasswordCore]
  
 ---
 

@@ -30,7 +30,7 @@ interface IDeepLinkUrl {
 }
 
 
-const EVENT_ID = 13068
+const EVENT_ID = 17081
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
@@ -138,6 +138,17 @@ const App = () => {
   //#endregion
   const handleOpenUrl = ({url}: IDeepLinkUrl) =>{
     console.log('Open urel', url)
+    //restlessnites://https//restlessnites.com/reset-password?token=5f867190b16fbb9a1856832161294063
+
+    const splitted = url.split("token=")
+    console.log('SPLIT', splitted)
+    if (splitted.length <= 1) {
+      return 
+    }
+
+
+
+    
   }
 
   const getInitialURL = async () => { 
