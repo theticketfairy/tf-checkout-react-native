@@ -217,6 +217,7 @@ const App = () => {
                 choosePassword: '_Choose password_',
                 fillAllRequiredFieldsAlert: '_Fill all required fields_',
                 optional: '(_Optional_)',
+                ttfPrivacyPolicyRequiredError: '* Required'
               },
               checkoutButton: '_Checkout_',
               loginTexts:{
@@ -308,6 +309,11 @@ const App = () => {
                 icon: {
                   tintColor: Color.validationGreen,
                 },
+                error: {
+                  color: Color.danger, 
+                  marginTop: 8,
+                  marginLeft: 40,
+                }
               },
 
               checkoutButton: {
