@@ -11,6 +11,7 @@ const Checkbox = ({
   styles,
   isActive,
   customTextComp,
+  error,
 }: ICheckboxProps) => {
   return (
     <TouchableOpacity
@@ -18,22 +19,25 @@ const Checkbox = ({
       activeOpacity={0.8}
       style={[s.container, styles?.container]}
     >
-      <View style={[s.content, styles?.content]}>
-        <View
-          style={
-            isActive
-              ? [s.indicatorOn, styles?.indicator]
-              : [s.indicator, styles?.indicatorDisabled]
-          }
-        >
-          {isActive && (
-            <Image source={R.icons.check} style={[s.check, styles?.icon]} />
+      <>
+        <View style={[s.content, styles?.content]}>
+          <View
+            style={
+              isActive
+                ? [s.indicatorOn, styles?.indicator]
+                : [s.indicator, styles?.indicatorDisabled]
+            }
+          >
+            {isActive && (
+              <Image source={R.icons.check} style={[s.check, styles?.icon]} />
+            )}
+          </View>
+          {customTextComp || (
+            <Text style={[s.textContainer, styles?.text]}>{text}</Text>
           )}
         </View>
-        {customTextComp || (
-          <Text style={[s.textContainer, styles?.text]}>{text}</Text>
-        )}
-      </View>
+        {!!error && <Text style={styles?.error}>{error}</Text>}
+      </>
     </TouchableOpacity>
   )
 }
