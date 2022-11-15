@@ -2178,6 +2178,9 @@ logout(): Promise<void>
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+## Next
+- Made TTF Privacy Policy mandatory 
+- Added styles and text for TTF Privacy Policy checkbox
 ## Version 1.0.22
 - Added cartTimer component, that will show the cart's remaining expiration time in the Billing screen.
 - setConfig not longer receives the `DOMAIN` prop, instead it receives the `CLIENT` 
