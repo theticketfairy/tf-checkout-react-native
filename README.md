@@ -2189,6 +2189,11 @@ logout(): Promise<void>
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+
+## Next
+- Made TTF Privacy Policy mandatory 
+- Added styles and text for TTF Privacy Policy checkbox
+
 ## Version 1.0.23
 - Fix Checkout not allowing free registrations
 
