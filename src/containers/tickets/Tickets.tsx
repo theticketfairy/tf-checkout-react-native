@@ -4,19 +4,18 @@ import _some from 'lodash/some'
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
-import {
-  IEventResponse,
-  IFetchTicketsResponse,
-  IPromoCodeResponse,
-} from '../../api/types'
+import { IEventResponse, IPromoCodeResponse } from '../../api/types'
 import { TicketsCore, TicketsCoreHandle } from '../../core'
-import { IBookTicketsOptions } from '../../core/TicketsCore/TicketsCoreTypes'
+import {
+  IBookTicketsOptions,
+  IGetTicketsPayload,
+  TicketsType,
+} from '../../core/TicketsCore/TicketsCoreTypes'
 import {
   IAddToCartResponse,
   IEvent,
   IOnFetchTicketsSuccess,
   ISelectedTicket,
-  ITicket,
 } from '../../types'
 import TicketsView from './TicketsView'
 import { ITicketsProps } from './types'
@@ -34,19 +33,24 @@ const Tickets: FC<ITicketsProps> = ({
   onFetchTicketsSuccess,
   onFetchEventError,
   onLoadingChange,
-  areAlertsEnabled = true,
-  areLoadingIndicatorsEnabled = true,
   onFetchEventSuccess,
   onAddToWaitingListError,
   onAddToWaitingListSuccess,
   promoCodeCloseIcon,
+  config = {
+    areTicketsGrouped: true,
+    areActivityIndicatorsEnabled: true,
+    areAlertsEnabled: true,
+    areTicketsSortedBySoldOut: true,
+  },
 }) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
   const [isGettingEvent, setIsGettingEvent] = useState(false)
   const [event, setEvent] = useState<IEvent>()
   const [isBooking, setIsBooking] = useState(false)
-  const [tickets, setTickets] = useState<ITicket[]>([])
+  const [areTicketGroupsShown, setAreTicketGroupsShown] = useState(false)
+  const [tickets, setTickets] = useState<TicketsType>([])
   const [isWaitingListVisible, setIsWaitingListVisible] = useState(false)
   const [isAccessCode, setIsAccessCode] = useState(false)
   const [selectedTicket, setSelectedTicket] = useState<ISelectedTicket>()
@@ -62,7 +66,7 @@ const Tickets: FC<ITicketsProps> = ({
   //#endregion
 
   const showAlert = (message: string) => {
-    if (areAlertsEnabled) {
+    if (config.areAlertsEnabled) {
       Alert.alert('', message)
     }
   }
@@ -83,12 +87,16 @@ const Tickets: FC<ITicketsProps> = ({
 
   const getTicketsCore = async (
     promoCode?: string
-  ): Promise<IFetchTicketsResponse> => {
+  ): Promise<IGetTicketsPayload> => {
     if (!ticketsCoreRef.current) {
       return { error: { message: 'Ticket core is not initialized' } }
     }
 
-    return await ticketsCoreRef.current.getTickets(promoCode)
+    return await ticketsCoreRef.current.getTickets({
+      promoCode,
+      areTicketsSortedBySoldOut: config.areTicketsSortedBySoldOut,
+      areTicketsGrouped: config.areTicketsGrouped,
+    })
   }
 
   const getEventCore = async (): Promise<IEventResponse> => {
@@ -118,6 +126,7 @@ const Tickets: FC<ITicketsProps> = ({
       promoCodeResult,
       isInWaitingList,
       isAccessCodeRequired,
+      areGroupsShown,
     } = await getTicketsCore(promoCode)
     setIsGettingTickets(false)
 
@@ -129,6 +138,7 @@ const Tickets: FC<ITicketsProps> = ({
 
     setIsWaitingListVisible(!!isInWaitingList)
     setIsAccessCode(!!isAccessCodeRequired)
+    setAreTicketGroupsShown(areGroupsShown || false)
 
     if (responseTickets && !_isEmpty(responseTickets)) {
       setTickets(responseTickets)
@@ -147,6 +157,7 @@ const Tickets: FC<ITicketsProps> = ({
         tickets: responseTickets,
         isInWaitingList,
         isAccessCodeRequired,
+        areTicketsGroupsShown: areGroupsShown,
       }
 
       onFetchTicketsSuccess?.(onFetchTicketsData)
@@ -321,11 +332,12 @@ const Tickets: FC<ITicketsProps> = ({
         isUserLogged={isUserLogged}
         onPressMyOrders={onPressMyOrders}
         onPressLogout={handleOnLogout}
-        areLoadingIndicatorsEnabled={areLoadingIndicatorsEnabled}
+        areLoadingIndicatorsEnabled={config.areActivityIndicatorsEnabled}
         onAddToWaitingListError={onAddToWaitingListError}
         onAddToWaitingListSuccess={onAddToWaitingListSuccess}
         onLoadingChange={handleOnLoadingChange}
         promoCodeCloseIcon={promoCodeCloseIcon}
+        areTicketsGroupsShown={areTicketGroupsShown}
       />
     </TicketsCore>
   )

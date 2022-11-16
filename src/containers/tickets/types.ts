@@ -1,4 +1,9 @@
-import { ImageSourcePropType, TextStyle, ViewStyle } from 'react-native'
+import {
+  ImageSourcePropType,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 
 import { IEventData } from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
@@ -15,11 +20,11 @@ import {
   IWaitingListStyles,
   IWaitingListTexts,
 } from '../../components/waitingList/types'
+import { TicketsType } from '../../core/TicketsCore/TicketsCoreTypes'
 import {
   IEvent,
   IOnFetchTicketsSuccess,
   ISelectedTicket,
-  ITicket,
   ITicketsResponseData,
 } from '../../types'
 import { IError } from '../../types/IError'
@@ -29,7 +34,8 @@ export interface ITicketsViewProps {
   isGettingTickets?: boolean
   isBookingTickets?: boolean
   isGettingEvent?: boolean
-  tickets: ITicket[]
+  tickets: TicketsType
+  areTicketsGroupsShown?: boolean
   styles?: ITicketsViewStyles
   onPressGetTickets: () => void
   onPressApplyPromoCode: (promoCode: string) => void
@@ -60,6 +66,10 @@ export interface ITicketsViewProps {
 export interface ITicketListStyles {
   listContainer?: ViewStyle
   item?: ITicketListItemStyles
+  sectionHeader?: {
+    container?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+  }
 }
 
 export interface ITicketsViewStyles {
@@ -84,6 +94,13 @@ export interface ITicketsViewTexts {
 
   listItem?: ITicketListItemTexts
   waitingList?: IWaitingListTexts
+}
+
+export interface ITicketsConfig {
+  areActivityIndicatorsEnabled?: boolean
+  areAlertsEnabled?: boolean
+  areTicketsSortedBySoldOut?: boolean
+  areTicketsGrouped?: boolean
 }
 
 export interface ITicketsProps {
@@ -112,10 +129,8 @@ export interface ITicketsProps {
   onPressMyOrders: () => void
   onPressLogout?: () => void
 
-  // With the following 3 props you can control the visibility of the stock loading indicators and alerts, so you can use your own.
   onLoadingChange?: (isLoading: boolean) => void
-  areAlertsEnabled?: boolean
-  areLoadingIndicatorsEnabled?: boolean
-
   promoCodeCloseIcon?: ImageSourcePropType
+
+  config?: ITicketsConfig
 }
