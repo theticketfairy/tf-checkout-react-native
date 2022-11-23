@@ -31,6 +31,7 @@ const EnterPassword: FC<IEnterPasswordProps> = ({
             value={password}
             onChangeText={setPassword}
             styles={styles?.input}
+            autoCapitalize='none'
           />
           {!!apiError && (
             <Text style={s.errorText || styles?.error}>{apiError}</Text>

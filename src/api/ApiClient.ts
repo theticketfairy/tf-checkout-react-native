@@ -500,6 +500,7 @@ export const fetchTickets = async (
     isAccessCodeRequired: _get(response, 'data.data.attributes.is_access_code'),
   }
 }
+//#endregion Tickets
 
 export const addToCart = async (
   data: IAddToCartParams
@@ -611,7 +612,7 @@ export const postReferralVisit = async (
     postReferralError: responseError,
   }
 }
-
+//#region Unlock Password Protected Event
 export const unlockPasswordProtectedEvent = async (
   password: string
 ): Promise<IEventResponse> => {
@@ -622,33 +623,31 @@ export const unlockPasswordProtectedEvent = async (
   const body = {
     attributes: {
       data: {
-        password,
+        password: password,
       },
     },
   }
 
-  // const response: AxiosResponse | void = await Client.get(
-  //   `api/v1/event/${eventId}/authenticate`
-  // ).catch((error: AxiosError) => {
-  //   responseError = {
-  //     message: 'err',
-  //   }
-  // })
+  const response: AxiosResponse | void = await Client.post(
+    `v1/event/${eventId}/authenticate`,
+    body
+  ).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message || 'Error while unlocking Event',
+      code: error?.response?.status,
+    }
+  })
 
-  // if (response?.data) {
-  //   responseData = {
-  //     message: response.data.message,
-  //     status: response.data.status,
-  //   }
+  if (response?.data) {
+    responseData = {
+      message: response.data.message,
+      status: response.data.status,
+    }
 
-  //   const guestHeaderValue = _get(response, 'headers.authorization-guest')
-  //   if (guestHeaderValue) {
-  //     setCustomHeader(response)
-  //   }
-  // }
-
-  responseError = {
-    message: 'Somethjing',
+    const guestHeaderValue = _get(response, 'headers.authorization-guest')
+    if (guestHeaderValue) {
+      setCustomHeader(response)
+    }
   }
 
   return {
@@ -656,7 +655,7 @@ export const unlockPasswordProtectedEvent = async (
     eventError: responseError,
   }
 }
-//#endregion
+//#endregion Unlock Password Protected Event
 
 //#region Billing Information
 export const fetchCountries = async (): Promise<ICountriesResponse> => {
