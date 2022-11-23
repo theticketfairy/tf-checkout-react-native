@@ -25,7 +25,7 @@ import styles from './styles'
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
-const EVENT_ID = 13053
+const EVENT_ID = 13090
 //Event with password 13053
 // Mana event 13066
 
