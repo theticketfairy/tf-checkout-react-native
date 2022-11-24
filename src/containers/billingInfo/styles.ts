@@ -57,4 +57,8 @@ export default StyleSheet.create({
     fontWeight: '700',
     marginBottom: 24,
   },
+  ttfPolicyError: {
+    color: R.colors.danger,
+    marginTop: 8,
+  },
 })

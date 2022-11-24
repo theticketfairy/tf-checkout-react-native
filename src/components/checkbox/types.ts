@@ -9,6 +9,7 @@ export interface ICheckboxStyles {
   text?: StyleProp<TextStyle>
   box?: StyleProp<ViewStyle>
   icon?: StyleProp<ImageStyle>
+  error?: StyleProp<TextStyle>
 }
 
 export interface ICheckboxProps {
@@ -17,4 +18,5 @@ export interface ICheckboxProps {
   isActive: boolean
   styles?: ICheckboxStyles
   customTextComp?: ReactNode
+  error?: string
 }
