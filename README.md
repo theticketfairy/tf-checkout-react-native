@@ -2219,8 +2219,9 @@ logout(): Promise<void>
 # Changelog
 
 ## Next
-- Made TTF Privacy Policy mandatory 
-- Added styles and text for TTF Privacy Policy checkbox
+- Made TTF Privacy Policy mandatory.
+- Added styles and text for TTF Privacy Policy checkbox.
+- Added Password Protected event feature.
 
 ## Version 1.0.23
 - Fix Checkout not allowing free registrations
