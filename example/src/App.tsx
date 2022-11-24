@@ -1048,7 +1048,8 @@ const App = () => {
                   title: {
                     fontWeight: '900',
                     fontSize: 30,
-                    marginBottom: 24
+                    marginBottom: 24,
+                    color: 'black'
                   }
                 },
                 waitingList: {
