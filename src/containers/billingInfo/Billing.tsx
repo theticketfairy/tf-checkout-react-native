@@ -207,6 +207,7 @@ const Billing: FC<IBillingProps> = ({
   const cityError = useDebounced(city, validateEmpty)
   const postalCodeError = useDebounced(postalCode, validateEmpty)
   const [dateOfBirthError, setDateOfBirthError] = useState('')
+  const [ttfPrivacyPolicyError, setTtfPrivacyPolicyError] = useState('')
   // End of errors state
   //#endregion
 
@@ -306,7 +307,6 @@ const Billing: FC<IBillingProps> = ({
     setCountryId(userProfile.countryId)
     setStateId(userProfile.stateId)
     setLoggedUserFirstName(userProfile.firstName)
-    setIsSubToTicketFairy(true)
 
     const thData = [...ticketHoldersData]
     thData.forEach((th, index) => {
@@ -471,6 +471,12 @@ const Billing: FC<IBillingProps> = ({
     'You must fill all Ticket Holder required fields'
 
   const checkExtraDataValid = (): string => {
+    if (!isTtfCheckboxHidden && !isSubToTicketFairy) {
+      setTtfPrivacyPolicyError(
+        texts?.form?.ttfPrivacyPolicyRequiredError || 'Required'
+      )
+      return 'Please accept our Privacy Policy'
+    }
     if (isAgeRequired) {
       const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
       if (ageValidationMessage) {
@@ -808,7 +814,7 @@ const Billing: FC<IBillingProps> = ({
 
     setNumberOfTicketHolders(cartData.quantity)
     setIsSubToBrand(cartData.isMarketingOptedIn)
-    setIsSubToTicketFairy(cartData.isTfOptIn)
+    setIsSubToTicketFairy(cartData.isTfOptIn || false)
     setIsTtfCheckboxHidden(cartData.isTfOptInHidden || false)
 
     if (cartData.expiresAt) {
@@ -1224,7 +1230,8 @@ const Billing: FC<IBillingProps> = ({
                   .
                 </Text>
               }
-              styles={styles?.checkboxStyles}
+              styles={{ error: s.ttfPolicyError, ...styles?.checkboxStyles }}
+              error={ttfPrivacyPolicyError}
             />
           )}
 

@@ -718,9 +718,10 @@ interface IBillingInfoViewTexts {
       label?: string
       customError?: string
     }
-    cartTimer?: {
-      message?: string
-    }
+    ttfPrivacyPolicyRequiredError?: string
+  }
+  cartTimer?: {
+    message?: string
   }
 }
 ```
@@ -753,7 +754,17 @@ interface IBillingInfoViewStyles {
     }
     input?: IInputStyles
   }
-  checkboxStyles?: ICheckboxStyles
+  
+  checkboxStyles?: {
+    container?: StyleProp<ViewStyle>
+    content?: StyleProp<ViewStyle>
+    indicator?: StyleProp<ViewStyle>
+    indicatorDisabled?: StyleProp<ViewStyle>
+    text?: StyleProp<TextStyle>
+    box?: StyleProp<ViewStyle>
+    icon?: StyleProp<ImageStyle>
+    error?: StyleProp<TextStyle>
+  }
 
   screenTitle?: StyleProp<TextStyle>
   ticketHoldersTitle?: StyleProp<TextStyle>
@@ -784,6 +795,8 @@ interface IBillingInfoViewStyles {
     message?: StyleProp<TextStyle>
     time?: StyleProp<TextStyle>
   }
+
+  privacyPolicyLinkStyle?: StyleProp<TextStyle>
 }
 ```
 ---
@@ -2178,9 +2191,14 @@ logout(): Promise<void>
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+
 ## Next
 - Made TTF Privacy Policy mandatory 
 - Added styles and text for TTF Privacy Policy checkbox
+
+## Version 1.0.23
+- Fix Checkout not allowing free registrations
+
 ## Version 1.0.22
 - Added cartTimer component, that will show the cart's remaining expiration time in the Billing screen.
 - setConfig not longer receives the `DOMAIN` prop, instead it receives the `CLIENT` 

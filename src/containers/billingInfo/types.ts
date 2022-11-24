@@ -183,6 +183,7 @@ export interface IBillingInfoViewTexts {
     fillAllRequiredFieldsAlert?: string
     optional?: string
     phoneInput?: IPhoneInputTexts
+    ttfPrivacyPolicyRequiredError?: string
   }
   cartTimer?: ICartTimerTexts
 }

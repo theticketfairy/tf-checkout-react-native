@@ -320,7 +320,7 @@ const Checkout: FC<ICheckoutProps> = ({
       setOrderInfo(tOrderInfo)
       setOrderReview(orderReviewData)
 
-      if (orderReview?.reviewData.total !== '0.00') {
+      if (orderReviewData?.reviewData.total !== '0.00') {
         if (!orderReviewData.paymentData?.stripePublishableKey) {
           onStripeInitializeError?.('Stripe is not configured for this event')
 
