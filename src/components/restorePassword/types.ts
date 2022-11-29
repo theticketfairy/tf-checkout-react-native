@@ -3,38 +3,6 @@ import { StyleProp, TextStyle, ViewStyle } from 'react-native'
 import { IButtonStyles } from '../button/types'
 import { IInputStyles } from '../input/types'
 
-//#region ResetPassword
-export interface IResetPasswordStyles {
-  rootContainer?: StyleProp<ViewStyle>
-  title?: StyleProp<TextStyle>
-  button?: IButtonStyles
-  input?: IInputStyles
-  apiError?: StyleProp<TextStyle>
-}
-
-export interface IResetPasswordTexts {
-  title?: string
-  button?: string
-  inputLabel?: string
-}
-
-export interface IResetPasswordButtonPayload {
-  password: string
-  confirmPassword: string
-}
-
-export interface IResetPasswordCoreProps {
-  isLoading?: boolean
-  onPressResetButton: (data: IResetPasswordButtonPayload) => void
-  onPressCancelButton: () => void
-  apiError?: string
-}
-export interface IResetPasswordProps extends IResetPasswordCoreProps {
-  styles?: IResetPasswordStyles
-  texts?: IResetPasswordTexts
-}
-//#endregion ResetPassword
-
 //#region RestorePassword
 export interface IRestorePasswordTexts {
   restorePasswordButton?: string

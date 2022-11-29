@@ -6,9 +6,6 @@ import { IError, IUserProfilePublic } from '../../types'
 import { IButtonStyles } from '../button/types'
 import { IInputStyles } from '../input/types'
 import {
-  IResetPasswordCoreProps,
-  IResetPasswordStyles,
-  IResetPasswordTexts,
   IRestorePasswordCoreProps,
   IRestorePasswordStyles,
   IRestorePasswordTexts,
@@ -66,41 +63,9 @@ export interface ILoginProps {
   brandImages?: ILoginBrandImages
   isShowPasswordButtonVisible?: boolean
 
-  config?: {
-    areActivityIndicatorsEnabled?: boolean
-    areAlertsEnabled?: boolean
-  }
-
   //Restore password
   onRestorePasswordError?: (error: IError) => void
   onRestorePasswordSuccess?: () => void
-
-  onResetPasswordError?: (error: IError) => void
-  onResetPasswordSuccess?: () => void
-
-  dialogsProps?: {
-    isShowPasswordButtonVisible?: boolean
-    brandImages?: ILoginBrandImages
-    login?: {
-      styles?: {
-        container?: StyleProp<ViewStyle>
-        loginButton?: IButtonStyles
-        loginButtonDisabled?: IButtonStyles
-        input?: IInputStyles
-        title?: StyleProp<TextStyle>
-        message?: StyleProp<TextStyle>
-        showPasswordIcon?: StyleProp<ImageStyle>
-      }
-      texts: {
-        loginButton?: string
-        message?: string
-        emailLabel?: string
-        passwordLabel?: string
-        title?: string
-      }
-    }
-    restorePassword?: {}
-  }
 }
 
 export interface ILoginViewStyles {
@@ -128,7 +93,6 @@ export interface ILoginViewStyles {
     button?: IButtonStyles
     message?: StyleProp<TextStyle>
   }
-  resetPassword?: IResetPasswordStyles
   restorePassword?: IRestorePasswordStyles
   restorePasswordSuccess?: IResultDialogStyles
 }
@@ -157,7 +121,6 @@ export interface ILoginViewTexts {
     loggedAs?: string
     notYou?: string
   }
-  resetPassword?: IResetPasswordTexts
   restorePassword?: IRestorePasswordTexts
   restorePasswordSuccess?: IResultDialogTexts
 }
@@ -204,7 +167,6 @@ export interface ILoginViewProps {
 
   // Used to send the Restore password request to the server
   restorePasswordProps: IRestorePasswordCoreProps
-  resetPasswordProps: IResetPasswordCoreProps
   resultDialogPropsProps?: IResultDialogCoreProps
 }
 

@@ -5,7 +5,6 @@ import { useDebounced } from '../../helpers/Debounced'
 import { validateEmail, validateMinLength } from '../../helpers/Validators'
 import R from '../../res'
 import Button from '../button/Button'
-import ResetPassword from '../restorePassword/ResetPassword'
 import RestorePassword from '../restorePassword/RestorePassword'
 import ResultDialog from '../restorePassword/ResultDialog'
 import LoginForm from './components/LoginForm'
@@ -33,7 +32,6 @@ const LoginView: FC<ILoginViewProps> = ({
   content,
   onPressForgotPassword,
   restorePasswordProps,
-  resetPasswordProps,
   resultDialogPropsProps,
 }) => {
   const [data, setData] = useState<ILoginViewState>(initialState)
@@ -214,18 +212,6 @@ const LoginView: FC<ILoginViewProps> = ({
               resultDialogPropsProps?.onPressButton()
             }}
             message={resultDialogPropsProps?.message}
-          />
-        )
-
-      case 'resetPassword':
-        return (
-          <ResetPassword
-            onPressResetButton={resetPasswordProps.onPressResetButton}
-            onPressCancelButton={resetPasswordProps.onPressCancelButton}
-            isLoading={resetPasswordProps.isLoading}
-            apiError={resetPasswordProps.apiError}
-            styles={styles?.resetPassword}
-            texts={texts?.resetPassword}
           />
         )
 
