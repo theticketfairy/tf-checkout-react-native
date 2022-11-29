@@ -15,5 +15,5 @@ export type LoginCoreHandle = {
   login(fields?: ILoginFields): Promise<ILoginCoreResponse>
   logout(): Promise<ICloseSessionResponse>
   restorePassword(email: string): Promise<IRestorePasswordResponse>
-  resetPassword(data: IResetPasswordRequestData): Promise<void>
+  resetPassword(data: IResetPasswordRequestData): Promise<any>
 }

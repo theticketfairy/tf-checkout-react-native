@@ -55,4 +55,7 @@ export default StyleSheet.create({
     color: R.colors.danger,
     fontWeight: '600',
   },
+  forgotPassword: {
+    color: R.colors.black,
+  },
 })

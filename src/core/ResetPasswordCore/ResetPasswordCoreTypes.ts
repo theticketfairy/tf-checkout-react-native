@@ -1,5 +1,10 @@
-import { IResetPasswordRequestData } from '../../api/types'
+import {
+  IResetPasswordRequestData,
+  IResetPasswordResponse,
+} from '../../api/types'
 
 export type ResetPasswordCoreHandle = {
-  postResetPassword(data: IResetPasswordRequestData): Promise<any>
+  postResetPassword(
+    data: IResetPasswordRequestData
+  ): Promise<IResetPasswordResponse>
 }

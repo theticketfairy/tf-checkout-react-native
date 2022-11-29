@@ -16,7 +16,9 @@ const ResultDialog: FC<IResultDialogProps> = ({
       {texts?.title || 'Email Sent!'}
     </Text>
 
-    {!!texts?.message && <Text>{texts.message}</Text>}
+    {!!texts?.message && (
+      <Text style={[s.message, styles?.message]}>{texts.message}</Text>
+    )}
     {!!message && <Text>{message}</Text>}
 
     <Button text={texts?.button || 'OK'} onPress={onPressButton!} />

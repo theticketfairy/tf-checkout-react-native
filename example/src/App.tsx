@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
@@ -14,6 +14,7 @@ import {
   ITicketsResponseData,
   SkippingStatusType,
   ResaleTickets,
+  ResetPassword
 } from 'tf-checkout-react-native'
 import { IMyOrderDetailsTicket } from '../../src/api/types'
 import { IConfig } from '../../src/helpers/Config'
@@ -28,7 +29,6 @@ const AMAZON_IMAGE = require('./amazon_logo.png')
 interface IDeepLinkUrl {
   url: string
 }
-
 
 const EVENT_ID = 17081
 
@@ -45,6 +45,7 @@ const config: IConfig = {
 // the-ticket-fairy
 
 const App = () => {
+  const resetPasswordTokenRef = useRef('')
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
     ComponentEnum.Tickets
   )
@@ -146,8 +147,10 @@ const App = () => {
       return 
     }
 
-
-
+    if (splitted[1])  {
+      resetPasswordTokenRef.current = splitted[1] 
+      setComponentToShow(ComponentEnum.ResetPassword)
+    }
     
   }
 
@@ -908,6 +911,38 @@ const App = () => {
             </TouchableOpacity>
           </View>
         )
+
+        case ComponentEnum.ResetPassword:
+          return (
+            <View style={{ flex: 1}}>
+              <ResetPassword
+              styles={{
+                apiSuccess: {
+                  fontSize: 18,
+                  fontWeight: '800',
+                  marginVertical: 16,
+                  color: Color.validationGreen,
+                  textAlign: 'center'
+                }
+              }}
+                token={resetPasswordTokenRef.current}
+                onPressResetButton={() => {
+                  console.log('OnPressResetPassword')
+                }}
+                onPressCancelButton={() => {
+                  resetPasswordTokenRef.current = ''
+                  setComponentToShow(ComponentEnum.Tickets)
+                }}
+                onResetPasswordSuccess={(data) => {
+                  setTimeout(() => { 
+                    resetPasswordTokenRef.current = ''
+                    setComponentToShow(ComponentEnum.Tickets)
+                   }, 5000)
+                }}
+                onResetPasswordError={(error)=> {}}
+              />
+            </View>
+          )
 
         case ComponentEnum.ResaleTickets:
         return (

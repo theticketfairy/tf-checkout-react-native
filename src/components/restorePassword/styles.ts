@@ -27,6 +27,7 @@ export const restorePasswordStyles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
+    color: R.colors.black,
     fontSize: 18,
     fontWeight: '800',
   },
@@ -42,7 +43,11 @@ export const restorePasswordSuccessStyles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
+    color: R.colors.black,
     fontSize: 18,
     fontWeight: '800',
+  },
+  message: {
+    color: R.colors.black,
   },
 })

@@ -119,6 +119,7 @@ export interface ILoginViewStyles {
     title?: StyleProp<TextStyle>
     message?: StyleProp<TextStyle>
     showPasswordIcon?: StyleProp<ImageStyle>
+    forgotPassword?: StyleProp<TextStyle>
   }
   loggedIn?: {
     container?: StyleProp<ViewStyle>
@@ -144,6 +145,7 @@ export interface ILoginViewTexts {
     emailLabel?: string
     passwordLabel?: string
     title?: string
+    forgotPassword?: string
   }
   logoutDialog?: {
     title?: string

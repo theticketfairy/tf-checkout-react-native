@@ -8,7 +8,10 @@ import {
   requestResetPassword,
   requestRestorePassword,
 } from '../../api/ApiClient'
-import { ICloseSessionResponse } from '../../api/types'
+import {
+  ICloseSessionResponse,
+  IResetPasswordRequestData,
+} from '../../api/types'
 import { ILoginFields } from '../../components/login/types'
 import { Config } from '../../helpers/Config'
 import {
@@ -145,8 +148,9 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
     // #endregion
 
     // #region Reset Password
-    async resetPassword(data: any) {
+    async resetPassword(data: IResetPasswordRequestData) {
       const response = await requestResetPassword(data)
+      console.log('RESPONSE RESET PASSWORD', response)
       return response
     },
     // #endregion

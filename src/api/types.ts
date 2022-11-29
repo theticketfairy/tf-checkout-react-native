@@ -386,7 +386,7 @@ export interface ICloseSessionResponse {
 export interface IResetPasswordRequestData {
   token: string
   password: string
-  confirmPassword: string
+  password_confirmation: string
 }
 
 export interface IRestorePasswordData {
@@ -398,3 +398,5 @@ export interface IRestorePasswordResponse {
   data?: IRestorePasswordData
   error?: IError
 }
+
+export interface IResetPasswordResponse extends IRestorePasswordResponse {}
