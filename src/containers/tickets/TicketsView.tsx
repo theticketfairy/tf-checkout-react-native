@@ -1,16 +1,9 @@
 import React from 'react'
 import { FlatList, Text, View } from 'react-native'
 
-import {
-  Loading,
-  LoggedIn,
-  Login,
-  PromoCode,
-  WaitingList,
-} from '../../components'
+import { Loading, LoggedIn, PromoCode, WaitingList } from '../../components'
 import Button from '../../components/button/Button'
 import Separator from '../../components/separator/Separator'
-import { IUserProfilePublic } from '../../types'
 import CartListItem from './components/TicketListItem'
 import s from './styles'
 import { ITicketsViewProps } from './types'
@@ -41,9 +34,6 @@ const TicketsView = ({
   onLoadingChange,
   areAlertsEnabled,
   promoCodeCloseIcon,
-  isLoginDialogVisible,
-  showLoginDialog,
-  hideLoginDialog,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -87,16 +77,6 @@ const TicketsView = ({
             />
           )}
           ItemSeparatorComponent={() => <Separator />}
-        />
-
-        <Login
-          onLoginSuccessful={function (userProfile: IUserProfilePublic): void {
-            throw new Error('Function not implemented.')
-          }}
-          isLoginDialogVisible={isLoginDialogVisible}
-          showLoginDialog={showLoginDialog}
-          hideLoginDialog={hideLoginDialog}
-          isShowPasswordButtonVisible={true}
         />
 
         {isWaitingListVisible && event?.salesStarted && (

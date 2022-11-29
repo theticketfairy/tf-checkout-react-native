@@ -55,11 +55,6 @@ const Tickets: FC<ITicketsProps> = ({
   >(undefined)
   const [isFirstCall, setIsFirstCall] = useState(true)
 
-  const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
-
-  const showLoginDialog = () => setIsLoginDialogVisible(true)
-  const hideLoginDialog = () => setIsLoginDialogVisible(false)
-
   //#region Refs
   const eventErrorCodeRef = useRef(0)
   const ticketsCoreRef = useRef<TicketsCoreHandle>(null)
@@ -331,9 +326,6 @@ const Tickets: FC<ITicketsProps> = ({
         onAddToWaitingListSuccess={onAddToWaitingListSuccess}
         onLoadingChange={handleOnLoadingChange}
         promoCodeCloseIcon={promoCodeCloseIcon}
-        showLoginDialog={showLoginDialog}
-        hideLoginDialog={hideLoginDialog}
-        isLoginDialogVisible={isLoginDialogVisible}
       />
     </TicketsCore>
   )

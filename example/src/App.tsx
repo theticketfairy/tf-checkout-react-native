@@ -30,7 +30,7 @@ interface IDeepLinkUrl {
   url: string
 }
 
-const EVENT_ID = 17081
+const EVENT_ID = 13098
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,

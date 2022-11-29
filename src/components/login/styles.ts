@@ -29,6 +29,7 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   dialogTitle: {
+    color: R.colors.black,
     fontSize: 18,
     fontWeight: '800',
   },
@@ -48,6 +49,7 @@ export default StyleSheet.create({
     tintColor: R.colors.white,
   },
   message: {
+    color: R.colors.black,
     marginBottom: 24,
     marginTop: -8,
   },

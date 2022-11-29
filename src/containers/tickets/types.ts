@@ -61,10 +61,6 @@ export interface ITicketsViewProps {
   onAddToWaitingListError?: (error: IError) => void
   onLoadingChange?: (isLoading: boolean) => void
   promoCodeCloseIcon?: ImageSourcePropType
-
-  isLoginDialogVisible: boolean
-  showLoginDialog: () => void
-  hideLoginDialog: () => void
 }
 
 export interface ITicketListStyles {
