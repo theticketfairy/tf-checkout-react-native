@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import React, { useEffect, useState } from 'react'
-import { Alert, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
   IMyOrderDetailsData,
@@ -14,6 +14,7 @@ import {
   ITicketsResponseData,
   SkippingStatusType,
   ResaleTickets,
+  ResetPassword
 } from 'tf-checkout-react-native'
 import { IMyOrderDetailsTicket } from '../../src/api/types'
 import { IConfig } from '../../src/helpers/Config'
@@ -25,7 +26,11 @@ import styles from './styles'
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
-const EVENT_ID = 13066
+interface IDeepLinkUrl {
+  url: string
+}
+
+const EVENT_ID = 13098
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
@@ -40,6 +45,7 @@ const config: IConfig = {
 // the-ticket-fairy
 
 const App = () => {
+  const resetPasswordTokenRef = useRef('')
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
     ComponentEnum.Tickets
   )
@@ -74,7 +80,6 @@ const App = () => {
     setIsTicketToSellActive(isActive)
     setComponentToShow(ComponentEnum.ResaleTickets)
   }
-
 
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
     setCartProps(data)
@@ -130,12 +135,46 @@ const App = () => {
     setSkippingStatus(undefined)
     setCartProps(undefined)
   }
+
   //#endregion
+  const handleOpenUrl = ({url}: IDeepLinkUrl) =>{
+    console.log('Open urel', url)
+    //restlessnites://https//restlessnites.com/reset-password?token=5f867190b16fbb9a1856832161294063
+
+    const splitted = url.split("token=")
+    console.log('SPLIT', splitted)
+    if (splitted.length <= 1) {
+      return 
+    }
+
+    if (splitted[1])  {
+      resetPasswordTokenRef.current = splitted[1] 
+      setComponentToShow(ComponentEnum.ResetPassword)
+    }
+    
+  }
+
+  const getInitialURL = async () => { 
+    const initialUrl = await Linking.getInitialURL();
+      console.log('initialurl', initialUrl)
+
+      if (initialUrl === null) {
+        return;
+      }
+
+      return initialUrl
+  }
 
   //#region effects
   useEffect(() => {
     setConfig(config)
+    Linking.addEventListener('url', handleOpenUrl)
+
+    return () => {
+      Linking.removeAllListeners('url')
+    }
   }, [])
+
   useEffect(() => {
     if (cartProps) {
       setComponentToShow(ComponentEnum.BillingInfo)
@@ -872,6 +911,38 @@ const App = () => {
             </TouchableOpacity>
           </View>
         )
+
+        case ComponentEnum.ResetPassword:
+          return (
+            <View style={{ flex: 1}}>
+              <ResetPassword
+              styles={{
+                apiSuccess: {
+                  fontSize: 18,
+                  fontWeight: '800',
+                  marginVertical: 16,
+                  color: Color.validationGreen,
+                  textAlign: 'center'
+                }
+              }}
+                token={resetPasswordTokenRef.current}
+                onPressResetButton={() => {
+                  console.log('OnPressResetPassword')
+                }}
+                onPressCancelButton={() => {
+                  resetPasswordTokenRef.current = ''
+                  setComponentToShow(ComponentEnum.Tickets)
+                }}
+                onResetPasswordSuccess={(data) => {
+                  setTimeout(() => { 
+                    resetPasswordTokenRef.current = ''
+                    setComponentToShow(ComponentEnum.Tickets)
+                   }, 5000)
+                }}
+                onResetPasswordError={(error)=> {}}
+              />
+            </View>
+          )
 
         case ComponentEnum.ResaleTickets:
         return (

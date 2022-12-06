@@ -382,3 +382,21 @@ export interface ICloseSessionResponse {
   closeSessionError?: IError
   closeSessionData?: ICloseSessionData
 }
+
+export interface IResetPasswordRequestData {
+  token: string
+  password: string
+  password_confirmation: string
+}
+
+export interface IRestorePasswordData {
+  message: string
+  status?: number
+}
+
+export interface IRestorePasswordResponse {
+  data?: IRestorePasswordData
+  error?: IError
+}
+
+export interface IResetPasswordResponse extends IRestorePasswordResponse {}

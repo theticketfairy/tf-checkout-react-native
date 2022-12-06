@@ -6,4 +6,6 @@ export default {
   error: require('../../assets/icons/ic_error.png'),
   more: require('../../assets/icons/ic_more.png'),
   clock: require('../../assets/icons/ic_clock.png'),
+  eye: require('../../assets/icons/ic_eye.png'),
+  eyeOff: require('../../assets/icons/ic_eye_off.png'),
 }
