@@ -180,13 +180,17 @@ const Checkout: FC<ICheckoutProps> = ({
     const { error: confirmPaymentError, paymentIntent } = await confirmPayment(
       orderReview.paymentData!.stripeClientSecret!,
       {
-        type: 'Card',
-        billingDetails: {
-          addressCity: addressData.city,
-          addressLine1: addressData.line1,
-          addressState: addressData.state,
-          addressPostalCode: addressData.postalCode,
-          name: `${orderReview.billingData.firstName} ${orderReview.billingData.lastName}`,
+        paymentMethodType: 'Card',
+        paymentMethodData: {
+          billingDetails: {
+            name: `${orderReview.billingData.firstName} ${orderReview.billingData.lastName}`,
+            address: {
+              city: addressData.city,
+              line1: addressData.line1,
+              state: addressData.state,
+              postalCode: addressData.postalCode,
+            },
+          },
         },
       }
     )
