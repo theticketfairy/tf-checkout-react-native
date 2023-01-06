@@ -349,42 +349,27 @@ PODS:
     - React-Core
   - RNFS (2.18.0):
     - React
-  - Stripe (23.3.1):
-    - StripeApplePay (= 23.3.1)
-    - StripeCore (= 23.3.1)
-    - StripePayments (= 23.3.1)
-    - StripePaymentsUI (= 23.3.1)
-    - StripeUICore (= 23.3.1)
-  - stripe-react-native (0.22.1):
+  - Stripe (22.8.4):
+    - Stripe/Stripe3DS2 (= 22.8.4)
+    - StripeApplePay (= 22.8.4)
+    - StripeCore (= 22.8.4)
+    - StripeUICore (= 22.8.4)
+  - stripe-react-native (0.19.0):
     - React-Core
-    - Stripe (~> 23.3.0)
-    - StripeApplePay (~> 23.3.0)
-    - StripeFinancialConnections (~> 23.3.0)
-    - StripePayments (~> 23.3.0)
-    - StripePaymentSheet (~> 23.3.0)
-    - StripePaymentsUI (~> 23.3.0)
-  - StripeApplePay (23.3.1):
-    - StripeCore (= 23.3.1)
-  - StripeCore (23.3.1)
-  - StripeFinancialConnections (23.3.1):
-    - StripeCore (= 23.3.1)
-    - StripeUICore (= 23.3.1)
-  - StripePayments (23.3.1):
-    - StripeCore (= 23.3.1)
-    - StripePayments/Stripe3DS2 (= 23.3.1)
-  - StripePayments/Stripe3DS2 (23.3.1):
-    - StripeCore (= 23.3.1)
-  - StripePaymentSheet (23.3.1):
-    - StripeApplePay (= 23.3.1)
-    - StripeCore (= 23.3.1)
-    - StripePayments (= 23.3.1)
-    - StripePaymentsUI (= 23.3.1)
-  - StripePaymentsUI (23.3.1):
-    - StripeCore (= 23.3.1)
-    - StripePayments (= 23.3.1)
-    - StripeUICore (= 23.3.1)
-  - StripeUICore (23.3.1):
-    - StripeCore (= 23.3.1)
+    - Stripe (~> 22.8.1)
+    - StripeFinancialConnections (~> 22.8.1)
+  - Stripe/Stripe3DS2 (22.8.4):
+    - StripeApplePay (= 22.8.4)
+    - StripeCore (= 22.8.4)
+    - StripeUICore (= 22.8.4)
+  - StripeApplePay (22.8.4):
+    - StripeCore (= 22.8.4)
+  - StripeCore (22.8.4)
+  - StripeFinancialConnections (22.8.4):
+    - StripeCore (= 22.8.4)
+    - StripeUICore (= 22.8.4)
+  - StripeUICore (22.8.4):
+    - StripeCore (= 22.8.4)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -470,9 +455,6 @@ SPEC REPOS:
     - StripeApplePay
     - StripeCore
     - StripeFinancialConnections
-    - StripePayments
-    - StripePaymentSheet
-    - StripePaymentsUI
     - StripeUICore
     - YogaKit
 
@@ -601,18 +583,15 @@ SPEC CHECKSUMS:
   RNCClipboard: cc054ad1e8a33d2a74cd13e565588b4ca928d8fd
   RNDateTimePicker: b829aa2110816633975f40161d04c42b64ca4459
   RNFS: 3ab21fa6c56d65566d1fb26c2228e2b6132e5e32
-  Stripe: 56fe274a24c371670859c5f5ae8df6486b0030ba
-  stripe-react-native: 345fb31abf42374a8cb48a4e03d183647f89195d
-  StripeApplePay: 38c814ce593ca36a5cdb3f50c5a1dd0cbd74e475
-  StripeCore: 904b1ba69c2aff587d811d2f75fa9400b5b0fecf
-  StripeFinancialConnections: f555e47e4ea3e16c3e4cb1aa4c05157d6f828c22
-  StripePayments: a4a1a0091e3425f68a0a4cd18e63d06d3673df85
-  StripePaymentSheet: 65824ab423403846590fd346f12f94f288ff80b3
-  StripePaymentsUI: f40988eb257eac3888d27bcf7c2b8150805f98e2
-  StripeUICore: b20de7cd68197e4ff9fe7944f42a8fa71a48a34f
+  Stripe: 59f6659e8ea413def19c97c57e23f5ec6ea48cf8
+  stripe-react-native: 0e50141806454839806143db5ce514a0cddd4d12
+  StripeApplePay: 6e9aebd3d248464836e9fbdaef6e5fb1817d56a6
+  StripeCore: 193f27552fb98108ebfe0df11651fe5f38948305
+  StripeFinancialConnections: 955c345ada7d0dff1a9bd15c4ebc97eacce4ac75
+  StripeUICore: 6a5bbea0164d63bd91000f001903e7901859e1a4
   Yoga: 32a18c0e845e185f4a2a66ec76e1fd1f958f22fa
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: bf5f2da5087706e25211124caf5e173e1d1cf775
+PODFILE CHECKSUM: 3db58c9622aa72af43bd32ac9de5200d23319cb6
 
 COCOAPODS: 1.11.3
