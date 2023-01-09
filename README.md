@@ -6,6 +6,8 @@ React Native library for Ticket Fairy checkout.
 
 Configure [ReactNative environment](https://reactnative.dev/docs/environment-setup) for desired platforms (iOS, Android or both).
 
+## Node version 
+16.10.0
 ### React Native
 
 - Suggested ReactNative version `0.66.3`
@@ -32,8 +34,8 @@ To download the PDFs, add the `WRITE_EXTERNAL_STORAGE` permission to the Android
 
 ### iOS
 
-- Compatible with apps targeting iOS 11 or above.
-- Pods version `1.10.1`
+- Compatible with apps targeting iOS 12 or above.
+- Pods version `1.11.3`
 - Command Line Tools version `13.0`
 
 To download the PDFs, add the following flags to `Info.plist` file:
