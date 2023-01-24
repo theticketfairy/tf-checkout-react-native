@@ -4,7 +4,7 @@ import { Keyboard } from 'react-native'
 import { LoginCore, LoginCoreHandle } from '../../core'
 import { IUserProfilePublic } from '../../types'
 import LoginView from './LoginView'
-import { ILoginFields, ILoginProps } from './types'
+import { ILoginFields, ILoginProps, LoginContentType } from './types'
 
 const Login: FC<ILoginProps> = ({
   onLoginSuccessful,
@@ -19,16 +19,32 @@ const Login: FC<ILoginProps> = ({
   styles,
   refs,
   brandImages,
+  isShowPasswordButtonVisible,
+  onRestorePasswordError,
+  onRestorePasswordSuccess,
 }) => {
+  //#region State
   const [isLoading, setIsLoading] = useState(false)
-  const [loginError, setLoginError] = useState('')
+  const [loginApiError, setLoginApiError] = useState('')
+  const [restorePasswordApiError, setRestorePasswordApiError] = useState('')
+  const [restorePasswordSuccessMessage, setRestorePasswordSuccessMessage] =
+    useState('')
   const [userProfileData, setUserProfileData] = useState<IUserProfilePublic>()
+  const [loginContentType, setLoginContentType] =
+    useState<LoginContentType>('login')
+  const [isRestorePasswordLoading, setIsRestorePasswordLoading] =
+    useState(false)
+  //#endregion State
 
   const loginCoreRef = useRef<LoginCoreHandle>(null)
 
+  //#region Handlers
+  const handleOnPressForgotPassword = () =>
+    setLoginContentType('restorePassword')
+
   const handleOnPressLogin = async (fields: ILoginFields) => {
-    if (loginError) {
-      setLoginError('')
+    if (loginApiError) {
+      setLoginApiError('')
     }
 
     if (!loginCoreRef.current?.login) {
@@ -43,7 +59,7 @@ const Login: FC<ILoginProps> = ({
 
     if (authorizationError || !authorizationData) {
       setIsLoading(false)
-      setLoginError(authorizationError?.message || 'Auth error')
+      setLoginApiError(authorizationError?.message || 'Auth error')
       return onLoginError?.(authorizationError!)
     }
 
@@ -65,11 +81,52 @@ const Login: FC<ILoginProps> = ({
     onLogoutSuccess?.()
   }
 
+  const handleOnPressCancelRestorePasswordButton = () =>
+    setLoginContentType('login')
+
+  const handleOnPressRestorePasswordButton = async (email: string) => {
+    if (!loginCoreRef.current?.restorePassword) {
+      return onRestorePasswordError?.({
+        message: 'LoginCoreRef is not initialized',
+      })
+    }
+
+    setIsRestorePasswordLoading(true)
+    const { data: restorePasswordSuccessData, error: restorePassError } =
+      await loginCoreRef.current.restorePassword(email)
+    setIsRestorePasswordLoading(false)
+
+    if (restorePassError || !restorePasswordSuccessData) {
+      setRestorePasswordApiError(
+        restorePassError?.message || 'Restore password unknown error'
+      )
+      setIsRestorePasswordLoading(false)
+      onRestorePasswordError?.(restorePassError!)
+      return
+    }
+
+    setLoginContentType('restorePasswordSuccess')
+
+    setRestorePasswordSuccessMessage(restorePasswordSuccessData.message)
+    onRestorePasswordSuccess?.()
+  }
+
+  const handleOnPressRestorePasswordSuccessButton = () => {
+    handleHideDialog()
+  }
+
+  const handleHideDialog = () => {
+    setLoginContentType('login')
+    hideLoginDialog()
+  }
+  //#endregion
+
+  //#region Render Main Content
   return (
     <LoginCore ref={loginCoreRef}>
       <LoginView
         showDialog={showLoginDialog}
-        hideDialog={hideLoginDialog}
+        hideDialog={handleHideDialog}
         isDialogVisible={isLoginDialogVisible}
         onPressLogin={handleOnPressLogin}
         isLoading={isLoading}
@@ -78,12 +135,26 @@ const Login: FC<ILoginProps> = ({
         texts={texts}
         styles={styles}
         userFirstName={userFirstName}
-        loginError={loginError}
+        loginApiError={loginApiError}
         refs={refs}
         brandImages={brandImages}
+        isShowPasswordButtonVisible={isShowPasswordButtonVisible}
+        content={loginContentType}
+        onPressForgotPassword={handleOnPressForgotPassword}
+        restorePasswordProps={{
+          apiError: restorePasswordApiError,
+          onPressRestorePasswordButton: handleOnPressRestorePasswordButton,
+          isLoading: isRestorePasswordLoading,
+          onPressCancelButton: handleOnPressCancelRestorePasswordButton,
+        }}
+        resultDialogPropsProps={{
+          message: restorePasswordSuccessMessage,
+          onPressButton: handleOnPressRestorePasswordSuccessButton,
+        }}
       />
     </LoginCore>
   )
+  //#endregion Render Main Content
 }
 
 export default Login

@@ -12,6 +12,7 @@ import {
   fetchEvent,
   fetchTickets,
   postReferralVisit,
+  unlockPasswordProtectedEvent,
 } from '../../api/ApiClient'
 import {
   IAddToCartParams,
@@ -117,6 +118,12 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
 
     async getEvent(): Promise<IEventResponse> {
       return await fetchEvent()
+    },
+
+    async unlockPasswordProtectedEvent(
+      password: string
+    ): Promise<IEventResponse> {
+      return await unlockPasswordProtectedEvent(password)
     },
 
     async addToCart({

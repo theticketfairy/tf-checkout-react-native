@@ -11,6 +11,7 @@ import {
   MyOrders,
   PurchaseConfirmation,
   ResaleTickets,
+  ResetPassword,
   Tickets,
 } from './containers'
 import {
@@ -31,6 +32,8 @@ import {
   OrderDetailsCoreHandle,
   PurchaseConfirmationCore,
   PurchaseConfirmationCoreHandle,
+  ResetPasswordCore,
+  ResetPasswordCoreHandle,
   TicketsCore,
   TicketsCoreHandle,
   WaitingListCore,
@@ -72,6 +75,9 @@ export {
   PurchaseConfirmationCore,
   PurchaseConfirmationCoreHandle,
   ResaleTickets,
+  ResetPassword,
+  ResetPasswordCore,
+  ResetPasswordCoreHandle,
   setConfig,
   SkippingStatusType,
   Tickets,

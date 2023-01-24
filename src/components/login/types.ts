@@ -4,13 +4,21 @@ import { StyleProp, ViewStyle } from 'react-native'
 
 import { IError, IUserProfilePublic } from '../../types'
 import { IButtonStyles } from '../button/types'
-import { IFormField } from '../formField/types'
 import { IInputStyles } from '../input/types'
+import {
+  IRestorePasswordCoreProps,
+  IRestorePasswordStyles,
+  IRestorePasswordTexts,
+  IResultDialogCoreProps,
+  IResultDialogStyles,
+  IResultDialogTexts,
+} from '../restorePassword/types'
 
 export interface ILoginRefs {
   inputs?: {
     email?: any
     password?: any
+    restorePasswordEmail?: any
   }
   button?: {
     containerView?: any
@@ -27,8 +35,13 @@ export interface ILoginBrandImages {
   image1Style?: StyleProp<ImageStyle>
   image2?: ImageSourcePropType
   image2Style?: StyleProp<ImageStyle>
+  showPassword?: ImageSourcePropType
+  hidePassword?: ImageSourcePropType
+  showPasswordStyle?: StyleProp<ImageStyle>
+  hidePasswordStyle?: StyleProp<ImageStyle>
 }
 
+// Exported component
 export interface ILoginProps {
   onLoginSuccessful: (userProfile: IUserProfilePublic) => void
   onLoginError?: (error: IError) => void
@@ -48,6 +61,11 @@ export interface ILoginProps {
   refs?: ILoginRefs
 
   brandImages?: ILoginBrandImages
+  isShowPasswordButtonVisible?: boolean
+
+  //Restore password
+  onRestorePasswordError?: (error: IError) => void
+  onRestorePasswordSuccess?: () => void
 }
 
 export interface ILoginViewStyles {
@@ -65,6 +83,8 @@ export interface ILoginViewStyles {
     input?: IInputStyles
     title?: StyleProp<TextStyle>
     message?: StyleProp<TextStyle>
+    showPasswordIcon?: StyleProp<ImageStyle>
+    forgotPassword?: StyleProp<TextStyle>
   }
   loggedIn?: {
     container?: StyleProp<ViewStyle>
@@ -73,6 +93,8 @@ export interface ILoginViewStyles {
     button?: IButtonStyles
     message?: StyleProp<TextStyle>
   }
+  restorePassword?: IRestorePasswordStyles
+  restorePasswordSuccess?: IResultDialogStyles
 }
 
 export interface ILoginViewTexts {
@@ -87,6 +109,7 @@ export interface ILoginViewTexts {
     emailLabel?: string
     passwordLabel?: string
     title?: string
+    forgotPassword?: string
   }
   logoutDialog?: {
     title?: string
@@ -98,7 +121,22 @@ export interface ILoginViewTexts {
     loggedAs?: string
     notYou?: string
   }
+  restorePassword?: IRestorePasswordTexts
+  restorePasswordSuccess?: IResultDialogTexts
 }
+
+//#region Login
+export interface ILoginDialogViewProps {
+  styles?: ILoginViewStyles
+  texts?: ILoginViewTexts
+}
+//#endregion
+
+export type LoginContentType =
+  | 'login'
+  | 'restorePassword'
+  | 'restorePasswordSuccess'
+  | 'resetPassword'
 
 export interface ILoginViewProps {
   showDialog: () => void
@@ -113,12 +151,23 @@ export interface ILoginViewProps {
   styles?: ILoginViewStyles
   texts?: ILoginViewTexts
 
-  loginError?: string
+  loginApiError?: string
   userFirstName?: string
 
   refs?: ILoginRefs
 
   brandImages?: ILoginBrandImages
+
+  isShowPasswordButtonVisible?: boolean
+
+  content: LoginContentType
+
+  // Used to start the Forgot Password flow
+  onPressForgotPassword: () => void
+
+  // Used to send the Restore password request to the server
+  restorePasswordProps: IRestorePasswordCoreProps
+  resultDialogPropsProps?: IResultDialogCoreProps
 }
 
 export interface ILoginFields {
@@ -127,7 +176,6 @@ export interface ILoginFields {
 }
 
 export interface ILoginViewState {
-  email: IFormField
-  password: IFormField
-  isDataValid: boolean
+  loginEmail: string
+  loginPassword: string
 }

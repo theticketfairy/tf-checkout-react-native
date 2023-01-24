@@ -1,7 +1,13 @@
 import React from 'react'
 import { FlatList, SectionList, Text, View } from 'react-native'
 
-import { Loading, LoggedIn, PromoCode, WaitingList } from '../../components'
+import {
+  EnterPassword,
+  Loading,
+  LoggedIn,
+  PromoCode,
+  WaitingList,
+} from '../../components'
 import Button from '../../components/button/Button'
 import Separator from '../../components/separator/Separator'
 import { IGroupedTickets } from '../../core/TicketsCore/TicketsCoreTypes'
@@ -38,6 +44,8 @@ const TicketsView = ({
   areAlertsEnabled,
   promoCodeCloseIcon,
   areTicketsGroupsShown,
+  passwordProtectedEventData,
+  onPressSubmitEventPassword,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -48,7 +56,17 @@ const TicketsView = ({
     : `Get ${selectedTicket?.selectedOption?.value} tickets`
   const title = texts?.title ? texts.title : 'GET TICKETS'
 
-  return (
+  console.log('is user logged in', isUserLogged)
+
+  return passwordProtectedEventData?.isPasswordProtected ? (
+    <EnterPassword
+      onSubmit={onPressSubmitEventPassword}
+      styles={styles?.enterPassword}
+      texts={texts?.enterPassword}
+      isLoading={passwordProtectedEventData?.isLoading}
+      apiError={passwordProtectedEventData?.apiError}
+    />
+  ) : (
     <View style={[s.container, styles?.rootContainer]}>
       <View style={[s.container, styles?.container]}>
         <View style={s.header}>
