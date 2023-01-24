@@ -10,6 +10,8 @@ export { default as OrderDetailsCore } from './OrderDetailsCore/OrderDetailsCore
 export { default as OrderDetailsCoreHandle } from './OrderDetailsCore/OrderDetailsCoreTypes'
 export { default as PurchaseConfirmationCore } from './PurchaseConfirmationCore/PurchaseConfirmationCore'
 export { PurchaseConfirmationCoreHandle } from './PurchaseConfirmationCore/PurchaseConfirmationCoreTypes'
+export { default as ResetPasswordCore } from './ResetPasswordCore/ResetPasswordCore'
+export { ResetPasswordCoreHandle } from './ResetPasswordCore/ResetPasswordCoreTypes'
 export { default as TicketsCore } from './TicketsCore/TicketsCore'
 export { TicketsCoreHandle } from './TicketsCore/TicketsCoreTypes'
 export { default as WaitingListCore } from './WaitingListCore/WaitingListCore'

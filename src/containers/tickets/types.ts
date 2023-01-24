@@ -1,4 +1,10 @@
-import { ImageSourcePropType, TextStyle, ViewStyle } from 'react-native'
+import {
+  ImageSourcePropType,
+  ImageStyle,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 
 import { IEventData } from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
@@ -82,6 +88,7 @@ export interface ITicketsViewStyles {
   waitingList?: IWaitingListStyles
   loggedIn?: ILoggedInStyles
   enterPassword?: IEnterPasswordStyles
+  showPasswordIcon?: StyleProp<ImageStyle>
 }
 
 export interface ITicketsViewTexts {

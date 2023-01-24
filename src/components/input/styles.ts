@@ -45,4 +45,9 @@ export default StyleSheet.create({
     fontSize: 14,
     marginTop: -4,
   },
+  showPasswordIcon: {
+    tintColor: 'black',
+    width: 24,
+    height: 24,
+  },
 })

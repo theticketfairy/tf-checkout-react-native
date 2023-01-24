@@ -2,6 +2,7 @@ import UIKit
 #if DEBUG
 import FlipperKit
 #endif
+import React
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, RCTBridgeDelegate {
@@ -47,5 +48,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, RCTBridgeDelegate {
     client?.add(FlipperKitNetworkPlugin(networkAdapter: SKIOSNetworkAdapter()))
     client?.start()
     #endif
+  }
+  
+  func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    print("Open url", url)
+    return RCTLinkingManager.application(app, open: url, options: options)
   }
 }

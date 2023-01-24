@@ -5,8 +5,13 @@ import {
   closeSession,
   fetchAccessToken,
   fetchUserProfile,
+  requestResetPassword,
+  requestRestorePassword,
 } from '../../api/ApiClient'
-import { ICloseSessionResponse } from '../../api/types'
+import {
+  ICloseSessionResponse,
+  IResetPasswordRequestData,
+} from '../../api/types'
 import { ILoginFields } from '../../components/login/types'
 import { Config } from '../../helpers/Config'
 import {
@@ -20,6 +25,7 @@ import { ILoginCoreResponse, LoginCoreHandle } from './LoginCoreTypes'
 
 const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
+    // #region Login
     async login({
       email,
       password,
@@ -132,6 +138,22 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
     async logout(): Promise<ICloseSessionResponse> {
       return await closeSession()
     },
+    // #endregion
+
+    // #region Restore Password
+    async restorePassword(email: string) {
+      const response = await requestRestorePassword(email)
+      return response
+    },
+    // #endregion
+
+    // #region Reset Password
+    async resetPassword(data: IResetPasswordRequestData) {
+      const response = await requestResetPassword(data)
+      console.log('RESPONSE RESET PASSWORD', response)
+      return response
+    },
+    // #endregion
   }))
 
   return <>{props.children}</>
