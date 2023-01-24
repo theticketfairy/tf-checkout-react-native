@@ -1,7 +1,13 @@
 import React from 'react'
 import { FlatList, Text, View } from 'react-native'
 
-import { Loading, LoggedIn, PromoCode, WaitingList } from '../../components'
+import {
+  EnterPassword,
+  Loading,
+  LoggedIn,
+  PromoCode,
+  WaitingList,
+} from '../../components'
 import Button from '../../components/button/Button'
 import Separator from '../../components/separator/Separator'
 import CartListItem from './components/TicketListItem'
@@ -34,6 +40,8 @@ const TicketsView = ({
   onLoadingChange,
   areAlertsEnabled,
   promoCodeCloseIcon,
+  passwordProtectedEventData,
+  onPressSubmitEventPassword,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -46,7 +54,15 @@ const TicketsView = ({
 
   console.log('is user logged in', isUserLogged)
 
-  return (
+  return passwordProtectedEventData?.isPasswordProtected ? (
+    <EnterPassword
+      onSubmit={onPressSubmitEventPassword}
+      styles={styles?.enterPassword}
+      texts={texts?.enterPassword}
+      isLoading={passwordProtectedEventData?.isLoading}
+      apiError={passwordProtectedEventData?.apiError}
+    />
+  ) : (
     <View style={[s.container, styles?.rootContainer]}>
       <View style={[s.container, styles?.container]}>
         <View style={s.header}>

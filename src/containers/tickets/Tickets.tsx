@@ -19,7 +19,7 @@ import {
   ITicket,
 } from '../../types'
 import TicketsView from './TicketsView'
-import { ITicketsProps } from './types'
+import { IPasswordProtectedEventData, ITicketsProps } from './types'
 
 const Tickets: FC<ITicketsProps> = ({
   onAddToCartSuccess,
@@ -54,12 +54,15 @@ const Tickets: FC<ITicketsProps> = ({
     IPromoCodeResponse | undefined
   >(undefined)
   const [isFirstCall, setIsFirstCall] = useState(true)
+  const [passwordProtectedEventData, setPasswordProtectedEventData] = useState<
+    IPasswordProtectedEventData | undefined
+  >()
 
   //#region Refs
   const eventErrorCodeRef = useRef(0)
   const ticketsCoreRef = useRef<TicketsCoreHandle>(null)
   const isApiErrorRef = useRef<boolean>(false)
-  //#endregion
+  //#endregion Refs
 
   const showAlert = (message: string) => {
     if (areAlertsEnabled) {
@@ -72,7 +75,7 @@ const Tickets: FC<ITicketsProps> = ({
     (item) => item.salesStarted && !item.salesEnded && !item.soldOut
   )
 
-  //#region Api calls
+  //#region Core Api calls
   const retrieveStoredAccessToken = async () => {
     if (!ticketsCoreRef.current) {
       return { eventError: { message: 'Ticket core is not initialized' } }
@@ -89,6 +92,16 @@ const Tickets: FC<ITicketsProps> = ({
     }
 
     return await ticketsCoreRef.current.getTickets(promoCode)
+  }
+
+  const unlockPasswordProtectedEventCore = async (
+    password: string
+  ): Promise<IEventResponse> => {
+    if (!ticketsCoreRef.current) {
+      return { eventError: { message: 'Ticket core is not initialized' } }
+    }
+
+    return await ticketsCoreRef.current.unlockPasswordProtectedEvent(password)
   }
 
   const getEventCore = async (): Promise<IEventResponse> => {
@@ -108,7 +121,9 @@ const Tickets: FC<ITicketsProps> = ({
 
     return await ticketsCoreRef.current.addToCart(data)
   }
+  //#endregion Core Api calls
 
+  //#region Api Calls
   const getTickets = async (promoCode: string = '') => {
     setIsGettingTickets(true)
     isApiErrorRef.current = false
@@ -178,7 +193,14 @@ const Tickets: FC<ITicketsProps> = ({
 
     if (eventError) {
       eventErrorCodeRef.current = eventError.code || 400
-      showAlert(eventError.message)
+      if (eventError.code === 401) {
+        setPasswordProtectedEventData({
+          isPasswordProtected: true,
+          message: eventError.message,
+        })
+      } else {
+        showAlert(eventError.message)
+      }
       return onFetchEventError?.(
         eventError || { message: 'There was an error while fetching event' }
       )
@@ -189,6 +211,8 @@ const Tickets: FC<ITicketsProps> = ({
         message: 'There was an error while fetching event',
       })
     }
+
+    await getTickets()
 
     onFetchEventSuccess?.(eventData)
     setEvent(eventData)
@@ -227,7 +251,7 @@ const Tickets: FC<ITicketsProps> = ({
       return onAddToCartError?.(addToCartError)
     }
   }
-  //#endregion
+  //#endregion Api Calls
 
   const onLoadingChangeCallback = useCallback(
     (loading: boolean) => {
@@ -250,7 +274,6 @@ const Tickets: FC<ITicketsProps> = ({
   useEffect(() => {
     const fetchInitialData = async () => {
       await retrieveStoredAccessToken()
-      await getTickets()
       await getEventData()
     }
     fetchInitialData()
@@ -286,7 +309,6 @@ const Tickets: FC<ITicketsProps> = ({
     await ticketsCoreRef.current.logout()
     setIsUserLogged(false)
 
-    await getTickets()
     await getEventData()
     if (onPressLogout) {
       onPressLogout()
@@ -295,6 +317,37 @@ const Tickets: FC<ITicketsProps> = ({
 
   const handleOnLoadingChange = (loading: boolean) => {
     onLoadingChangeCallback(loading)
+  }
+
+  const handleOnSubmitEventPassword = async (password: string) => {
+    setPasswordProtectedEventData({
+      ...passwordProtectedEventData,
+      isLoading: true,
+    })
+
+    const { eventData, eventError } = await unlockPasswordProtectedEventCore(
+      password
+    )
+
+    if (eventError) {
+      return setPasswordProtectedEventData({
+        ...passwordProtectedEventData,
+        isLoading: false,
+        apiError: eventError.message,
+      })
+    }
+
+    setPasswordProtectedEventData({
+      ...passwordProtectedEventData,
+      isLoading: false,
+      apiError: '',
+      isPasswordProtected: false,
+      message: '',
+    })
+
+    onFetchEventSuccess?.(eventData!)
+    setEvent(eventData)
+    getTickets()
   }
   //#endregion
 
@@ -326,6 +379,8 @@ const Tickets: FC<ITicketsProps> = ({
         onAddToWaitingListSuccess={onAddToWaitingListSuccess}
         onLoadingChange={handleOnLoadingChange}
         promoCodeCloseIcon={promoCodeCloseIcon}
+        passwordProtectedEventData={passwordProtectedEventData}
+        onPressSubmitEventPassword={handleOnSubmitEventPassword}
       />
     </TicketsCore>
   )

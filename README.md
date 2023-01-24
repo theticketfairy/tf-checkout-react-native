@@ -190,6 +190,7 @@ Let the user to resale their tickets. They can choose between selling them to a 
 ### Reset Password
 
 After opening and URL with the corresponding schema, use this component to let the user reset its password.
+
 # Component styling
 ### Button
 ```ts
@@ -432,6 +433,12 @@ interface ILoginViewStyles {
 ---
 ## Tickets UI 
 
+This component will first fetch for the Event's data, if data is ok, then will fetch the tickets for this event. 
+
+### Password protected event
+
+If the Event's response returns a `401` error, then it means it's password protected and need to authenticate with a password. Then the EnterPassword component will be shown for the user to enter the password.
+
 Import the component from the library.
 
 ```js
@@ -510,6 +517,15 @@ Then add it to the render function.
   areLoadingIndicatorsEnabled?: boolean
   
   promoCodeCloseIcon?: ImageSourcePropType
+
+  // Event password protected
+  onPressSubmitEventPassword?: (password: string) => void
+  passwordProtectedEventData?: {
+    isPasswordProtected?: boolean
+    message?: string
+    apiError?: string
+    isLoading?: boolean
+  }
 }
 ```
 
@@ -594,6 +610,14 @@ You can then call the `BillingInfo` component and pass them as props in the `car
     myOrdersButton?: IButtonStyles
     logOutButton?: IButtonStyles
   }
+  enterPassword?: {
+    input?: IInputStyles
+    title?: StyleProp<TextStyle>
+    error?: StyleProp<TextStyle>
+    button?: IButtonStyles
+    rootContainer?: StyleProp<ViewStyle>
+    contentContainer?: StyleProp<ViewStyle>
+  }
 }
 ```
 
@@ -637,6 +661,11 @@ You can then call the `BillingInfo` component and pass them as props in the `car
     exclFees?: string
     free?: string
     ticket?: string
+  }
+  enterPassword?: {
+    inputLabel?: string
+    title?: string
+    buttonText?: string
   }
 }
 ```
@@ -2347,8 +2376,9 @@ Wrap your component with the Core component.
 # Changelog
 
 ## Next
-- Made TTF Privacy Policy mandatory 
-- Added styles and text for TTF Privacy Policy checkbox
+- Made TTF Privacy Policy mandatory.
+- Added styles and text for TTF Privacy Policy checkbox.
+- Added Password Protected event feature.
 
 ## Version 1.0.23
 - Fix Checkout not allowing free registrations
