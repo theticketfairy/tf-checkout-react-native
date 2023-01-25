@@ -25,11 +25,12 @@ import {
   IWaitingListStyles,
   IWaitingListTexts,
 } from '../../components/waitingList/types'
-import { TicketsType } from '../../core/TicketsCore/TicketsCoreTypes'
+import { IGroupedTickets } from '../../core/TicketsCore/TicketsCoreTypes'
 import {
   IEvent,
   IOnFetchTicketsSuccess,
   ISelectedTicket,
+  ITicket,
   ITicketsResponseData,
 } from '../../types'
 import { IError } from '../../types/IError'
@@ -39,7 +40,8 @@ export interface ITicketsViewProps {
   isGettingTickets?: boolean
   isBookingTickets?: boolean
   isGettingEvent?: boolean
-  tickets: TicketsType
+  tickets: ITicket[]
+  groupedTickets: IGroupedTickets[]
   areTicketsGroupsShown?: boolean
   styles?: ITicketsViewStyles
   onPressGetTickets: () => void

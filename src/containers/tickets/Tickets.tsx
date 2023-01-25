@@ -9,13 +9,14 @@ import { TicketsCore, TicketsCoreHandle } from '../../core'
 import {
   IBookTicketsOptions,
   IGetTicketsPayload,
-  TicketsType,
+  IGroupedTickets,
 } from '../../core/TicketsCore/TicketsCoreTypes'
 import {
   IAddToCartResponse,
   IEvent,
   IOnFetchTicketsSuccess,
   ISelectedTicket,
+  ITicket,
 } from '../../types'
 import TicketsView from './TicketsView'
 import { IPasswordProtectedEventData, ITicketsProps } from './types'
@@ -50,7 +51,8 @@ const Tickets: FC<ITicketsProps> = ({
   const [event, setEvent] = useState<IEvent>()
   const [isBooking, setIsBooking] = useState(false)
   const [areTicketGroupsShown, setAreTicketGroupsShown] = useState(false)
-  const [tickets, setTickets] = useState<TicketsType>([])
+  const [tickets, setTickets] = useState<ITicket[]>([])
+  const [groupedTickets, setGroupedTickets] = useState<IGroupedTickets[]>([])
   const [isWaitingListVisible, setIsWaitingListVisible] = useState(false)
   const [isAccessCode, setIsAccessCode] = useState(false)
   const [selectedTicket, setSelectedTicket] = useState<ISelectedTicket>()
@@ -74,10 +76,31 @@ const Tickets: FC<ITicketsProps> = ({
     }
   }
 
-  const isTicketOnSale = _some(
-    tickets,
-    (item) => item.salesStarted && !item.salesEnded && !item.soldOut
-  )
+  const isTicketOnSale = (ticketsForCheck: ITicket[]) =>
+    _some(
+      ticketsForCheck,
+      (item: ITicket) => item.salesStarted && !item.salesEnded && !item.soldOut
+    )
+
+  const areTicketsOnSale = (): boolean => {
+    if (!event?.salesEnded) {
+      return false
+    }
+
+    if (config.areTicketsGrouped && groupedTickets.length === 0) {
+      return false
+    }
+
+    if (!config.areTicketsGrouped && tickets.length === 0) {
+      return false
+    }
+
+    if (config.areTicketsGrouped) {
+      return _some(groupedTickets, (gTicket) => isTicketOnSale(gTicket.data))
+    } else {
+      return isTicketOnSale(tickets)
+    }
+  }
 
   //#region Core Api calls
   const retrieveStoredAccessToken = async () => {
@@ -156,7 +179,15 @@ const Tickets: FC<ITicketsProps> = ({
     setAreTicketGroupsShown(areGroupsShown || false)
 
     if (responseTickets && !_isEmpty(responseTickets)) {
-      setTickets(responseTickets)
+      if (config.areTicketsGrouped) {
+        if (areGroupsShown) {
+          setGroupedTickets(responseTickets as IGroupedTickets[])
+        } else {
+          setTickets(responseTickets as ITicket[])
+        }
+      } else {
+        setTickets(responseTickets as ITicket[])
+      }
 
       if (isFirstCall && promoCodeResult?.isValid) {
         setPromoCodeResponse(promoCodeResult)
@@ -367,6 +398,7 @@ const Tickets: FC<ITicketsProps> = ({
       <TicketsView
         isGettingTickets={isGettingTickets}
         tickets={tickets}
+        groupedTickets={groupedTickets}
         onPressGetTickets={handleOnPressGetTickets}
         onPressApplyPromoCode={handleOnPressApplyPromoCode}
         promoCodeValidationMessage={promoCodeResponse?.message}
@@ -379,7 +411,7 @@ const Tickets: FC<ITicketsProps> = ({
         texts={texts}
         event={event}
         isWaitingListVisible={isWaitingListVisible}
-        isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
+        isGetTicketsButtonVisible={areTicketsOnSale()}
         isAccessCodeEnabled={isAccessCodeEnabled || isAccessCode}
         isPromoEnabled={isPromoEnabled}
         isUserLogged={isUserLogged}

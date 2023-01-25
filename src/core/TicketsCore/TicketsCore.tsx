@@ -86,10 +86,18 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
             areGroupsShown: false,
           }
         }
-        return {
-          ...ticketsResponse,
-          tickets: groupTickets(sortedTickets),
-          areGroupsShown: areGroupsShown,
+        if (areGroupsShown) {
+          return {
+            ...ticketsResponse,
+            tickets: groupTickets(sortedTickets),
+            areGroupsShown: areGroupsShown,
+          }
+        } else {
+          return {
+            ...ticketsResponse,
+            tickets: sortedTickets,
+            areGroupsShown: areGroupsShown,
+          }
         }
       } else {
         // Sort tickets by sold out

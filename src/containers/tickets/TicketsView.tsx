@@ -10,8 +10,6 @@ import {
 } from '../../components'
 import Button from '../../components/button/Button'
 import Separator from '../../components/separator/Separator'
-import { IGroupedTickets } from '../../core/TicketsCore/TicketsCoreTypes'
-import { ITicket } from '../../types'
 import TicketGroupListHeader from './components/TicketGroupListHeader'
 import CartListItem from './components/TicketListItem'
 import s from './styles'
@@ -20,6 +18,7 @@ import { ITicketsViewProps } from './types'
 const TicketsView = ({
   isGettingTickets,
   tickets,
+  groupedTickets,
   styles,
   onPressGetTickets,
   onPressApplyPromoCode,
@@ -83,7 +82,7 @@ const TicketsView = ({
         />
         {areTicketsGroupsShown ? (
           <SectionList
-            sections={tickets as IGroupedTickets[]}
+            sections={groupedTickets}
             renderItem={({ item, index }) => (
               <CartListItem
                 onSelectTicketItem={onSelectTicketOption}
@@ -107,7 +106,7 @@ const TicketsView = ({
           />
         ) : (
           <FlatList
-            data={tickets as ITicket[]}
+            data={tickets}
             style={styles?.ticketList?.listContainer}
             keyExtractor={(item) => `ticket.${item.id}`}
             renderItem={({ item, index }) => (
@@ -134,7 +133,6 @@ const TicketsView = ({
             areAlertsEnabled={areAlertsEnabled}
           />
         )}
-
         {isGetTicketsButtonVisible && (
           <Button
             text={buttonText}
