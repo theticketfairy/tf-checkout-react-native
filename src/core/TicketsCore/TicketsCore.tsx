@@ -1,4 +1,9 @@
 import jwtDecode from 'jwt-decode'
+import _find from 'lodash/find'
+import _groupBy from 'lodash/groupBy'
+import _map from 'lodash/map'
+import _mapKeys from 'lodash/mapKeys'
+import _sortBy from 'lodash/sortBy'
 import React, { forwardRef, useImperativeHandle } from 'react'
 
 import {
@@ -13,7 +18,6 @@ import {
   IAddToCartParams,
   ICloseSessionResponse,
   IEventResponse,
-  IFetchTicketsResponse,
   IPostReferralResponse,
 } from '../../api/types'
 import { Config } from '../../helpers/Config'
@@ -22,14 +26,102 @@ import {
   getData,
   LocalStorageKeys,
 } from '../../helpers/LocalStorage'
-import { IAddToCartResponse } from '../../types'
+import { IAddToCartResponse, ITicket } from '../../types'
 import { ICoreProps } from '../CoreProps'
-import { IBookTicketsOptions, TicketsCoreHandle } from './TicketsCoreTypes'
+import {
+  IBookTicketsOptions,
+  IGetTicketsOptions,
+  IGetTicketsPayload,
+  IGroupedTickets,
+  TicketsCoreHandle,
+} from './TicketsCoreTypes'
 
 const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
-    async getTickets(promoCode?: string): Promise<IFetchTicketsResponse> {
-      return await fetchTickets(promoCode)
+    async getTickets({
+      promoCode,
+      areTicketsSortedBySoldOut,
+      areTicketsGrouped,
+    }: IGetTicketsOptions): Promise<IGetTicketsPayload> {
+      const groupTickets = (tickets: ITicket[]) => {
+        // Create an array of tickets with the GroupName set
+        const ticketsWithGroupName = _map(tickets, (ticket) => {
+          return {
+            ...ticket,
+            groupName: ticket.groupName || '',
+          }
+        })
+        const groupedTickets = _groupBy(ticketsWithGroupName, 'groupName')
+        const ticketsSections: IGroupedTickets[] = []
+        _mapKeys(groupedTickets, (val, key) => {
+          ticketsSections.push({
+            title: key,
+            data: val,
+          })
+        })
+
+        return ticketsSections
+      }
+
+      const ticketsResponse = await fetchTickets(promoCode)
+
+      if (ticketsResponse.error || !ticketsResponse.tickets) {
+        return ticketsResponse
+      }
+
+      const sortedTickets = areTicketsSortedBySoldOut
+        ? _sortBy(_sortBy(ticketsResponse.tickets, 'sortOrder'), 'soldOut')
+        : _sortBy(ticketsResponse.tickets, 'sortOrder')
+
+      const areGroupsShown = !!_find(
+        sortedTickets,
+        (ticket) => ticket.groupName
+      )
+
+      if (!areTicketsSortedBySoldOut) {
+        if (!areTicketsGrouped) {
+          return {
+            ...ticketsResponse,
+            tickets: sortedTickets,
+            areGroupsShown: false,
+          }
+        }
+        if (areGroupsShown) {
+          return {
+            ...ticketsResponse,
+            tickets: groupTickets(sortedTickets),
+            areGroupsShown: areGroupsShown,
+          }
+        } else {
+          return {
+            ...ticketsResponse,
+            tickets: sortedTickets,
+            areGroupsShown: areGroupsShown,
+          }
+        }
+      } else {
+        // Sort tickets by sold out
+        if (!areTicketsGrouped) {
+          return {
+            ...ticketsResponse,
+            tickets: sortedTickets,
+            areGroupsShown: false,
+          }
+        } else {
+          if (areGroupsShown) {
+            return {
+              ...ticketsResponse,
+              tickets: groupTickets(sortedTickets),
+              areGroupsShown: areGroupsShown,
+            }
+          }
+          return {
+            ...ticketsResponse,
+            tickets: sortedTickets,
+            areGroupsShown: areGroupsShown,
+          }
+        }
+      }
     },
 
     async getEvent(): Promise<IEventResponse> {

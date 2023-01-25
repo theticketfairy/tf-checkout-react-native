@@ -458,6 +458,12 @@ Then add it to the render function.
   eventId: number
 
   // Callbacks for when user taps on GET Tickets button
+  config: {
+    areActivityIndicatorsEnabled?: boolean
+    areAlertsEnabled?: boolean
+    areTicketsSortedBySoldOut?: boolean
+    areTicketsGrouped?: boolean
+  }
   onAddToCartSuccess: (data: {
     isBillingRequired: boolean
     isPhoneRequired?: boolean
@@ -512,10 +518,7 @@ Then add it to the render function.
   onPressLogout?: () => void
 
   // With the following 3 props you can control the visibility of the stock loading indicators and alerts, so you can use your own.
-  onLoadingChange?: (isLoading: boolean) => void
-  areAlertsEnabled?: boolean
-  areLoadingIndicatorsEnabled?: boolean
-  
+  onLoadingChange?: (isLoading: boolean) => void 
   promoCodeCloseIcon?: ImageSourcePropType
 
   // Event password protected
@@ -555,8 +558,8 @@ You can then call the `BillingInfo` component and pass them as props in the `car
   getTicketsButtonDisabled?: IButtonStyles
   getTicketsButtonActive?: IButtonStyles
   promoCode?: {
-    rootContainer?: StyleProp<ViewStyle>
-    contentWrapper?: StyleProp<ViewStyle>
+    rootContainer?: ViewStyle
+    contentWrapper?: ViewStyle
     content?: StyleProp<ViewStyle>
     input?: TextInputProps['style']
     inputPlaceholderColor?: string
@@ -572,6 +575,10 @@ You can then call the `BillingInfo` component and pass them as props in the `car
     cancelIcon?: StyleProp<ImageStyle>
   }
   ticketList?: {
+    sectionHeader?: {
+      container?: StyleProp<ViewStyle>
+      title?: StyleProp<TextStyle>
+    }
     listContainer?: ViewStyle
     item?: {
       container?: ViewStyle
@@ -2376,6 +2383,19 @@ Wrap your component with the Core component.
 # Changelog
 
 ## Next
+- Add show Tickets in groups and the option to sort them by sold out.
+- Add config prop to Tickets component:
+
+```
+    config: {
+      areActivityIndicatorsEnabled?: boolean
+      areAlertsEnabled?: boolean
+      areTicketsSortedBySoldOut?: boolean
+      areTicketsGrouped?: boolean
+    }
+```
+- Updated Tickets styles prop to include Ticket Section Header.
+- Moved areActivityIndicatorsEnabled and areAlertsEnabled to the config prop.
 - Made TTF Privacy Policy mandatory.
 - Added styles and text for TTF Privacy Policy checkbox.
 - Added Password Protected event feature.

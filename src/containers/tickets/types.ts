@@ -25,6 +25,7 @@ import {
   IWaitingListStyles,
   IWaitingListTexts,
 } from '../../components/waitingList/types'
+import { IGroupedTickets } from '../../core/TicketsCore/TicketsCoreTypes'
 import {
   IEvent,
   IOnFetchTicketsSuccess,
@@ -40,6 +41,8 @@ export interface ITicketsViewProps {
   isBookingTickets?: boolean
   isGettingEvent?: boolean
   tickets: ITicket[]
+  groupedTickets: IGroupedTickets[]
+  areTicketsGroupsShown?: boolean
   styles?: ITicketsViewStyles
   onPressGetTickets: () => void
   onPressApplyPromoCode: (promoCode: string) => void
@@ -74,6 +77,10 @@ export interface ITicketsViewProps {
 export interface ITicketListStyles {
   listContainer?: ViewStyle
   item?: ITicketListItemStyles
+  sectionHeader?: {
+    container?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+  }
 }
 
 export interface ITicketsViewStyles {
@@ -100,6 +107,13 @@ export interface ITicketsViewTexts {
   listItem?: ITicketListItemTexts
   waitingList?: IWaitingListTexts
   enterPassword?: IEnterPasswordTexts
+}
+
+export interface ITicketsConfig {
+  areActivityIndicatorsEnabled?: boolean
+  areAlertsEnabled?: boolean
+  areTicketsSortedBySoldOut?: boolean
+  areTicketsGrouped?: boolean
 }
 
 export interface ITicketsProps {
@@ -132,12 +146,10 @@ export interface ITicketsProps {
   onPressMyOrders: () => void
   onPressLogout?: () => void
 
-  // With the following 3 props you can control the visibility of the stock loading indicators and alerts, so you can use your own.
   onLoadingChange?: (isLoading: boolean) => void
-  areAlertsEnabled?: boolean
-  areLoadingIndicatorsEnabled?: boolean
-
   promoCodeCloseIcon?: ImageSourcePropType
+
+  config?: ITicketsConfig
 }
 
 export interface IPasswordProtectedEventData {

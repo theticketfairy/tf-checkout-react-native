@@ -1100,6 +1100,9 @@ const App = () => {
         return (
           <View style={{ flex: 1 }}>
             <Tickets
+            config={{
+              areTicketsGrouped: true
+            }}
               onLoadingChange={(loading) => setIsLoading(loading)}
               onAddToCartSuccess={handleOnAddToCartSuccess}
               onPressLogout={handleOnPressLogout}
@@ -1211,6 +1214,15 @@ const App = () => {
                   }
                 },
                 ticketList: {
+                  sectionHeader: {
+                    container: {
+                      padding: 8,
+                      backgroundColor: Color.gray40
+                    },
+                    title: {
+                      fontWeight: '800'
+                    }
+                  },
                   item: {
                     ticketName: {
                       color: Color.textMain,

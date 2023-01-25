@@ -1,5 +1,5 @@
 import React from 'react'
-import { FlatList, Text, View } from 'react-native'
+import { FlatList, SectionList, Text, View } from 'react-native'
 
 import {
   EnterPassword,
@@ -10,6 +10,7 @@ import {
 } from '../../components'
 import Button from '../../components/button/Button'
 import Separator from '../../components/separator/Separator'
+import TicketGroupListHeader from './components/TicketGroupListHeader'
 import CartListItem from './components/TicketListItem'
 import s from './styles'
 import { ITicketsViewProps } from './types'
@@ -17,6 +18,7 @@ import { ITicketsViewProps } from './types'
 const TicketsView = ({
   isGettingTickets,
   tickets,
+  groupedTickets,
   styles,
   onPressGetTickets,
   onPressApplyPromoCode,
@@ -40,6 +42,7 @@ const TicketsView = ({
   onLoadingChange,
   areAlertsEnabled,
   promoCodeCloseIcon,
+  areTicketsGroupsShown,
   passwordProtectedEventData,
   onPressSubmitEventPassword,
 }: ITicketsViewProps) => {
@@ -77,24 +80,49 @@ const TicketsView = ({
           texts={texts?.promoCode}
           closeButtonIcon={promoCodeCloseIcon}
         />
-        <FlatList
-          data={tickets}
-          style={styles?.ticketList?.listContainer}
-          keyExtractor={(item) => `ticket.${item.id}`}
-          renderItem={({ item, index }) => (
-            <CartListItem
-              onSelectTicketItem={onSelectTicketOption}
-              ticket={item}
-              ticketNumber={index}
-              selectedTicket={selectedTicket}
-              styles={styles?.ticketList?.item}
-              texts={texts?.listItem}
-              {...item}
-            />
-          )}
-          ItemSeparatorComponent={() => <Separator />}
-        />
-
+        {areTicketsGroupsShown ? (
+          <SectionList
+            sections={groupedTickets}
+            renderItem={({ item, index }) => (
+              <CartListItem
+                onSelectTicketItem={onSelectTicketOption}
+                ticket={item}
+                ticketNumber={index}
+                selectedTicket={selectedTicket}
+                styles={styles?.ticketList?.item}
+                texts={texts?.listItem}
+                {...item}
+              />
+            )}
+            renderSectionHeader={(data) => (
+              <TicketGroupListHeader
+                text={data.section.title}
+                styles={{
+                  container: styles?.ticketList?.sectionHeader?.container,
+                  text: styles?.ticketList?.sectionHeader?.title,
+                }}
+              />
+            )}
+          />
+        ) : (
+          <FlatList
+            data={tickets}
+            style={styles?.ticketList?.listContainer}
+            keyExtractor={(item) => `ticket.${item.id}`}
+            renderItem={({ item, index }) => (
+              <CartListItem
+                onSelectTicketItem={onSelectTicketOption}
+                ticket={item}
+                ticketNumber={index}
+                selectedTicket={selectedTicket}
+                styles={styles?.ticketList?.item}
+                texts={texts?.listItem}
+                {...item}
+              />
+            )}
+            ItemSeparatorComponent={() => <Separator />}
+          />
+        )}
         {isWaitingListVisible && event?.salesStarted && (
           <WaitingList
             styles={styles?.waitingList}
@@ -105,7 +133,6 @@ const TicketsView = ({
             areAlertsEnabled={areAlertsEnabled}
           />
         )}
-
         {isGetTicketsButtonVisible && (
           <Button
             text={buttonText}

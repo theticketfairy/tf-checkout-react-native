@@ -33,3 +33,15 @@ export interface ITicketListItemProps extends ITicket {
   styles?: ITicketListItemStyles
   texts?: ITicketListItemTexts
 }
+
+//#region TicketGroupListHeader
+export interface ITicketGroupListHeaderStyles {
+  container?: StyleProp<ViewStyle>
+  text?: StyleProp<TextStyle>
+}
+
+export interface ITicketGroupListHeaderProps {
+  styles?: ITicketGroupListHeaderStyles
+  text?: string
+}
+//#endregion
