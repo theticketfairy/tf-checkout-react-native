@@ -39,12 +39,6 @@ const config: IConfig = {
   BRAND: 'mana-onetree-testing-brand',
   ARE_SUB_BRANDS_INCLUDED: true,
   ENV: 'STAG',
-  AUTH: {
-    accessToken: Config.ACCESS_TOKEN,
-    tokenType: Config.TOKEN_TYPE,
-    refreshToken: Config.REFRESH_TOKEN,
-    scope: Config.SCOPE
-  }
 }
 
 // BRANDS
