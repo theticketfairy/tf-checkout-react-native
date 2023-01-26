@@ -1,4 +1,4 @@
-import _, { size } from 'lodash'
+import _ from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
@@ -33,7 +33,6 @@ interface IDeepLinkUrl {
 
 const EVENT_ID = 13090
 
-
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
   CLIENT: 'mana',
@@ -56,9 +55,9 @@ const App = () => {
   )
 
   //#region Loadings
+  const [isCheckingCurrentSession, setIsCheckingCurrentSession] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [skippingStatus, setSkippingStatus] = useState<SkippingStatusType>(undefined)
-
 
   const [checkoutProps, setCheckOutProps] = useState<
     IOnCheckoutSuccess | undefined
@@ -140,11 +139,7 @@ const App = () => {
 
   //#endregion
   const handleOpenUrl = ({url}: IDeepLinkUrl) =>{
-    console.log('Open urel', url)
-    //restlessnites://https//restlessnites.com/reset-password?token=5f867190b16fbb9a1856832161294063
-
     const splitted = url.split("token=")
-    console.log('SPLIT', splitted)
     if (splitted.length <= 1) {
       return 
     }
@@ -158,8 +153,6 @@ const App = () => {
 
   const getInitialURL = async () => { 
     const initialUrl = await Linking.getInitialURL();
-      console.log('initialurl', initialUrl)
-
       if (initialUrl === null) {
         return;
       }
@@ -169,7 +162,14 @@ const App = () => {
 
   //#region effects
   useEffect(() => {
-    setConfig(config)
+
+    const setConfigAsync = async () => {
+      setIsCheckingCurrentSession(true)
+      await setConfig(config)
+      setIsCheckingCurrentSession(false)
+    }
+
+    setConfigAsync()
     Linking.addEventListener('url', handleOpenUrl)
 
     return () => {
@@ -1101,12 +1101,12 @@ const App = () => {
           <View style={{ flex: 1 }}>
             <Tickets
             config={{
-              areTicketsGrouped: true
+              areTicketsGrouped: true,
             }}
+              isCheckingCurrentSession={isCheckingCurrentSession}
               onLoadingChange={(loading) => setIsLoading(loading)}
               onAddToCartSuccess={handleOnAddToCartSuccess}
               onPressLogout={handleOnPressLogout}
-
               onPressMyOrders={handleOnPressMyOrders}
               styles={{
                 enterPassword: {

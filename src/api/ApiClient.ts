@@ -81,11 +81,13 @@ axiosRetry(Client, { retries: 3 })
 Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
   const guestToken = await getData(LocalStorageKeys.AUTH_GUEST_TOKEN)
   const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
+  const storedTokenType = await getData(LocalStorageKeys.AUTH_TOKEN_TYPE)
+  const tokenType = storedTokenType || 'Bearer'
 
   if (accessToken) {
     const updatedHeaders = {
       ...config.headers,
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `${tokenType} ${accessToken}`,
     }
     config.headers = updatedHeaders
   }
@@ -116,7 +118,7 @@ Client.interceptors.response.use(
   },
   async (error: AxiosError) => {
     if (error?.response?.status === 401) {
-      await deleteAllData()
+      error.code = error.code
       error.message = error.response.data.error_description
     } else if (error.message) {
       error.message = error.message

@@ -38,6 +38,7 @@ const Tickets: FC<ITicketsProps> = ({
   onAddToWaitingListError,
   onAddToWaitingListSuccess,
   promoCodeCloseIcon,
+  isCheckingCurrentSession,
   config = {
     areTicketsGrouped: true,
     areActivityIndicatorsEnabled: true,
@@ -83,11 +84,15 @@ const Tickets: FC<ITicketsProps> = ({
     )
 
   const areTicketsOnSale = (): boolean => {
-    if (!event?.salesEnded) {
+    if (event?.salesEnded) {
       return false
     }
 
-    if (config.areTicketsGrouped && groupedTickets.length === 0) {
+    if (
+      config.areTicketsGrouped &&
+      areTicketGroupsShown &&
+      groupedTickets.length === 0
+    ) {
       return false
     }
 
@@ -248,6 +253,8 @@ const Tickets: FC<ITicketsProps> = ({
       )
     }
 
+    eventErrorCodeRef.current = 0
+
     if (!eventData) {
       return onFetchEventError?.({
         message: 'There was an error while fetching event',
@@ -318,9 +325,11 @@ const Tickets: FC<ITicketsProps> = ({
       await retrieveStoredAccessToken()
       await getEventData()
     }
-    fetchInitialData()
+    if (!isCheckingCurrentSession && isFirstCall) {
+      fetchInitialData()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isCheckingCurrentSession])
   //#endregion
 
   //#region Handlers
@@ -352,9 +361,7 @@ const Tickets: FC<ITicketsProps> = ({
     setIsUserLogged(false)
 
     await getEventData()
-    if (onPressLogout) {
-      onPressLogout()
-    }
+    onPressLogout?.()
   }
 
   const handleOnLoadingChange = (loading: boolean) => {
@@ -386,6 +393,7 @@ const Tickets: FC<ITicketsProps> = ({
       isPasswordProtected: false,
       message: '',
     })
+    eventErrorCodeRef.current = 0
 
     onFetchEventSuccess?.(eventData!)
     setEvent(eventData)
@@ -425,6 +433,7 @@ const Tickets: FC<ITicketsProps> = ({
         areTicketsGroupsShown={areTicketGroupsShown}
         passwordProtectedEventData={passwordProtectedEventData}
         onPressSubmitEventPassword={handleOnSubmitEventPassword}
+        isCheckingCurrentSession={isCheckingCurrentSession}
       />
     </TicketsCore>
   )

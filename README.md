@@ -11,7 +11,7 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 - Suggested ReactNative version `0.66.3`
 - Suggested Flipper version `0.99.0`
 - React version `0.17.1`
-
+- Node version `16.10.0`
 ### Android
 
 - Android 5.0 (API level 21) and above
@@ -99,16 +99,41 @@ Import the function from the library.
 import { setConfig } from 'tf-checkout-react-native'
 ```
 
-Use it in your initial useEffect function:
+Use it in your initial useEffect function, please keep in mind this is an `async` function. It is highly recommended that you track when `setConfig` is finished, and pass that control prop to the Tickets component.
 
 ```ts
-useEffect(() => {
-  setConfig({
-    EVENT_ID: '4344',
-    CLIENT: 'ttf',
-    ENV: 'STAG'
-  })
-}, [])
+
+const YourComponent: FC () => {
+    const [isCheckingCurrentSession, setIsCheckingCurrentSession] = useState(true)
+
+  useEffect(() => {
+    const initConfig = async () => {
+      setIsCheckingCurrentSession(true)
+
+      await setConfig({
+        EVENT_ID: '4344',
+        CLIENT: 'ttf',
+        ENV: 'STAG',
+        CLIENT_ID: '3emd9023349dfn',
+        CLIENT_SECRET: 'CCEw33o4030e4df',
+        AUTH: {
+          ACCESS_TOKEN: 'token393939',
+          REFRESH_TOKEN: 'dee2030edmd',
+          TOKEN_TYPE: 'bearer',
+          SCOPE: 'scope',
+        }
+      })
+
+      setIsCheckingCurrentSession(false)
+    }
+
+    initConfig()
+  }, [])
+
+  return <Tickets 
+    isCheckingCurrentSession 
+  />
+}
 ```
 
 `setConfig` set your event's configuration, with the following options:
@@ -123,6 +148,12 @@ useEffect(() => {
   TIMEOUT?: number,
   BRAND?: string,
   ARE_SUB_BRANDS_INCLUDED?: boolean
+  AUTH?: {
+    ACCESS_TOKEN: string
+    REFRESH_TOKEN: string
+    TOKEN_TYPE: string
+    SCOPE: string
+  }
 }
 ````
 ### Props
@@ -136,6 +167,7 @@ useEffect(() => {
 | BRAND | Set your BRAND so users can only see this brand in their orders. |
 | TIMEOUT | Set custom timeout for the APIs requests. |
 | ARE_SUB_BRANDS_INCLUDED | If true will include orders from the `BRAND` sub-brands. Default `false`. |
+| AUTH | Object that receives data for Single Sign On (SSO).|
 
 # Run the example app
 
@@ -437,7 +469,7 @@ This component will first fetch for the Event's data, if data is ok, then will f
 
 ### Password protected event
 
-If the Event's response returns a `401` error, then it means it's password protected and need to authenticate with a password. Then the EnterPassword component will be shown for the user to enter the password.
+If the Event's response returns a `401` error, then it means it's password protected and need to authenticate with a password. Then the `EnterPassword` component will be shown for the user to enter the password.
 
 Import the component from the library.
 
@@ -455,15 +487,7 @@ Then add it to the render function.
 
 ```js
 {
-  eventId: number
-
   // Callbacks for when user taps on GET Tickets button
-  config: {
-    areActivityIndicatorsEnabled?: boolean
-    areAlertsEnabled?: boolean
-    areTicketsSortedBySoldOut?: boolean
-    areTicketsGrouped?: boolean
-  }
   onAddToCartSuccess: (data: {
     isBillingRequired: boolean
     isPhoneRequired?: boolean
@@ -517,7 +541,6 @@ Then add it to the render function.
   onPressMyOrders: () => void
   onPressLogout?: () => void
 
-  // With the following 3 props you can control the visibility of the stock loading indicators and alerts, so you can use your own.
   onLoadingChange?: (isLoading: boolean) => void 
   promoCodeCloseIcon?: ImageSourcePropType
 
@@ -529,6 +552,16 @@ Then add it to the render function.
     apiError?: string
     isLoading?: boolean
   }
+
+  config: {
+    areActivityIndicatorsEnabled?: boolean
+    areAlertsEnabled?: boolean
+    areTicketsSortedBySoldOut?: boolean
+    areTicketsGrouped?: boolean
+  }
+
+  // For SSO
+  isCheckingCurrentSession?: boolean
 }
 ```
 
@@ -2382,7 +2415,8 @@ Wrap your component with the Core component.
 
 # Changelog
 
-## Next
+## Version 1.0.24
+- Add **SingleSignOn** feature.
 - Add show Tickets in groups and the option to sort them by sold out.
 - Add config prop to Tickets component:
 
@@ -2395,10 +2429,10 @@ Wrap your component with the Core component.
     }
 ```
 - Updated Tickets styles prop to include Ticket Section Header.
-- Moved areActivityIndicatorsEnabled and areAlertsEnabled to the config prop.
+- Moved `areActivityIndicatorsEnabled` and `areAlertsEnabled` to the `config` prop.
 - Made TTF Privacy Policy mandatory.
-- Added styles and text for TTF Privacy Policy checkbox.
-- Added Password Protected event feature.
+- Added `styles` and `texts` props for TTF Privacy Policy checkbox.
+- Added **Password Protected** event feature.
 
 ## Version 1.0.23
 - Fix Checkout not allowing free registrations
