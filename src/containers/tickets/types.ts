@@ -57,6 +57,7 @@ export interface ITicketsViewProps {
   isPromoEnabled?: boolean
   isAccessCodeEnabled?: boolean
   isUserLogged?: boolean
+  isCheckingCurrentSession?: boolean
   onPressMyOrders: () => void
   onPressLogout: () => void
 
@@ -150,6 +151,8 @@ export interface ITicketsProps {
   promoCodeCloseIcon?: ImageSourcePropType
 
   config?: ITicketsConfig
+
+  isCheckingCurrentSession?: boolean
 }
 
 export interface IPasswordProtectedEventData {
