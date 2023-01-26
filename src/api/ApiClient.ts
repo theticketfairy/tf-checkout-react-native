@@ -116,7 +116,7 @@ Client.interceptors.response.use(
   },
   async (error: AxiosError) => {
     if (error?.response?.status === 401) {
-      await deleteAllData()
+      error.code = error.code
       error.message = error.response.data.error_description
     } else if (error.message) {
       error.message = error.message
