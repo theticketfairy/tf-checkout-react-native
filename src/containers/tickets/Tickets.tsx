@@ -253,6 +253,8 @@ const Tickets: FC<ITicketsProps> = ({
       )
     }
 
+    eventErrorCodeRef.current = 0
+
     if (!eventData) {
       return onFetchEventError?.({
         message: 'There was an error while fetching event',
@@ -391,6 +393,7 @@ const Tickets: FC<ITicketsProps> = ({
       isPasswordProtected: false,
       message: '',
     })
+    eventErrorCodeRef.current = 0
 
     onFetchEventSuccess?.(eventData!)
     setEvent(eventData)
