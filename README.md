@@ -11,7 +11,7 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 - Suggested ReactNative version `0.66.3`
 - Suggested Flipper version `0.99.0`
 - React version `0.17.1`
-
+- Node version `16.10.0`
 ### Android
 
 - Android 5.0 (API level 21) and above
@@ -99,16 +99,41 @@ Import the function from the library.
 import { setConfig } from 'tf-checkout-react-native'
 ```
 
-Use it in your initial useEffect function:
+Use it in your initial useEffect function, please keep in mind this is an `async` function. It is highly recommended that you track when `setConfig` is finished, and pass that control prop to the Tickets component.
 
 ```ts
-useEffect(() => {
-  setConfig({
-    EVENT_ID: '4344',
-    CLIENT: 'ttf',
-    ENV: 'STAG'
-  })
-}, [])
+
+const YourComponent: FC () => {
+    const [isCheckingCurrentSession, setIsCheckingCurrentSession] = useState(true)
+
+  useEffect(() => {
+    const initConfig = async () => {
+      setIsCheckingCurrentSession(true)
+
+      await setConfig({
+        EVENT_ID: '4344',
+        CLIENT: 'ttf',
+        ENV: 'STAG',
+        CLIENT_ID: '3emd9023349dfn',
+        CLIENT_SECRET: 'CCEw33o4030e4df',
+        AUTH: {
+          ACCESS_TOKEN: 'token393939',
+          REFRESH_TOKEN: 'dee2030edmd',
+          TOKEN_TYPE: 'bearer',
+          SCOPE: 'scope',
+        }
+      })
+
+      setIsCheckingCurrentSession(false)
+    }
+
+    initConfig()
+  }, [])
+
+  return <Tickets 
+    isCheckingCurrentSession 
+  />
+}
 ```
 
 `setConfig` set your event's configuration, with the following options:
@@ -123,6 +148,12 @@ useEffect(() => {
   TIMEOUT?: number,
   BRAND?: string,
   ARE_SUB_BRANDS_INCLUDED?: boolean
+  AUTH?: {
+    ACCESS_TOKEN: string
+    REFRESH_TOKEN: string
+    TOKEN_TYPE: string
+    SCOPE: string
+  }
 }
 ````
 ### Props
@@ -136,6 +167,7 @@ useEffect(() => {
 | BRAND | Set your BRAND so users can only see this brand in their orders. |
 | TIMEOUT | Set custom timeout for the APIs requests. |
 | ARE_SUB_BRANDS_INCLUDED | If true will include orders from the `BRAND` sub-brands. Default `false`. |
+| AUTH | Object that receives data for Single Sign On (SSO).|
 
 # Run the example app
 
@@ -147,13 +179,13 @@ useEffect(() => {
 5. Run `yarn ios` or `npm run ios` to initialize and run in the iPhone simulator.
 6. If running on Android, run `yarn android` or `npm run android` to run it in the Android emulator or connected physical device.
 
-# Features [🚧 WIP 🚧]
+# Features
 
 This library exports the following components:
 
 ### Login
 
-Used to authenticate the user.
+Used to authenticate the user and request password restore.
 
 ### Tickets
 
@@ -186,6 +218,10 @@ Will show the details for the selected Order, it also allows the user to downloa
 ### Tickets Resale
 
 Let the user to resale their tickets. They can choose between selling them to a friend or to any other user.
+
+### Reset Password
+
+After opening and URL with the corresponding schema, use this component to let the user reset its password.
 
 # Component styling
 ### Button
@@ -249,6 +285,8 @@ Depending on your needs, you can use the UI Components or the Core Components.
 
 [Resale](#resale-tickets-ui)
 
+[Reset Password](#reset-password-ui)
+
 ---
 ## Login UI
 
@@ -301,6 +339,12 @@ Then add it to the render function.
   }
   styles?: ILoginViewStyles
   texts?: ILoginViewTexts
+
+  isShowPasswordButtonVisible?: boolean
+
+  //Restore password
+  onRestorePasswordError?: (error: IError) => void
+  onRestorePasswordSuccess?: () => void
 />
 ```
 
@@ -320,6 +364,8 @@ Then add it to the render function.
 |texts?: ILoginViewTexts | Use this to change some texts that appear in this component. |
 |userFirstName?: string | Once authenticated send the received firstName data to this prop, so the component can render the Logged in view. |
 |brandImages?: ILoginBrandImages | Receives up to 2 images with their styles and the container style for the images. |
+| onRestorePasswordError?: (error: string) | When restore password fails will return the error received. |
+| onRestorePasswordSuccess? | Called when restore password request was successful |
 
 ### styles
 
@@ -346,6 +392,33 @@ interface ILoginViewStyles {
     value?: StyleProp<TextStyle>
     button?: IButtonStyles
     message?: StyleProp<TextStyle>
+  }
+  restorePassword?: {
+    rootContainer?: StyleProp<ViewStyle>
+    restorePasswordButton?: {
+      container?: StyleProp<ViewStyle>
+      button?: StyleProp<ViewStyle>
+      text?: StyleProp<TextStyle>
+    }
+    cancelRestorePasswordButton?: {
+      container?: StyleProp<ViewStyle>
+      button?: StyleProp<ViewStyle>
+      text?: StyleProp<TextStyle>
+    }
+    input?: IInputStyles
+    title?: StyleProp<TextStyle>
+    message?: StyleProp<TextStyle>
+    apiError?: StyleProp<TextStyle>
+  }
+  restorePasswordSuccess?: {
+    rootContainer?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+    message?: StyleProp<TextStyle>
+    button?: {
+      container?: StyleProp<ViewStyle>
+      button?: StyleProp<ViewStyle>
+      text?: StyleProp<TextStyle>
+    }
   }
 }
 ```
@@ -375,12 +448,30 @@ interface ILoginViewStyles {
     loggedAs?: string
     notYou?: string
   }
-
+  restorePassword?: {
+    restorePasswordButton?: string
+    cancelButton?: string
+    message?: string
+    inputLabel?: string
+    title?: string
+  }
+  restorePasswordSuccess?: {
+    title?: string
+    message?: string
+    button?: string
+  }
+}
 ```
 ---
 ## Tickets UI 
 
-Import the component from the library
+This component will first fetch for the Event's data, if data is ok, then will fetch the tickets for this event. 
+
+### Password protected event
+
+If the Event's response returns a `401` error, then it means it's password protected and need to authenticate with a password. Then the `EnterPassword` component will be shown for the user to enter the password.
+
+Import the component from the library.
 
 ```js
 import { Tickets } from 'tf-checkout-react-native'
@@ -396,8 +487,6 @@ Then add it to the render function.
 
 ```js
 {
-  eventId: number
-
   // Callbacks for when user taps on GET Tickets button
   onAddToCartSuccess: (data: {
     isBillingRequired: boolean
@@ -452,12 +541,27 @@ Then add it to the render function.
   onPressMyOrders: () => void
   onPressLogout?: () => void
 
-  // With the following 3 props you can control the visibility of the stock loading indicators and alerts, so you can use your own.
-  onLoadingChange?: (isLoading: boolean) => void
-  areAlertsEnabled?: boolean
-  areLoadingIndicatorsEnabled?: boolean
-  
+  onLoadingChange?: (isLoading: boolean) => void 
   promoCodeCloseIcon?: ImageSourcePropType
+
+  // Event password protected
+  onPressSubmitEventPassword?: (password: string) => void
+  passwordProtectedEventData?: {
+    isPasswordProtected?: boolean
+    message?: string
+    apiError?: string
+    isLoading?: boolean
+  }
+
+  config: {
+    areActivityIndicatorsEnabled?: boolean
+    areAlertsEnabled?: boolean
+    areTicketsSortedBySoldOut?: boolean
+    areTicketsGrouped?: boolean
+  }
+
+  // For SSO
+  isCheckingCurrentSession?: boolean
 }
 ```
 
@@ -487,8 +591,8 @@ You can then call the `BillingInfo` component and pass them as props in the `car
   getTicketsButtonDisabled?: IButtonStyles
   getTicketsButtonActive?: IButtonStyles
   promoCode?: {
-    rootContainer?: StyleProp<ViewStyle>
-    contentWrapper?: StyleProp<ViewStyle>
+    rootContainer?: ViewStyle
+    contentWrapper?: ViewStyle
     content?: StyleProp<ViewStyle>
     input?: TextInputProps['style']
     inputPlaceholderColor?: string
@@ -504,6 +608,10 @@ You can then call the `BillingInfo` component and pass them as props in the `car
     cancelIcon?: StyleProp<ImageStyle>
   }
   ticketList?: {
+    sectionHeader?: {
+      container?: StyleProp<ViewStyle>
+      title?: StyleProp<TextStyle>
+    }
     listContainer?: ViewStyle
     item?: {
       container?: ViewStyle
@@ -541,6 +649,14 @@ You can then call the `BillingInfo` component and pass them as props in the `car
     rootContainer?: StyleProp<ViewStyle>
     myOrdersButton?: IButtonStyles
     logOutButton?: IButtonStyles
+  }
+  enterPassword?: {
+    input?: IInputStyles
+    title?: StyleProp<TextStyle>
+    error?: StyleProp<TextStyle>
+    button?: IButtonStyles
+    rootContainer?: StyleProp<ViewStyle>
+    contentContainer?: StyleProp<ViewStyle>
   }
 }
 ```
@@ -585,6 +701,11 @@ You can then call the `BillingInfo` component and pass them as props in the `car
     exclFees?: string
     free?: string
     ticket?: string
+  }
+  enterPassword?: {
+    inputLabel?: string
+    title?: string
+    buttonText?: string
   }
 }
 ```
@@ -718,9 +839,10 @@ interface IBillingInfoViewTexts {
       label?: string
       customError?: string
     }
-    cartTimer?: {
-      message?: string
-    }
+    ttfPrivacyPolicyRequiredError?: string
+  }
+  cartTimer?: {
+    message?: string
   }
 }
 ```
@@ -753,7 +875,17 @@ interface IBillingInfoViewStyles {
     }
     input?: IInputStyles
   }
-  checkboxStyles?: ICheckboxStyles
+  
+  checkboxStyles?: {
+    container?: StyleProp<ViewStyle>
+    content?: StyleProp<ViewStyle>
+    indicator?: StyleProp<ViewStyle>
+    indicatorDisabled?: StyleProp<ViewStyle>
+    text?: StyleProp<TextStyle>
+    box?: StyleProp<ViewStyle>
+    icon?: StyleProp<ImageStyle>
+    error?: StyleProp<TextStyle>
+  }
 
   screenTitle?: StyleProp<TextStyle>
   ticketHoldersTitle?: StyleProp<TextStyle>
@@ -784,6 +916,8 @@ interface IBillingInfoViewStyles {
     message?: StyleProp<TextStyle>
     time?: StyleProp<TextStyle>
   }
+
+  privacyPolicyLinkStyle?: StyleProp<TextStyle>
 }
 ```
 ---
@@ -1369,7 +1503,64 @@ import { ResaleTickets } from 'tf-checkout-react-native'
 }
 ```
 
+## Reset Password UI
 
+After opening and URL with the corresponding schema and token, use this component to let the user reset its password.
+
+### Usage
+Import the component from the library.
+```ts
+import { ResetPassword } from 'tf-checkout-react-native'
+```
+
+Then add it to the render function.
+
+```xml
+<ResetPassword
+  styles={myStyles}
+  token={resetToken}
+  onPressResetButton={handleOnPressResetButton}
+  onPressCancelButton={handleOnPressCancelButton}
+  onResetPasswordSuccess={handleOnResetPasswordSuccess}
+  onResetPasswordError={handleOnResetPasswordError}
+/>
+```
+
+### Props
+
+```ts
+{
+  token: string
+  styles?: {
+    rootContainer?: StyleProp<ViewStyle>
+    contentContainer?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+    resetButton?: IButtonStyles
+    cancelButton?: IButtonStyles
+    input?: IInputStyles
+    apiError?: StyleProp<TextStyle>
+    apiSuccess?: StyleProp<TextStyle>
+  }
+  texts?: {
+    title?: string
+    resetButton?: string
+    cancelButton?: string
+    newPasswordLabel?: string
+    confirmNewPasswordLabel?: string
+  }
+  onResetPasswordSuccess?: (data: { 
+    message: string
+    status?: number
+    }) => void
+  onResetPasswordError?: (error: {
+    code?: number
+    message: string
+    extraData?: any
+  }) => void
+  onPressResetButton?: () => void
+  onPressCancelButton?: () => void
+}
+```
 
 
 # Core Components
@@ -1393,6 +1584,8 @@ import { ResaleTickets } from 'tf-checkout-react-native'
 [OrderDetailsCore](#orderdetailscore)
 
 [LoginCore](#logincore)
+
+[ResetPasswordCore](#resetpasswordcore)
  
 ---
 
@@ -1608,6 +1801,7 @@ const handleGetTickets = async () => {
 }
 
 ```
+---
 
 ## WaitingListCore
 This component *must* appear after getting the response from **getTickets()** and the property `isInWaitingList` is set to true.
@@ -1692,6 +1886,7 @@ const handleAddToWaitingList = async (params: IAddToWaitingListCoreParams) => {
   const res = await waitingListCoreRef.current.addToWaitingList(params)
 }
 ```
+---
 
 ## BillingCore
 This component collects user's billing information and checks the order out. If the entered user data is already in the system it will perform checkout, other wise it will perform a registration and then the checkout.
@@ -1810,6 +2005,7 @@ Exposes the following functions:
 }
 
 ```
+---
 
 ## CheckoutCore
 Shows the event conditions, purchase details and process the payment and free registration to an event.
@@ -1936,7 +2132,7 @@ freeRegistration(orderHash: string): Promise<{
 // Payment success.
 paymentSuccess(orderHash: string): Promise<any>
 ```
-
+---
 ## PurchaseConfirmationCore
 Shows the purchase confirmation information.
 
@@ -1982,7 +2178,7 @@ getPurchaseConfirmation(
     }
   }>
 ```
-
+---
 ## MyOrdersCore
 Shows the purchased orders from the user. It can also show the sub-brands if the `ARE_SUB_BRANDS_INCLUDED` was set to true and the `BRAND` was set to an existing brand. 
 
@@ -2062,7 +2258,7 @@ getOrderDetails(orderId: string): Promise<{
   }
 }>
 ```
-
+---
 ## OrderDetailsCore
 Allows to re-sale the tickets or to remove them from the re-sale system.
 
@@ -2130,7 +2326,7 @@ resaleTicket(
       }
   }>
 ```
-
+---
 ## LoginCore
 Handles the login and logout process.
 
@@ -2169,13 +2365,75 @@ login(fields?: {
 
 logout(): Promise<void>
 ```
+---
+## ResetPasswordCore
+Will allow the user to reset its password.
 
+Exposes the following function: 
+
+`postResetPassword` Sends the reset token and the new password values.
+
+postResetPassword parameters: 
+```
+  token: string,
+  password: string,
+  password_confirmation: string,
+```
+postResetPassword returning data:
+
+```ts
+{
+  data?: {
+    message: string
+    status?: number
+  }
+  error?: {  
+    code?: number
+    message: string
+    extraData?: any
+  }
+}
+```
+
+### Usage
+Import it from the library.
+
+```ts
+import { ResetPasswordCore, ResetPasswordCoreHandle } from 'tf-checkout-react-native'
+```
+Wrap your component with the Core component.
+
+```xml
+<ResetPasswordCore ref={resetPasswordCoreRef}>
+  {yourComponent}
+</ResetPasswordCore>
+```
 
 # Utils
 
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+
+## Version 1.0.24
+- Add **SingleSignOn** feature.
+- Add show Tickets in groups and the option to sort them by sold out.
+- Add config prop to Tickets component:
+
+```
+    config: {
+      areActivityIndicatorsEnabled?: boolean
+      areAlertsEnabled?: boolean
+      areTicketsSortedBySoldOut?: boolean
+      areTicketsGrouped?: boolean
+    }
+```
+- Updated Tickets styles prop to include Ticket Section Header.
+- Moved `areActivityIndicatorsEnabled` and `areAlertsEnabled` to the `config` prop.
+- Made TTF Privacy Policy mandatory.
+- Added `styles` and `texts` props for TTF Privacy Policy checkbox.
+- Added **Password Protected** event feature.
+
 ## Version 1.0.23
 - Fix Checkout not allowing free registrations
 

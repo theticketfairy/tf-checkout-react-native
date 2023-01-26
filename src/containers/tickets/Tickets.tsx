@@ -4,13 +4,13 @@ import _some from 'lodash/some'
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
-import {
-  IEventResponse,
-  IFetchTicketsResponse,
-  IPromoCodeResponse,
-} from '../../api/types'
+import { IEventResponse, IPromoCodeResponse } from '../../api/types'
 import { TicketsCore, TicketsCoreHandle } from '../../core'
-import { IBookTicketsOptions } from '../../core/TicketsCore/TicketsCoreTypes'
+import {
+  IBookTicketsOptions,
+  IGetTicketsPayload,
+  IGroupedTickets,
+} from '../../core/TicketsCore/TicketsCoreTypes'
 import {
   IAddToCartResponse,
   IEvent,
@@ -19,7 +19,7 @@ import {
   ITicket,
 } from '../../types'
 import TicketsView from './TicketsView'
-import { ITicketsProps } from './types'
+import { IPasswordProtectedEventData, ITicketsProps } from './types'
 
 const Tickets: FC<ITicketsProps> = ({
   onAddToCartSuccess,
@@ -34,19 +34,26 @@ const Tickets: FC<ITicketsProps> = ({
   onFetchTicketsSuccess,
   onFetchEventError,
   onLoadingChange,
-  areAlertsEnabled = true,
-  areLoadingIndicatorsEnabled = true,
   onFetchEventSuccess,
   onAddToWaitingListError,
   onAddToWaitingListSuccess,
   promoCodeCloseIcon,
+  isCheckingCurrentSession,
+  config = {
+    areTicketsGrouped: true,
+    areActivityIndicatorsEnabled: true,
+    areAlertsEnabled: true,
+    areTicketsSortedBySoldOut: true,
+  },
 }) => {
   const [isUserLogged, setIsUserLogged] = useState(false)
   const [isGettingTickets, setIsGettingTickets] = useState(false)
   const [isGettingEvent, setIsGettingEvent] = useState(false)
   const [event, setEvent] = useState<IEvent>()
   const [isBooking, setIsBooking] = useState(false)
+  const [areTicketGroupsShown, setAreTicketGroupsShown] = useState(false)
   const [tickets, setTickets] = useState<ITicket[]>([])
+  const [groupedTickets, setGroupedTickets] = useState<IGroupedTickets[]>([])
   const [isWaitingListVisible, setIsWaitingListVisible] = useState(false)
   const [isAccessCode, setIsAccessCode] = useState(false)
   const [selectedTicket, setSelectedTicket] = useState<ISelectedTicket>()
@@ -54,25 +61,53 @@ const Tickets: FC<ITicketsProps> = ({
     IPromoCodeResponse | undefined
   >(undefined)
   const [isFirstCall, setIsFirstCall] = useState(true)
+  const [passwordProtectedEventData, setPasswordProtectedEventData] = useState<
+    IPasswordProtectedEventData | undefined
+  >()
 
   //#region Refs
   const eventErrorCodeRef = useRef(0)
   const ticketsCoreRef = useRef<TicketsCoreHandle>(null)
   const isApiErrorRef = useRef<boolean>(false)
-  //#endregion
+  //#endregion Refs
 
   const showAlert = (message: string) => {
-    if (areAlertsEnabled) {
+    if (config.areAlertsEnabled) {
       Alert.alert('', message)
     }
   }
 
-  const isTicketOnSale = _some(
-    tickets,
-    (item) => item.salesStarted && !item.salesEnded && !item.soldOut
-  )
+  const isTicketOnSale = (ticketsForCheck: ITicket[]) =>
+    _some(
+      ticketsForCheck,
+      (item: ITicket) => item.salesStarted && !item.salesEnded && !item.soldOut
+    )
 
-  //#region Api calls
+  const areTicketsOnSale = (): boolean => {
+    if (event?.salesEnded) {
+      return false
+    }
+
+    if (
+      config.areTicketsGrouped &&
+      areTicketGroupsShown &&
+      groupedTickets.length === 0
+    ) {
+      return false
+    }
+
+    if (!config.areTicketsGrouped && tickets.length === 0) {
+      return false
+    }
+
+    if (config.areTicketsGrouped) {
+      return _some(groupedTickets, (gTicket) => isTicketOnSale(gTicket.data))
+    } else {
+      return isTicketOnSale(tickets)
+    }
+  }
+
+  //#region Core Api calls
   const retrieveStoredAccessToken = async () => {
     if (!ticketsCoreRef.current) {
       return { eventError: { message: 'Ticket core is not initialized' } }
@@ -83,12 +118,26 @@ const Tickets: FC<ITicketsProps> = ({
 
   const getTicketsCore = async (
     promoCode?: string
-  ): Promise<IFetchTicketsResponse> => {
+  ): Promise<IGetTicketsPayload> => {
     if (!ticketsCoreRef.current) {
       return { error: { message: 'Ticket core is not initialized' } }
     }
 
-    return await ticketsCoreRef.current.getTickets(promoCode)
+    return await ticketsCoreRef.current.getTickets({
+      promoCode,
+      areTicketsSortedBySoldOut: config.areTicketsSortedBySoldOut,
+      areTicketsGrouped: config.areTicketsGrouped,
+    })
+  }
+
+  const unlockPasswordProtectedEventCore = async (
+    password: string
+  ): Promise<IEventResponse> => {
+    if (!ticketsCoreRef.current) {
+      return { eventError: { message: 'Ticket core is not initialized' } }
+    }
+
+    return await ticketsCoreRef.current.unlockPasswordProtectedEvent(password)
   }
 
   const getEventCore = async (): Promise<IEventResponse> => {
@@ -108,7 +157,9 @@ const Tickets: FC<ITicketsProps> = ({
 
     return await ticketsCoreRef.current.addToCart(data)
   }
+  //#endregion Core Api calls
 
+  //#region Api Calls
   const getTickets = async (promoCode: string = '') => {
     setIsGettingTickets(true)
     isApiErrorRef.current = false
@@ -118,6 +169,7 @@ const Tickets: FC<ITicketsProps> = ({
       promoCodeResult,
       isInWaitingList,
       isAccessCodeRequired,
+      areGroupsShown,
     } = await getTicketsCore(promoCode)
     setIsGettingTickets(false)
 
@@ -129,9 +181,18 @@ const Tickets: FC<ITicketsProps> = ({
 
     setIsWaitingListVisible(!!isInWaitingList)
     setIsAccessCode(!!isAccessCodeRequired)
+    setAreTicketGroupsShown(areGroupsShown || false)
 
     if (responseTickets && !_isEmpty(responseTickets)) {
-      setTickets(responseTickets)
+      if (config.areTicketsGrouped) {
+        if (areGroupsShown) {
+          setGroupedTickets(responseTickets as IGroupedTickets[])
+        } else {
+          setTickets(responseTickets as ITicket[])
+        }
+      } else {
+        setTickets(responseTickets as ITicket[])
+      }
 
       if (isFirstCall && promoCodeResult?.isValid) {
         setPromoCodeResponse(promoCodeResult)
@@ -147,6 +208,7 @@ const Tickets: FC<ITicketsProps> = ({
         tickets: responseTickets,
         isInWaitingList,
         isAccessCodeRequired,
+        areTicketsGroupsShown: areGroupsShown,
       }
 
       onFetchTicketsSuccess?.(onFetchTicketsData)
@@ -178,17 +240,28 @@ const Tickets: FC<ITicketsProps> = ({
 
     if (eventError) {
       eventErrorCodeRef.current = eventError.code || 400
-      showAlert(eventError.message)
+      if (eventError.code === 401) {
+        setPasswordProtectedEventData({
+          isPasswordProtected: true,
+          message: eventError.message,
+        })
+      } else {
+        showAlert(eventError.message)
+      }
       return onFetchEventError?.(
         eventError || { message: 'There was an error while fetching event' }
       )
     }
+
+    eventErrorCodeRef.current = 0
 
     if (!eventData) {
       return onFetchEventError?.({
         message: 'There was an error while fetching event',
       })
     }
+
+    await getTickets()
 
     onFetchEventSuccess?.(eventData)
     setEvent(eventData)
@@ -227,7 +300,7 @@ const Tickets: FC<ITicketsProps> = ({
       return onAddToCartError?.(addToCartError)
     }
   }
-  //#endregion
+  //#endregion Api Calls
 
   const onLoadingChangeCallback = useCallback(
     (loading: boolean) => {
@@ -250,12 +323,13 @@ const Tickets: FC<ITicketsProps> = ({
   useEffect(() => {
     const fetchInitialData = async () => {
       await retrieveStoredAccessToken()
-      await getTickets()
       await getEventData()
     }
-    fetchInitialData()
+    if (!isCheckingCurrentSession && isFirstCall) {
+      fetchInitialData()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isCheckingCurrentSession])
   //#endregion
 
   //#region Handlers
@@ -286,15 +360,44 @@ const Tickets: FC<ITicketsProps> = ({
     await ticketsCoreRef.current.logout()
     setIsUserLogged(false)
 
-    await getTickets()
     await getEventData()
-    if (onPressLogout) {
-      onPressLogout()
-    }
+    onPressLogout?.()
   }
 
   const handleOnLoadingChange = (loading: boolean) => {
     onLoadingChangeCallback(loading)
+  }
+
+  const handleOnSubmitEventPassword = async (password: string) => {
+    setPasswordProtectedEventData({
+      ...passwordProtectedEventData,
+      isLoading: true,
+    })
+
+    const { eventData, eventError } = await unlockPasswordProtectedEventCore(
+      password
+    )
+
+    if (eventError) {
+      return setPasswordProtectedEventData({
+        ...passwordProtectedEventData,
+        isLoading: false,
+        apiError: eventError.message,
+      })
+    }
+
+    setPasswordProtectedEventData({
+      ...passwordProtectedEventData,
+      isLoading: false,
+      apiError: '',
+      isPasswordProtected: false,
+      message: '',
+    })
+    eventErrorCodeRef.current = 0
+
+    onFetchEventSuccess?.(eventData!)
+    setEvent(eventData)
+    getTickets()
   }
   //#endregion
 
@@ -303,6 +406,7 @@ const Tickets: FC<ITicketsProps> = ({
       <TicketsView
         isGettingTickets={isGettingTickets}
         tickets={tickets}
+        groupedTickets={groupedTickets}
         onPressGetTickets={handleOnPressGetTickets}
         onPressApplyPromoCode={handleOnPressApplyPromoCode}
         promoCodeValidationMessage={promoCodeResponse?.message}
@@ -315,17 +419,21 @@ const Tickets: FC<ITicketsProps> = ({
         texts={texts}
         event={event}
         isWaitingListVisible={isWaitingListVisible}
-        isGetTicketsButtonVisible={isTicketOnSale || !event?.salesEnded}
+        isGetTicketsButtonVisible={areTicketsOnSale()}
         isAccessCodeEnabled={isAccessCodeEnabled || isAccessCode}
         isPromoEnabled={isPromoEnabled}
         isUserLogged={isUserLogged}
         onPressMyOrders={onPressMyOrders}
         onPressLogout={handleOnLogout}
-        areLoadingIndicatorsEnabled={areLoadingIndicatorsEnabled}
+        areLoadingIndicatorsEnabled={config.areActivityIndicatorsEnabled}
         onAddToWaitingListError={onAddToWaitingListError}
         onAddToWaitingListSuccess={onAddToWaitingListSuccess}
         onLoadingChange={handleOnLoadingChange}
         promoCodeCloseIcon={promoCodeCloseIcon}
+        areTicketsGroupsShown={areTicketGroupsShown}
+        passwordProtectedEventData={passwordProtectedEventData}
+        onPressSubmitEventPassword={handleOnSubmitEventPassword}
+        isCheckingCurrentSession={isCheckingCurrentSession}
       />
     </TicketsCore>
   )

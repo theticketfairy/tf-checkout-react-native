@@ -3,8 +3,16 @@ import _forEach from 'lodash/forEach'
 import { Client } from '../api/ApiClient'
 import Constants from '../api/Constants'
 import { getDomainByClientAndEnv } from './Domains'
+import { LocalStorageKeys, storeData } from './LocalStorage'
 
 export type EnvType = 'PROD' | 'DEV' | 'STAG'
+
+export interface IConfigAuth {
+  ACCESS_TOKEN: string
+  REFRESH_TOKEN: string
+  TOKEN_TYPE: string
+  SCOPE: string
+}
 
 export interface IConfig {
   EVENT_ID: string | number
@@ -15,13 +23,16 @@ export interface IConfig {
   TIMEOUT?: number
   BRAND?: string
   ARE_SUB_BRANDS_INCLUDED?: boolean
+  AUTH?: IConfigAuth
 
-  [key: string]: string | number | boolean | undefined
+  [key: string]: string | number | boolean | undefined | IConfigAuth
 }
 
 export const Config: IConfig = {} as IConfig
 
-export const setConfig = (configs: IConfig): string | undefined => {
+export const setConfig = async (
+  configs: IConfig
+): Promise<string | undefined> => {
   _forEach(configs, (value, key) => {
     Config[key] = value
   })
@@ -58,6 +69,17 @@ export const setConfig = (configs: IConfig): string | undefined => {
   }
 
   Config.IS_BILLING_STREET_NAME_REQUIRED = true
+
+  if (Config.AUTH) {
+    await storeData(LocalStorageKeys.ACCESS_TOKEN, Config.AUTH.ACCESS_TOKEN)
+    await storeData(
+      LocalStorageKeys.AUTH_TOKEN_TYPE,
+      Config.AUTH.TOKEN_TYPE || 'Bearer'
+    )
+    await storeData(LocalStorageKeys.AUTH_SCOPE, Config.AUTH.SCOPE)
+    await storeData(LocalStorageKeys.REFRESH_TOKEN, Config.AUTH.REFRESH_TOKEN)
+    Client.setAccessToken(Config.AUTH.ACCESS_TOKEN)
+  }
 
   return undefined
 }

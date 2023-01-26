@@ -1,4 +1,5 @@
 import { IDropdownItem } from '../components/dropdown/types'
+import { TicketsType } from '../core/TicketsCore/TicketsCoreTypes'
 import { IError } from './IError'
 
 export interface ITicket {
@@ -40,6 +41,7 @@ export interface ITicket {
   oldPrice?: number
   oldBasePrice?: number
   descriptionRich?: string
+  groupName?: string
 }
 
 export interface ISelectedTicket extends ITicket {
@@ -60,11 +62,12 @@ export interface IAddToCartResponse {
 }
 
 export interface IOnFetchTicketsSuccess {
-  tickets: ITicket[]
+  tickets: TicketsType
   promoCodeResponse: {
     success?: boolean
     message?: string
   }
   isInWaitingList?: boolean
   isAccessCodeRequired?: boolean
+  areTicketsGroupsShown?: boolean
 }

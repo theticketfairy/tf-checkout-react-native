@@ -56,6 +56,10 @@ import {
   IRemoveTicketFromResaleResponse,
   IResaleTicketData,
   IResaleTicketResponse,
+  IResetPasswordRequestData,
+  IResetPasswordResponse,
+  IRestorePasswordData,
+  IRestorePasswordResponse,
   IStatesResponse,
   IUserProfileResponse,
 } from './types'
@@ -77,11 +81,13 @@ axiosRetry(Client, { retries: 3 })
 Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
   const guestToken = await getData(LocalStorageKeys.AUTH_GUEST_TOKEN)
   const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
+  const storedTokenType = await getData(LocalStorageKeys.AUTH_TOKEN_TYPE)
+  const tokenType = storedTokenType || 'Bearer'
 
   if (accessToken) {
     const updatedHeaders = {
       ...config.headers,
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `${tokenType} ${accessToken}`,
     }
     config.headers = updatedHeaders
   }
@@ -112,7 +118,7 @@ Client.interceptors.response.use(
   },
   async (error: AxiosError) => {
     if (error?.response?.status === 401) {
-      await deleteAllData()
+      error.code = error.code
       error.message = error.response.data.error_description
     } else if (error.message) {
       error.message = error.message
@@ -500,6 +506,7 @@ export const fetchTickets = async (
     isAccessCodeRequired: _get(response, 'data.data.attributes.is_access_code'),
   }
 }
+//#endregion Tickets
 
 export const addToCart = async (
   data: IAddToCartParams
@@ -611,7 +618,50 @@ export const postReferralVisit = async (
     postReferralError: responseError,
   }
 }
-//#endregion
+//#region Unlock Password Protected Event
+export const unlockPasswordProtectedEvent = async (
+  password: string
+): Promise<IEventResponse> => {
+  const eventId = Config.EVENT_ID.toString()
+  let responseError: IError | undefined
+  let responseData: any | undefined
+
+  const body = {
+    attributes: {
+      data: {
+        password: password,
+      },
+    },
+  }
+
+  const response: AxiosResponse | void = await Client.post(
+    `v1/event/${eventId}/authenticate`,
+    body
+  ).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message || 'Error while unlocking Event',
+      code: error?.response?.status,
+    }
+  })
+
+  if (response?.data) {
+    responseData = {
+      message: response.data.message,
+      status: response.data.status,
+    }
+
+    const guestHeaderValue = _get(response, 'headers.authorization-guest')
+    if (guestHeaderValue) {
+      setCustomHeader(response)
+    }
+  }
+
+  return {
+    eventData: responseData,
+    eventError: responseError,
+  }
+}
+//#endregion Unlock Password Protected Event
 
 //#region Billing Information
 export const fetchCountries = async (): Promise<ICountriesResponse> => {
@@ -1015,3 +1065,67 @@ export const closeSession = async (): Promise<ICloseSessionResponse> => {
   }
 }
 //endregion Logout
+
+//#region Restore Password
+export const requestRestorePassword = async (
+  email: string
+): Promise<IRestorePasswordResponse> => {
+  let responseError: IError | undefined
+  let successData: IRestorePasswordData | undefined
+
+  const response: AxiosResponse | void = await Client.post(
+    `v1/oauth/restore-password-rn`,
+    {
+      email: email,
+    }
+  ).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message || 'Error while restoring password',
+      code: error.response?.status,
+    }
+  })
+
+  if (!responseError && response?.status === 200) {
+    successData = {
+      message: response.data.message,
+      status: response.data.status,
+    }
+  }
+
+  return {
+    data: successData,
+    error: responseError,
+  }
+}
+//#endregion
+
+//#region Request Password
+export const requestResetPassword = async (
+  data: IResetPasswordRequestData
+): Promise<IResetPasswordResponse> => {
+  let responseError: IError | undefined
+  let responseData: any | undefined
+
+  const response: AxiosResponse | void = await Client.post(
+    `/auth/reset-password`,
+    data
+  ).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message || 'Reset password error',
+      code: error.response?.data.status,
+    }
+  })
+
+  if (!responseError && response?.status === 200) {
+    responseData = {
+      message: response.data.message,
+      status: response.status,
+    }
+  }
+
+  return {
+    error: responseError,
+    data: responseData,
+  }
+}
+//#endregion Request Password

@@ -1,7 +1,17 @@
-import { ImageSourcePropType, TextStyle, ViewStyle } from 'react-native'
+import {
+  ImageSourcePropType,
+  ImageStyle,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 
 import { IEventData } from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
+import {
+  IEnterPasswordStyles,
+  IEnterPasswordTexts,
+} from '../../components/enterPassword/types'
 import { ILoadingStyles } from '../../components/loading/types'
 import {
   ILoggedInStyles,
@@ -15,6 +25,7 @@ import {
   IWaitingListStyles,
   IWaitingListTexts,
 } from '../../components/waitingList/types'
+import { IGroupedTickets } from '../../core/TicketsCore/TicketsCoreTypes'
 import {
   IEvent,
   IOnFetchTicketsSuccess,
@@ -30,6 +41,8 @@ export interface ITicketsViewProps {
   isBookingTickets?: boolean
   isGettingEvent?: boolean
   tickets: ITicket[]
+  groupedTickets: IGroupedTickets[]
+  areTicketsGroupsShown?: boolean
   styles?: ITicketsViewStyles
   onPressGetTickets: () => void
   onPressApplyPromoCode: (promoCode: string) => void
@@ -44,6 +57,7 @@ export interface ITicketsViewProps {
   isPromoEnabled?: boolean
   isAccessCodeEnabled?: boolean
   isUserLogged?: boolean
+  isCheckingCurrentSession?: boolean
   onPressMyOrders: () => void
   onPressLogout: () => void
 
@@ -55,11 +69,19 @@ export interface ITicketsViewProps {
   onAddToWaitingListError?: (error: IError) => void
   onLoadingChange?: (isLoading: boolean) => void
   promoCodeCloseIcon?: ImageSourcePropType
+
+  // Event password protected
+  onPressSubmitEventPassword?: (password: string) => void
+  passwordProtectedEventData?: IPasswordProtectedEventData
 }
 
 export interface ITicketListStyles {
   listContainer?: ViewStyle
   item?: ITicketListItemStyles
+  sectionHeader?: {
+    container?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+  }
 }
 
 export interface ITicketsViewStyles {
@@ -73,6 +95,8 @@ export interface ITicketsViewStyles {
   loading?: ILoadingStyles
   waitingList?: IWaitingListStyles
   loggedIn?: ILoggedInStyles
+  enterPassword?: IEnterPasswordStyles
+  showPasswordIcon?: StyleProp<ImageStyle>
 }
 
 export interface ITicketsViewTexts {
@@ -81,9 +105,16 @@ export interface ITicketsViewTexts {
   title?: string
   item?: ITicketListItemTexts
   loggedInTexts?: ILoggedInTexts
-
   listItem?: ITicketListItemTexts
   waitingList?: IWaitingListTexts
+  enterPassword?: IEnterPasswordTexts
+}
+
+export interface ITicketsConfig {
+  areActivityIndicatorsEnabled?: boolean
+  areAlertsEnabled?: boolean
+  areTicketsSortedBySoldOut?: boolean
+  areTicketsGrouped?: boolean
 }
 
 export interface ITicketsProps {
@@ -99,6 +130,10 @@ export interface ITicketsProps {
   onFetchEventError?: (error: IError) => void
   onFetchEventSuccess?: (data: IEventData) => void
 
+  // Callbacks for fetching Password Protected Event
+  onUnlockPasswordProtectedEventError?: (error: IError) => void
+  onUnlockPasswordProtectedEventSuccess?: (data: IEventData) => void
+
   // Callbacks for Waiting list
   onAddToWaitingListSuccess?: () => void
   onAddToWaitingListError?: (error: IError) => void
@@ -112,10 +147,17 @@ export interface ITicketsProps {
   onPressMyOrders: () => void
   onPressLogout?: () => void
 
-  // With the following 3 props you can control the visibility of the stock loading indicators and alerts, so you can use your own.
   onLoadingChange?: (isLoading: boolean) => void
-  areAlertsEnabled?: boolean
-  areLoadingIndicatorsEnabled?: boolean
-
   promoCodeCloseIcon?: ImageSourcePropType
+
+  config?: ITicketsConfig
+
+  isCheckingCurrentSession?: boolean
+}
+
+export interface IPasswordProtectedEventData {
+  isPasswordProtected?: boolean
+  message?: string
+  apiError?: string
+  isLoading?: boolean
 }

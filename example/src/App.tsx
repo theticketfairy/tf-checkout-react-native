@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import React, { useEffect, useState } from 'react'
-import { Alert, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
   IMyOrderDetailsData,
@@ -14,6 +14,7 @@ import {
   ITicketsResponseData,
   SkippingStatusType,
   ResaleTickets,
+  ResetPassword
 } from 'tf-checkout-react-native'
 import { IMyOrderDetailsTicket } from '../../src/api/types'
 import { IConfig } from '../../src/helpers/Config'
@@ -25,7 +26,12 @@ import styles from './styles'
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
 
-const EVENT_ID = 13066
+
+interface IDeepLinkUrl {
+  url: string
+}
+
+const EVENT_ID = 13090
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
@@ -40,6 +46,7 @@ const config: IConfig = {
 // the-ticket-fairy
 
 const App = () => {
+  const resetPasswordTokenRef = useRef('')
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
     ComponentEnum.Tickets
   )
@@ -48,9 +55,9 @@ const App = () => {
   )
 
   //#region Loadings
+  const [isCheckingCurrentSession, setIsCheckingCurrentSession] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [skippingStatus, setSkippingStatus] = useState<SkippingStatusType>(undefined)
-
 
   const [checkoutProps, setCheckOutProps] = useState<
     IOnCheckoutSuccess | undefined
@@ -74,7 +81,6 @@ const App = () => {
     setIsTicketToSellActive(isActive)
     setComponentToShow(ComponentEnum.ResaleTickets)
   }
-
 
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
     setCartProps(data)
@@ -130,12 +136,47 @@ const App = () => {
     setSkippingStatus(undefined)
     setCartProps(undefined)
   }
+
   //#endregion
+  const handleOpenUrl = ({url}: IDeepLinkUrl) =>{
+    const splitted = url.split("token=")
+    if (splitted.length <= 1) {
+      return 
+    }
+
+    if (splitted[1])  {
+      resetPasswordTokenRef.current = splitted[1] 
+      setComponentToShow(ComponentEnum.ResetPassword)
+    }
+    
+  }
+
+  const getInitialURL = async () => { 
+    const initialUrl = await Linking.getInitialURL();
+      if (initialUrl === null) {
+        return;
+      }
+
+      return initialUrl
+  }
 
   //#region effects
   useEffect(() => {
-    setConfig(config)
+
+    const setConfigAsync = async () => {
+      setIsCheckingCurrentSession(true)
+      await setConfig(config)
+      setIsCheckingCurrentSession(false)
+    }
+
+    setConfigAsync()
+    Linking.addEventListener('url', handleOpenUrl)
+
+    return () => {
+      Linking.removeAllListeners('url')
+    }
   }, [])
+
   useEffect(() => {
     if (cartProps) {
       setComponentToShow(ComponentEnum.BillingInfo)
@@ -217,6 +258,7 @@ const App = () => {
                 choosePassword: '_Choose password_',
                 fillAllRequiredFieldsAlert: '_Fill all required fields_',
                 optional: '(_Optional_)',
+                ttfPrivacyPolicyRequiredError: '* Required'
               },
               checkoutButton: '_Checkout_',
               loginTexts:{
@@ -308,6 +350,11 @@ const App = () => {
                 icon: {
                   tintColor: Color.validationGreen,
                 },
+                error: {
+                  color: Color.danger, 
+                  marginTop: 8,
+                  marginLeft: 40,
+                }
               },
 
               checkoutButton: {
@@ -867,6 +914,38 @@ const App = () => {
           </View>
         )
 
+        case ComponentEnum.ResetPassword:
+          return (
+            <View style={{ flex: 1}}>
+              <ResetPassword
+              styles={{
+                apiSuccess: {
+                  fontSize: 18,
+                  fontWeight: '800',
+                  marginVertical: 16,
+                  color: Color.validationGreen,
+                  textAlign: 'center'
+                }
+              }}
+                token={resetPasswordTokenRef.current}
+                onPressResetButton={() => {
+                  console.log('OnPressResetPassword')
+                }}
+                onPressCancelButton={() => {
+                  resetPasswordTokenRef.current = ''
+                  setComponentToShow(ComponentEnum.Tickets)
+                }}
+                onResetPasswordSuccess={(data) => {
+                  setTimeout(() => { 
+                    resetPasswordTokenRef.current = ''
+                    setComponentToShow(ComponentEnum.Tickets)
+                   }, 5000)
+                }}
+                onResetPasswordError={(error)=> {}}
+              />
+            </View>
+          )
+
         case ComponentEnum.ResaleTickets:
         return (
           <View style={{flex: 1}}>
@@ -1021,12 +1100,32 @@ const App = () => {
         return (
           <View style={{ flex: 1 }}>
             <Tickets
+            config={{
+              areTicketsGrouped: true,
+            }}
+              isCheckingCurrentSession={isCheckingCurrentSession}
               onLoadingChange={(loading) => setIsLoading(loading)}
               onAddToCartSuccess={handleOnAddToCartSuccess}
               onPressLogout={handleOnPressLogout}
-
               onPressMyOrders={handleOnPressMyOrders}
               styles={{
+                enterPassword: {
+                  rootContainer: {
+                    backgroundColor: 'white', 
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }, 
+                  contentContainer: {
+                    paddingHorizontal: 32
+                  },
+                  title: {
+                    fontWeight: '900',
+                    fontSize: 30,
+                    marginBottom: 24,
+                    color: 'black'
+                  }
+                },
                 waitingList: {
                   title: { color: Color.textMain },
                   input: {
@@ -1115,6 +1214,15 @@ const App = () => {
                   }
                 },
                 ticketList: {
+                  sectionHeader: {
+                    container: {
+                      padding: 8,
+                      backgroundColor: Color.gray40
+                    },
+                    title: {
+                      fontWeight: '800'
+                    }
+                  },
                   item: {
                     ticketName: {
                       color: Color.textMain,

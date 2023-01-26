@@ -1,32 +1,19 @@
-import _map from 'lodash/map'
-import React, { FC, useCallback, useMemo, useState } from 'react'
-import {
-  Alert,
-  Image,
-  Modal,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native'
+import React, { FC, useMemo, useState } from 'react'
+import { Alert, Image, Modal, Text, TouchableOpacity, View } from 'react-native'
 
+import { useDebounced } from '../../helpers/Debounced'
+import { validateEmail, validateMinLength } from '../../helpers/Validators'
 import R from '../../res'
 import Button from '../button/Button'
-import FormField from '../formField/FormField'
-import { IFormFieldProps } from '../formField/types'
+import RestorePassword from '../restorePassword/RestorePassword'
+import ResultDialog from '../restorePassword/ResultDialog'
+import LoginForm from './components/LoginForm'
 import s from './styles'
 import { ILoginViewProps, ILoginViewState } from './types'
 
 const initialState: ILoginViewState = {
-  isDataValid: false,
-  email: {
-    value: '',
-    error: undefined,
-  },
-  password: {
-    value: '',
-    error: undefined,
-  },
+  loginEmail: '',
+  loginPassword: '',
 }
 
 const LoginView: FC<ILoginViewProps> = ({
@@ -39,69 +26,26 @@ const LoginView: FC<ILoginViewProps> = ({
   styles,
   texts,
   userFirstName,
-  loginError,
-  refs,
+  loginApiError,
   brandImages,
+  isShowPasswordButtonVisible,
+  content,
+  onPressForgotPassword,
+  restorePasswordProps,
+  resultDialogPropsProps,
 }) => {
   const [data, setData] = useState<ILoginViewState>(initialState)
-  const { email, password } = data
-  const getFormFields = (): IFormFieldProps[] => {
-    const setInputData = (id: string, value: string) => {
-      setData({ ...data, [id]: { value: value } })
-    }
+  const { loginEmail, loginPassword } = data
 
-    return [
-      {
-        fieldType: 'input',
-        id: 'email',
-        inputProps: {
-          value: email.value as string,
-          onTextChanged: setInputData,
-          label: texts?.dialog?.emailLabel || 'Email',
-          keyboardType: 'email-address',
-          autoCapitalize: 'none',
-          styles: styles?.dialog?.input,
-          reference: refs?.inputs?.email,
-        },
-      },
-      {
-        fieldType: 'input',
-        id: 'password',
-        inputProps: {
-          value: password.value as string,
-          onTextChanged: setInputData,
-          label: texts?.dialog?.passwordLabel || 'Password',
-          secureTextEntry: true,
-          styles: styles?.dialog?.input,
-          reference: refs?.inputs?.password,
-        },
-      },
-    ]
-  }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const formFields = useMemo(getFormFields, [data, email.value, password.value])
-
-  const renderFormFields = useCallback(() => {
-    return _map(formFields, (item, index) => (
-      <FormField {...item} key={`loginModal.${index}.${item.id}`} />
-    ))
-  }, [formFields])
-
-  const checkIsDataValid = (): boolean => {
-    if (email.value.toString().length === 0) {
-      return false
-    }
-    if (password.value.toString().length < 6) {
-      return false
-    }
-    return true
-  }
+  const loginEmailError = useDebounced(loginEmail, validateEmail)
+  const loginPasswordError = useDebounced(loginPassword, (value: string) =>
+    validateMinLength(value, 6, 'Password')
+  )
 
   const handleOnPressLogin = () => {
     onPressLogin({
-      email: email.value as string,
-      password: password.value as string,
+      email: loginEmail,
+      password: loginPassword,
     })
   }
 
@@ -132,17 +76,14 @@ const LoginView: FC<ILoginViewProps> = ({
     }
   }
 
-  const handleOnPressLogout = () => {
-    Alert.alert(logoutTitle, logoutMessage, [
-      {
-        text: logoutConfirm,
-        onPress: handleLogout,
-        style: 'destructive',
-      },
-      {
-        text: logoutCancel,
-      },
-    ])
+  const checkIsLoginDataValid = (): boolean => {
+    if (loginEmailError) {
+      return false
+    }
+    if (loginPasswordError) {
+      return false
+    }
+    return true
   }
 
   const LoggedComponent = () => (
@@ -202,6 +143,84 @@ const LoginView: FC<ILoginViewProps> = ({
     ]
   )
 
+  //#region Button Press
+  const handleOnPressLogout = () => {
+    Alert.alert(logoutTitle, logoutMessage, [
+      {
+        text: logoutConfirm,
+        onPress: handleLogout,
+        style: 'destructive',
+      },
+      {
+        text: logoutCancel,
+      },
+    ])
+  }
+  //#endregion Button Press
+
+  //#region Text Changed
+  const handleOnLoginEmailChanged = (text: string) =>
+    setData({ ...data, loginEmail: text })
+
+  const handleOnLoginPasswordChanged = (text: string) =>
+    setData({ ...data, loginPassword: text })
+  //#endregion Text Changed
+
+  const renderContent = () => {
+    switch (content) {
+      case 'login':
+        return (
+          <LoginForm
+            email={loginEmail}
+            emailError={loginEmailError}
+            onEmailChanged={handleOnLoginEmailChanged}
+            password={loginPassword}
+            passwordError={loginPasswordError}
+            onPasswordChanged={handleOnLoginPasswordChanged}
+            onPressLoginButton={handleOnPressLogin}
+            onPressForgotPassword={onPressForgotPassword}
+            viewProps={{
+              styles: styles,
+              texts: texts,
+            }}
+            loginApiError={loginApiError}
+            isLoginButtonDisabled={!checkIsLoginDataValid()}
+            isLoading={isLoading}
+            brandImages={BrandImages}
+            isShowPasswordButtonVisible={isShowPasswordButtonVisible}
+          />
+        )
+
+      case 'restorePassword':
+        return (
+          <RestorePassword
+            onPressRestorePasswordButton={
+              restorePasswordProps.onPressRestorePasswordButton
+            }
+            onPressCancelButton={restorePasswordProps.onPressCancelButton}
+            styles={styles?.restorePassword}
+            texts={texts?.restorePassword}
+            isLoading={restorePasswordProps.isLoading}
+          />
+        )
+
+      case 'restorePasswordSuccess':
+        return (
+          <ResultDialog
+            onPressButton={() => {
+              console.log('ALV')
+              resultDialogPropsProps?.onPressButton()
+            }}
+            message={resultDialogPropsProps?.message}
+          />
+        )
+
+      default:
+        return LoginForm
+    }
+  }
+
+  //#region Render main component
   return (
     <View style={s.rootContainer}>
       {userFirstName ? LoggedComponent() : GuestComponent()}
@@ -210,43 +229,16 @@ const LoginView: FC<ILoginViewProps> = ({
         <Modal transparent={true} presentationStyle='overFullScreen'>
           <View style={s.touchableContainer}>
             <TouchableOpacity style={s.dismissibleArea} onPress={hideDialog}>
-              <TouchableWithoutFeedback>
-                <View style={[s.dialog, styles?.dialog?.container]}>
-                  <Text style={[s.dialogTitle, styles?.dialog?.title]}>
-                    {texts?.dialog?.title || 'Login'}
-                  </Text>
-                  {BrandImages}
-                  {!!texts?.dialog?.message && (
-                    <Text style={[s.message, styles?.dialog?.message]}>
-                      {texts.dialog.message}
-                    </Text>
-                  )}
-                  {renderFormFields()}
-                  {!!loginError && <Text style={[s.error]}>{loginError}</Text>}
-                  <Button
-                    styles={
-                      !checkIsDataValid()
-                        ? styles?.dialog?.loginButtonDisabled
-                        : {
-                            container: [s.loginButton],
-                            ...styles?.dialog?.loginButton,
-                          }
-                    }
-                    text={texts?.dialog?.loginButton || 'LOGIN'}
-                    onPress={handleOnPressLogin}
-                    isLoading={isLoading}
-                    isDisabled={!checkIsDataValid()}
-                    //@ts-ignore
-                    ref={refs?.button}
-                  />
-                </View>
-              </TouchableWithoutFeedback>
+              <TouchableOpacity activeOpacity={1}>
+                {renderContent()}
+              </TouchableOpacity>
             </TouchableOpacity>
           </View>
         </Modal>
       )}
     </View>
   )
+  //#endregion Render main component
 }
 
 export default LoginView

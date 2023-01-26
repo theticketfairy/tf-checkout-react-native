@@ -78,6 +78,8 @@ export interface IBillingProps {
   // cartExpired
   onCartExpired: () => void
 
+  // restorePassword
+
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts
 
@@ -181,6 +183,7 @@ export interface IBillingInfoViewTexts {
     fillAllRequiredFieldsAlert?: string
     optional?: string
     phoneInput?: IPhoneInputTexts
+    ttfPrivacyPolicyRequiredError?: string
   }
   cartTimer?: ICartTimerTexts
 }
