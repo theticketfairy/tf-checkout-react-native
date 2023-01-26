@@ -1,4 +1,4 @@
-import _, { size } from 'lodash'
+import _ from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
@@ -22,7 +22,6 @@ import R from '../../src/res'
 import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles from './styles'
-import Config from "react-native-config";
 
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
@@ -146,8 +145,6 @@ const App = () => {
 
   //#endregion
   const handleOpenUrl = ({url}: IDeepLinkUrl) =>{
-    //restlessnites://https//restlessnites.com/reset-password?token=5f867190b16fbb9a1856832161294063
-
     const splitted = url.split("token=")
     if (splitted.length <= 1) {
       return 

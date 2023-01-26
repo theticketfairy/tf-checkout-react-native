@@ -8,10 +8,10 @@ import { LocalStorageKeys, storeData } from './LocalStorage'
 export type EnvType = 'PROD' | 'DEV' | 'STAG'
 
 export interface IConfigAuth {
-  accessToken: string
-  refreshToken: string
-  tokenType: string
-  scope: string
+  ACCESS_TOKEN: string
+  REFRESH_TOKEN: string
+  TOKEN_TYPE: string
+  SCOPE: string
 }
 
 export interface IConfig {
@@ -71,14 +71,14 @@ export const setConfig = async (
   Config.IS_BILLING_STREET_NAME_REQUIRED = true
 
   if (Config.AUTH) {
-    await storeData(LocalStorageKeys.ACCESS_TOKEN, Config.AUTH.accessToken)
+    await storeData(LocalStorageKeys.ACCESS_TOKEN, Config.AUTH.ACCESS_TOKEN)
     await storeData(
       LocalStorageKeys.AUTH_TOKEN_TYPE,
-      Config.AUTH.tokenType || 'Bearer'
+      Config.AUTH.TOKEN_TYPE || 'Bearer'
     )
-    await storeData(LocalStorageKeys.AUTH_SCOPE, Config.AUTH.scope)
-    await storeData(LocalStorageKeys.REFRESH_TOKEN, Config.AUTH.refreshToken)
-    Client.setAccessToken(Config.AUTH.accessToken)
+    await storeData(LocalStorageKeys.AUTH_SCOPE, Config.AUTH.SCOPE)
+    await storeData(LocalStorageKeys.REFRESH_TOKEN, Config.AUTH.REFRESH_TOKEN)
+    Client.setAccessToken(Config.AUTH.ACCESS_TOKEN)
   }
 
   return undefined
