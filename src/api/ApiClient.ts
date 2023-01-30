@@ -1042,7 +1042,12 @@ export const closeSession = async (): Promise<ICloseSessionResponse> => {
   let responseError: IError | undefined
 
   const response: AxiosResponse | void = await Client.delete('/auth').catch(
-    (error: AxiosError) => {
+    async (error: AxiosError) => {
+      if (error.response?.status === 401) {
+        await deleteAllData()
+        Client.removeGuestToken()
+        Client.removeAccessToken()
+      }
       responseError =
         error.response?.data.message || 'Error while closing session'
     }
