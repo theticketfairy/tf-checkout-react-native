@@ -2,6 +2,8 @@
 
 React Native library for Ticket Fairy checkout.
 
+For Single Sign-On (SSO) Please be awere that this is the first version of the implementation, we are working to release a V2, that will cover other use cases, in the near future.
+
 # Requirements
 
 Configure [ReactNative environment](https://reactnative.dev/docs/environment-setup) for desired platforms (iOS, Android or both).
