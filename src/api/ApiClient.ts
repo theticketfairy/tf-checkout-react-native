@@ -35,6 +35,7 @@ import {
   ICloseSessionResponse,
   ICountriesResponse,
   IEventResponse,
+  IFetchAccessTokenResponse,
   IFetchTicketsResponse,
   IFreeRegistrationData,
   IFreeRegistrationResponse,
@@ -197,7 +198,9 @@ export const authorize = async (
   }
 }
 
-export const fetchAccessToken = async (data: FormData) => {
+export const fetchAccessToken = async (
+  data: FormData
+): Promise<IFetchAccessTokenResponse> => {
   let responseError: IError | undefined
   const response = await Client.post('/v1/oauth/access_token', data).catch(
     (error: AxiosError) => {
@@ -208,9 +211,31 @@ export const fetchAccessToken = async (data: FormData) => {
     }
   )
 
+  const accessToken = _get(response, 'data.access_token')
+  if (accessToken) {
+    await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken)
+  }
+  const refreshToken = _get(response, 'data.refresh_token')
+  if (refreshToken) {
+    await storeData(LocalStorageKeys.REFRESH_TOKEN, refreshToken)
+  }
+  const tokenType = _get(response, 'data.token_type')
+  if (tokenType) {
+    await storeData(LocalStorageKeys.TOKEN_TYPE, tokenType)
+  }
+  const scope = _get(response, 'data.scope')
+  if (scope) {
+    await storeData(LocalStorageKeys.AUTH_SCOPE, scope)
+  }
+
   return {
-    error: responseError,
-    accessToken: _get(response, 'data.access_token'),
+    accessTokenError: responseError,
+    accessTokenData: {
+      accessToken,
+      refreshToken,
+      tokenType,
+      scope,
+    },
   }
 }
 
@@ -1052,12 +1077,12 @@ export const closeSession = async (): Promise<ICloseSessionResponse> => {
     responseData = {
       message: response.data.message || 'Session closed successfully',
     }
-
-    await deleteAllData()
-
-    Client.removeGuestToken()
-    Client.removeAccessToken()
   }
+
+  await deleteAllData()
+
+  Client.removeGuestToken()
+  Client.removeAccessToken()
 
   return {
     closeSessionData: responseData,

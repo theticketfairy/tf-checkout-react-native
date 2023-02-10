@@ -400,3 +400,17 @@ export interface IRestorePasswordResponse {
 }
 
 export interface IResetPasswordResponse extends IRestorePasswordResponse {}
+
+//#region Fetch AccessToken
+export interface IFetchAccessTokenData {
+  accessToken: string
+  refreshToken: string
+  tokenType: string
+  scope: string
+}
+
+export interface IFetchAccessTokenResponse {
+  accessTokenError?: IError
+  accessTokenData?: IFetchAccessTokenData
+}
+//#endregion Refresh AccessToken
