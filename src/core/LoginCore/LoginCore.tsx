@@ -21,6 +21,7 @@ import {
 } from '../../helpers/LocalStorage'
 import { IUserProfilePublic } from '../../types'
 import { ICoreProps } from '../CoreProps'
+import { getFetchAccessTokenBody } from './LoginCoreHelper'
 import { ILoginCoreResponse, LoginCoreHandle } from './LoginCoreTypes'
 
 const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
@@ -55,15 +56,8 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
         }
       }
 
-      const bodyFormDataToken = new FormData()
-      bodyFormDataToken.append('code', authorizationCode)
-      bodyFormDataToken.append('scope', 'profile')
-      bodyFormDataToken.append('grant_type', 'authorization_code')
-      bodyFormDataToken.append('client_id', Config.CLIENT_ID)
-      bodyFormDataToken.append('client_secret', Config.CLIENT_SECRET)
-
       const { error: tokenError, accessToken } = await fetchAccessToken(
-        bodyFormDataToken
+        getFetchAccessTokenBody(authorizationCode)
       )
 
       if (tokenError) {
