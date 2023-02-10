@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios'
 
 import { IOnCheckoutSuccess } from '..'
 import { IError, IEvent, ITicket, IUserProfile } from '../types'
+import { IAddOnResponse } from '../types/IAddOn'
 
 export interface IClientRequest extends AxiosInstance {
   setGuestToken: (token: string) => void
@@ -400,3 +401,12 @@ export interface IRestorePasswordResponse {
 }
 
 export interface IResetPasswordResponse extends IRestorePasswordResponse {}
+
+export interface IAddOnsResponseData {
+  addOns?: IAddOnResponse[]
+  addOnGroups?: any
+}
+export interface IFetchAddOnsResponse {
+  fetchAddOnsError?: IError
+  fetchAddOnsData?: IAddOnsResponseData
+}

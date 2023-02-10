@@ -1,3 +1,4 @@
+export { default as AddOns } from './addons/AddOns'
 export { default as BottomSheetModal } from './bottomSheetModal/BottomSheetModal'
 export { default as Button } from './button/Button'
 export { default as CartTimer } from './cartTimer/CartTimer'

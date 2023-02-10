@@ -3,6 +3,7 @@ import {
   ICartResponse,
   ICheckoutBody,
   ICountriesResponse,
+  IFetchAddOnsResponse,
   IRegisterNewUserResponse,
   IStatesResponse,
   IUserProfileResponse,
@@ -22,6 +23,7 @@ export type BillingCoreHandle = {
   getStates(countryId: string): Promise<IStatesResponse>
   getUserProfile(): Promise<IUserProfileResponse>
   registerNewUser(data: FormData): Promise<IRegisterNewUserResponse>
+  getAddOns(): Promise<IFetchAddOnsResponse>
 }
 
 export interface IBillingCoreProps extends ICoreProps {

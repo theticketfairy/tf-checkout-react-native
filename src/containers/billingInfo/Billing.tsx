@@ -23,11 +23,14 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import Constants from '../../api/Constants'
 import {
+  IAddOnsResponseData,
   ICheckoutBody,
   ICheckoutTicketHolder,
+  IFetchAddOnsResponse,
   IRegisterNewUserBody,
 } from '../../api/types'
 import {
+  AddOns,
   Button,
   CartTimer,
   Checkbox,
@@ -38,6 +41,7 @@ import {
   Login,
   PhoneInput,
 } from '../../components'
+import { getAddOnsData } from '../../components/addons/AddOnsHelper'
 import { IDropdownItem } from '../../components/dropdown/types'
 import { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
 import { BillingCore, BillingCoreHandle } from '../../core'
@@ -54,6 +58,7 @@ import {
 } from '../../helpers/Validators'
 import R from '../../res'
 import { IError, IUserProfile, IUserProfilePublic } from '../../types'
+import { IAddOn } from '../../types/IAddOn'
 import s from './styles'
 import {
   IBillingProps,
@@ -96,6 +101,8 @@ const Billing: FC<IBillingProps> = ({
   onLogoutError,
   onCartExpired,
   shouldCartTimerNotMinimizeOnTap,
+  onFetchAddonsError,
+  onFetchAddonsSuccess,
 }) => {
   //#region Labels
   const holderLabels = useMemo(() => {
@@ -178,6 +185,9 @@ const Billing: FC<IBillingProps> = ({
 
   const [states, setStates] = useState<IDropdownItem[]>([])
   const [countries, setCountries] = useState<IDropdownItem[]>([])
+  const [eventAddOns, setEventAddOns] = useState<IAddOnsResponseData | null>(
+    null
+  )
 
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
   const [skippingStatus, setSkippingStatus] =
@@ -186,6 +196,7 @@ const Billing: FC<IBillingProps> = ({
 
   // Cart expiration timer
   const [secondsLeft, setSecondsLeft] = React.useState(420)
+  const [isTimeUp, setIsTimeUp] = React.useState(false)
 
   // Errors state
   const firstNameError = useDebounced(firstName, validateEmpty)
@@ -720,6 +731,16 @@ const Billing: FC<IBillingProps> = ({
   }
   //#endregion
 
+  //#region Core
+  const getEventAddOnsCore = async (): Promise<IFetchAddOnsResponse> => {
+    if (!billingCoreRef.current) {
+      return { fetchAddOnsError: { message: 'Ticket core is not initialized' } }
+    }
+
+    return await billingCoreRef.current.getAddOns()
+  }
+  //#endregion
+
   const fetchData = async () => {
     if (!billingCoreRef.current) {
       onFetchCartError?.({ message: 'BillingCoreRef not initialized' })
@@ -864,6 +885,21 @@ const Billing: FC<IBillingProps> = ({
 
     setCountries(parsedCountries)
     setTicketHoldersData(tHolders)
+
+    // AddOns
+    const { fetchAddOnsData, fetchAddOnsError } = await getEventAddOnsCore()
+
+    if (fetchAddOnsError) {
+      onFetchAddonsError?.(fetchAddOnsError)
+      setEventAddOns(null)
+    } else {
+      if (fetchAddOnsData) {
+        setEventAddOns(fetchAddOnsData!)
+        const addonsData = getAddOnsData(fetchAddOnsData)
+        console.log('=====> Adns', addonsData)
+      }
+    }
+
     setIsLoading(false)
   }
 
@@ -1062,6 +1098,7 @@ const Billing: FC<IBillingProps> = ({
 
   const renderContent = () => (
     <>
+      {console.log('Render Billing content')}
       <KeyboardAwareScrollView extraScrollHeight={32}>
         <View style={styles?.rootContainer}>
           <Login
@@ -1077,6 +1114,7 @@ const Billing: FC<IBillingProps> = ({
             styles={styles?.loginStyles}
             brandImages={loginBrandImages}
           />
+          {eventAddOns ? <AddOns addOnsResponseData={eventAddOns} /> : null}
           <Text style={styles?.screenTitle}>
             {texts?.form?.getYourTicketsTitle || 'Get Your Tickets'}
           </Text>

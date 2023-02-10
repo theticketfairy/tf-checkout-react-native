@@ -49,6 +49,7 @@ export const deleteData = async (key: string) => {
 }
 
 export const deleteAllData = async () => {
+  console.log('DEleting all data')
   try {
     const value = await AsyncStorage.multiRemove([
       LocalStorageKeys.ACCESS_TOKEN,
@@ -61,9 +62,12 @@ export const deleteAllData = async () => {
       LocalStorageKeys.AUTH_SCOPE,
     ])
     if (value !== null) {
+      console.log('VALUE', value)
+
       return value
     }
   } catch (ex) {
+    console.log('Can not delete all data', ex)
     return undefined
   }
 }

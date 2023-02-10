@@ -169,7 +169,7 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
 
     async getIsUserLoggedIn(): Promise<boolean> {
       const token = await getData(LocalStorageKeys.ACCESS_TOKEN)
-
+      console.log('TOKEN', token)
       if (!token) {
         return false
       }

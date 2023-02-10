@@ -31,7 +31,7 @@ interface IDeepLinkUrl {
   url: string
 }
 
-const EVENT_ID = 13090
+const EVENT_ID = 13098
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
@@ -1101,7 +1101,6 @@ const App = () => {
           <View style={{ flex: 1 }}>
             <Tickets
             config={{
-              areTicketsGrouped: true,
             }}
               isCheckingCurrentSession={isCheckingCurrentSession}
               onLoadingChange={(loading) => setIsLoading(loading)}

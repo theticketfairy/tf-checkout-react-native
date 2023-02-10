@@ -27,6 +27,7 @@ import {
   IPhoneInputTexts,
 } from '../../components/phoneInput/types'
 import { IError, ITicketsResponseData, IUserProfilePublic } from '../../types'
+import { IAddOnResponse } from '../../types/IAddOn'
 
 export interface ITokens {
   accessToken: string
@@ -78,7 +79,9 @@ export interface IBillingProps {
   // cartExpired
   onCartExpired: () => void
 
-  // restorePassword
+  // addOns
+  onFetchAddonsError?: (error: IError) => void
+  onFetchAddonsSuccess?: (data: IAddOnResponse[]) => void
 
   styles?: IBillingInfoViewStyles
   texts?: IBillingInfoViewTexts

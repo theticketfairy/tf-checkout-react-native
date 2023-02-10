@@ -35,6 +35,7 @@ import {
   ICloseSessionResponse,
   ICountriesResponse,
   IEventResponse,
+  IFetchAddOnsResponse,
   IFetchTicketsResponse,
   IFreeRegistrationData,
   IFreeRegistrationResponse,
@@ -84,6 +85,8 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
   const storedTokenType = await getData(LocalStorageKeys.AUTH_TOKEN_TYPE)
   const tokenType = storedTokenType || 'Bearer'
 
+  console.log(`%c Request ${config.url}`, 'background: #00AA00', config)
+
   if (accessToken) {
     const updatedHeaders = {
       ...config.headers,
@@ -114,9 +117,16 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 
 Client.interceptors.response.use(
   (response: AxiosResponse) => {
+    console.log(
+      `%c Response ${response.request}`,
+      'background: #F00AA0',
+      response
+    )
+
     return response
   },
   async (error: AxiosError) => {
+    console.log(`%c ERROR`, 'background: #FF0000', error.response)
     if (error?.response?.status === 401) {
       error.code = error.code
       error.message = error.response.data.error_description
@@ -185,6 +195,7 @@ export const authorize = async (
     `/v1/oauth/authorize-rn?client_id=${Config.CLIENT_ID}`,
     data
   ).catch((error: AxiosError) => {
+    console.log('Auth failed', error.response)
     responseError = {
       message: error?.response?.data.message || 'Authorization failed',
       code: error?.response?.status,
@@ -1134,3 +1145,37 @@ export const requestResetPassword = async (
   }
 }
 //#endregion Request Password
+
+//#region Add-Ons
+export const fetchAddOns = async (): Promise<IFetchAddOnsResponse> => {
+  const eventId = Config.EVENT_ID.toString()
+  let responseError: IError | undefined
+
+  const result = await Client.get(`/v1/event/${eventId}/add-ons`).catch(
+    (error: AxiosError) => {
+      responseError = {
+        message: error.response?.data.message || 'Error getting AddOns',
+        code: error.response?.data.status,
+      }
+    }
+  )
+
+  if (responseError) {
+    return {
+      fetchAddOnsError: responseError,
+    }
+  }
+
+  const attributes = _get(result, 'data.data.attributes', [])
+  const addons = _get(attributes, 'add_ons', [])
+  const addonGroups = _get(attributes, 'add_on_groups', [])
+
+  return {
+    fetchAddOnsError: responseError,
+    fetchAddOnsData: {
+      addOnGroups: addonGroups,
+      addOns: addons,
+    },
+  }
+}
+//#endregion

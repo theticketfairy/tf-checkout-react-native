@@ -4,6 +4,7 @@ import BackgroundTimer from 'react-native-background-timer'
 
 import {
   checkoutOrder,
+  fetchAddOns,
   fetchCart,
   fetchCountries,
   fetchStates,
@@ -14,6 +15,7 @@ import {
   ICartResponse,
   ICheckoutBody,
   ICountriesResponse,
+  IFetchAddOnsResponse,
   IRegisterNewUserResponse,
   IStatesResponse,
   IUserProfileResponse,
@@ -23,7 +25,7 @@ import {
   IBillingCoreProps,
   ICheckoutResponse,
 } from './BillingCoreTypes'
-
+// TODO:  CHECK WHERE THE IADDON TPYE IS USED AND REPLACE IT WITH IADDONRESPONSE
 const BillingCore = forwardRef<BillingCoreHandle, IBillingCoreProps>(
   (props, ref) => {
     const [secondsLeft, setSecondsLeft] = useState(420)
@@ -99,6 +101,10 @@ const BillingCore = forwardRef<BillingCoreHandle, IBillingCoreProps>(
 
       async registerNewUser(data: FormData): Promise<IRegisterNewUserResponse> {
         return await registerNewUser(data)
+      },
+
+      async getAddOns(): Promise<IFetchAddOnsResponse> {
+        return await fetchAddOns()
       },
     }))
 

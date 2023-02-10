@@ -69,8 +69,9 @@ export const setConfig = async (
   }
 
   Config.IS_BILLING_STREET_NAME_REQUIRED = true
-
+  console.log('Config', Config)
   if (Config.AUTH) {
+    console.log('Setting AUTH', Config.AUTH)
     await storeData(LocalStorageKeys.ACCESS_TOKEN, Config.AUTH.ACCESS_TOKEN)
     await storeData(
       LocalStorageKeys.AUTH_TOKEN_TYPE,
