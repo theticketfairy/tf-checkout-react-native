@@ -13,7 +13,6 @@ import {
   IResetPasswordRequestData,
 } from '../../api/types'
 import { ILoginFields } from '../../components/login/types'
-import { Config } from '../../helpers/Config'
 import {
   IStoredUserData,
   LocalStorageKeys,
