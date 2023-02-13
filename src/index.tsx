@@ -41,6 +41,7 @@ import {
 } from './core'
 import { setConfig } from './helpers/Config'
 import { deleteAllData } from './helpers/LocalStorage'
+import { refreshAccessToken } from './helpers/RefreshAccessToken'
 import { ITicketsResponseData, IUserProfile } from './types'
 
 LogBox.ignoreAllLogs()
@@ -74,6 +75,7 @@ export {
   PurchaseConfirmation,
   PurchaseConfirmationCore,
   PurchaseConfirmationCoreHandle,
+  refreshAccessToken,
   ResaleTickets,
   ResetPassword,
   ResetPasswordCore,

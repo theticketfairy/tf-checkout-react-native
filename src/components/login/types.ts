@@ -2,6 +2,7 @@ import { ImageSourcePropType, ImageStyle } from 'react-native'
 import { TextStyle } from 'react-native'
 import { StyleProp, ViewStyle } from 'react-native'
 
+import { IFetchAccessTokenData } from '../../api/types'
 import { IError, IUserProfilePublic } from '../../types'
 import { IButtonStyles } from '../button/types'
 import { IInputStyles } from '../input/types'
@@ -42,8 +43,14 @@ export interface ILoginBrandImages {
 }
 
 // Exported component
+
+export interface ILoginSuccessData {
+  userProfile: IUserProfilePublic
+  accessTokenData?: IFetchAccessTokenData
+}
+
 export interface ILoginProps {
-  onLoginSuccessful: (userProfile: IUserProfilePublic) => void
+  onLoginSuccessful: (data: ILoginSuccessData) => void
   onLoginError?: (error: IError) => void
 
   isLoginDialogVisible: boolean

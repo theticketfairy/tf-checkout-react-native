@@ -14,7 +14,7 @@ import {
   ITicketsResponseData,
   SkippingStatusType,
   ResaleTickets,
-  ResetPassword
+  ResetPassword,
 } from 'tf-checkout-react-native'
 import { IMyOrderDetailsTicket } from '../../src/api/types'
 import { IConfig } from '../../src/helpers/Config'

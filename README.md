@@ -223,6 +223,12 @@ Let the user to resale their tickets. They can choose between selling them to a 
 
 After opening and URL with the corresponding schema, use this component to let the user reset its password.
 
+### Exported functions
+
+- setConfig: Sets config for the library
+
+- refreshAccessToken: Let refresh the expired access token.
+
 # Component styling
 ### Button
 ```ts
@@ -259,6 +265,52 @@ interface ICheckboxStyles {
 }
 ```
 
+# Exported functions
+## setConfig
+Set the configuration for the library.
+
+```ts
+export interface IConfig {
+  EVENT_ID: string | number
+  CLIENT?: string
+  ENV?: EnvType
+  CLIENT_ID?: string
+  CLIENT_SECRET?: string
+  TIMEOUT?: number
+  BRAND?: string
+  ARE_SUB_BRANDS_INCLUDED?: boolean
+  // AUTH is used for single sign on v1.
+  // It receives the needed information for the authenticated user.
+  AUTH?: {
+    ACCESS_TOKEN: string
+    REFRESH_TOKEN: string
+    TOKEN_TYPE: string
+    SCOPE: string
+  }
+}
+```
+## refreshAccessToken
+
+Let refresh the expired access token, it can use the internal stored refresh token, passing nothing to it, or you can pass a `string` refresh token.
+
+```ts
+const response: IFetchAccessTokenResponse = await refreshAccessToken(refreshToken?: string)
+```
+
+Returns the new access token data or error.
+
+```ts
+accessTokenError?: {
+  code?: number
+  message: string
+}
+accessTokenData?: {
+  accessToken: string
+  refreshToken: string
+  tokenType: string
+  scope: string
+}
+```
 
 # Exported components
 Depending on your needs, you can use the UI Components or the Core Components.
@@ -300,7 +352,10 @@ Then add it to the render function.
 
 ```tsx
 <Login
-  onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
+  onLoginSuccessful: (
+    userProfile: IUserProfile, 
+    accessTokenData?: IFetchAccessTokenData
+  ) => void
   onLoginError?: (error: IError) => void
 
   onFetchUserProfileError?: (error: IError) => void
@@ -348,6 +403,34 @@ Then add it to the render function.
 />
 ```
 
+### Data Types
+#### IUserProfile
+```ts
+{
+  customerId: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  streetAddress: string
+  zipCode: string
+  countryId: string
+  company?: string
+  state: string
+  stateId: string
+  city: string
+}
+```
+
+#### IFetchAccessTokenData
+```ts
+{
+  accessToken: string
+  refreshToken: string
+  tokenType: string
+  scope: string
+}
+```
 ### Props
 | Property | Description |
 |----------|-------------|
@@ -480,7 +563,9 @@ import { Tickets } from 'tf-checkout-react-native'
 Then add it to the render function.
 
 ```js
-<Tickets eventId={EVENT_ID} onAddToCartSuccess={handleOnAddToCartSuccess} />
+<Tickets 
+  eventId={EVENT_ID} 
+  onAddToCartSuccess={handleOnAddToCartSuccess} />
 ```
 
 ### Props
@@ -553,6 +638,7 @@ Then add it to the render function.
     isLoading?: boolean
   }
 
+  // Configure the Component behavior
   config: {
     areActivityIndicatorsEnabled?: boolean
     areAlertsEnabled?: boolean
@@ -575,6 +661,21 @@ Then add it to the render function.
   isAgeRequired?: boolean
   minimumAge?: number
   isNameRequired?: boolean
+}
+```
+
+### config prop
+Configure the component's behavior 
+```ts
+config: {
+  // Whether or not show the loading indicators.
+  areActivityIndicatorsEnabled?: boolean
+  // Whether or not show the alerts.
+  areAlertsEnabled?: boolean
+  // Whether or not the Ticket should be sorted by Sold Out.
+  areTicketsSortedBySoldOut?: boolean
+  // Whether or not the tickets should be grouped, they need to be configured as groups in the Tickets admin.
+  areTicketsGrouped?: boolean
 }
 ```
 
@@ -730,8 +831,24 @@ Add it to the render function.
     minimumAge: number
   }
   // registerNewUser
-  onRegisterSuccess?: (tokens: ITokens) => void
-  onRegisterError?: (error: string) => void
+  onRegisterSuccess?: (data: {
+      accessTokenData: {
+        accessToken: string
+        refreshToken: string
+        tokenType: string
+        scope: string
+      }
+      userProfile: {
+        firstName: string
+        lastName: string
+        email: string
+      }
+    }) => void
+  onRegisterError?: (error: { 
+    isAlreadyRegistered?: boolean
+    message?: string
+    raw?: any
+  }) => void
 
   onCheckoutSuccess: (data: {   
     id: string
@@ -741,7 +858,8 @@ Add it to the render function.
   }) => void
   onCheckoutError?: (error: IError) => void
 
-  onLoginSuccess: (data: any) => void
+  // See ILoginSuccessData data type below.
+  onLoginSuccess: (data: ILoginSuccessData) => void
   onLoginError?: (error: IError) => void
 
   onFetchUserProfileSuccess?: (data: any) => void
@@ -793,6 +911,34 @@ Add it to the render function.
     image2Style?: StyleProp<ImageStyle>
   }
 />
+```
+
+### DataTypes
+ILoginSuccessData
+
+```ts
+interface ILoginSuccessData {
+  userProfile: {
+    customerId: string
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    streetAddress: string
+    zipCode: string
+    countryId: string
+    company?: string
+    state: string
+    stateId: string
+    city: string
+  }
+  accessTokenData?: {
+    accessToken: string
+    refreshToken: string
+    tokenType: string
+    scope: string
+  }
+}
 ```
 
 ### Props
@@ -1901,7 +2047,7 @@ Exposes the following functions:
 
 `getUserProfile` Fetches the user profile information.
 
-`registerNewUser` Registers a new user.
+`registerNewUser` Registers a new user. Returns accessTokens data.
 
 `checkoutOrder` Performs the checkout.
 
@@ -1987,17 +2133,21 @@ Exposes the following functions:
 
   // Registers a new user.
   registerNewUser(data: FormData): Promise<{
-    error?: {
+    registerNewUserResponseError?: {
       isAlreadyRegistered?: boolean
       message?: string
       raw?: any
     }
-    data?: {
-      token_type: string
-      scope: string
-      user_profile: {
-        first_name: string
-        last_name: string
+    registerNewUserResponseData?: {
+      accessTokenData: {
+        accessToken: string
+        refreshToken: string
+        tokenType: string
+        scope: string
+      }
+      userProfile: {
+        firstName: string
+        lastName: string
         email: string
       }
     }
@@ -2347,7 +2497,7 @@ login(fields?: {
     extraData?: any
   }
 
-  data?: {
+  userProfile?: {
     customerId: string
     firstName: string
     lastName: string
@@ -2360,6 +2510,13 @@ login(fields?: {
     state: string
     stateId: string
     city: string
+  }
+
+  accessTokenData?: {
+    accessToken: string
+    refreshToken: string
+    tokenType: string
+    scope: string
   }
 }>
 
@@ -2415,13 +2572,25 @@ Wrap your component with the Core component.
 
 # Changelog
 
+## NEXT
+- Exposes `refreshAccessToken` function.
+- Changed returned `data` prop to `userProfile` in LoginCore response.
+- In **LoginCore Component**:
+  - Add `accessTokenData` object prop in `onLoginSuccessful` response.
+- On **BillingUI Component**:
+  - Change `onRegisterSuccess` return data type.
+  - Change `onRegisterError` return data type.
+- On **LoginCore**:
+  - Change `login` return data type to include `accessTokenData` object.
+
 ## Version 1.0.24
 - Add **SingleSignOn** feature.
 - Add show Tickets in groups and the option to sort them by sold out.
 - Add config prop to Tickets component:
 
-```
+```ts
     config: {
+      // Indicates if loading component should be visible.
       areActivityIndicatorsEnabled?: boolean
       areAlertsEnabled?: boolean
       areTicketsSortedBySoldOut?: boolean

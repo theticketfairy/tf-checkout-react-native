@@ -39,6 +39,7 @@ import {
   PhoneInput,
 } from '../../components'
 import { IDropdownItem } from '../../components/dropdown/types'
+import { ILoginSuccessData } from '../../components/login/types'
 import { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
 import { BillingCore, BillingCoreHandle } from '../../core'
 import { Config } from '../../helpers/Config'
@@ -322,11 +323,17 @@ const Billing: FC<IBillingProps> = ({
     }
   }
 
-  const handleOnLoginSuccess = async (userProfile: IUserProfilePublic) => {
+  const handleOnLoginSuccess = async ({
+    userProfile,
+    accessTokenData,
+  }: ILoginSuccessData) => {
     let phoneCountry = 'US'
     const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
     const usrProfile = { ...userProfile }
-    onLoginSuccess?.(usrProfile)
+    onLoginSuccess?.({
+      userProfile,
+      accessTokenData,
+    })
 
     try {
       const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY)
@@ -553,37 +560,30 @@ const Billing: FC<IBillingProps> = ({
     const registerUserBody = getRegisterNewUserBody()
     const registerForm = getRegisterFormData(registerUserBody)
 
-    const { data: registerResponseData, error: registerResponseError } =
+    const { registerNewUserResponseData, registerNewUserResponseError } =
       await billingCoreRef.current.registerNewUser(registerForm)
 
-    if (registerResponseError) {
+    if (registerNewUserResponseError) {
       setIsSubmittingData(false)
-      if (registerResponseError.isAlreadyRegistered) {
-        setLoginMessage(registerResponseError.message!)
+      if (registerNewUserResponseError.isAlreadyRegistered) {
+        setLoginMessage(registerNewUserResponseError.message!)
         showLoginDialog()
-        return handleOnRegisterFail(registerResponseError.raw)
+        return handleOnRegisterFail(registerNewUserResponseError.raw)
       }
-      handleOnRegisterFail(registerResponseError.raw)
-      return showAlert(registerResponseError.message!)
+      handleOnRegisterFail(registerNewUserResponseError.raw)
+      return showAlert(registerNewUserResponseError.message!)
     }
 
-    if (!registerResponseData) {
+    if (!registerNewUserResponseData) {
       setIsSubmittingData(false)
       handleOnRegisterFail('Register returned no data')
       return showAlert('Register returned no data')
     }
 
-    const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
-    const refreshToken = await getData(LocalStorageKeys.REFRESH_TOKEN)
+    storedToken.current =
+      registerNewUserResponseData.accessTokenData.accessToken
 
-    const tokens = {
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    }
-
-    storedToken.current = tokens.accessToken!
-
-    onRegisterSuccess?.()
+    onRegisterSuccess?.(registerNewUserResponseData)
 
     await performCheckout()
   }
