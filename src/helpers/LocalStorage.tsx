@@ -6,6 +6,8 @@ export const LocalStorageKeys = {
   ACCESS_TOKEN: 'ACCESS_TOKEN',
   CHECKOUT_DATA: 'CHECKOUT_DATA',
   REFRESH_TOKEN: 'REFRESH_TOKEN',
+  TOKEN_TYPE: 'TOKEN_TYPE',
+  SCOPE: 'SCOPE',
   RESET_PASS_TOKEN: 'RESET_PASS_TOKEN',
   AUTH_SCOPE: 'AUTH_SCOPE',
   AUTH_TOKEN_TYPE: 'AUTH_TOKEN_TYPE',
@@ -59,7 +61,10 @@ export const deleteAllData = async () => {
       LocalStorageKeys.RESET_PASS_TOKEN,
       LocalStorageKeys.AUTH_TOKEN_TYPE,
       LocalStorageKeys.AUTH_SCOPE,
+      LocalStorageKeys.SCOPE,
+      LocalStorageKeys.TOKEN_TYPE,
     ])
+
     if (value !== null) {
       return value
     }
@@ -79,6 +84,8 @@ export const checkStoredData = async () => {
       LocalStorageKeys.RESET_PASS_TOKEN,
       LocalStorageKeys.AUTH_TOKEN_TYPE,
       LocalStorageKeys.AUTH_SCOPE,
+      LocalStorageKeys.SCOPE,
+      LocalStorageKeys.TOKEN_TYPE,
     ])
     return values
   } catch (ex) {

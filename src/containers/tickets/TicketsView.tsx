@@ -55,8 +55,6 @@ const TicketsView = ({
     : `Get ${selectedTicket?.selectedOption?.value} tickets`
   const title = texts?.title ? texts.title : 'GET TICKETS'
 
-  console.log('is user logged in', isUserLogged)
-
   return passwordProtectedEventData?.isPasswordProtected ? (
     <EnterPassword
       onSubmit={onPressSubmitEventPassword}

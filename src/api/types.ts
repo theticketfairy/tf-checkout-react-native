@@ -143,21 +143,27 @@ export interface IRegisterNewUserBody {
     check_cart_expiration: boolean
   }
 }
+
+export interface IRegisterNewUserProfileResponseData {
+  firstName: string
+  lastName: string
+  email: string
+}
+
+export interface IRegisterNewUserSuccessData {
+  accessTokenData: IFetchAccessTokenData
+  userProfile: IRegisterNewUserProfileResponseData
+}
+
+export interface IRegisterNewUserError {
+  isAlreadyRegistered?: boolean
+  message?: string
+  raw?: any
+}
+
 export interface IRegisterNewUserResponse {
-  error?: {
-    isAlreadyRegistered?: boolean
-    message?: string
-    raw?: any
-  }
-  data?: {
-    token_type: string
-    scope: string
-    user_profile: {
-      first_name: string
-      last_name: string
-      email: string
-    }
-  }
+  registerNewUserResponseError?: IRegisterNewUserError
+  registerNewUserResponseData?: IRegisterNewUserSuccessData
 }
 
 // Billing information
@@ -400,3 +406,17 @@ export interface IRestorePasswordResponse {
 }
 
 export interface IResetPasswordResponse extends IRestorePasswordResponse {}
+
+//#region Fetch AccessToken
+export interface IFetchAccessTokenData {
+  accessToken: string
+  refreshToken: string
+  tokenType: string
+  scope: string
+}
+
+export interface IFetchAccessTokenResponse {
+  accessTokenError?: IError
+  accessTokenData?: IFetchAccessTokenData
+}
+//#endregion Refresh AccessToken

@@ -2,8 +2,9 @@ import {
   IRemoveTicketFromResaleResponse,
   IResaleTicketResponse,
 } from '../../api/types'
+import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
-type OrderDetailsCoreHandle = {
+type OrderDetailsCoreHandleType = {
   resaleTicket(
     data: FormData,
     orderHash: string
@@ -14,4 +15,5 @@ type OrderDetailsCoreHandle = {
   ): Promise<IRemoveTicketFromResaleResponse>
 }
 
-export default OrderDetailsCoreHandle
+export type OrderDetailsCoreHandle = OrderDetailsCoreHandleType &
+  SessionCoreHandleType

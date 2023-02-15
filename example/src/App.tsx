@@ -14,14 +14,15 @@ import {
   ITicketsResponseData,
   SkippingStatusType,
   ResaleTickets,
-  ResetPassword
+  ResetPassword,
+  SessionHandleType
 } from 'tf-checkout-react-native'
 import { IMyOrderDetailsTicket } from '../../src/api/types'
 import { IConfig } from '../../src/helpers/Config'
 import R from '../../src/res'
 import Color from './Colors'
 import { ComponentEnum } from './enums'
-import styles from './styles'
+import styles, { billingInfoStyles } from './styles'
 
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
@@ -47,6 +48,10 @@ const config: IConfig = {
 
 const App = () => {
   const resetPasswordTokenRef = useRef('')
+  const billingRef = useRef<SessionHandleType>(null)
+  const ticketsRef = useRef<SessionHandleType>(null)
+
+
   const [componentToShow, setComponentToShow] = useState<ComponentEnum>(
     ComponentEnum.Tickets
   )
@@ -74,6 +79,7 @@ const App = () => {
   const [isTicketToSellActive, setIsTicketToSellActive] = useState<
     boolean | undefined
   >(undefined)
+
   
   //#region Handlers
   const handleOnPressSellTicket = (ticket: IMyOrderDetailsTicket, isActive: boolean) => {
@@ -163,6 +169,7 @@ const App = () => {
   //#region effects
   useEffect(() => {
 
+    setTimeout(() => { ticketsRef.current?.refreshAccessToken() }, 2000)
     const setConfigAsync = async () => {
       setIsCheckingCurrentSession(true)
       await setConfig(config)
@@ -210,305 +217,90 @@ const App = () => {
         return (
           <>
           <BillingInfo
-          onCartExpired={handleOnCartExpired}
-          onSkippingStatusChange={setSkippingStatus}
-          loginBrandImages={{
-            image1: GOOGLE_IMAGE,
-            image1Style: {
-              height: 50,
-              width: 100,
-              resizeMode: 'contain',
-              tintColor: undefined
-            },
-            image2: AMAZON_IMAGE,
-            image2Style: {
-              height: 50,
-              width: 100,
-              resizeMode: 'contain',
-              tintColor: undefined,
-              marginBottom: 16
-            },
-          }}
-          onLoadingChange={setIsLoading}
-            texts={{
-              form: {
-                getYourTicketsTitle: '_Get your tickets_',
-                firstName: '_First name_',
-                lastName: '_Last name_',
-                email: '_Email_',
-                phone: '_Phone_',
-                confirmEmail: '_Confirm email_',
-                street: '_Street_',
-                city: '_City_',
-                country: '_Country_',
-                zipCode: '_Zip code_',
-                state: '_State_',
-                ticketHoldersTitle: '_Ticket holders_',
-                ticketHolderItem: '_Ticket holder item_',
-                isSubToTicketFairy:'_Is sub to ticket fairy_',
-                holderEmail: '_Holder email_',
-                holderFirstName: '_Holder first name_',
-                holderLastName: '_Holder last name_',
-                holderPhone: '_Holder phone_',
-                isSubToBrand: '_Is sub to Brand_',
-                password: '_Password_',
-                confirmPassword: '_Confirm password_',
-                dateOfBirth: '_Date of birth_',
-                emailsAdvice: '_Emails advice_',
-                choosePassword: '_Choose password_',
-                fillAllRequiredFieldsAlert: '_Fill all required fields_',
-                optional: '(_Optional_)',
-                ttfPrivacyPolicyRequiredError: '* Required'
-              },
-              checkoutButton: '_Checkout_',
-              loginTexts:{
-                loginButton:'_Login_',
-                logoutButton: '_Logout_',
-                line1: '_Line 1_',
-                line2: '_Line 2_',
-                message: '_Message_',
-                
-                logoutDialog: {
-                  title: '_Logout?_',
-                  message: '_sure to logout?_',
-                  confirm: '_yes_',
-                  cancel: '_cancel_',
-                },
-                dialog: {
-                  loginButton: '_Dialog_login_',
-                  message: '_Dialog message_',
-                  emailLabel: '_Dialog email label_',
-                  passwordLabel: '_Dialog password label_',
-                  title: '_Login title_',
-
-                },
-                loggedIn:{
-                  loggedAs: '_Logged in:_',
-                  notYou: '_Not you?_',
-                }
-              }
-            }}
-            styles={{
-              cartTimer: {
-              message: {
-                color: R.colors.black
-              },
-              time: {
-                color: R.colors.black
-              }
-              },
-              datePicker: {
-                container: { marginBottom: 16 },
-                button: {
-                  borderColor: Color.white,
-                  borderWidth: 2,
-                },
-                text: {
-                  color: Color.textMain,
-                  fontSize: 16,
-                },
-                error: {
-                  color: Color.danger,
-                  fontSize: 14,
-                  marginTop: 4,
-                },
-                errorColor: Color.danger,
-              },
-              rootContainer: {
-                marginHorizontal: 24,
-                marginBottom: 50,
-              },
-              customCheckbox: {
-                text: {
-                  flex: 1,
-                  color: Color.textMain,
-                },
-                container: {
-                  width: '100%',
-                },
-              },
-              passwordTitle: {
-                color: Color.textMain,
-                fontSize: 20,
-                fontWeight: '700',
-                marginBottom: 16,
-              },
-              checkboxStyles: {
-                container: {
-                  width: '100%',
-                },
-                text: {
-                  color: Color.textMain,
-                },
-                indicator: {
-                  borderColor: Color.white,
-                  backgroundColor: Color.white,
-                },
-                indicatorDisabled: {
-                  borderColor: Color.white,
-                },
-                icon: {
-                  tintColor: Color.validationGreen,
-                },
-                error: {
-                  color: Color.danger, 
-                  marginTop: 8,
-                  marginLeft: 40,
-                }
-              },
-
-              checkoutButton: {
-                button: {
-                  backgroundColor: Color.primary,
-                  borderRadius: 2,
-                },
-              },
-              checkoutButtonDisabled: {
-                button: {
-                  backgroundColor: Color.blueGray,
-                  borderRadius: 2,
-                },
-              },
-
-              texts: {
-                color: Color.textMain,
-                fontSize: 14,
-                marginBottom: 16,
-              },
-              dropdownStyles: {
-                container: {
-                  width: '100%',
-                  marginBottom: 32,
-                },
-                button: {
-                  borderColor: Color.white,
-                  width: '100%',
+            ref={billingRef}
+            onCartExpired={handleOnCartExpired}
+            onSkippingStatusChange={setSkippingStatus}
+            loginBrandImages={{
+              image1: GOOGLE_IMAGE,
+              image1Style: {
                   height: 50,
-                  borderRadius: 5,
-                  borderWidth: 1,
+                  width: 100,
+                  resizeMode: 'contain',
+                  tintColor: undefined
                 },
-                label: {
-                  color: Color.textMain,
-                  fontSize: 16,
+                image2: AMAZON_IMAGE,
+                image2Style: {
+                  height: 50,
+                  width: 100,
+                  resizeMode: 'contain',
+                  tintColor: undefined,
+                  marginBottom: 16
                 },
-                icon: {
-                  tintColor: Color.white,
+              }}
+              onLoadingChange={setIsLoading}
+              texts={{
+                form: {
+                  getYourTicketsTitle: '_Get your tickets_',
+                  firstName: '_First name_',
+                  lastName: '_Last name_',
+                  email: '_Email_',
+                  phone: '_Phone_',
+                  confirmEmail: '_Confirm email_',
+                  street: '_Street_',
+                  city: '_City_',
+                  country: '_Country_',
+                  zipCode: '_Zip code_',
+                  state: '_State_',
+                  ticketHoldersTitle: '_Ticket holders_',
+                  ticketHolderItem: '_Ticket holder item_',
+                  isSubToTicketFairy: '_Is sub to ticket fairy_',
+                  holderEmail: '_Holder email_',
+                  holderFirstName: '_Holder first name_',
+                  holderLastName: '_Holder last name_',
+                  holderPhone: '_Holder phone_',
+                  isSubToBrand: '_Is sub to Brand_',
+                  password: '_Password_',
+                  confirmPassword: '_Confirm password_',
+                  dateOfBirth: '_Date of birth_',
+                  emailsAdvice: '_Emails advice_',
+                  choosePassword: '_Choose password_',
+                  fillAllRequiredFieldsAlert: '_Fill all required fields_',
+                  optional: '(_Optional_)',
+                  ttfPrivacyPolicyRequiredError: '* Required'
                 },
-              },
-              dropdownMaterialStyles: {
-                input: {
-                  baseColor: Color.white
-                }, 
-                
-              },
-              ticketHolderItemHeader: {
-                fontSize: 28,
-                fontWeight: '800',
-                marginBottom: 16,
-                color: Color.textMain,
-              },
-              screenTitle: {
-                fontSize: 28,
-                fontWeight: '800',
-                marginBottom: 16,
-                color: Color.textMain,
-              },
-              ticketHoldersTitle: {
-                color: Color.textMain,
-                fontSize: 20,
-                fontWeight: '700',
-                marginBottom: 16,
-              },
-              inputStyles: {
-                input: {
-                  color: Color.textMain,
-                },
-                container: {
-                  borderColor: 'red',
-                },
-                baseColor: Color.white,
-                errorColor: Color.danger,
-              },
-              loginStyles: {
-                guest: {
-                  line1: {
-                    color: Color.textMain,
-                  },
-                  line2: {
-                    color: Color.textMain,
-                  },
-                  loginButton: {
-                    button: {
-                      backgroundColor: Color.primary,
-                      borderRadius: 2,
-                    },
-                  },
-                },
-                dialog: {
-                  container: {
-                    backgroundColor: Color.backgroundMain,
-                  },
-                  title: {
-                    color: Color.textMain,
-                  },
-                  input: {
-                    baseColor: Color.textMain,
-                    input: {
-                      color: Color.textMain,
-                    },
-                  },
-                  loginButton: {
-                    button: {
-                      backgroundColor: Color.primary,
-                      borderRadius: 2,
-                    },
-                  },
-                  loginButtonDisabled: {
-                    button: {
-                      backgroundColor: Color.blueGray,
-                      borderRadius: 2,
-                    },
-                    container: {
-                      width: '100%',
-                    },
-                  },
-                },
+                checkoutButton: '_Checkout_',
+                loginTexts: {
+                  loginButton: '_Login_',
+                  logoutButton: '_Logout_',
+                  line1: '_Line 1_',
+                  line2: '_Line 2_',
+                  message: '_Message_',
 
-                loggedIn: {
-                  placeholder: {
-                    color: Color.textMain,
-                    fontSize: 16,
+                  logoutDialog: {
+                    title: '_Logout?_',
+                    message: '_sure to logout?_',
+                    confirm: '_yes_',
+                    cancel: '_cancel_',
                   },
-                  value: {
-                    fontWeight: '800',
+                  dialog: {
+                    loginButton: '_Dialog_login_',
+                    message: '_Dialog message_',
+                    emailLabel: '_Dialog email label_',
+                    passwordLabel: '_Dialog password label_',
+                    title: '_Login title_',
                   },
-                  message: {
-                    color: Color.textMain,
-                  },
-                  button: {
-                    button: {
-                      backgroundColor: Color.danger,
-                      borderRadius: 2,
-                    },
-                  },
-                },
-              },
-              phoneInput: {
-                input: {
-                  baseColor: Color.textMain,
-                  color: Color.textMain,
-                  input: {
-                    color: Color.textMain,
-                  },
-                },
-                
-              }
-            }}
-            cartProps={cartProps!}
-            onCheckoutSuccess={handleOnCheckoutSuccess}
-            onLoginSuccess={handleOnLoginSuccess}
-            onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}
-          />
+                  loggedIn: {
+                    loggedAs: '_Logged in:_',
+                    notYou: '_Not you?_',
+                  }
+                }
+              }}
+              styles={billingInfoStyles}
+              cartProps={cartProps!}
+              onCheckoutSuccess={handleOnCheckoutSuccess}
+              onLoginSuccess={handleOnLoginSuccess}
+              onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}        
+              />
           </>
         )
       case ComponentEnum.Checkout:
@@ -1100,6 +892,7 @@ const App = () => {
         return (
           <View style={{ flex: 1 }}>
             <Tickets
+            ref={ticketsRef}
             config={{
               areTicketsGrouped: true,
             }}

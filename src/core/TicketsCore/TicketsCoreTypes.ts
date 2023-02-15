@@ -5,6 +5,7 @@ import {
   IPromoCodeResponse,
 } from '../../api/types'
 import { IAddToCartResponse, IError, ITicket } from '../../types'
+import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
 export interface IBookTicketsOptions {
   optionName: string
@@ -35,7 +36,7 @@ export interface IGetTicketsPayload {
   isAccessCodeRequired?: boolean
 }
 
-export type TicketsCoreHandle = {
+export type TicketsCoreHandleType = {
   getTickets(options?: IGetTicketsOptions): Promise<IGetTicketsPayload>
   getEvent(): Promise<IEventResponse>
   addToCart(options: IBookTicketsOptions): Promise<IAddToCartResponse>
@@ -44,3 +45,5 @@ export type TicketsCoreHandle = {
   postReferralVisit(referralId: string): Promise<IPostReferralResponse>
   unlockPasswordProtectedEvent(password: string): Promise<IEventResponse>
 }
+
+export type TicketsCoreHandle = TicketsCoreHandleType & SessionCoreHandleType
