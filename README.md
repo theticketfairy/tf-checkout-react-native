@@ -2689,7 +2689,7 @@ Wrap your component with the Core component.
 
 # Changelog
 
-## NEXT
+## Version 1.0.25
 - Exposes `refreshAccessToken` function.
 - Changed returned `data` prop to `userProfile` in LoginCore response.
 - In **LoginCore Component**:
@@ -2699,6 +2699,10 @@ Wrap your component with the Core component.
   - Change `onRegisterError` return data type.
 - On **LoginCore**:
   - Change `login` return data type to include `accessTokenData` object.
+- Exports `SessionHandleType` to use it in the `ref` of the UI components.
+- All UI and Core components except Login and ResetPassword:
+  - Export function `refreshAccessToken`
+- Add `reloadData` to re-fetch servers data in UI components.
 
 ## Version 1.0.24
 - Add **SingleSignOn** feature.
