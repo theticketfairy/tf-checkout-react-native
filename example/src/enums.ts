@@ -6,5 +6,5 @@ export enum ComponentEnum {
   MyOrders,
   MyOrderDetails,
   ResaleTickets,
-  ResetPassword
+  ResetPassword,
 }

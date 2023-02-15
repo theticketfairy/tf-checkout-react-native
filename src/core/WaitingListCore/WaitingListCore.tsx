@@ -1,8 +1,12 @@
 import React, { forwardRef, useImperativeHandle } from 'react'
 
 import { addToWaitingList } from '../../api/ApiClient'
-import { IAddToWaitingListResponse } from '../../api/types'
+import {
+  IAddToWaitingListResponse,
+  IFetchAccessTokenResponse,
+} from '../../api/types'
 import { IWaitingListFields } from '../../components/waitingList/types'
+import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
 import { ICoreProps } from '../CoreProps'
 import {
   IAddToWaitingListCoreParams,
@@ -22,6 +26,12 @@ const WaitingListCore = forwardRef<WaitingListCoreHandle, ICoreProps>(
         }
 
         return await addToWaitingList(fields)
+      },
+
+      async refreshAccessToken(
+        refreshToken?: string
+      ): Promise<IFetchAccessTokenResponse> {
+        return await refreshAccessTokenAsync(refreshToken)
       },
     }))
 

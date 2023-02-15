@@ -15,9 +15,15 @@ import {
   Tickets,
 } from './containers'
 import {
+  IBillingProps,
   IOnCheckoutSuccess,
   SkippingStatusType,
 } from './containers/billingInfo/types'
+import { ICheckoutProps } from './containers/checkout/types'
+import { IMyOrderDetailsProps } from './containers/myOrderDetails/types'
+import { IMyOrdersProps } from './containers/myOrders/types'
+import { IPurchaseConfirmationProps } from './containers/purchaseConfirmation/types'
+import { IResaleTicketsProps } from './containers/resaleTickets/types'
 import { ITicketsProps } from './containers/tickets/types'
 import {
   BillingCore,
@@ -34,6 +40,8 @@ import {
   PurchaseConfirmationCoreHandle,
   ResetPasswordCore,
   ResetPasswordCoreHandle,
+  SessionCoreHandleType,
+  SessionHandleType,
   TicketsCore,
   TicketsCoreHandle,
   WaitingListCore,
@@ -56,9 +64,15 @@ export {
   CheckoutCore,
   CheckoutCoreHandle,
   deleteAllData,
+  IBillingProps,
+  ICheckoutProps,
   IMyOrderDetailsData,
+  IMyOrderDetailsProps,
   IMyOrdersOrder,
+  IMyOrdersProps,
   IOnCheckoutSuccess,
+  IPurchaseConfirmationProps,
+  IResaleTicketsProps,
   ITicketsProps,
   ITicketsResponseData,
   IUserProfile,
@@ -80,6 +94,8 @@ export {
   ResetPassword,
   ResetPasswordCore,
   ResetPasswordCoreHandle,
+  SessionCoreHandleType,
+  SessionHandleType,
   setConfig,
   SkippingStatusType,
   Tickets,

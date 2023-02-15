@@ -115,6 +115,8 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 
 Client.interceptors.response.use(
   (response: AxiosResponse) => {
+    console.log('Response', response.config.url)
+    console.log('Response', response.request)
     return response
   },
   async (error: AxiosError) => {

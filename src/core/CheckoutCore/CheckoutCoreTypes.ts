@@ -4,8 +4,9 @@ import {
   IOrderReviewResponse,
 } from '../../api/types'
 import { ICoreProps } from '../CoreProps'
+import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
-export type CheckoutCoreHandle = {
+export type CheckoutCoreHandleType = {
   getEventConditions(eventId: string): Promise<any>
   getPurchaseOrderDetails(orderId: string): Promise<IMyOrderDetailsResponse>
   getOrderReview(orderHash: string): Promise<IOrderReviewResponse>
@@ -17,3 +18,5 @@ export interface ICheckoutCoreProps extends ICoreProps {
   onCartExpired?: () => void
   onSecondsLeftChange?: (secondsLeft: number) => void
 }
+
+export type CheckoutCoreHandle = CheckoutCoreHandleType & SessionCoreHandleType
