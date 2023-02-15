@@ -35,6 +35,7 @@ import {
   ICloseSessionResponse,
   ICountriesResponse,
   IEventResponse,
+  IFetchAccessTokenResponse,
   IFetchTicketsResponse,
   IFreeRegistrationData,
   IFreeRegistrationResponse,
@@ -114,6 +115,8 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 
 Client.interceptors.response.use(
   (response: AxiosResponse) => {
+    console.log('Response', response.config.url)
+    console.log('Response', response.request)
     return response
   },
   async (error: AxiosError) => {
@@ -197,7 +200,9 @@ export const authorize = async (
   }
 }
 
-export const fetchAccessToken = async (data: FormData) => {
+export const fetchAccessToken = async (
+  data: FormData
+): Promise<IFetchAccessTokenResponse> => {
   let responseError: IError | undefined
   const response = await Client.post('/v1/oauth/access_token', data).catch(
     (error: AxiosError) => {
@@ -208,9 +213,31 @@ export const fetchAccessToken = async (data: FormData) => {
     }
   )
 
+  const accessToken = _get(response, 'data.access_token')
+  if (accessToken) {
+    await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken)
+  }
+  const refreshToken = _get(response, 'data.refresh_token')
+  if (refreshToken) {
+    await storeData(LocalStorageKeys.REFRESH_TOKEN, refreshToken)
+  }
+  const tokenType = _get(response, 'data.token_type')
+  if (tokenType) {
+    await storeData(LocalStorageKeys.TOKEN_TYPE, tokenType)
+  }
+  const scope = _get(response, 'data.scope')
+  if (scope) {
+    await storeData(LocalStorageKeys.AUTH_SCOPE, scope)
+  }
+
   return {
-    error: responseError,
-    accessToken: _get(response, 'data.access_token'),
+    accessTokenError: responseError,
+    accessTokenData: {
+      accessToken,
+      refreshToken,
+      tokenType,
+      scope,
+    },
   }
 }
 
@@ -253,18 +280,18 @@ export const registerNewUser = async (
   data: FormData
 ): Promise<IRegisterNewUserResponse> => {
   const resultData: IRegisterNewUserResponse = {
-    error: undefined,
-    data: undefined,
+    registerNewUserResponseError: undefined,
+    registerNewUserResponseData: undefined,
   }
 
   const res: AxiosResponse | void = await Client.post(
     '/v1/oauth/register-rn',
     data
   ).catch((error: AxiosError) => {
-    resultData.error = error.response?.data.message
+    resultData.registerNewUserResponseError = error.response?.data.message
 
     if (error.response?.data.message.email) {
-      resultData.error = {
+      resultData.registerNewUserResponseError = {
         isAlreadyRegistered: true,
         message:
           'It appears this email is already attached to an account. Please log in here to complete your registration.',
@@ -274,19 +301,41 @@ export const registerNewUser = async (
   })
 
   if (res?.status === 200) {
-    resultData.data = res.data.data.attributes
+    const userProfile = _get(res, 'data.data.attributes.user_profile')
+    const accessToken = _get(res, 'data.data.attributes.access_token')
+    const refreshToken = _get(res, 'data.data.attributes.refresh_token')
+    const scope = _get(res, 'data.data.attributes.scope')
+    const tokenType = _get(res, 'data.data.attributes.token_type')
 
-    if (res.data.data?.attributes.access_token) {
-      await setAccessTokenHandler(res.data.data.attributes.access_token)
+    if (accessToken) {
+      await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken)
+      await setAccessTokenHandler(accessToken)
+    }
 
-      await storeData(
-        LocalStorageKeys.ACCESS_TOKEN,
-        res.data.data.attributes.access_token
-      )
-      await storeData(
-        LocalStorageKeys.REFRESH_TOKEN,
-        res.data.data.attributes.refresh_token
-      )
+    if (refreshToken) {
+      await storeData(LocalStorageKeys.REFRESH_TOKEN, refreshToken)
+    }
+
+    if (tokenType) {
+      await storeData(LocalStorageKeys.TOKEN_TYPE, tokenType)
+    }
+
+    if (scope) {
+      await storeData(LocalStorageKeys.AUTH_SCOPE, scope)
+    }
+
+    resultData.registerNewUserResponseData = {
+      accessTokenData: {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        tokenType: tokenType,
+        scope: scope,
+      },
+      userProfile: {
+        firstName: _get(userProfile, 'first_name'),
+        lastName: _get(userProfile, 'last_name'),
+        email: _get(userProfile, 'email'),
+      },
     }
   }
 
@@ -1052,12 +1101,12 @@ export const closeSession = async (): Promise<ICloseSessionResponse> => {
     responseData = {
       message: response.data.message || 'Session closed successfully',
     }
-
-    await deleteAllData()
-
-    Client.removeGuestToken()
-    Client.removeAccessToken()
   }
+
+  await deleteAllData()
+
+  Client.removeGuestToken()
+  Client.removeAccessToken()
 
   return {
     closeSessionData: responseData,

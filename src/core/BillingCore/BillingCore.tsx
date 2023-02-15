@@ -14,10 +14,12 @@ import {
   ICartResponse,
   ICheckoutBody,
   ICountriesResponse,
+  IFetchAccessTokenResponse,
   IRegisterNewUserResponse,
   IStatesResponse,
   IUserProfileResponse,
 } from '../../api/types'
+import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
 import {
   BillingCoreHandle,
   IBillingCoreProps,
@@ -99,6 +101,12 @@ const BillingCore = forwardRef<BillingCoreHandle, IBillingCoreProps>(
 
       async registerNewUser(data: FormData): Promise<IRegisterNewUserResponse> {
         return await registerNewUser(data)
+      },
+
+      async refreshAccessToken(
+        refreshToken?: string
+      ): Promise<IFetchAccessTokenResponse> {
+        return await refreshAccessTokenAsync(refreshToken)
       },
     }))
 

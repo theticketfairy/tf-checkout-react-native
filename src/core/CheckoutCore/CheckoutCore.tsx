@@ -10,10 +10,12 @@ import {
   postOnPaymentSuccess,
 } from '../../api/ApiClient'
 import {
+  IFetchAccessTokenResponse,
   IFreeRegistrationResponse,
   IMyOrderDetailsResponse,
   IOrderReviewResponse,
 } from '../../api/types'
+import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
 import { CheckoutCoreHandle, ICheckoutCoreProps } from './CheckoutCoreTypes'
 
 const CheckoutCore = forwardRef<CheckoutCoreHandle, ICheckoutCoreProps>(
@@ -61,11 +63,13 @@ const CheckoutCore = forwardRef<CheckoutCoreHandle, ICheckoutCoreProps>(
       async getEventConditions(eventId: string): Promise<any> {
         return await fetchEventConditions(eventId)
       },
+
       async getPurchaseOrderDetails(
         orderId: string
       ): Promise<IMyOrderDetailsResponse> {
         return await fetchOrderDetails(orderId)
       },
+
       async getOrderReview(orderHash: string): Promise<IOrderReviewResponse> {
         const res = await fetchOrderReview(orderHash)
         if (res.orderReviewData) {
@@ -74,13 +78,21 @@ const CheckoutCore = forwardRef<CheckoutCoreHandle, ICheckoutCoreProps>(
         }
         return res
       },
+
       async freeRegistration(
         orderHash: string
       ): Promise<IFreeRegistrationResponse> {
         return await postOnFreeRegistration(orderHash)
       },
+
       async paymentSuccess(orderHash: string): Promise<any> {
         return await postOnPaymentSuccess(orderHash)
+      },
+
+      async refreshAccessToken(
+        refreshToken?: string
+      ): Promise<IFetchAccessTokenResponse> {
+        return await refreshAccessTokenAsync(refreshToken)
       },
     }))
 

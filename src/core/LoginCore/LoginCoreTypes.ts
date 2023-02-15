@@ -1,5 +1,6 @@
 import {
   ICloseSessionResponse,
+  IFetchAccessTokenData,
   IResetPasswordRequestData,
   IRestorePasswordResponse,
 } from '../../api/types'
@@ -8,7 +9,8 @@ import { IError, IUserProfilePublic } from '../../types'
 
 export interface ILoginCoreResponse {
   error?: IError
-  data?: IUserProfilePublic
+  userProfile?: IUserProfilePublic
+  accessTokenData?: IFetchAccessTokenData
 }
 
 export type LoginCoreHandle = {

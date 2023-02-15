@@ -12,6 +12,7 @@ import React, {
   useImperativeHandle,
 } from 'react'
 
+import styles from './styles'
 import { IStripePaymentProps, StripePaymentHandle } from './types'
 
 const StripePayment = forwardRef<StripePaymentHandle, IStripePaymentProps>(
@@ -45,7 +46,7 @@ const StripePayment = forwardRef<StripePaymentHandle, IStripePaymentProps>(
     return (
       <CardForm
         onFormComplete={props.onChangePaymentInfo}
-        style={[{ height: 300 }, props.style]}
+        style={[styles.cardForm, props.style]}
         cardStyle={props.cardStyle}
       />
     )

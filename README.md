@@ -225,6 +225,12 @@ Let the user to resale their tickets. They can choose between selling them to a 
 
 After opening and URL with the corresponding schema, use this component to let the user reset its password.
 
+### Exported functions
+
+- setConfig: Sets config for the library
+
+- refreshAccessToken: Let refresh the expired access token.
+
 # Component styling
 ### Button
 ```ts
@@ -261,6 +267,69 @@ interface ICheckboxStyles {
 }
 ```
 
+# Exported functions
+## setConfig
+Set the configuration for the library.
+
+```ts
+export interface IConfig {
+  EVENT_ID: string | number
+  CLIENT?: string
+  ENV?: EnvType
+  CLIENT_ID?: string
+  CLIENT_SECRET?: string
+  TIMEOUT?: number
+  BRAND?: string
+  ARE_SUB_BRANDS_INCLUDED?: boolean
+  // AUTH is used for single sign on v1.
+  // It receives the needed information for the authenticated user.
+  AUTH?: {
+    ACCESS_TOKEN: string
+    REFRESH_TOKEN: string
+    TOKEN_TYPE: string
+    SCOPE: string
+  }
+}
+```
+## refreshAccessToken
+
+Let refresh the expired access token, it can use the internal stored refresh token, passing nothing to it, or you can pass a `string` refresh token.
+
+```ts
+const response: IFetchAccessTokenResponse = await refreshAccessToken(refreshToken?: string)
+```
+
+Returns the new access token data or error.
+
+```ts
+accessTokenError?: {
+  code?: number
+  message: string
+}
+accessTokenData?: {
+  accessToken: string
+  refreshToken: string
+  tokenType: string
+  scope: string
+}
+```
+
+# Exported handlers
+## SessionCoreHandle
+Exports function to refresh access token.
+
+### refreshAccessToken
+Allows to refresh access token inside the component. It will automatically re-fetch the component's data from the server. You will need to create a `ref` object with the corresponding type.
+
+Example: 
+
+In your parent component
+```ts 
+const sessionHandleRef = useRef<SessionHandleType>(null)
+
+// Call the refreshAccessToken function by using
+await sessionHandleRef.current?.refreshAccessToken()
+```
 
 # Exported components
 Depending on your needs, you can use the UI Components or the Core Components.
@@ -290,6 +359,14 @@ Depending on your needs, you can use the UI Components or the Core Components.
 [Reset Password](#reset-password-ui)
 
 ---
+## Session handle
+
+In all components with the exception of Login and Reset Password, you can pass a `ref` with type `SessionHandleType` to access two functions:
+
+`refreshAccessToken` After a successful access token refresh, it will re-fetch component's data from server when applicable.
+`reloadData` It will re-fetch component's data from server.
+
+---
 ## Login UI
 
 Import the component from the library
@@ -302,7 +379,10 @@ Then add it to the render function.
 
 ```tsx
 <Login
-  onLoginSuccessful: (userProfile: IUserProfile, accessToken: string) => void
+  onLoginSuccessful: (
+    userProfile: IUserProfile, 
+    accessTokenData?: IFetchAccessTokenData
+  ) => void
   onLoginError?: (error: IError) => void
 
   onFetchUserProfileError?: (error: IError) => void
@@ -350,6 +430,34 @@ Then add it to the render function.
 />
 ```
 
+### Data Types
+#### IUserProfile
+```ts
+{
+  customerId: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  streetAddress: string
+  zipCode: string
+  countryId: string
+  company?: string
+  state: string
+  stateId: string
+  city: string
+}
+```
+
+#### IFetchAccessTokenData
+```ts
+{
+  accessToken: string
+  refreshToken: string
+  tokenType: string
+  scope: string
+}
+```
 ### Props
 | Property | Description |
 |----------|-------------|
@@ -482,13 +590,19 @@ import { Tickets } from 'tf-checkout-react-native'
 Then add it to the render function.
 
 ```js
-<Tickets eventId={EVENT_ID} onAddToCartSuccess={handleOnAddToCartSuccess} />
+const sessionHandleRef = useRef<SessionHandleType>(null)
+
+<Tickets 
+  ref={sessionHandleRef}
+  eventId={EVENT_ID} 
+  onAddToCartSuccess={handleOnAddToCartSuccess} />
 ```
 
 ### Props
 
 ```js
 {
+  ref?: SessionHandleType
   // Callbacks for when user taps on GET Tickets button
   onAddToCartSuccess: (data: {
     isBillingRequired: boolean
@@ -555,6 +669,7 @@ Then add it to the render function.
     isLoading?: boolean
   }
 
+  // Configure the Component behavior
   config: {
     areActivityIndicatorsEnabled?: boolean
     areAlertsEnabled?: boolean
@@ -577,6 +692,21 @@ Then add it to the render function.
   isAgeRequired?: boolean
   minimumAge?: number
   isNameRequired?: boolean
+}
+```
+
+### config prop
+Configure the component's behavior 
+```ts
+config: {
+  // Whether or not show the loading indicators.
+  areActivityIndicatorsEnabled?: boolean
+  // Whether or not show the alerts.
+  areAlertsEnabled?: boolean
+  // Whether or not the Ticket should be sorted by Sold Out.
+  areTicketsSortedBySoldOut?: boolean
+  // Whether or not the tickets should be grouped, they need to be configured as groups in the Tickets admin.
+  areTicketsGrouped?: boolean
 }
 ```
 
@@ -723,7 +853,11 @@ import { BillingInfo } from 'tf-checkout-react-native'
 Add it to the render function.
 
 ```js
+const sessionHandleRef = useRef<SessionHandleType>(null)
+
+
 <BillingInfo
+  ref={sessionHandleRef}
   cartProps: { 
     isBillingRequired: boolean
     isNameRequired: boolean
@@ -732,8 +866,24 @@ Add it to the render function.
     minimumAge: number
   }
   // registerNewUser
-  onRegisterSuccess?: (tokens: ITokens) => void
-  onRegisterError?: (error: string) => void
+  onRegisterSuccess?: (data: {
+      accessTokenData: {
+        accessToken: string
+        refreshToken: string
+        tokenType: string
+        scope: string
+      }
+      userProfile: {
+        firstName: string
+        lastName: string
+        email: string
+      }
+    }) => void
+  onRegisterError?: (error: { 
+    isAlreadyRegistered?: boolean
+    message?: string
+    raw?: any
+  }) => void
 
   onCheckoutSuccess: (data: {   
     id: string
@@ -743,7 +893,8 @@ Add it to the render function.
   }) => void
   onCheckoutError?: (error: IError) => void
 
-  onLoginSuccess: (data: any) => void
+  // See ILoginSuccessData data type below.
+  onLoginSuccess: (data: ILoginSuccessData) => void
   onLoginError?: (error: IError) => void
 
   onFetchUserProfileSuccess?: (data: any) => void
@@ -795,6 +946,34 @@ Add it to the render function.
     image2Style?: StyleProp<ImageStyle>
   }
 />
+```
+
+### DataTypes
+ILoginSuccessData
+
+```ts
+interface ILoginSuccessData {
+  userProfile: {
+    customerId: string
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    streetAddress: string
+    zipCode: string
+    countryId: string
+    company?: string
+    state: string
+    stateId: string
+    city: string
+  }
+  accessTokenData?: {
+    accessToken: string
+    refreshToken: string
+    tokenType: string
+    scope: string
+  }
+}
 ```
 
 ### Props
@@ -935,7 +1114,10 @@ import { Checkout } from 'tf-checkout-react-native'
 Add it to the render function.
 
 ```js
+const sessionHandleRef = useRef<SessionHandleType>(null)
+
 <Checkout
+  ref={sessionHandleRef}
   eventId={EVENT_ID}
   hash={hash}
   total={total}
@@ -951,6 +1133,7 @@ Add it to the render function.
 
 ```js
 {
+  ref?: SessionHandleType
   eventId: number
   hash: string
   total: string
@@ -1062,13 +1245,16 @@ Additionally, if you are encountering problems with building your project, pleas
 Import the component from the library
 
 ```js
-import { PurchaseConfirmation } from 'tf-checkout-react-native'
+import { PurchaseConfirmation, SessionHandleType } from 'tf-checkout-react-native'
 ```
 
 Add it to the render function.
 
 ```js
+const sessionHandleRef = useRef<SessionHandleType>(null)
+
 <PurchaseConfirmation
+  ref={sessionHandleRef}
   orderHash={checkoutProps!.hash}
   onComplete={handleOnComplete}
 
@@ -1114,14 +1300,15 @@ If there is a valid session, there will appear a button to access `MyOrders` in 
 Import the component from the library.
 
 ```js
-import { MyOrders } from 'tf-checkout-react-native'
+import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
 ```
 
 
 ### Props
 
-```js
+```tsx
 {
+  ref={SessionHandleType}
   onSelectOrder: (order: {
     order: {
     header: {
@@ -1238,13 +1425,14 @@ When user selects an order from the `MyOrders` component, will show it details.
 Import the component from the library.
 
 ```js
-import { MyOrderDetails } from 'tf-checkout-react-native'
+import { MyOrderDetails, SessionHandleType } from 'tf-checkout-react-native'
 ```
 
 ### Props
 
 ```tsx
 {
+  ref={SessionHandleType}
   data: IMyOrderDetailsData
 
   // Used to navigate to the Resale Tickets screen
@@ -1406,13 +1594,14 @@ Allows the user to resale the tickets they bought. They can decide wether sell i
 Import the component from the library.
 
 ```js
-import { ResaleTickets } from 'tf-checkout-react-native'
+import { ResaleTickets, SessionHandleType } from 'tf-checkout-react-native'
 ```
 
 ### Props
 
 ```ts
 {
+  ref={SessionHandleType}
   ticket: {
     currency: string
     description: string
@@ -1590,6 +1779,63 @@ Then add it to the render function.
 [ResetPasswordCore](#resetpasswordcore)
  
 ---
+## SessionCoreHandle
+
+All Core components with the exception of Login and ResetPassword exposes the `refreshAccessToken` function to re-authenticate the user after the access token is expired. This is through the corresponding `CoreHandle` ref.
+
+It returns the `IFetchAccessTokenResponse` object: 
+
+```ts
+IFetchAccessTokenResponse {
+  accessTokenError?: {
+    code?: number
+    message: string
+    extraData?: any
+  }
+  accessTokenData?: {
+    accessToken: string
+    refreshToken: string
+    tokenType: string
+    scope: string
+  }
+}
+```
+
+
+### Example:
+
+Import the component from the library
+
+```js
+import { 
+  TicketsCore 
+  TicketsCoreHandle // You can import the Handle to use it as type in the useRef hook
+} from 'tf-checkout-react-native'
+```
+
+Declare a reference to pass it to the component.
+
+```js
+const ticketsCoreRef = useRef<TicketsCoreHandle>(null)
+```
+
+Then add it to the render function and assign the reference to the corresponding component.
+
+```js
+<TicketsCore ref={ticketsCoreRef}>
+  <YourComponent />
+</TicketsCore>
+```
+
+Use the reference to access the component methods.
+
+```js
+const handleGetTickets = async () => {
+  const res = await ticketsCoreRef.current.refreshAccessToken()
+}
+```
+
+---
 
 ## TicketsCore
 This is the initial component to show. It will retrieve the tickets, event, present My Orders and Logout buttons if the user is logged in, and will add the selected tickets to the cart.
@@ -1603,6 +1849,8 @@ Exposes the following functions:
 `addToCart` Adds the selected tickets to the cart.
 
 `postReferralVisit` Posts a referral visit to the server.
+
+`refreshAccessToken` : Refreshes expired access token.
 
 ```js
 {
@@ -1757,16 +2005,16 @@ Exposes the following functions:
     }
 
     postReferralVisit(referralId: string): Promise<
-    postReferralError?: {
-      code?: number
+      postReferralError?: {
+        code?: number
+        message: string
+        extraData?: any
+      }
+      postReferralData?: {
       message: string
-      extraData?: any
-    }
-    postReferralData?: {
-    message: string
-    status: number
-  }
-    >
+      status: number
+    }>
+    refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
   }>
 }
 ```
@@ -1777,7 +2025,6 @@ Import the component from the library
 import { 
   TicketsCore 
   TicketsCoreHandle // You can import the Handle to use it as type in the useRef hook
-  
 } from 'tf-checkout-react-native'
 ```
 
@@ -1801,7 +2048,6 @@ Use the reference to access the component methods.
 const handleGetTickets = async () => {
   const res = await ticketsCoreRef.current.getTickets()
 }
-
 ```
 ---
 
@@ -1810,7 +2056,7 @@ This component *must* appear after getting the response from **getTickets()** an
 
 
 Exposes the following functions: 
-```js
+```tsx
 {
   addToWaitingList(
     params: {
@@ -1831,6 +2077,7 @@ Exposes the following functions:
       success: boolean
     }
   }>
+  refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
 }
 ```
 **addToWaitingList** Receives params with the following properties:
@@ -1903,7 +2150,7 @@ Exposes the following functions:
 
 `getUserProfile` Fetches the user profile information.
 
-`registerNewUser` Registers a new user.
+`registerNewUser` Registers a new user. Returns accessTokens data.
 
 `checkoutOrder` Performs the checkout.
 
@@ -1989,21 +2236,27 @@ Exposes the following functions:
 
   // Registers a new user.
   registerNewUser(data: FormData): Promise<{
-    error?: {
+    registerNewUserResponseError?: {
       isAlreadyRegistered?: boolean
       message?: string
       raw?: any
     }
-    data?: {
-      token_type: string
-      scope: string
-      user_profile: {
-        first_name: string
-        last_name: string
+    registerNewUserResponseData?: {
+      accessTokenData: {
+        accessToken: string
+        refreshToken: string
+        tokenType: string
+        scope: string
+      }
+      userProfile: {
+        firstName: string
+        lastName: string
         email: string
       }
     }
   }>
+
+  refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
 }
 
 ```
@@ -2030,6 +2283,8 @@ Exposes the following functions:
 `freeRegistration` Free registration to an event.
 
 `paymentSuccess` Payment success.
+
+`refreshAccessToken` Refreshes access token.
 
 
 ```ts
@@ -2133,6 +2388,9 @@ freeRegistration(orderHash: string): Promise<{
 
 // Payment success.
 paymentSuccess(orderHash: string): Promise<any>
+
+// Refresh access token.
+refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
 ```
 ---
 ## PurchaseConfirmationCore
@@ -2141,6 +2399,8 @@ Shows the purchase confirmation information.
 It exposes the following functions:
 
 `getPurchaseConfirmation` Get purchase confirmation for the current event.
+
+`refreshAccesstoken` Refreshes access token.
 
 ```ts
 getPurchaseConfirmation(
@@ -2179,6 +2439,7 @@ getPurchaseConfirmation(
       }[]
     }
   }>
+  refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
 ```
 ---
 ## MyOrdersCore
@@ -2190,8 +2451,12 @@ Exposes the following functions:
 
 `getOrderDetails` Get the details from a specific order.
 
+`refreshAccessToken` Refreshes access token.
+
 
 ```ts
+refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
+
 getMyOrders(page: number, filter: string): Promise<{
   myOrdersData?: {
     events: {
@@ -2349,7 +2614,7 @@ login(fields?: {
     extraData?: any
   }
 
-  data?: {
+  userProfile?: {
     customerId: string
     firstName: string
     lastName: string
@@ -2362,6 +2627,13 @@ login(fields?: {
     state: string
     stateId: string
     city: string
+  }
+
+  accessTokenData?: {
+    accessToken: string
+    refreshToken: string
+    tokenType: string
+    scope: string
   }
 }>
 
@@ -2417,13 +2689,29 @@ Wrap your component with the Core component.
 
 # Changelog
 
+## Version 1.0.25
+- Exposes `refreshAccessToken` function.
+- Changed returned `data` prop to `userProfile` in LoginCore response.
+- In **LoginCore Component**:
+  - Add `accessTokenData` object prop in `onLoginSuccessful` response.
+- On **BillingUI Component**:
+  - Change `onRegisterSuccess` return data type.
+  - Change `onRegisterError` return data type.
+- On **LoginCore**:
+  - Change `login` return data type to include `accessTokenData` object.
+- Exports `SessionHandleType` to use it in the `ref` of the UI components.
+- All UI and Core components except Login and ResetPassword:
+  - Export function `refreshAccessToken`
+- Add `reloadData` to re-fetch servers data in UI components.
+
 ## Version 1.0.24
 - Add **SingleSignOn** feature.
 - Add show Tickets in groups and the option to sort them by sold out.
 - Add config prop to Tickets component:
 
-```
+```ts
     config: {
+      // Indicates if loading component should be visible.
       areActivityIndicatorsEnabled?: boolean
       areAlertsEnabled?: boolean
       areTicketsSortedBySoldOut?: boolean

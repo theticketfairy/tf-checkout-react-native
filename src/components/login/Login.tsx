@@ -54,18 +54,24 @@ const Login: FC<ILoginProps> = ({
     }
 
     setIsLoading(true)
-    const { data: authorizationData, error: authorizationError } =
-      await loginCoreRef.current.login(fields)
+    const {
+      userProfile,
+      error: authorizationError,
+      accessTokenData,
+    } = await loginCoreRef.current.login(fields)
 
-    if (authorizationError || !authorizationData) {
+    if (authorizationError || !userProfile) {
       setIsLoading(false)
       setLoginApiError(authorizationError?.message || 'Auth error')
       return onLoginError?.(authorizationError!)
     }
 
     Keyboard.dismiss()
-    setUserProfileData(authorizationData)
-    onLoginSuccessful(authorizationData)
+    setUserProfileData(userProfile)
+    onLoginSuccessful({
+      userProfile,
+      accessTokenData,
+    })
     setIsLoading(false)
     hideLoginDialog()
   }
