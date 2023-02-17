@@ -7,6 +7,10 @@ import {
   ViewStyle,
 } from 'react-native'
 
+import {
+  IRegisterNewUserError,
+  IRegisterNewUserSuccessData,
+} from '../../api/types'
 import { IButtonStyles } from '../../components/button/types'
 import {
   ICartTimerStyles,
@@ -19,6 +23,7 @@ import { IDropdownMaterialStyles } from '../../components/dropdownMaterial/types
 import { IInputStyles } from '../../components/input/types'
 import {
   ILoginBrandImages,
+  ILoginSuccessData,
   ILoginViewStyles,
   ILoginViewTexts,
 } from '../../components/login/types'
@@ -26,7 +31,7 @@ import {
   IPhoneInputStyles,
   IPhoneInputTexts,
 } from '../../components/phoneInput/types'
-import { IError, ITicketsResponseData, IUserProfilePublic } from '../../types'
+import { IError, ITicketsResponseData } from '../../types'
 import { IAddOnResponse } from '../../types/IAddOn'
 
 export interface ITokens {
@@ -45,15 +50,15 @@ export interface IBillingProps {
   cartProps: ITicketsResponseData
 
   // registerNewUser
-  onRegisterSuccess?: () => void
-  onRegisterError?: (error: IError) => void
+  onRegisterSuccess?: (data: IRegisterNewUserSuccessData) => void
+  onRegisterError?: (error: IRegisterNewUserError) => void
 
   // checkoutOrder
   onCheckoutSuccess: (data: IOnCheckoutSuccess) => void
   onCheckoutError?: (error: IError) => void
 
   // login
-  onLoginSuccess: (data: IUserProfilePublic) => void
+  onLoginSuccess: (data: ILoginSuccessData) => void
   onLoginError?: (error: IError) => void
 
   // logout

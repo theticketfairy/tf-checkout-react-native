@@ -18,6 +18,7 @@ import {
   IAddToCartParams,
   ICloseSessionResponse,
   IEventResponse,
+  IFetchAccessTokenResponse,
   IPostReferralResponse,
 } from '../../api/types'
 import { Config } from '../../helpers/Config'
@@ -26,6 +27,7 @@ import {
   getData,
   LocalStorageKeys,
 } from '../../helpers/LocalStorage'
+import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
 import { IAddToCartResponse, ITicket } from '../../types'
 import { ICoreProps } from '../CoreProps'
 import {
@@ -192,6 +194,12 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
       referralId: string
     ): Promise<IPostReferralResponse> {
       return await postReferralVisit(referralId)
+    },
+
+    async refreshAccessToken(
+      refreshToken?: string
+    ): Promise<IFetchAccessTokenResponse> {
+      return await refreshAccessTokenAsync(refreshToken)
     },
   }))
 

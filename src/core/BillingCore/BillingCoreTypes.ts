@@ -10,13 +10,14 @@ import {
 } from '../../api/types'
 import { IError } from '../../types'
 import { ICoreProps } from '../CoreProps'
+import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
 export interface ICheckoutResponse {
   error?: IError
   data?: IOnCheckoutSuccess
 }
 
-export type BillingCoreHandle = {
+export type BillingCoreHandleType = {
   checkoutOrder(body: ICheckoutBody): Promise<ICheckoutResponse>
   getCart(): Promise<ICartResponse>
   getCountries(): Promise<ICountriesResponse>
@@ -25,6 +26,8 @@ export type BillingCoreHandle = {
   registerNewUser(data: FormData): Promise<IRegisterNewUserResponse>
   getAddOns(): Promise<IFetchAddOnsResponse>
 }
+
+export type BillingCoreHandle = BillingCoreHandleType & SessionCoreHandleType
 
 export interface IBillingCoreProps extends ICoreProps {
   onCartExpired: () => void

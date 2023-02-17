@@ -13,7 +13,6 @@ import {
   IResetPasswordRequestData,
 } from '../../api/types'
 import { ILoginFields } from '../../components/login/types'
-import { Config } from '../../helpers/Config'
 import {
   IStoredUserData,
   LocalStorageKeys,
@@ -21,6 +20,7 @@ import {
 } from '../../helpers/LocalStorage'
 import { IUserProfilePublic } from '../../types'
 import { ICoreProps } from '../CoreProps'
+import { getFetchAccessTokenBody } from './LoginCoreHelper'
 import { ILoginCoreResponse, LoginCoreHandle } from './LoginCoreTypes'
 
 const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
@@ -55,21 +55,14 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
         }
       }
 
-      const bodyFormDataToken = new FormData()
-      bodyFormDataToken.append('code', authorizationCode)
-      bodyFormDataToken.append('scope', 'profile')
-      bodyFormDataToken.append('grant_type', 'authorization_code')
-      bodyFormDataToken.append('client_id', Config.CLIENT_ID)
-      bodyFormDataToken.append('client_secret', Config.CLIENT_SECRET)
-
-      const { error: tokenError, accessToken } = await fetchAccessToken(
-        bodyFormDataToken
+      const { accessTokenError, accessTokenData } = await fetchAccessToken(
+        getFetchAccessTokenBody(authorizationCode)
       )
 
-      if (tokenError) {
+      if (accessTokenError) {
         return {
           error: {
-            ...tokenError,
+            ...accessTokenError,
             extraData: {
               endpoint: 'accessToken',
             },
@@ -77,9 +70,6 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
         }
       }
 
-      await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken)
-
-      // Fetch user profile
       const { userProfileError, userProfileData } = await fetchUserProfile()
 
       if (userProfileError) {
@@ -131,29 +121,29 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
         JSON.stringify(storedUserData)
       )
 
-      await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken)
-
-      return { data: userPublicData }
+      return { userProfile: userPublicData, accessTokenData: accessTokenData }
     },
+    // #endregion Login
+
+    // #region Logout
     async logout(): Promise<ICloseSessionResponse> {
       return await closeSession()
     },
-    // #endregion
+    // #endregion Logout
 
     // #region Restore Password
     async restorePassword(email: string) {
       const response = await requestRestorePassword(email)
       return response
     },
-    // #endregion
+    // #endregion Restore Password
 
     // #region Reset Password
     async resetPassword(data: IResetPasswordRequestData) {
       const response = await requestResetPassword(data)
-      console.log('RESPONSE RESET PASSWORD', response)
       return response
     },
-    // #endregion
+    // #endregion Reset Password
   }))
 
   return <>{props.children}</>
