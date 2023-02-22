@@ -577,19 +577,19 @@ export const addToCart = async (
 
   if (!responseError) {
     setCustomHeader(response)
+    const { attributes } = response?.data?.data
     responseData = {
-      isBillingRequired:
-        !response?.data?.data?.attributes?.skip_billing_page ?? true,
-      isNameRequired: response?.data?.data?.attributes?.names_required ?? false,
-      isAgeRequired: response?.data?.data?.attributes?.age_required ?? false,
-      isPhoneRequired:
-        response?.data?.data?.attributes?.phone_required ?? false,
+      isBillingRequired: !attributes?.skip_billing_page ?? true,
+      isNameRequired: attributes?.names_required ?? false,
+      isAgeRequired: attributes?.age_required ?? false,
+      isPhoneRequired: attributes?.phone_required ?? false,
       minimumAge: undefined,
+      isTicketFree: attributes?.free_ticket ?? false,
+      isPhoneHidden: attributes?.hide_phone_field && false,
     }
 
-    if (response?.data?.data?.attributes?.age_required) {
-      responseData.minimumAge =
-        response?.data?.data?.attributes?.minimum_age ?? 18
+    if (attributes?.age_required) {
+      responseData.minimumAge = attributes?.minimum_age ?? 18
     }
   }
 
