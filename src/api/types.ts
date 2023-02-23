@@ -91,18 +91,18 @@ export interface ICheckoutTicketHolder {
 export interface ICheckoutBody {
   attributes: {
     brand_opt_in: boolean
-    city: string
+    city?: string
     confirm_email: string
-    country: number
+    country?: number
     email: string
     first_name: string
     last_name: string
     password: string
-    phone: string
-    state: number
-    street_address: string
+    phone?: string
+    state?: number
+    street_address?: string
     ttf_opt_in: boolean
-    zip: string
+    zip?: string
     ticket_holders: ICheckoutTicketHolder[]
     dob_day?: number
     dob_month?: number
@@ -134,12 +134,12 @@ export interface IRegisterNewUserBody {
     last_name: string
     client_id: string
     client_secret: string
-    country: number
-    city: string
-    state: number
-    street_address: string
-    zip: string
-    phone: string
+    country?: number
+    city?: string
+    state?: number
+    street_address?: string
+    zip?: string
+    phone?: string
     check_cart_expiration: boolean
   }
 }

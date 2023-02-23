@@ -115,8 +115,6 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 
 Client.interceptors.response.use(
   (response: AxiosResponse) => {
-    console.log('Response', response.config.url)
-    console.log('Response', response.request)
     return response
   },
   async (error: AxiosError) => {
@@ -578,6 +576,7 @@ export const addToCart = async (
   if (!responseError) {
     setCustomHeader(response)
     const { attributes } = response?.data?.data
+
     responseData = {
       isBillingRequired: !attributes?.skip_billing_page ?? true,
       isNameRequired: attributes?.names_required ?? false,

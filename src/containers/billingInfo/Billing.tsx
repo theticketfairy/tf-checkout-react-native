@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable */
 import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _forEach from 'lodash/forEach'
@@ -49,6 +50,7 @@ import { Config } from '../../helpers/Config'
 import { getCountryDialCode } from '../../helpers/CountryCodes'
 import { useDebounced } from '../../helpers/Debounced'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
+import { emptyPhone } from '../../helpers/StringsHelper'
 import {
   validateAge,
   validateEmail,
@@ -66,6 +68,15 @@ import {
   SkippingStatusType,
 } from './types'
 
+/*
+  Fields to hide when ticket is free
+  - Billing Street Address
+  - City
+  - State/County
+  - Post Code/Zip
+  - Country
+*/
+
 const Billing = forwardRef<SessionHandleType, IBillingProps>(
   (
     {
@@ -77,6 +88,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         isPhoneRequired,
         minimumAge,
         isBillingRequired,
+        isTicketFree,
+        isPhoneHidden,
       },
       loginBrandImages,
       skipBillingConfig,
@@ -487,31 +500,38 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         return false
       }
 
-      if (
-        !firstName ||
-        !lastName ||
-        !email ||
-        !emailConfirmation ||
-        !city ||
-        !postalCode ||
-        selectedState?.value === '-1' ||
-        selectedCountry?.value === '-1'
-      ) {
-        return false
+      if (isTicketFree) {
+        if (!firstName || !lastName || !email || !emailConfirmation) {
+          return false
+        }
+      } else {
+        if (
+          !firstName ||
+          !lastName ||
+          !email ||
+          !emailConfirmation ||
+          !city ||
+          !postalCode ||
+          selectedState?.value === '-1' ||
+          selectedCountry?.value === '-1'
+        ) {
+          return false
+        }
+
+        if (Config.IS_BILLING_STREET_NAME_REQUIRED && !street) {
+          setIsLoading(false)
+          return false
+        }
       }
 
       if (
         isPhoneRequired &&
+        !isPhoneHidden &&
         validatePhoneNumber({
           phoneNumber: phone,
           customError: texts?.form?.phoneInput?.customError,
         })
       ) {
-        setIsLoading(false)
-        return false
-      }
-
-      if (Config.IS_BILLING_STREET_NAME_REQUIRED && !street) {
         setIsLoading(false)
         return false
       }
@@ -637,26 +657,45 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const getRegisterNewUserBody = (): IRegisterNewUserBody => {
-      const phoneNumber = phone.length < 5 ? '' : phone
+      const phoneNumber = isPhoneRequired ? phone : emptyPhone(phone)
 
-      const body: IRegisterNewUserBody = {
-        attributes: {
-          city: city,
-          country: parseInt(selectedCountry!.value as string, 10),
-          email: email,
-          first_name: firstName,
-          last_name: lastName,
-          password: password,
-          phone: phoneNumber,
-          state: parseInt(selectedState!.value as string, 10),
-          street_address: street,
-          zip: postalCode,
-          password_confirmation: passwordConfirmation,
-          client_id: Config.CLIENT_ID!,
-          client_secret: Config.CLIENT_SECRET!,
-          check_cart_expiration: true,
-        },
+      const body: IRegisterNewUserBody = isTicketFree
+        ? {
+            attributes: {
+              email: email,
+              first_name: firstName,
+              last_name: lastName,
+              password: password,
+              phone: phoneNumber,
+              password_confirmation: passwordConfirmation,
+              client_id: Config.CLIENT_ID!,
+              client_secret: Config.CLIENT_SECRET!,
+              check_cart_expiration: true,
+            },
+          }
+        : {
+            attributes: {
+              city: city,
+              country: parseInt(selectedCountry!.value as string, 10),
+              email: email,
+              first_name: firstName,
+              last_name: lastName,
+              password: password,
+              phone: phoneNumber,
+              state: parseInt(selectedState!.value as string, 10),
+              street_address: street,
+              zip: postalCode,
+              password_confirmation: passwordConfirmation,
+              client_id: Config.CLIENT_ID!,
+              client_secret: Config.CLIENT_SECRET!,
+              check_cart_expiration: true,
+            },
+          }
+
+      if (body.attributes.phone === undefined) {
+        delete body.attributes.phone
       }
+
       return body
     }
 
@@ -673,29 +712,49 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         parsedTicketHolders.push(individualHolder)
       }
 
-      const checkoutBody: ICheckoutBody = {
-        attributes: {
-          city: city,
-          confirm_email: emailConfirmation,
-          country: parseInt(selectedCountry!.value as string, 10),
-          email: email,
-          first_name: firstName,
-          last_name: lastName,
-          password: password,
-          phone: phone,
-          state: parseInt(selectedState!.value as string, 10),
-          street_address: street,
-          zip: postalCode,
-          ticket_holders: parsedTicketHolders,
-          ttf_opt_in: isSubToTicketFairy,
-          brand_opt_in: isSubToBrand,
-        },
-      }
+      const formattedPhone = isPhoneRequired ? phone : emptyPhone(phone)
+
+      const checkoutBody: ICheckoutBody = isTicketFree
+        ? {
+            attributes: {
+              confirm_email: emailConfirmation,
+              email: email,
+              first_name: firstName,
+              last_name: lastName,
+              password: password,
+              phone: formattedPhone,
+              ticket_holders: parsedTicketHolders,
+              ttf_opt_in: isSubToTicketFairy,
+              brand_opt_in: isSubToBrand,
+            },
+          }
+        : {
+            attributes: {
+              city: city,
+              confirm_email: emailConfirmation,
+              country: parseInt(selectedCountry!.value as string, 10),
+              email: email,
+              first_name: firstName,
+              last_name: lastName,
+              password: password,
+              phone: formattedPhone,
+              state: parseInt(selectedState!.value as string, 10),
+              street_address: street,
+              zip: postalCode,
+              ticket_holders: parsedTicketHolders,
+              ttf_opt_in: isSubToTicketFairy,
+              brand_opt_in: isSubToBrand,
+            },
+          }
 
       if (isAgeRequired) {
         checkoutBody.attributes.dob_day = dateOfBirth.getDate()
         checkoutBody.attributes.dob_month = dateOfBirth.getMonth() + 1
         checkoutBody.attributes.dob_year = dateOfBirth.getFullYear()
+      }
+
+      if (checkoutBody.attributes.phone === undefined) {
+        delete checkoutBody.attributes.phone
       }
 
       return checkoutBody
@@ -734,16 +793,16 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       const checkoutBody: ICheckoutBody = {
         attributes: {
-          city: userProfile.city,
+          city: isTicketFree ? null : userProfile.city,
           confirm_email: userProfile.email,
-          country: parseInt(userProfile.countryId, 10),
+          country: isTicketFree ? null : parseInt(userProfile.countryId, 10),
           email: userProfile.email,
           first_name: userProfile.firstName,
           last_name: userProfile.lastName,
           phone: userProfile.phone,
-          state: parseInt(userProfile.stateId, 10),
-          street_address: userProfile.streetAddress,
-          zip: userProfile.zipCode,
+          state: isTicketFree ? null : parseInt(userProfile.stateId, 10),
+          street_address: isTicketFree ? null : userProfile.streetAddress,
+          zip: isTicketFree ? null : userProfile.zipCode,
           ticket_holders: parsedTicketHolders,
           ttf_opt_in: isSubToTicketFairy,
           brand_opt_in: isSubToBrand,
@@ -881,14 +940,29 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       }
 
       if (usrPrfl) {
-        if (!checkIsStoredPhoneNumberFormat(usrPrfl.phone)) {
-          showAlert(
-            texts?.invalidPhoneNumberError ||
-              'Please enter a valid phone number'
-          )
-          skippingStatusInner = 'fail'
-          setSkippingStatus('fail')
-          setIsLoading(false)
+        if (!isPhoneHidden && isPhoneRequired) {
+          if (!checkIsStoredPhoneNumberFormat(usrPrfl.phone)) {
+            showAlert(
+              texts?.invalidPhoneNumberError ||
+                'Please enter a valid phone number'
+            )
+            skippingStatusInner = 'fail'
+            setSkippingStatus('fail')
+            setIsLoading(false)
+          } else {
+            // We can perfom Checkout process since phone is valid
+            if (!isBillingRequired && usrTkn && cartData) {
+              const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
+                userProfile: usrPrfl,
+                ticketsQuantity: cartData.quantity,
+              })
+              return await performCheckout(checkoutBody)
+            } else {
+              if (skippingStatusInner === 'skipping') {
+                setSkippingStatus('fail')
+              }
+            }
+          }
         } else {
           // We can perfom Checkout process since phone is valid
           if (!isBillingRequired && usrTkn && cartData) {
@@ -1218,55 +1292,61 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               </>
             )}
 
-            <PhoneInput
-              phoneNumber={phone}
-              onChangePhoneNumber={handleOnChangePhoneNumber}
-              styles={styles?.phoneInput}
-              error={phoneError}
-              texts={{
-                label: phoneLabel,
-                ...texts?.form?.phoneInput,
-              }}
-            />
-            <Input
-              label={addressLabel}
-              value={street}
-              onChangeText={setStreet}
-              error={streetError}
-              styles={styles?.inputStyles}
-            />
-            <Input
-              label={texts?.form?.city || 'City'}
-              value={city}
-              onChangeText={setCity}
-              error={cityError}
-              styles={styles?.inputStyles}
-            />
-            <DropdownMaterial
-              items={countries}
-              onSelectItem={setSelectedCountry}
-              selectedOption={selectedCountry}
-              styles={styles?.dropdownMaterialStyles}
-              materialInputProps={{
-                label: texts?.form?.country || 'Country',
-              }}
-            />
-            <Input
-              label={texts?.form?.zipCode || 'Postal Code / Zip Code'}
-              value={postalCode}
-              onChangeText={setPostalCode}
-              error={postalCodeError}
-              styles={styles?.inputStyles}
-            />
-            <DropdownMaterial
-              items={states}
-              onSelectItem={setSelectedState}
-              selectedOption={selectedState}
-              styles={styles?.dropdownMaterialStyles}
-              materialInputProps={{
-                label: texts?.form?.state || 'State',
-              }}
-            />
+            {!isPhoneHidden && (
+              <PhoneInput
+                phoneNumber={phone}
+                onChangePhoneNumber={handleOnChangePhoneNumber}
+                styles={styles?.phoneInput}
+                error={phoneError}
+                texts={{
+                  label: phoneLabel,
+                  ...texts?.form?.phoneInput,
+                }}
+              />
+            )}
+            {!isTicketFree && (
+              <>
+                <Input
+                  label={addressLabel}
+                  value={street}
+                  onChangeText={setStreet}
+                  error={streetError}
+                  styles={styles?.inputStyles}
+                />
+                <Input
+                  label={texts?.form?.city || 'City'}
+                  value={city}
+                  onChangeText={setCity}
+                  error={cityError}
+                  styles={styles?.inputStyles}
+                />
+                <DropdownMaterial
+                  items={countries}
+                  onSelectItem={setSelectedCountry}
+                  selectedOption={selectedCountry}
+                  styles={styles?.dropdownMaterialStyles}
+                  materialInputProps={{
+                    label: texts?.form?.country || 'Country',
+                  }}
+                />
+                <Input
+                  label={texts?.form?.zipCode || 'Postal Code / Zip Code'}
+                  value={postalCode}
+                  onChangeText={setPostalCode}
+                  error={postalCodeError}
+                  styles={styles?.inputStyles}
+                />
+                <DropdownMaterial
+                  items={states}
+                  onSelectItem={setSelectedState}
+                  selectedOption={selectedState}
+                  styles={styles?.dropdownMaterialStyles}
+                  materialInputProps={{
+                    label: texts?.form?.state || 'State',
+                  }}
+                />
+              </>
+            )}
             <Checkbox
               onPress={handleIsSubToBrandToggle}
               text={brandCheckBoxText}
