@@ -791,23 +791,41 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         parsedTicketHolders.push(individualHolder)
       }
 
-      const checkoutBody: ICheckoutBody = {
-        attributes: {
-          city: isTicketFree ? null : userProfile.city,
-          confirm_email: userProfile.email,
-          country: isTicketFree ? null : parseInt(userProfile.countryId, 10),
-          email: userProfile.email,
-          first_name: userProfile.firstName,
-          last_name: userProfile.lastName,
-          phone: userProfile.phone,
-          state: isTicketFree ? null : parseInt(userProfile.stateId, 10),
-          street_address: isTicketFree ? null : userProfile.streetAddress,
-          zip: isTicketFree ? null : userProfile.zipCode,
-          ticket_holders: parsedTicketHolders,
-          ttf_opt_in: isSubToTicketFairy,
-          brand_opt_in: isSubToBrand,
-          password: password,
-        },
+      const checkoutBody: ICheckoutBody = isTicketFree
+        ? {
+            attributes: {
+              confirm_email: userProfile.email,
+              email: userProfile.email,
+              first_name: userProfile.firstName,
+              last_name: userProfile.lastName,
+              phone: userProfile.phone,
+              ticket_holders: parsedTicketHolders,
+              ttf_opt_in: isSubToTicketFairy,
+              brand_opt_in: isSubToBrand,
+              password: password,
+            },
+          }
+        : {
+            attributes: {
+              city: userProfile.city,
+              confirm_email: userProfile.email,
+              country: parseInt(userProfile.countryId, 10),
+              email: userProfile.email,
+              first_name: userProfile.firstName,
+              last_name: userProfile.lastName,
+              phone: userProfile.phone,
+              state: parseInt(userProfile.stateId, 10),
+              street_address: userProfile.streetAddress,
+              zip: userProfile.zipCode,
+              ticket_holders: parsedTicketHolders,
+              ttf_opt_in: isSubToTicketFairy,
+              brand_opt_in: isSubToBrand,
+              password: password,
+            },
+          }
+
+      if (checkoutBody.attributes.phone === undefined) {
+        delete checkoutBody.attributes.phone
       }
 
       return checkoutBody
