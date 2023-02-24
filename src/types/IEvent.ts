@@ -61,6 +61,11 @@ export interface IEvent {
   l10nLanguages: []
   imageURLs: any
   descriptions: any
+  currency: {
+    currency: string
+    decimal_places: number
+    symbol: string
+  }
 }
 
 export interface IEventData {
