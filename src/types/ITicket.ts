@@ -54,6 +54,8 @@ export interface ITicketsResponseData {
   isAgeRequired?: boolean
   minimumAge?: number
   isNameRequired?: boolean
+  isTicketFree?: boolean
+  isPhoneHidden?: boolean
 }
 
 export interface IAddToCartResponse {

@@ -64,6 +64,7 @@ interface IValidatePhoneNumber {
   phoneNumber?: string
   customError?: string
 }
+
 export const validatePhoneNumber = ({
   phoneNumber,
   customError,
