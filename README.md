@@ -610,6 +610,8 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
     isAgeRequired?: boolean
     minimumAge?: number
     isNameRequired?: boolean
+    isTicketFree?: boolean
+    isPhoneHidden?: boolean
   }) => void
   onAddToCartError?: (error: {
     code: number
@@ -2002,6 +2004,8 @@ Exposes the following functions:
       isAgeRequired?: boolean
       minimumAge?: number
       isNameRequired?: boolean
+      isTicketFree?: boolean
+      isPhoneHidden?: boolean
     }
 
     postReferralVisit(referralId: string): Promise<
@@ -2696,6 +2700,12 @@ Wrap your component with the Core component.
   - State/County
   - Post Code/Zip
   - Country
+
+- Update `addToCart` success response to include: 
+```  
+ isTicketFree?: boolean
+isPhoneHidden?: boolean
+  ```
 
 ## Version 1.0.25
 - Exposes `refreshAccessToken` function.
