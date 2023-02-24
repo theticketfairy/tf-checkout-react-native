@@ -2689,6 +2689,14 @@ Wrap your component with the Core component.
 
 # Changelog
 
+## Version 1.0.26
+- Add the possibility to remove all of the following Billing/Street Address fields from free tickets:
+  - Billing Street Address
+  - City
+  - State/County
+  - Post Code/Zip
+  - Country
+
 ## Version 1.0.25
 - Exposes `refreshAccessToken` function.
 - Changed returned `data` prop to `userProfile` in LoginCore response.
