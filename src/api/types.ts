@@ -229,6 +229,15 @@ export interface IMyOrdersOrder {
 export interface IMyOrdersData {
   events: IMyOrdersEvent[]
   orders: IMyOrdersOrder[]
+  filter?: string
+  brandFilter?: string
+  subBrands?: boolean
+  pagination: {
+    page: number
+    limit: number
+    totalCount: number
+    totalPages: number
+  }
 }
 
 export interface IMyOrdersResponse {

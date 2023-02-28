@@ -386,6 +386,12 @@ export const fetchMyOrders = async (
   const data: IMyOrdersData = {
     events: [],
     orders: [],
+    pagination: {
+      page: 0,
+      limit: 0,
+      totalCount: 0,
+      totalPages: 0,
+    },
   }
   let responseError: IError | undefined
 
@@ -406,8 +412,17 @@ export const fetchMyOrders = async (
   )
 
   if (response?.data) {
-    data.events = response.data.data.attributes.purchased_events
-    data.orders = response.data.data.attributes.orders
+    const dataAttributes = response.data.data.attributes
+
+    data.events = dataAttributes.purchased_events
+    data.orders = dataAttributes.orders
+    data.pagination.limit = dataAttributes.limit
+    data.pagination.page = dataAttributes.page
+    data.pagination.totalCount = dataAttributes.total_count
+    data.pagination.totalPages = dataAttributes.total_pages
+    data.filter = dataAttributes.filter
+    data.brandFilter = dataAttributes.brand_filter
+    data.subBrands = dataAttributes.sub_brands
   }
 
   return {
