@@ -258,6 +258,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
       if (isApiErrorRef.current === true) {
         return
       }
+
       setIsGettingEvent(true)
       const { eventError, eventData } = await getEventCore()
       setIsGettingEvent(false)

@@ -15,7 +15,7 @@ export interface IConfigAuth {
 }
 
 export interface IConfig {
-  EVENT_ID: string | number
+  EVENT_ID?: string | number
   CLIENT?: string
   ENV?: EnvType
   CLIENT_ID?: string

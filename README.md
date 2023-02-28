@@ -142,7 +142,7 @@ const YourComponent: FC () => {
 
 ````ts
 {
-  EVENT_ID: string,
+  EVENT_ID?: string | number,
   CLIENT?: string,
   ENV?: 'PROD' | 'DEV' | 'STAG',
   CLIENT_ID?: string,
@@ -594,7 +594,6 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
 <Tickets 
   ref={sessionHandleRef}
-  eventId={EVENT_ID} 
   onAddToCartSuccess={handleOnAddToCartSuccess} />
 ```
 
@@ -1120,7 +1119,6 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
 <Checkout
   ref={sessionHandleRef}
-  eventId={EVENT_ID}
   hash={hash}
   total={total}
   onPaymentSuccess={handleOnPaymentSuccess}
@@ -1136,7 +1134,6 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 ```js
 {
   ref?: SessionHandleType
-  eventId: number
   hash: string
   total: string
 
@@ -1190,7 +1187,6 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 ```
 | Property | Description |
 |----------|-------------|
-| eventId | Same as used in the `Tickets` component. |
 | hash | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo`component. |
 | total | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo` component. |
 | onPaymentSuccess | will handle the success in the payment process. Will return the `hash`. |
@@ -2292,8 +2288,8 @@ Exposes the following functions:
 
 
 ```ts
-// Get event conditions for the current event.
-getEventConditions(eventId: string): Promise<any>
+// Get event conditions for the Event Id set on the setConfig.
+getEventConditions(): Promise<any>
 
 // Get purchase order details for the current event.
 getPurchaseOrderDetails(orderId: string): Promise<{
@@ -2692,6 +2688,11 @@ Wrap your component with the Core component.
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+
+## Version 1.0.27
+- Make `EVENT_ID` optional in the `setConfig` function. An error will be returned when `EVENT_ID` is not set and trying to make a request that requires it.
+
+- Remove `eventId` prop from `Checkout UI` component in favor of use the one on the Config.
 
 ## Version 1.0.26
 - Add the possibility to remove all of the following Billing/Street Address fields from free tickets:

@@ -345,6 +345,14 @@ export const registerNewUser = async (
 export const addToWaitingList = async (
   values: IWaitingListFields
 ): Promise<IAddToWaitingListResponse> => {
+  if (!Config.EVENT_ID) {
+    return {
+      addToWaitingListError: {
+        message: 'Event ID is not configured!',
+      },
+    }
+  }
+
   const requestData = {
     data: {
       attributes: values,
@@ -492,6 +500,14 @@ export const fetchOrderDetails = async (
 export const fetchTickets = async (
   promoCode?: string
 ): Promise<IFetchTicketsResponse> => {
+  if (!Config.EVENT_ID) {
+    return {
+      error: {
+        message: 'Event ID is not configured!',
+      },
+    }
+  }
+
   const eventId = Config.EVENT_ID.toString()
   const headers = {
     'Promotion-Event': eventId,
@@ -558,6 +574,14 @@ export const fetchTickets = async (
 export const addToCart = async (
   data: IAddToCartParams
 ): Promise<IAddToCartResponse> => {
+  if (!Config.EVENT_ID) {
+    return {
+      error: {
+        message: 'Event ID is not configured!',
+      },
+    }
+  }
+
   let responseError: IError | undefined
   let responseData: ITicketsResponseData | undefined
 
@@ -599,6 +623,14 @@ export const addToCart = async (
 }
 
 export const fetchEvent = async (): Promise<IEventResponse> => {
+  if (!Config.EVENT_ID) {
+    return {
+      eventError: {
+        message: 'Event ID is not configured!',
+      },
+    }
+  }
+
   let responseError: IError | undefined
   let event: IEvent | undefined
   const response: AxiosResponse | void = await Client.get(
@@ -626,6 +658,14 @@ export const fetchEvent = async (): Promise<IEventResponse> => {
 export const postReferralVisit = async (
   referralId: string
 ): Promise<IPostReferralResponse> => {
+  if (!Config.EVENT_ID) {
+    return {
+      postReferralError: {
+        message: 'Event ID is not configured!',
+      },
+    }
+  }
+
   const eventId = Config.EVENT_ID.toString()
   const referralIdNumber = parseInt(referralId, 10)
   let responseError: IError | undefined
@@ -670,6 +710,14 @@ export const postReferralVisit = async (
 export const unlockPasswordProtectedEvent = async (
   password: string
 ): Promise<IEventResponse> => {
+  if (!Config.EVENT_ID) {
+    return {
+      eventError: {
+        message: 'Event ID is not configured!',
+      },
+    }
+  }
+
   const eventId = Config.EVENT_ID.toString()
   let responseError: IError | undefined
   let responseData: any | undefined
@@ -845,10 +893,18 @@ export const checkoutOrder = async (
 //#endregion
 
 //#region Checkout
-export const fetchEventConditions = async (eventId: string) => {
+export const fetchEventConditions = async () => {
+  if (!Config.EVENT_ID) {
+    return {
+      error: {
+        message: 'Event ID is not configured!',
+      },
+    }
+  }
+
   let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.get(
-    `v1/event/${eventId}/conditions`
+    `v1/event/${Config.EVENT_ID}/conditions`
   ).catch((error: AxiosError) => {
     responseError = {
       message: error.response?.data,
