@@ -307,7 +307,6 @@ const App = () => {
         return (
           <>
           <Checkout
-            eventId={EVENT_ID}
             checkoutData={checkoutProps!}
             onPaymentSuccess={handleOnPaymentSuccess}
             onPressExit={handleStripeError}
@@ -898,6 +897,10 @@ const App = () => {
             }}
               isCheckingCurrentSession={isCheckingCurrentSession}
               onLoadingChange={(loading) => setIsLoading(loading)}
+              onFetchTicketsError={(error) => {
+                console.log(`onFetchTicketsError`, error)
+              }}
+              onFetchEventError={(error) => console.log('onFetchEventError', error)}
               onAddToCartSuccess={handleOnAddToCartSuccess}
               onPressLogout={handleOnPressLogout}
               onPressMyOrders={handleOnPressMyOrders}

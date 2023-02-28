@@ -53,8 +53,6 @@ export interface IOrderDetails {
 }
 
 export interface ICheckoutProps {
-  eventId: number
-
   checkoutData: IOnCheckoutSuccess
 
   onFetchOrderReviewError?: (error: IError) => void
