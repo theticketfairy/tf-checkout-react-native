@@ -2689,6 +2689,11 @@ Wrap your component with the Core component.
 
 # Changelog
 
+## Version 1.0.27
+- Make `EVENT_ID` optional in the `setConfig` function. An error will be returned when `EVENT_ID` is not set and trying to make a request that requires it.
+
+- Remove `eventId` prop from `Checkout UI` component in favor of use the one on the Config.
+
 ## Version 1.0.26
 - Add the possibility to remove all of the following Billing/Street Address fields from free tickets:
   - Billing Street Address
