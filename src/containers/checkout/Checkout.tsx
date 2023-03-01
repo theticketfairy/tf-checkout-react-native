@@ -25,6 +25,7 @@ import Button from '../../components/button/Button'
 import { IFormFieldProps } from '../../components/formField/types'
 import { CheckoutCore, CheckoutCoreHandle, SessionHandle } from '../../core'
 import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
+import { Config } from '../../helpers/Config'
 import { priceWithCurrency } from '../../helpers/StringsHelper'
 import { orderReviewItems } from './CheckoutData'
 import Conditions from './components/Conditions'
@@ -35,7 +36,6 @@ import { ICheckoutProps, IOrderDetails, IOrderItem } from './types'
 const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
   (
     {
-      eventId,
       checkoutData,
       onFetchOrderReviewError,
       onFetchOrderReviewSuccess,
@@ -134,12 +134,12 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
 
     //#region Fetch Data
     const fetchEventConditionsAsync = async () => {
-      if (!isCheckoutCoreRefReady) {
+      if (!isCheckoutCoreRefReady || !Config.EVENT_ID) {
         return
       }
 
       const { error: conditionsError, data: conditionsData } =
-        await checkoutCoreRef.current!.getEventConditions(eventId.toString())
+        await checkoutCoreRef.current!.getEventConditions()
 
       if (conditionsError) {
         hideLoading()
@@ -278,8 +278,19 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
         return showAlert('No items found in order')
       }
 
+      if (!Config.EVENT_ID) {
+        return onFetchOrderDetailsError?.({
+          message: 'EventId not configured.',
+        })
+      }
+
+      const eventIdNumber =
+        typeof Config.EVENT_ID === 'number'
+          ? Config.EVENT_ID
+          : parseInt(Config.EVENT_ID, 10)
+
       const orderDetails: IOrderDetails = {
-        eventId: eventId,
+        eventId: eventIdNumber,
         ticketName: orderDetailsData.items[0].name,
         ticketCost: orderDetailsData.items[0].price,
         numberOfTickets: parseInt(orderDetailsData.items[0].quantity, 10),

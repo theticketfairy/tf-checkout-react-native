@@ -60,8 +60,8 @@ const CheckoutCore = forwardRef<CheckoutCoreHandle, ICheckoutCoreProps>(
     }, [handleStartTimer, timerOn])
 
     useImperativeHandle(ref, () => ({
-      async getEventConditions(eventId: string): Promise<any> {
-        return await fetchEventConditions(eventId)
+      async getEventConditions(): Promise<any> {
+        return await fetchEventConditions()
       },
 
       async getPurchaseOrderDetails(

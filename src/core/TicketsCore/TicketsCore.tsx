@@ -142,6 +142,13 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
       ticketId,
       price,
     }: IBookTicketsOptions): Promise<IAddToCartResponse> {
+      if (!Config.EVENT_ID) {
+        return {
+          error: {
+            message: 'Event ID is not configured',
+          },
+        }
+      }
       const parsedEventId =
         typeof Config.EVENT_ID === 'string'
           ? parseInt(Config.EVENT_ID, 10)

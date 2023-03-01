@@ -142,7 +142,7 @@ const YourComponent: FC () => {
 
 ````ts
 {
-  EVENT_ID: string,
+  EVENT_ID?: string | number,
   CLIENT?: string,
   ENV?: 'PROD' | 'DEV' | 'STAG',
   CLIENT_ID?: string,
@@ -594,7 +594,6 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
 <Tickets 
   ref={sessionHandleRef}
-  eventId={EVENT_ID} 
   onAddToCartSuccess={handleOnAddToCartSuccess} />
 ```
 
@@ -1120,7 +1119,6 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
 <Checkout
   ref={sessionHandleRef}
-  eventId={EVENT_ID}
   hash={hash}
   total={total}
   onPaymentSuccess={handleOnPaymentSuccess}
@@ -1136,7 +1134,6 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 ```js
 {
   ref?: SessionHandleType
-  eventId: number
   hash: string
   total: string
 
@@ -1190,7 +1187,6 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 ```
 | Property | Description |
 |----------|-------------|
-| eventId | Same as used in the `Tickets` component. |
 | hash | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo`component. |
 | total | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo` component. |
 | onPaymentSuccess | will handle the success in the payment process. Will return the `hash`. |
@@ -1201,7 +1197,7 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
 ### styles
 
-```js
+```ts
 {
   rootStyle?: ViewStyle
   title?: StyleProp<TextStyle>
@@ -1252,7 +1248,7 @@ import { PurchaseConfirmation, SessionHandleType } from 'tf-checkout-react-nativ
 
 Add it to the render function.
 
-```js
+```ts
 const sessionHandleRef = useRef<SessionHandleType>(null)
 
 <PurchaseConfirmation
@@ -1308,7 +1304,7 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
 
 ### Props
 
-```tsx
+```ts
 {
   ref={SessionHandleType}
   onSelectOrder: (order: {
@@ -1349,10 +1345,10 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
   }
   }) => void
 
-  onFetchMyOrdersSuccess?: () => void
+  onFetchMyOrdersSuccess?: (data: IMyOrdersData) => void
   onFetchMyOrdersError?: (error: IError) => void
 
-  onFetchOrderDetailsSuccess?: () => void
+  onFetchOrderDetailsSuccess?: (data: IMyOrderDetailsData) => void
   onFetchOrderDetailsError?: (error: IError) => void
 
   onLoadingChange?: (isLoading: boolean) => void
@@ -1367,6 +1363,61 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
     selectEventPlaceholder?: string
     title?: string
   }
+}
+```
+IMyOrdersData
+```ts
+{
+  events: IMyOrdersEvent[]
+  orders: IMyOrdersOrder[]
+  filter?: string
+  brandFilter?: string
+  subBrands?: boolean
+  pagination: {
+    page: number
+    limit: number
+    totalCount: number
+    totalPages: number
+  }
+}
+```
+IMyOrderDetailsData
+```ts
+{
+  header: {
+    isReferralDisabled: boolean
+    shareLink: string
+    total: string
+    salesReferred: string
+  }
+  items?: {
+    isActive: boolean
+    currency: string
+    discount: string
+    name: string
+    price: string
+    quantity: string
+    total: string
+    hash: string
+  }[]
+  tickets: {
+    currency: string
+    description: string
+    descriptionPlain?: string
+    eventName: string
+    hash: string
+    holderEmail?: string
+    holderName: string
+    holderPhone?: string
+    isOnSale: boolean
+    isSellable: boolean
+    pdfLink: string
+    qrData: string
+    resaleFeeAmount: number
+    status: string
+    ticketType: string
+    ticketTypeHash: string
+  }[]
 }
 ```
 
@@ -2292,8 +2343,8 @@ Exposes the following functions:
 
 
 ```ts
-// Get event conditions for the current event.
-getEventConditions(eventId: string): Promise<any>
+// Get event conditions for the Event Id set on the setConfig.
+getEventConditions(): Promise<any>
 
 // Get purchase order details for the current event.
 getPurchaseOrderDetails(orderId: string): Promise<{
@@ -2477,6 +2528,15 @@ getMyOrders(page: number, filter: string): Promise<{
       eventUrl: string
       image: string
     }[]
+    filter?: string
+    brandFilter?: string
+    subBrands?: boolean
+    pagination: {
+      page: number
+      limit: number
+      totalCount: number
+      totalPages: number
+    }
   }
 
   myOrdersError?: {
@@ -2693,6 +2753,15 @@ Wrap your component with the Core component.
 
 # Changelog
 
+## Version 1.0.27
+- Make `EVENT_ID` optional in the `setConfig` function. An error will be returned when `EVENT_ID` is not set and trying to make a request that requires it.
+
+- Remove `eventId` prop from `Checkout UI` component in favor of use the one on the Config.
+
+- Add missing pagination data in `onFetchMyOrdersSuccess` response.
+
+- Add missing success data in `onFetchOrderDetailsSuccess` response.
+
 ## Version 1.0.26
 - Add the possibility to remove all of the following Billing/Street Address fields from free tickets:
   - Billing Street Address
@@ -2703,7 +2772,7 @@ Wrap your component with the Core component.
 
 - Update `addToCart` success response to include: 
 ```  
- isTicketFree?: boolean
+isTicketFree?: boolean
 isPhoneHidden?: boolean
   ```
 

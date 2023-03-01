@@ -7,7 +7,7 @@ import { ICoreProps } from '../CoreProps'
 import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
 export type CheckoutCoreHandleType = {
-  getEventConditions(eventId: string): Promise<any>
+  getEventConditions(): Promise<any>
   getPurchaseOrderDetails(orderId: string): Promise<IMyOrderDetailsResponse>
   getOrderReview(orderHash: string): Promise<IOrderReviewResponse>
   freeRegistration(orderHash: string): Promise<IFreeRegistrationResponse>
