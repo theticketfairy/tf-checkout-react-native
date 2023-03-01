@@ -1197,7 +1197,7 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
 ### styles
 
-```js
+```ts
 {
   rootStyle?: ViewStyle
   title?: StyleProp<TextStyle>
@@ -1248,7 +1248,7 @@ import { PurchaseConfirmation, SessionHandleType } from 'tf-checkout-react-nativ
 
 Add it to the render function.
 
-```js
+```ts
 const sessionHandleRef = useRef<SessionHandleType>(null)
 
 <PurchaseConfirmation
@@ -1304,7 +1304,7 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
 
 ### Props
 
-```tsx
+```ts
 {
   ref={SessionHandleType}
   onSelectOrder: (order: {
@@ -1345,10 +1345,10 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
   }
   }) => void
 
-  onFetchMyOrdersSuccess?: () => void
+  onFetchMyOrdersSuccess?: (data: IMyOrdersData) => void
   onFetchMyOrdersError?: (error: IError) => void
 
-  onFetchOrderDetailsSuccess?: () => void
+  onFetchOrderDetailsSuccess?: (data: IMyOrderDetailsData) => void
   onFetchOrderDetailsError?: (error: IError) => void
 
   onLoadingChange?: (isLoading: boolean) => void
@@ -1363,6 +1363,61 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
     selectEventPlaceholder?: string
     title?: string
   }
+}
+```
+IMyOrdersData
+```ts
+{
+  events: IMyOrdersEvent[]
+  orders: IMyOrdersOrder[]
+  filter?: string
+  brandFilter?: string
+  subBrands?: boolean
+  pagination: {
+    page: number
+    limit: number
+    totalCount: number
+    totalPages: number
+  }
+}
+```
+IMyOrderDetailsData
+```ts
+{
+  header: {
+    isReferralDisabled: boolean
+    shareLink: string
+    total: string
+    salesReferred: string
+  }
+  items?: {
+    isActive: boolean
+    currency: string
+    discount: string
+    name: string
+    price: string
+    quantity: string
+    total: string
+    hash: string
+  }[]
+  tickets: {
+    currency: string
+    description: string
+    descriptionPlain?: string
+    eventName: string
+    hash: string
+    holderEmail?: string
+    holderName: string
+    holderPhone?: string
+    isOnSale: boolean
+    isSellable: boolean
+    pdfLink: string
+    qrData: string
+    resaleFeeAmount: number
+    status: string
+    ticketType: string
+    ticketTypeHash: string
+  }[]
 }
 ```
 
@@ -2473,6 +2528,15 @@ getMyOrders(page: number, filter: string): Promise<{
       eventUrl: string
       image: string
     }[]
+    filter?: string
+    brandFilter?: string
+    subBrands?: boolean
+    pagination: {
+      page: number
+      limit: number
+      totalCount: number
+      totalPages: number
+    }
   }
 
   myOrdersError?: {
@@ -2694,6 +2758,10 @@ Wrap your component with the Core component.
 
 - Remove `eventId` prop from `Checkout UI` component in favor of use the one on the Config.
 
+- Add missing pagination data in `onFetchMyOrdersSuccess` response.
+
+- Add missing success data in `onFetchOrderDetailsSuccess` response.
+
 ## Version 1.0.26
 - Add the possibility to remove all of the following Billing/Street Address fields from free tickets:
   - Billing Street Address
@@ -2704,7 +2772,7 @@ Wrap your component with the Core component.
 
 - Update `addToCart` success response to include: 
 ```  
- isTicketFree?: boolean
+isTicketFree?: boolean
 isPhoneHidden?: boolean
   ```
 

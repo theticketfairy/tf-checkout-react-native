@@ -11,7 +11,11 @@ import React, {
 } from 'react'
 import { Alert } from 'react-native'
 
-import { IFetchAccessTokenResponse, IMyOrdersOrder } from '../../api/types'
+import {
+  IFetchAccessTokenResponse,
+  IMyOrdersData,
+  IMyOrdersOrder,
+} from '../../api/types'
 import { IDropdownItem } from '../../components/dropdown/types'
 import { MyOrdersCore, MyOrdersCoreHandle, SessionHandle } from '../../core'
 import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
@@ -70,7 +74,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
     }
 
     //#region Fetch data
-    const getOrdersAsync = async (): Promise<undefined | IMyOrdersOrder[]> => {
+    const getOrdersAsync = async (): Promise<undefined | IMyOrdersData> => {
       if (!isMyOrdersCoreRefReady()) {
         return
       }
@@ -102,7 +106,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
         return undefined
       }
 
-      onFetchMyOrdersSuccess?.()
+      onFetchMyOrdersSuccess?.(myOrdersData)
 
       const events = _sortBy(
         _map(myOrdersData.events, (item) => {
@@ -116,18 +120,18 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
 
       setMyEvents(events)
 
-      return myOrdersData.orders
+      return myOrdersData
     }
 
     const getOrders = async () => {
       const fetchedOrders = await getOrdersAsync()
-      setMyOrders(fetchedOrders ?? [])
+      setMyOrders(fetchedOrders?.orders ?? [])
     }
 
     const getMoreOrders = async () => {
       const fetchedOrders = await getOrdersAsync()
       const uniqOrders = _uniqBy(
-        [...myOrders, ...(fetchedOrders ?? [])],
+        [...myOrders, ...(fetchedOrders?.orders ?? [])],
         (item) => item.id
       )
       setMyOrders(uniqOrders)

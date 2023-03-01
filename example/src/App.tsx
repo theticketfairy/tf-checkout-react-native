@@ -431,6 +431,9 @@ const App = () => {
               config={{
                 areActivityIndicatorsEnabled: false,
               }}
+              onFetchMyOrdersSuccess={(data) => {
+                console.log('onFetchMyOrdersSuccess', data)
+              }}
               onLoadingChange={(loading) => setIsLoading(loading)}
               onSelectOrder={handleOnSelectOrder}
               styles={{
