@@ -216,7 +216,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
       }
 
       if (orderDetailsData) {
-        onFetchOrderDetailsSuccess?.()
+        onFetchOrderDetailsSuccess?.(orderDetailsData)
         onSelectOrder(orderDetailsData)
       }
     }
