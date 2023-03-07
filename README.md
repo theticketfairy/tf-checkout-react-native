@@ -907,7 +907,11 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
     // fetchCountries
   onFetchCountriesError?: (error: IError) => void
-  onFetchCountriesSuccess?: () => void
+  onFetchCountriesSuccess?: (data: {
+    code: string
+    id: string
+    name: string
+  }[]) => void
 
   // fetchState
   onFetchStatesError?: (error: IError) => void
@@ -2249,9 +2253,11 @@ Exposes the following functions:
        message: string
        extraData?: any
      }
-    countriesData?: {
-      [key: number | string]: string
-    }
+    countriesData?:  {
+      code: string
+      id: string
+      name: string
+    }[]
   }>
 
   // Fetches the states list.

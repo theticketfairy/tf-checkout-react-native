@@ -32,6 +32,7 @@ import {
   IPhoneInputTexts,
 } from '../../components/phoneInput/types'
 import { IError, ITicketsResponseData } from '../../types'
+import { ICountry } from '../../types/ICountry'
 
 export interface ITokens {
   accessToken: string
@@ -74,7 +75,7 @@ export interface IBillingProps {
 
   // fetchCountries
   onFetchCountriesError?: (error: IError) => void
-  onFetchCountriesSuccess?: () => void
+  onFetchCountriesSuccess?: (data: ICountry[]) => void
 
   // fetchState
   onFetchStatesError?: (error: IError) => void

@@ -889,7 +889,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         return showAlert(countriesError.message || 'Error fetching countries')
       }
 
-      onFetchCountriesSuccess?.()
+      onFetchCountriesSuccess?.(countriesData!)
 
       const parsedCountries: IDropdownItem[] = _map(countriesData, (item) => {
         return { label: item.name, value: item.id, code: item.code }
