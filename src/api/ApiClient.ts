@@ -664,6 +664,10 @@ export const fetchEvent = async (): Promise<IEventResponse> => {
     event = response.data.data.attributes
   }
 
+  if (event?.country) {
+    await storeData(LocalStorageKeys.EVENT_COUNTRY, event.country)
+  }
+
   return {
     eventError: responseError,
     eventData: event,
@@ -777,14 +781,14 @@ export const unlockPasswordProtectedEvent = async (
 //#region Billing Information
 export const fetchCountries = async (): Promise<ICountriesResponse> => {
   let responseError: IError | undefined
-  const response: AxiosResponse | void = await Client.get('/countries/').catch(
-    (error: AxiosError) => {
-      responseError = {
-        message: error.response?.data.message,
-        code: error.response?.status!,
-      }
+  const response: AxiosResponse | void = await Client.get(
+    '/countries/list'
+  ).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status!,
     }
-  )
+  })
 
   if (response?.status === 200) {
     setCustomHeader(response)

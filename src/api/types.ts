@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios'
 
 import { IOnCheckoutSuccess } from '..'
 import { IError, IEvent, ITicket, IUserProfile } from '../types'
+import { ICountry } from '../types/ICountry'
 
 export interface IClientRequest extends AxiosInstance {
   setGuestToken: (token: string) => void
@@ -309,13 +310,9 @@ export interface ICartResponse {
   cartData?: ICartData
 }
 
-export interface ICountryData {
-  [key: number | string]: string
-}
-
 export interface ICountriesResponse {
   countriesError?: IError
-  countriesData?: ICountryData
+  countriesData?: ICountry[]
 }
 
 export interface IStateData {
