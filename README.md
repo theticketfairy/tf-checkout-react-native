@@ -1394,15 +1394,16 @@ IMyOrdersData
     timezone: string
     venueCity: string
     venueCountry: string
-    venueGooglePlaceId: string
-    venueLatitude: string
-    venueLongitude: string
-    venueName: string
-    venuePostalCode: string
+    venueGooglePlaceId?: string
+    venueLatitude?: string
+    venueLongitude?: string
+    venueName?: string
+    venuePostalCode?: string
     venueState: string
-    venueStreet: string
-    venueStreetNumber: string
+    venueStreet?: string
+    venueStreetNumber?: string
   }[]
+  //Those mark with ? are only included if the venue is not hidden
   filter?: string
   brandFilter?: string
   subBrands?: boolean
@@ -1439,15 +1440,16 @@ IMyOrderDetailsData
     venue: {
       city: string
       country: string
-      googlePlaceId: string
-      latitude: string
-      longitude: string
-      name: string
-      postalCode: string
+      googlePlaceId?: string
+      latitude?: string
+      longitude?: string
+      name?: string
+      postalCode?: string
       state: string
-      street: string
-      streetNumber: string
+      street?: string
+      streetNumber?: string
     }
+    //Those mark with ? are only included if the venue is not hidden
   }
   items?: {
     currency: string
