@@ -634,6 +634,7 @@ const App = () => {
                     },
                     link: {
                       color: Color.notificationPrimary,
+                      maxWidth: '70%',
                     },
                     copyIconTint: Color.textMain,
                     copyText: {

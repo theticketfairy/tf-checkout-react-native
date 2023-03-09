@@ -1372,8 +1372,37 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
 IMyOrdersData
 ```ts
 {
-  events: IMyOrdersEvent[]
-  orders: IMyOrdersOrder[]
+  events: {
+    event_name: string
+    url_name: string
+  }[]
+  orders: {
+    amount: string
+    currency: string
+    date: string
+    eventEndDate: string
+    eventId: string
+    eventName: string
+    eventSalesEndDate: string
+    eventSalesStartDate: string | null
+    eventStartDate: string
+    eventUrl: string
+    hideVenue: boolean
+    hideVenueUntil: string | null
+    id: string
+    image: string
+    timezone: string
+    venueCity: string
+    venueCountry: string
+    venueGooglePlaceId: string
+    venueLatitude: string
+    venueLongitude: string
+    venueName: string
+    venuePostalCode: string
+    venueState: string
+    venueStreet: string
+    venueStreetNumber: string
+  }[]
   filter?: string
   brandFilter?: string
   subBrands?: boolean
@@ -1389,20 +1418,46 @@ IMyOrderDetailsData
 ```ts
 {
   header: {
+    currency: string
+    date: string
+    eventEndDate: string
+    eventId: string
+    eventName: string
+    eventSalesEndDate: string
+    eventSalesStartDate: string
+    eventStartDate: string
+    eventUrl: string
+    hideVenueUntil: string | null
+    id: string
+    image: string
     isReferralDisabled: boolean
-    shareLink: string
-    total: string
+    isVenueHidden: boolean
     salesReferred: string
+    shareLink: string
+    timeZone: string
+    total: string
+    venue: {
+      city: string
+      country: string
+      googlePlaceId: string
+      latitude: string
+      longitude: string
+      name: string
+      postalCode: string
+      state: string
+      street: string
+      streetNumber: string
+    }
   }
   items?: {
-    isActive: boolean
     currency: string
     discount: string
+    hash: string
+    isActive: boolean
     name: string
     price: string
     quantity: string
     total: string
-    hash: string
   }[]
   tickets: {
     currency: string
@@ -1415,6 +1470,7 @@ IMyOrderDetailsData
     holderPhone?: string
     isOnSale: boolean
     isSellable: boolean
+    isTable: boolean
     pdfLink: string
     qrData: string
     resaleFeeAmount: number
@@ -2758,6 +2814,10 @@ Wrap your component with the Core component.
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+
+## Version 1.0.28
+- Add more data to the `getMyOrders` success response.
+- Add more data to the `getOrderDetails` success response.
 
 ## Version 1.0.27
 - Make `EVENT_ID` optional in the `setConfig` function. An error will be returned when `EVENT_ID` is not set and trying to make a request that requires it.
