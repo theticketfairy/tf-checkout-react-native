@@ -1,76 +1,87 @@
 export interface IEvent {
-  passwordProtected: boolean
-  passwordAuthenticated: boolean
-  name: string
-  description?: string
-  slug: string
-  redirectUrl?: string
-  facebookEvent?: string
-  title: string
-  relatedProducts: []
-  country: string
-  date: string
-  startDate: string
-  endDate: string
-  timezone: string
-  formattedDate: string
-  venueCountry: string
-  venueCity?: string
-  venueState?: string
-  hideVenueUntil?: string
-  hideVenue?: boolean
-  venueName?: string
-  venueGooglePlaceId?: string
-  venueLatitude?: string
-  venueLongitude?: string
-  venuePostalCode?: string
-  venueStreet?: string
-  venueStreetNumber?: string
-  eventType: any
-  productImage: string
-  imageUrl: string
-  imageUrlHd: string
+  affirmAllowed: boolean
+  alwaysShowWaitingList?: any
   backgroundImage: string
   backgroundVideo?: string
-  twitterImage?: string
-  ogImage?: string
-  tags: []
-  preregEnabled: boolean
-  presalesStarted: boolean
-  presalesEnded: boolean
-  salesStart?: string
-  salesEnd: string
-  salesStarted: boolean
-  salesEnded: boolean
-  feeMode: string
-  feesIncluded?: any
-  minimumAge?: any
-  enableWaitingList: boolean
-  alwaysShowWaitingList?: any
-  titleReplacementImage?: any
-  titleReplacementHeight?: any
-  titleReplacementImageSvg?: any
-  fullTitleReplacement?: any
-  affirmAllowed: boolean
-  subHeading?: any
-  isTimeSlotEvent: boolean
-  preregistered: []
-  referralsEnabled: boolean
-  referrals: []
-  faq: []
-  l10nLanguages: []
-  imageURLs: any
-  descriptions: any
+  brandCheckoutPixels?: string
+  brandConversionPixels?: string
+  brandGoogleAnalyticsKey?: string
+  brandPagePixels?: string
+  checkoutPixels?: string
+  conversionPixels?: string
+  country: string
   currency: {
     currency: string
     decimal_places: number
     symbol: string
   }
+  date: string
+  description?: string
+  descriptions: any
+  enableWaitingList: boolean
+  endDate: string
+  eventType: any
+  facebookEvent?: string
+  faq: []
+  feeMode: string
+  feesIncluded?: any
+  formattedDate: string
+  fullTitleReplacement?: any
+  hideTopInfluencers: boolean
+  hideVenue?: boolean
+  hideVenueUntil?: string
+  imageUrl: string
+  imageUrlHd: string
+  imageURLs: any
+  isTimeSlotEvent: boolean
+  l10nLanguages: []
+  minimumAge?: any
+  name: string
+  ogImage?: string
+  pagePixels?: string
+  passwordAuthenticated: boolean
+  passwordProtected: boolean
+  preregEnabled: boolean
+  preregistered: []
+  presalesEnded: boolean
+  presalesStarted: boolean
+  productImage: string
+  redirectUrl?: string
+  referrals: []
+  referralsEnabled: boolean
+  relatedProducts: []
+  salesEnd: string
+  salesEnded: boolean
+  salesStart?: string
+  salesStarted: boolean
+  slug: string
+  startDate: string
+  subHeading?: any
+  tableMapEnabled: boolean
+  tags: []
+  ticketsSold: number
+  timezone: string
+  title: string
+  titleReplacementHeight?: any
+  titleReplacementImage?: any
+  titleReplacementImageSvg?: any
+  twitterImage?: string
+  venueCity?: string
+  venueCountry: string
+  venueGooglePlaceId?: string
+  venueLatitude?: string
+  venueLongitude?: string
+  venueName?: string
+  venuePostalCode?: string
+  venueState?: string
+  venueStreet?: string
+  venueStreetNumber?: string
+  waitingListMaxQuantity: number
 }
 
 export interface IEventData {
-  slug: string
-  name: string
   description?: string
+  name: string
+  slug: string
   title: string
 }

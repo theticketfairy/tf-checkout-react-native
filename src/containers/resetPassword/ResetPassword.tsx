@@ -69,8 +69,6 @@ const ResetPassword: FC<IResetPasswordProps> = ({
     })
     setIsLoading(false)
 
-    console.log('response', response)
-
     if (response.error) {
       setApiError(response.error.message)
       return onResetPasswordError?.(response.error)

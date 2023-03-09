@@ -1394,15 +1394,16 @@ IMyOrdersData
     timezone: string
     venueCity: string
     venueCountry: string
-    venueGooglePlaceId: string
-    venueLatitude: string
-    venueLongitude: string
-    venueName: string
-    venuePostalCode: string
+    venueGooglePlaceId?: string
+    venueLatitude?: string
+    venueLongitude?: string
+    venueName?: string
+    venuePostalCode?: string
     venueState: string
-    venueStreet: string
-    venueStreetNumber: string
+    venueStreet?: string
+    venueStreetNumber?: string
   }[]
+  //Those mark with ? are only included if the venue is not hidden
   filter?: string
   brandFilter?: string
   subBrands?: boolean
@@ -1439,15 +1440,16 @@ IMyOrderDetailsData
     venue: {
       city: string
       country: string
-      googlePlaceId: string
-      latitude: string
-      longitude: string
-      name: string
-      postalCode: string
+      googlePlaceId?: string
+      latitude?: string
+      longitude?: string
+      name?: string
+      postalCode?: string
       state: string
-      street: string
-      streetNumber: string
+      street?: string
+      streetNumber?: string
     }
+    //Those mark with ? are only included if the venue is not hidden
   }
   items?: {
     currency: string
@@ -2030,68 +2032,84 @@ Exposes the following functions:
       extraData?: any
     }
     eventData?: {
-      passwordProtected: boolean
-      passwordAuthenticated: boolean
-      name: string
-      description?: string
-      slug: string
-      redirectUrl?: string
-      facebookEvent?: string
-      title: string
-      relatedProducts: []
+      affirmAllowed: boolean
+      alwaysShowWaitingList?: any
+      backgroundImage: string
+      backgroundVideo?: string
+      brandCheckoutPixels?: string
+      brandConversionPixels?: string
+      brandGoogleAnalyticsKey?: string
+      brandPagePixels?: string
+      checkoutPixels?: string
+      conversionPixels?: string
       country: string
+      currency: {
+        currency: string
+        decimal_places: number
+        symbol: string
+      }
       date: string
-      startDate: string
+      description?: string
+      descriptions: any
+      enableWaitingList: boolean
       endDate: string
-      timezone: string
+      eventType: any
+      facebookEvent?: string
+      faq: []
+      feeMode: string
+      feesIncluded?: any
       formattedDate: string
-      venueCountry: string
-      venueCity?: string
-      venueState?: string
-      hideVenueUntil?: string
+      fullTitleReplacement?: any
+      hideTopInfluencers: boolean
       hideVenue?: boolean
-      venueName?: string
+      hideVenueUntil?: string
+      imageUrl: string
+      imageUrlHd: string
+      imageURLs: any
+      isTimeSlotEvent: boolean
+      l10nLanguages: []
+      minimumAge?: any
+      name: string
+      ogImage?: string
+      pagePixels?: string
+      passwordAuthenticated: boolean
+      passwordProtected: boolean
+      preregEnabled: boolean
+      preregistered: []
+      presalesEnded: boolean
+      presalesStarted: boolean
+      productImage: string
+      redirectUrl?: string
+      referrals: []
+      referralsEnabled: boolean
+      relatedProducts: []
+      salesEnd: string
+      salesEnded: boolean
+      salesStart?: string
+      salesStarted: boolean
+      slug: string
+      startDate: string
+      subHeading?: any
+      tableMapEnabled: boolean
+      tags: []
+      ticketsSold: number
+      timezone: string
+      title: string
+      titleReplacementHeight?: any
+      titleReplacementImage?: any
+      titleReplacementImageSvg?: any
+      twitterImage?: string
+      venueCity?: string
+      venueCountry: string
       venueGooglePlaceId?: string
       venueLatitude?: string
       venueLongitude?: string
+      venueName?: string
       venuePostalCode?: string
+      venueState?: string
       venueStreet?: string
       venueStreetNumber?: string
-      eventType: any
-      productImage: string
-      imageUrl: string
-      imageUrlHd: string
-      backgroundImage: string
-      backgroundVideo?: string
-      twitterImage?: string
-      ogImage?: string
-      tags: []
-      preregEnabled: boolean
-      presalesStarted: boolean
-      presalesEnded: boolean
-      salesStart?: string
-      salesEnd: string
-      salesStarted: boolean
-      salesEnded: boolean
-      feeMode: string
-      feesIncluded?: any
-      minimumAge?: any
-      enableWaitingList: boolean
-      alwaysShowWaitingList?: any
-      titleReplacementImage?: any
-      titleReplacementHeight?: any
-      titleReplacementImageSvg?: any
-      fullTitleReplacement?: any
-      affirmAllowed: boolean
-      subHeading?: any
-      isTimeSlotEvent: boolean
-      preregistered: []
-      referralsEnabled: boolean
-      referrals: []
-      faq: []
-      l10nLanguages: []
-      imageURLs: any
-      descriptions: any
+      waitingListMaxQuantity: number
     }
   }>
 
@@ -2818,6 +2836,7 @@ Wrap your component with the Core component.
 ## Version 1.0.28
 - Add more data to the `getMyOrders` success response.
 - Add more data to the `getOrderDetails` success response.
+- Add `ticketsSold` prop to Event's object in fetchEvent success data.
 
 ## Version 1.0.27
 - Make `EVENT_ID` optional in the `setConfig` function. An error will be returned when `EVENT_ID` is not set and trying to make a request that requires it.
