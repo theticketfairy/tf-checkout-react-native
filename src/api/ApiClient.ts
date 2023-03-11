@@ -22,6 +22,7 @@ import {
   ITicketsResponseData,
 } from '../types/ITicket'
 import Constants from './Constants'
+import { getApiError } from './ErrorHandler'
 import {
   IAddToCartParams,
   IAddToWaitingListResponse,
@@ -44,6 +45,7 @@ import {
   IMyOrderDetailsResponse,
   IMyOrderDetailsTicket,
   IMyOrdersData,
+  IMyOrdersRequestParams,
   IMyOrdersResponse,
   IOrderReview,
   IOrderReviewResponse,
@@ -378,11 +380,12 @@ export const addToWaitingList = async (
 //#endregion
 
 //#region MyOrders
-export const fetchMyOrders = async (
-  page: number = 1,
-  filter: string = ''
-): Promise<IMyOrdersResponse> => {
-  const limit = 20
+export const fetchMyOrders = async ({
+  page,
+  limit = 20,
+  filter = '',
+  from = '',
+}: IMyOrdersRequestParams): Promise<IMyOrdersResponse> => {
   const data: IMyOrdersData = {
     events: [],
     orders: [],
@@ -400,14 +403,12 @@ export const fetchMyOrders = async (
   const withSubBrands = Config.ARE_SUB_BRANDS_INCLUDED
     ? `&filter[subbrands]=${Config.ARE_SUB_BRANDS_INCLUDED}`
     : ''
-  const endpoint = `/v1/account/orders/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}`
+  const withFrom = from ? `&filter[from]=${from}` : ''
 
+  const endpoint = `/v1/account/orders/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}${withFrom}`
   const response: AxiosResponse | void = await Client.get(endpoint).catch(
     (error: AxiosError) => {
-      responseError = {
-        message: error.response?.data.message || 'Error fetching My Orders',
-        code: error.response?.status,
-      }
+      responseError = getApiError(error, 'Error fetching My Orders')
     }
   )
 

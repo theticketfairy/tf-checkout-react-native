@@ -15,6 +15,8 @@ import {
   IFetchAccessTokenResponse,
   IMyOrdersData,
   IMyOrdersOrder,
+  IMyOrdersRequestParams,
+  MyOrderRequestFromType,
 } from '../../api/types'
 import { IDropdownItem } from '../../components/dropdown/types'
 import { MyOrdersCore, MyOrdersCoreHandle, SessionHandle } from '../../core'
@@ -40,14 +42,36 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
   ) => {
     //#region State
     const [isLoading, setIsLoading] = useState(true)
+    const [isRefreshing, setIsRefreshing] = useState(false)
     const [isGettingEventDetails, setIsGettingEventDetails] = useState(false)
     const [myEvents, setMyEvents] = useState<IDropdownItem[]>([])
     const [selectedEvent, setSelectedEvent] = useState<IDropdownItem>({
       label: texts?.selectEventPlaceholder || 'Select event',
-      value: '-1',
+      value: '',
     })
+
+    const [selectedTimeFilter, setSelectedTimeFilter] = useState<IDropdownItem>(
+      {
+        label: texts?.selectTimeFilterPlaceholder || 'Select time filter',
+        value: '',
+      }
+    )
     const [myOrders, setMyOrders] = useState<IMyOrdersOrder[]>([])
     //#endregion
+
+    const timeFilters: IDropdownItem[] = [
+      { label: 'Upcoming events', value: 'upcoming_events' },
+      {
+        label: 'Ongoing and upcoming events',
+        value: 'ongoing_and_upcoming_events',
+      },
+      { label: 'Ongoing events', value: 'ongoing_events' },
+      { label: 'Past events', value: 'past_events' },
+      {
+        label: texts?.selectTimeFilterPlaceholder || 'Select time filter',
+        value: '',
+      },
+    ]
 
     //#region Refs
     const currentPage = useRef(1)
@@ -81,13 +105,23 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
 
       setIsLoading(true)
       const validSelectedEvent =
-        selectedEvent.value === '-1' ? null : selectedEvent
+        selectedEvent.value === '' ? null : selectedEvent
+
+      const myOrdersRequestParams: IMyOrdersRequestParams = {
+        limit: 20,
+        page: currentPage.current,
+        filter:
+          validSelectedEvent?.value.toString() === 'none'
+            ? ''
+            : validSelectedEvent?.value.toString(),
+        from:
+          selectedTimeFilter.value === 'none'
+            ? ''
+            : (selectedTimeFilter.value as MyOrderRequestFromType),
+      }
 
       const { myOrdersData, myOrdersError } =
-        await myOrdersCoreRef.current!.getMyOrders(
-          currentPage.current,
-          validSelectedEvent?.value.toString()
-        )
+        await myOrdersCoreRef.current!.getMyOrders(myOrdersRequestParams)
 
       setIsLoading(false)
 
@@ -169,6 +203,12 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
     //#endregion Imperative Handler
 
     //#region Handlers
+    const handleOnRefresh = async () => {
+      setIsRefreshing(true)
+      await getOrders()
+      setIsRefreshing(false)
+    }
+
     const handleOnLoadingChange = useCallback(
       (loading: boolean) => {
         onLoadingChange?.(loading)
@@ -176,8 +216,19 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
       [onLoadingChange]
     )
 
+    const handleOnChangeTimeFilter = (item: IDropdownItem) => {
+      setMyOrders([])
+
+      if (item.value !== selectedTimeFilter.value) {
+        currentPage.current = 1
+        setSelectedTimeFilter(item)
+      }
+    }
+
     const handleOnChangeEvent = (event: IDropdownItem) => {
-      if (event.value !== selectedEvent.value) {
+      setMyOrders([])
+
+      if (event.value !== selectedEvent.value || event.value === '') {
         currentPage.current = 1
         setSelectedEvent(event)
       }
@@ -187,8 +238,10 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
       if (myOrders.length < 8) {
         return
       }
-      currentPage.current = currentPage.current + 1
-      getMoreOrders()
+      if (!isLoading) {
+        currentPage.current = currentPage.current + 1
+        getMoreOrders()
+      }
     }
 
     const handleOnSelectOrder = async (order: IMyOrdersOrder) => {
@@ -236,11 +289,14 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
     }, [])
 
     useEffect(() => {
-      getOrders()
+      if (selectedEvent.value !== '' || selectedTimeFilter.value !== '') {
+        getOrders()
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedEvent])
+    }, [selectedEvent, selectedTimeFilter])
     //#endregion useEffect
 
+    //#region Return
     return (
       <MyOrdersCore ref={myOrdersCoreRef}>
         <SessionHandle ref={sessionHandleRef}>
@@ -250,17 +306,22 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
             onChangeEvent={handleOnChangeEvent}
             myOrders={myOrders}
             onSelectOrder={handleOnSelectOrder}
-            onRefresh={getOrders}
+            onRefresh={handleOnRefresh}
             isLoading={isLoading}
             isGettingEventDetails={isGettingEventDetails}
             styles={styles}
             config={config}
             onFetchMoreOrders={handleOnFetchMoreOrders}
             texts={texts}
+            timeFilters={timeFilters}
+            selectedTimeFilter={selectedTimeFilter}
+            onChangeTimeFilter={handleOnChangeTimeFilter}
+            isRefreshing={isRefreshing}
           />
         </SessionHandle>
       </MyOrdersCore>
     )
+    //#endregion Return
   }
 )
 

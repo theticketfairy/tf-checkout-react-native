@@ -1,5 +1,6 @@
 import React, { FC, useCallback, useMemo, useRef } from 'react'
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   RefreshControl,
@@ -29,8 +30,13 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
   config,
   onFetchMoreOrders,
   texts,
+  onChangeTimeFilter,
+  timeFilters,
+  selectedTimeFilter,
+  isRefreshing,
 }) => {
   const onEndReachedCalledDuringMomentum = useRef(false)
+  //#region Handlers
   const handleOnSelectOrder = (order: IMyOrdersOrder) => {
     if (onSelectOrder) {
       onSelectOrder(order)
@@ -47,7 +53,9 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
   const handleOnMomentumScrollBegin = () => {
     onEndReachedCalledDuringMomentum.current = false
   }
+  //#endregion Handlers
 
+  //#region Renders
   const renderOrderListItem = useCallback(
     ({ item }) => (
       <OrderListItem
@@ -60,16 +68,13 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
     [handleOnSelectOrder]
   )
 
-  const renderRefreshControl = useMemo(
-    () => (
-      <RefreshControl
-        tintColor={styles?.refreshControlColor || R.colors.primary}
-        refreshing={!!isLoading}
-        onRefresh={onRefresh}
-      />
-    ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isLoading, onRefresh]
+  const renderRefreshControl = (
+    <RefreshControl
+      enabled={false}
+      tintColor={styles?.refreshControlColor || R.colors.primary}
+      refreshing={!!isLoading}
+      onRefresh={onRefresh}
+    />
   )
 
   const dropdownStyles = useMemo(() => {
@@ -86,14 +91,17 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
   const onClearSelectedEvent = () =>
     onChangeEvent({
       label: texts?.selectEventPlaceholder || 'Select event',
-      value: '-1',
+      value: 'none',
+    })
+
+  const onClearSelectedTimeFilter = () =>
+    onChangeTimeFilter({
+      label: texts?.selectTimeFilterPlaceholder || 'Select time filter',
+      value: 'none',
     })
 
   const eventsDropdown = (
     <View style={[s.eventsContainer, styles?.eventsContainer]}>
-      <Text style={[s.eventsTitle, styles?.eventsTitle]}>
-        {texts?.title || 'Events'}
-      </Text>
       <View
         style={[s.eventsSelectionContainer, styles?.eventsSelectionContainer]}
       >
@@ -113,9 +121,42 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
     </View>
   )
 
+  const timeFilterDropdown = (
+    <View style={[s.eventsContainer, styles?.timeFilters?.container]}>
+      <View
+        style={[
+          s.eventsSelectionContainer,
+          styles?.timeFilters?.selectionContainer,
+        ]}
+      >
+        <Dropdown
+          items={timeFilters}
+          onSelectItem={onChangeTimeFilter}
+          selectedOption={selectedTimeFilter}
+          styles={dropdownStyles}
+        />
+        <TouchableOpacity onPress={onClearSelectedTimeFilter}>
+          <Image
+            source={R.icons.error}
+            style={[
+              s.clearEventSelectionIcon,
+              styles?.timeFilters?.clearSelectionIcon,
+            ]}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
+  //#endregion Renders
+
+  //#region Return
   return (
     <View style={[s.rootContainer, styles?.rootContainer]}>
       <SafeAreaView style={[s.safeArea, styles?.safeArea]}>
+        <Text style={[s.eventsTitle, styles?.eventsTitle]}>
+          {texts?.title || 'Events'}
+        </Text>
+        {!config?.isTimeFilterDropdownHidden && timeFilterDropdown}
         {!config?.isEventsDropdownHidden && eventsDropdown}
         <View style={[s.listContainer, styles?.listContainer]}>
           <FlatList
@@ -127,6 +168,12 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
             onEndReachedThreshold={0.2}
             extraData={myOrders}
           />
+          {isLoading && myOrders.length > 8 && !isRefreshing && (
+            <ActivityIndicator
+              size={'large'}
+              color={styles?.refreshControlColor || R.colors.primary}
+            />
+          )}
         </View>
         {config?.areActivityIndicatorsEnabled && isGettingEventDetails && (
           <Loading />
@@ -134,6 +181,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
       </SafeAreaView>
     </View>
   )
+  //#endregion Return
 }
 
 export default MyOrdersView
