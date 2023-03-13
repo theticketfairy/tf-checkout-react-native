@@ -37,7 +37,7 @@ const EVENT_ID = 13090
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
   CLIENT: 'mana',
-  BRAND: 'mana-onetree-testing-brand',
+  BRAND: 'mana-common',
   ARE_SUB_BRANDS_INCLUDED: true,
   ENV: 'STAG',
 }
