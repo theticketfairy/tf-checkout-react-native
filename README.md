@@ -1313,40 +1313,66 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
   ref={SessionHandleType}
   onSelectOrder: (order: {
     order: {
-    header: {
-      isReferralDisabled: boolean
-      shareLink: string
-      total: string
-      salesReferred: string
-    },
-    items: [
-      {
-        name: string
+      header: {
         currency: string
-        price: string
-        discount: string
-        quantity: string
+        date: string
+        eventEndDate: string
+        eventId: string
+        eventName: string
+        eventSalesEndDate: string
+        eventSalesStartDate: string
+        eventStartDate: string
+        eventUrl: string
+        hideVenueUntil: string | null
+        id: string
+        image: string
+        isReferralDisabled: boolean
+        isVenueHidden: boolean
+        salesReferred: string
+        shareLink: string
+        timeZone: string
         total: string
+        venue: {
+          city: string
+          country: string
+          googlePlaceId?: string
+          latitude?: string
+          longitude?: string
+          name?: string
+          postalCode?: string
+          state: string
+          street?: string
+          streetNumber?: string
+        }
       },
-      {...}
-    ],
-    tickets: [
-      {
-        hash: string
-        ticketType: string
-        holderName?: string
-        holderEmail?: string
-        holderPhone?: string
-        status: string
-        pdfLink?: string
-        qrData?: string
-        isSellable?: boolean
-        description?: string
-        descriptionPlain?: string
-      },
-      {...}
-    ]
-  }
+      items: [
+        {
+          name: string
+          currency: string
+          price: string
+          discount: string
+          quantity: string
+          total: string
+        },
+        {...}
+      ],
+      tickets: [
+        {
+          hash: string
+          ticketType: string
+          holderName?: string
+          holderEmail?: string
+          holderPhone?: string
+          status: string
+          pdfLink?: string
+          qrData?: string
+          isSellable?: boolean
+          description?: string
+          descriptionPlain?: string
+        },
+        {...}
+      ]
+    }
   }) => void
 
   onFetchMyOrdersSuccess?: (data: IMyOrdersData) => void
@@ -1357,15 +1383,40 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
 
   onLoadingChange?: (isLoading: boolean) => void
 
-  styles?: IMyOrdersStyles
+  styles?: {
+    orderListItem?: IOrderListItemStyles
+    safeArea?: StyleProp<ViewStyle>
+    listContainer?: StyleProp<ViewStyle>
+    eventsContainer?: StyleProp<ViewStyle>
+    eventsTitle?: StyleProp<TextStyle>
+    refreshControlColor?: ColorValue
+    eventsDropdown?: IDropdownStyles
+    rootContainer?: StyleProp<ViewStyle>
+    eventsSelectionContainer?: StyleProp<ViewStyle>
+    clearEventSelectionIcon?: StyleProp<ImageStyle>
+    timeFilters?: {
+      container?: StyleProp<ViewStyle>
+      dropdown?: IDropdownStyles
+      selectionContainer?: StyleProp<ViewStyle>
+      clearSelectionIcon?: StyleProp<ImageStyle>
+    }
+  }
   config?: {
     isEventsDropdownHidden?: boolean
     areActivityIndicatorsEnabled?: boolean
     areAlertsEnabled?: boolean
+    isTimeFilterDropdownHidden?: boolean
   }
   texts?: {
     selectEventPlaceholder?: string
+    selectTimeFilterPlaceholder?: string
     title?: string
+    timeFilters?: {
+      upcoming?: string
+      ongoingAndUpcoming?: string
+      ongoing?: string
+      past?: string
+    }
   }
 }
 ```
@@ -2834,6 +2885,12 @@ Wrap your component with the Core component.
 # Changelog
 
 ## Version 1.0.28
+- Add filter to `getMyOrders` request in `MyOrdersCore` component, to filter by time frame by passing the following string:
+
+```ts
+'upcoming_events' | 'ongoing_and_upcoming_events' | 'ongoing_events' | 'past_events'
+```
+
 - Add more data to the `getMyOrders` success response.
 - Add more data to the `getOrderDetails` success response.
 - Add `ticketsSold` prop to Event's object in fetchEvent success data.

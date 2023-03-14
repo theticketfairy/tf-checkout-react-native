@@ -45,6 +45,12 @@ export interface IMyOrdersTexts {
   selectEventPlaceholder?: string
   selectTimeFilterPlaceholder?: string
   title?: string
+  timeFilters?: {
+    upcoming?: string
+    ongoingAndUpcoming?: string
+    ongoing?: string
+    past?: string
+  }
 }
 
 export interface IMyOrdersProps {

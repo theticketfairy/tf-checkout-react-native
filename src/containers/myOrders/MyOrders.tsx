@@ -60,16 +60,23 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
     //#endregion
 
     const timeFilters: IDropdownItem[] = [
-      { label: 'Upcoming events', value: 'upcoming_events' },
       {
-        label: 'Ongoing and upcoming events',
+        label: texts?.timeFilters?.upcoming || 'Upcoming events',
+        value: 'upcoming_events',
+      },
+      {
+        label:
+          texts?.timeFilters?.ongoingAndUpcoming ||
+          'Ongoing and upcoming events',
         value: 'ongoing_and_upcoming_events',
       },
-      { label: 'Ongoing events', value: 'ongoing_events' },
-      { label: 'Past events', value: 'past_events' },
       {
-        label: texts?.selectTimeFilterPlaceholder || 'Select time filter',
-        value: '',
+        label: texts?.timeFilters?.ongoing || 'Ongoing events',
+        value: 'ongoing_events',
+      },
+      {
+        label: texts?.timeFilters?.past || 'Past events',
+        value: 'past_events',
       },
     ]
 
@@ -218,6 +225,10 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
 
     const handleOnChangeTimeFilter = (item: IDropdownItem) => {
       setMyOrders([])
+      setSelectedEvent({
+        label: texts?.selectEventPlaceholder || 'Select event',
+        value: '',
+      })
 
       if (item.value !== selectedTimeFilter.value) {
         currentPage.current = 1
