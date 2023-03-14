@@ -5,6 +5,7 @@ import { fetchMyOrders, fetchOrderDetails } from '../../api/ApiClient'
 import {
   IFetchAccessTokenResponse,
   IMyOrderDetailsResponse,
+  IMyOrdersRequestParams,
   IMyOrdersResponse,
 } from '../../api/types'
 import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
@@ -15,10 +16,9 @@ const MyOrdersCore = forwardRef<MyOrdersCoreHandle, ICoreProps>(
   (props, ref) => {
     useImperativeHandle(ref, () => ({
       async getMyOrders(
-        page: number,
-        filter: string
+        params: IMyOrdersRequestParams
       ): Promise<IMyOrdersResponse> {
-        return await fetchMyOrders(page, filter)
+        return await fetchMyOrders(params)
       },
 
       async getOrderDetails(orderId: string): Promise<IMyOrderDetailsResponse> {

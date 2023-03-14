@@ -263,6 +263,20 @@ export interface IMyOrdersResponse {
   myOrdersData?: IMyOrdersData
   myOrdersError?: IError
 }
+
+export type MyOrderRequestFromType =
+  | 'upcoming_events'
+  | 'ongoing_and_upcoming_events'
+  | 'ongoing_events'
+  | 'past_events'
+  | ''
+
+export interface IMyOrdersRequestParams {
+  page: number
+  limit?: number
+  filter?: string
+  from?: MyOrderRequestFromType
+}
 //#endregion
 
 //#region My Order Details

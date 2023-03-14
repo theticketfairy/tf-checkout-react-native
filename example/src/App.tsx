@@ -37,7 +37,7 @@ const EVENT_ID = 13090
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
   CLIENT: 'mana',
-  BRAND: 'mana-onetree-testing-brand',
+  BRAND: 'mana-common',
   ARE_SUB_BRANDS_INCLUDED: true,
   ENV: 'STAG',
 }
@@ -430,6 +430,7 @@ const App = () => {
             <MyOrders
               config={{
                 areActivityIndicatorsEnabled: false,
+                areAlertsEnabled: true,
               }}
               onFetchMyOrdersSuccess={(data) => {
                 console.log('onFetchMyOrdersSuccess', data)
@@ -437,6 +438,11 @@ const App = () => {
               onLoadingChange={(loading) => setIsLoading(loading)}
               onSelectOrder={handleOnSelectOrder}
               styles={{
+                timeFilters: { 
+                  container: {
+                    paddingHorizontal: 16
+                  }
+                },
                 eventsTitle: {
                   color: Color.textMain,
                   fontWeight: '800',
@@ -491,7 +497,8 @@ const App = () => {
               }}
               texts={{
                 title: '_My Orders_',
-                selectEventPlaceholder: '_Selected Order Details_',
+                selectEventPlaceholder: '_CUSTOM EVENT_',
+                selectTimeFilterPlaceholder: 'Custom placeholder time filter'
               }}
             />
             <TouchableOpacity
