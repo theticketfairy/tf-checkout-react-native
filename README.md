@@ -2275,6 +2275,16 @@ Exposes the following functions:
 }
 ```
 
+## MyOrderRequestFromType
+```
+MyOrderRequestFromType =
+  | 'upcoming_events'
+  | 'ongoing_and_upcoming_events'
+  | 'ongoing_events'
+  | 'past_events'
+  | ''
+```
+
 Import the component from the library
 
 ```js
@@ -2863,6 +2873,17 @@ getOrderDetails(orderId: string): Promise<{
   }
 }>
 ```
+
+## MyOrderRequestFromType
+```
+MyOrderRequestFromType =
+  | 'upcoming_events'
+  | 'ongoing_and_upcoming_events'
+  | 'ongoing_events'
+  | 'past_events'
+  | ''
+```
+
 ---
 ## OrderDetailsCore
 Allows to re-sale the tickets or to remove them from the re-sale system.

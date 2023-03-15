@@ -2,7 +2,11 @@
 import * as React from 'react' //Needed to render
 import { LogBox, NativeModules } from 'react-native'
 
-import { IMyOrderDetailsData, IMyOrdersOrder } from './api/types'
+import {
+  IMyOrderDetailsData,
+  IMyOrdersOrder,
+  MyOrderRequestFromType,
+} from './api/types'
 import { LoggedIn, Login } from './components'
 import {
   BillingInfo,
@@ -50,7 +54,15 @@ import {
 import { setConfig } from './helpers/Config'
 import { deleteAllData } from './helpers/LocalStorage'
 import { refreshAccessToken } from './helpers/RefreshAccessToken'
-import { ITicketsResponseData, IUserProfile } from './types'
+import {
+  IAccountOrdersPurchasedEvent,
+  IAccountOrdersTicket,
+  IAccountTicketsAttributes,
+  IAccountTicketsData,
+  IAccountTicketsResponse,
+  ITicketsResponseData,
+  IUserProfile,
+} from './types'
 
 LogBox.ignoreAllLogs()
 // @ts-ignore
@@ -64,6 +76,11 @@ export {
   CheckoutCore,
   CheckoutCoreHandle,
   deleteAllData,
+  IAccountOrdersPurchasedEvent,
+  IAccountOrdersTicket,
+  IAccountTicketsAttributes,
+  IAccountTicketsData,
+  IAccountTicketsResponse,
   IBillingProps,
   ICheckoutProps,
   IMyOrderDetailsData,
@@ -81,6 +98,7 @@ export {
   LoginCore,
   LoginCoreHandle,
   MyOrderDetails,
+  MyOrderRequestFromType,
   MyOrders,
   MyOrdersCore,
   MyOrdersCoreHandle,
