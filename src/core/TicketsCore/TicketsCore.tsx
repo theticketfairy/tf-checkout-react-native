@@ -9,6 +9,7 @@ import React, { forwardRef, useImperativeHandle } from 'react'
 import {
   addToCart,
   closeSession,
+  fetchAccountTickets,
   fetchEvent,
   fetchTickets,
   postReferralVisit,
@@ -19,6 +20,7 @@ import {
   ICloseSessionResponse,
   IEventResponse,
   IFetchAccessTokenResponse,
+  IMyOrdersRequestParams,
   IPostReferralResponse,
 } from '../../api/types'
 import { Config } from '../../helpers/Config'
@@ -28,7 +30,11 @@ import {
   LocalStorageKeys,
 } from '../../helpers/LocalStorage'
 import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
-import { IAddToCartResponse, ITicket } from '../../types'
+import {
+  IAccountTicketsResponse,
+  IAddToCartResponse,
+  ITicket,
+} from '../../types'
 import { ICoreProps } from '../CoreProps'
 import {
   IBookTicketsOptions,
@@ -207,6 +213,12 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
       refreshToken?: string
     ): Promise<IFetchAccessTokenResponse> {
       return await refreshAccessTokenAsync(refreshToken)
+    },
+
+    async getAccountTickets(
+      params: IMyOrdersRequestParams
+    ): Promise<IAccountTicketsResponse> {
+      return await fetchAccountTickets(params)
     },
   }))
 

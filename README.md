@@ -2018,6 +2018,8 @@ Exposes the following functions:
 
 `refreshAccessToken` : Refreshes expired access token.
 
+`getAccountTickets`: Fetches the tickets purchased for the user that logged in.
+
 ```js
 {
   // Fetches the tickets from the event set in the config function. It receives a promoCode parameter to apply to the tickets.
@@ -2199,6 +2201,76 @@ Exposes the following functions:
       status: number
     }>
     refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
+
+    getAccountTickets({
+      page: number
+      limit?: number
+      filter?: string
+      from?: MyOrderRequestFromType
+    }): Promise<
+      data?: {
+        attributes: {
+          page: number
+          limit: number
+          total_count: number
+          total_pages: number
+          filter?: any
+          brand_filter: string
+          sub_brands: boolean
+          purchased_events: {
+            url_name: string
+            event_name: string
+          }[]
+          tickets: {
+            id: string
+            orderId: string
+            hash: string
+            qrData: string
+            ticketType: string
+            ticketTypeHash: string
+            description?: any
+            descriptionPlain?: any
+            currency: string
+            price: string
+            retainAmountOnSale: number
+            status: string
+            holderName: string
+            holderEmail?: any
+            holderPhone?: any
+            isTable: boolean
+            isSellable: boolean
+            isOnSale: boolean
+            createdAt: Date
+            pdfLink: string
+            eventId: string
+            eventName: string
+            eventUrl: string
+            eventTimezone: string
+            eventStartDate: Date
+            eventEndDate: Date
+            eventSalesStartDate?: any
+            eventSalesEndDate: Date
+            eventImage: string
+            eventBackgroundImage: string
+            eventIsOnlineEvent: boolean
+            venueCountry: string
+            venueCity: string
+            venueState: string
+            hideVenueUntil?: any
+            hideVenue: boolean
+            venueName?: string //Optional
+            venueGooglePlaceId?: string //Optional
+            venueLatitude?: string //Optional
+            venueLongitude?: string //Optional
+            venuePostalCode?: string //Optional
+            venueStreet?: string //Optional
+            venueStreetNumber?: string //Optional
+          }[]
+        }
+        relationships: any[]
+        type: string
+      },  
+      error?: IError>
   }>
 }
 ```
@@ -2639,6 +2711,7 @@ Exposes the following functions:
 
 `refreshAccessToken` Refreshes access token.
 
+`getAccountTickets`: Fetches the tickets purchased for the user that logged in.
 
 ```ts
 refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
@@ -2675,6 +2748,76 @@ getMyOrders(page: number, filter: string): Promise<{
     message: string
     extraData?: any
   }
+
+  getAccountTickets({
+      page: number
+      limit?: number
+      filter?: string
+      from?: MyOrderRequestFromType
+    }): Promise<
+      data?: {
+        attributes: {
+          page: number
+          limit: number
+          total_count: number
+          total_pages: number
+          filter?: any
+          brand_filter: string
+          sub_brands: boolean
+          purchased_events: {
+            url_name: string
+            event_name: string
+          }[]
+          tickets: {
+            id: string
+            orderId: string
+            hash: string
+            qrData: string
+            ticketType: string
+            ticketTypeHash: string
+            description?: any
+            descriptionPlain?: any
+            currency: string
+            price: string
+            retainAmountOnSale: number
+            status: string
+            holderName: string
+            holderEmail?: any
+            holderPhone?: any
+            isTable: boolean
+            isSellable: boolean
+            isOnSale: boolean
+            createdAt: Date
+            pdfLink: string
+            eventId: string
+            eventName: string
+            eventUrl: string
+            eventTimezone: string
+            eventStartDate: Date
+            eventEndDate: Date
+            eventSalesStartDate?: any
+            eventSalesEndDate: Date
+            eventImage: string
+            eventBackgroundImage: string
+            eventIsOnlineEvent: boolean
+            venueCountry: string
+            venueCity: string
+            venueState: string
+            hideVenueUntil?: any
+            hideVenue: boolean
+            venueName?: string //Optional
+            venueGooglePlaceId?: string //Optional
+            venueLatitude?: string //Optional
+            venueLongitude?: string //Optional
+            venuePostalCode?: string //Optional
+            venueStreet?: string //Optional
+            venueStreetNumber?: string //Optional
+          }[]
+        }
+        relationships: any[]
+        type: string
+      },  
+      error?: IError>
 }>
 
 
@@ -2885,6 +3028,7 @@ Wrap your component with the Core component.
 # Changelog
 
 ## Version 1.0.28
+- Add `getAccountTickets` request in `MyOrdersCore` and `TicketsCore`, it will allow get Tickets from the logged-in user.
 - Add filter to `getMyOrders` request in `MyOrdersCore` component, to filter by time frame by passing the following string:
 
 ```ts
