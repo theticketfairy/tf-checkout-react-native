@@ -1,3 +1,4 @@
+export * from './IAccountTickets'
 export * from './IError'
 export * from './IEvent'
 export * from './ITicket'

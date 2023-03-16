@@ -15,7 +15,7 @@ import {
   LocalStorageKeys,
   storeData,
 } from '../helpers/LocalStorage'
-import { IError, IEvent, IUserProfile } from '../types'
+import { IAccountTicketsResponse, IError, IEvent, IUserProfile } from '../types'
 import {
   IAddToCartResponse,
   ITicket,
@@ -1280,3 +1280,47 @@ export const requestResetPassword = async (
   }
 }
 //#endregion Request Password
+
+//#region Account Tickets
+export const fetchAccountTickets = async ({
+  page = 1,
+  limit = 20,
+  filter = '',
+  from = '',
+}: IMyOrdersRequestParams): Promise<IAccountTicketsResponse> => {
+  let responseError: IError | undefined
+
+  const withFilterEvent = filter ? `&filter[event]=${filter}` : ''
+  const withBrand = Config.BRAND ? `&filter[brand]=${Config.BRAND}` : ''
+  const withSubBrands = Config.ARE_SUB_BRANDS_INCLUDED
+    ? `&filter[subbrands]=${Config.ARE_SUB_BRANDS_INCLUDED}`
+    : ''
+  const withFrom = from ? `&filter[from]=${from}` : ''
+
+  const endpoint = `/v1/account/tickets/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}${withFrom}`
+
+  const response: AxiosResponse | void = await Client.get(endpoint).catch(
+    (error: AxiosError) => {
+      responseError = getApiError(error)
+    }
+  )
+
+  if (responseError) {
+    return {
+      error: responseError,
+    }
+  }
+
+  if (response?.data) {
+    return {
+      data: response.data.data,
+    }
+  }
+
+  return {
+    error: {
+      message: 'No data was received in Account Tickets.',
+    },
+  }
+}
+//#endregion Account Tickets
