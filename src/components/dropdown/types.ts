@@ -2,6 +2,7 @@ import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
 export interface IDropdownItem {
   label: string
   value: string | number
+  [key: string]: string | number
 }
 
 export interface IDropdownListItemStyles {

@@ -11,6 +11,7 @@ export const LocalStorageKeys = {
   RESET_PASS_TOKEN: 'RESET_PASS_TOKEN',
   AUTH_SCOPE: 'AUTH_SCOPE',
   AUTH_TOKEN_TYPE: 'AUTH_TOKEN_TYPE',
+  EVENT_COUNTRY: 'EVENT_COUNTRY',
 }
 
 export interface IStoredUserData {
@@ -63,6 +64,7 @@ export const deleteAllData = async () => {
       LocalStorageKeys.AUTH_SCOPE,
       LocalStorageKeys.SCOPE,
       LocalStorageKeys.TOKEN_TYPE,
+      LocalStorageKeys.EVENT_COUNTRY,
     ])
 
     if (value !== null) {
@@ -86,6 +88,7 @@ export const checkStoredData = async () => {
       LocalStorageKeys.AUTH_SCOPE,
       LocalStorageKeys.SCOPE,
       LocalStorageKeys.TOKEN_TYPE,
+      LocalStorageKeys.EVENT_COUNTRY,
     ])
     return values
   } catch (ex) {

@@ -907,7 +907,11 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
     // fetchCountries
   onFetchCountriesError?: (error: IError) => void
-  onFetchCountriesSuccess?: () => void
+  onFetchCountriesSuccess?: (data: {
+    code: string
+    id: string
+    name: string
+  }[]) => void
 
   // fetchState
   onFetchStatesError?: (error: IError) => void
@@ -1309,40 +1313,66 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
   ref={SessionHandleType}
   onSelectOrder: (order: {
     order: {
-    header: {
-      isReferralDisabled: boolean
-      shareLink: string
-      total: string
-      salesReferred: string
-    },
-    items: [
-      {
-        name: string
+      header: {
         currency: string
-        price: string
-        discount: string
-        quantity: string
+        date: string
+        eventEndDate: string
+        eventId: string
+        eventName: string
+        eventSalesEndDate: string
+        eventSalesStartDate: string
+        eventStartDate: string
+        eventUrl: string
+        hideVenueUntil: string | null
+        id: string
+        image: string
+        isReferralDisabled: boolean
+        isVenueHidden: boolean
+        salesReferred: string
+        shareLink: string
+        timeZone: string
         total: string
+        venue: {
+          city: string
+          country: string
+          googlePlaceId?: string
+          latitude?: string
+          longitude?: string
+          name?: string
+          postalCode?: string
+          state: string
+          street?: string
+          streetNumber?: string
+        }
       },
-      {...}
-    ],
-    tickets: [
-      {
-        hash: string
-        ticketType: string
-        holderName?: string
-        holderEmail?: string
-        holderPhone?: string
-        status: string
-        pdfLink?: string
-        qrData?: string
-        isSellable?: boolean
-        description?: string
-        descriptionPlain?: string
-      },
-      {...}
-    ]
-  }
+      items: [
+        {
+          name: string
+          currency: string
+          price: string
+          discount: string
+          quantity: string
+          total: string
+        },
+        {...}
+      ],
+      tickets: [
+        {
+          hash: string
+          ticketType: string
+          holderName?: string
+          holderEmail?: string
+          holderPhone?: string
+          status: string
+          pdfLink?: string
+          qrData?: string
+          isSellable?: boolean
+          description?: string
+          descriptionPlain?: string
+        },
+        {...}
+      ]
+    }
   }) => void
 
   onFetchMyOrdersSuccess?: (data: IMyOrdersData) => void
@@ -1353,23 +1383,78 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
 
   onLoadingChange?: (isLoading: boolean) => void
 
-  styles?: IMyOrdersStyles
+  styles?: {
+    orderListItem?: IOrderListItemStyles
+    safeArea?: StyleProp<ViewStyle>
+    listContainer?: StyleProp<ViewStyle>
+    eventsContainer?: StyleProp<ViewStyle>
+    eventsTitle?: StyleProp<TextStyle>
+    refreshControlColor?: ColorValue
+    eventsDropdown?: IDropdownStyles
+    rootContainer?: StyleProp<ViewStyle>
+    eventsSelectionContainer?: StyleProp<ViewStyle>
+    clearEventSelectionIcon?: StyleProp<ImageStyle>
+    timeFilters?: {
+      container?: StyleProp<ViewStyle>
+      dropdown?: IDropdownStyles
+      selectionContainer?: StyleProp<ViewStyle>
+      clearSelectionIcon?: StyleProp<ImageStyle>
+    }
+  }
   config?: {
     isEventsDropdownHidden?: boolean
     areActivityIndicatorsEnabled?: boolean
     areAlertsEnabled?: boolean
+    isTimeFilterDropdownHidden?: boolean
   }
   texts?: {
     selectEventPlaceholder?: string
+    selectTimeFilterPlaceholder?: string
     title?: string
+    timeFilters?: {
+      upcoming?: string
+      ongoingAndUpcoming?: string
+      ongoing?: string
+      past?: string
+    }
   }
 }
 ```
 IMyOrdersData
 ```ts
 {
-  events: IMyOrdersEvent[]
-  orders: IMyOrdersOrder[]
+  events: {
+    event_name: string
+    url_name: string
+  }[]
+  orders: {
+    amount: string
+    currency: string
+    date: string
+    eventEndDate: string
+    eventId: string
+    eventName: string
+    eventSalesEndDate: string
+    eventSalesStartDate: string | null
+    eventStartDate: string
+    eventUrl: string
+    hideVenue: boolean
+    hideVenueUntil: string | null
+    id: string
+    image: string
+    timezone: string
+    venueCity: string
+    venueCountry: string
+    venueGooglePlaceId?: string
+    venueLatitude?: string
+    venueLongitude?: string
+    venueName?: string
+    venuePostalCode?: string
+    venueState: string
+    venueStreet?: string
+    venueStreetNumber?: string
+  }[]
+  //Those mark with ? are only included if the venue is not hidden
   filter?: string
   brandFilter?: string
   subBrands?: boolean
@@ -1385,20 +1470,47 @@ IMyOrderDetailsData
 ```ts
 {
   header: {
+    currency: string
+    date: string
+    eventEndDate: string
+    eventId: string
+    eventName: string
+    eventSalesEndDate: string
+    eventSalesStartDate: string
+    eventStartDate: string
+    eventUrl: string
+    hideVenueUntil: string | null
+    id: string
+    image: string
     isReferralDisabled: boolean
-    shareLink: string
-    total: string
+    isVenueHidden: boolean
     salesReferred: string
+    shareLink: string
+    timeZone: string
+    total: string
+    venue: {
+      city: string
+      country: string
+      googlePlaceId?: string
+      latitude?: string
+      longitude?: string
+      name?: string
+      postalCode?: string
+      state: string
+      street?: string
+      streetNumber?: string
+    }
+    //Those mark with ? are only included if the venue is not hidden
   }
   items?: {
-    isActive: boolean
     currency: string
     discount: string
+    hash: string
+    isActive: boolean
     name: string
     price: string
     quantity: string
     total: string
-    hash: string
   }[]
   tickets: {
     currency: string
@@ -1411,6 +1523,7 @@ IMyOrderDetailsData
     holderPhone?: string
     isOnSale: boolean
     isSellable: boolean
+    isTable: boolean
     pdfLink: string
     qrData: string
     resaleFeeAmount: number
@@ -1905,6 +2018,8 @@ Exposes the following functions:
 
 `refreshAccessToken` : Refreshes expired access token.
 
+`getAccountTickets`: Fetches the tickets purchased for the user that logged in.
+
 ```js
 {
   // Fetches the tickets from the event set in the config function. It receives a promoCode parameter to apply to the tickets.
@@ -1970,68 +2085,84 @@ Exposes the following functions:
       extraData?: any
     }
     eventData?: {
-      passwordProtected: boolean
-      passwordAuthenticated: boolean
-      name: string
-      description?: string
-      slug: string
-      redirectUrl?: string
-      facebookEvent?: string
-      title: string
-      relatedProducts: []
+      affirmAllowed: boolean
+      alwaysShowWaitingList?: any
+      backgroundImage: string
+      backgroundVideo?: string
+      brandCheckoutPixels?: string
+      brandConversionPixels?: string
+      brandGoogleAnalyticsKey?: string
+      brandPagePixels?: string
+      checkoutPixels?: string
+      conversionPixels?: string
       country: string
+      currency: {
+        currency: string
+        decimal_places: number
+        symbol: string
+      }
       date: string
-      startDate: string
+      description?: string
+      descriptions: any
+      enableWaitingList: boolean
       endDate: string
-      timezone: string
+      eventType: any
+      facebookEvent?: string
+      faq: []
+      feeMode: string
+      feesIncluded?: any
       formattedDate: string
-      venueCountry: string
-      venueCity?: string
-      venueState?: string
-      hideVenueUntil?: string
+      fullTitleReplacement?: any
+      hideTopInfluencers: boolean
       hideVenue?: boolean
-      venueName?: string
+      hideVenueUntil?: string
+      imageUrl: string
+      imageUrlHd: string
+      imageURLs: any
+      isTimeSlotEvent: boolean
+      l10nLanguages: []
+      minimumAge?: any
+      name: string
+      ogImage?: string
+      pagePixels?: string
+      passwordAuthenticated: boolean
+      passwordProtected: boolean
+      preregEnabled: boolean
+      preregistered: []
+      presalesEnded: boolean
+      presalesStarted: boolean
+      productImage: string
+      redirectUrl?: string
+      referrals: []
+      referralsEnabled: boolean
+      relatedProducts: []
+      salesEnd: string
+      salesEnded: boolean
+      salesStart?: string
+      salesStarted: boolean
+      slug: string
+      startDate: string
+      subHeading?: any
+      tableMapEnabled: boolean
+      tags: []
+      ticketsSold: number
+      timezone: string
+      title: string
+      titleReplacementHeight?: any
+      titleReplacementImage?: any
+      titleReplacementImageSvg?: any
+      twitterImage?: string
+      venueCity?: string
+      venueCountry: string
       venueGooglePlaceId?: string
       venueLatitude?: string
       venueLongitude?: string
+      venueName?: string
       venuePostalCode?: string
+      venueState?: string
       venueStreet?: string
       venueStreetNumber?: string
-      eventType: any
-      productImage: string
-      imageUrl: string
-      imageUrlHd: string
-      backgroundImage: string
-      backgroundVideo?: string
-      twitterImage?: string
-      ogImage?: string
-      tags: []
-      preregEnabled: boolean
-      presalesStarted: boolean
-      presalesEnded: boolean
-      salesStart?: string
-      salesEnd: string
-      salesStarted: boolean
-      salesEnded: boolean
-      feeMode: string
-      feesIncluded?: any
-      minimumAge?: any
-      enableWaitingList: boolean
-      alwaysShowWaitingList?: any
-      titleReplacementImage?: any
-      titleReplacementHeight?: any
-      titleReplacementImageSvg?: any
-      fullTitleReplacement?: any
-      affirmAllowed: boolean
-      subHeading?: any
-      isTimeSlotEvent: boolean
-      preregistered: []
-      referralsEnabled: boolean
-      referrals: []
-      faq: []
-      l10nLanguages: []
-      imageURLs: any
-      descriptions: any
+      waitingListMaxQuantity: number
     }
   }>
 
@@ -2070,8 +2201,88 @@ Exposes the following functions:
       status: number
     }>
     refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
+
+    getAccountTickets({
+      page: number
+      limit?: number
+      filter?: string
+      from?: MyOrderRequestFromType
+    }): Promise<
+      data?: {
+        attributes: {
+          page: number
+          limit: number
+          total_count: number
+          total_pages: number
+          filter?: any
+          brand_filter: string
+          sub_brands: boolean
+          purchased_events: {
+            url_name: string
+            event_name: string
+          }[]
+          tickets: {
+            id: string
+            orderId: string
+            hash: string
+            qrData: string
+            ticketType: string
+            ticketTypeHash: string
+            description?: any
+            descriptionPlain?: any
+            currency: string
+            price: string
+            retainAmountOnSale: number
+            status: string
+            holderName: string
+            holderEmail?: any
+            holderPhone?: any
+            isTable: boolean
+            isSellable: boolean
+            isOnSale: boolean
+            createdAt: Date
+            pdfLink: string
+            eventId: string
+            eventName: string
+            eventUrl: string
+            eventTimezone: string
+            eventStartDate: Date
+            eventEndDate: Date
+            eventSalesStartDate?: any
+            eventSalesEndDate: Date
+            eventImage: string
+            eventBackgroundImage: string
+            eventIsOnlineEvent: boolean
+            venueCountry: string
+            venueCity: string
+            venueState: string
+            hideVenueUntil?: any
+            hideVenue: boolean
+            venueName?: string //Optional
+            venueGooglePlaceId?: string //Optional
+            venueLatitude?: string //Optional
+            venueLongitude?: string //Optional
+            venuePostalCode?: string //Optional
+            venueStreet?: string //Optional
+            venueStreetNumber?: string //Optional
+          }[]
+        }
+        relationships: any[]
+        type: string
+      },  
+      error?: IError>
   }>
 }
+```
+
+## MyOrderRequestFromType
+```
+MyOrderRequestFromType =
+  | 'upcoming_events'
+  | 'ongoing_and_upcoming_events'
+  | 'ongoing_events'
+  | 'past_events'
+  | ''
 ```
 
 Import the component from the library
@@ -2249,9 +2460,11 @@ Exposes the following functions:
        message: string
        extraData?: any
      }
-    countriesData?: {
-      [key: number | string]: string
-    }
+    countriesData?:  {
+      code: string
+      id: string
+      name: string
+    }[]
   }>
 
   // Fetches the states list.
@@ -2508,6 +2721,7 @@ Exposes the following functions:
 
 `refreshAccessToken` Refreshes access token.
 
+`getAccountTickets`: Fetches the tickets purchased for the user that logged in.
 
 ```ts
 refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
@@ -2544,6 +2758,76 @@ getMyOrders(page: number, filter: string): Promise<{
     message: string
     extraData?: any
   }
+
+  getAccountTickets({
+      page: number
+      limit?: number
+      filter?: string
+      from?: MyOrderRequestFromType
+    }): Promise<
+      data?: {
+        attributes: {
+          page: number
+          limit: number
+          total_count: number
+          total_pages: number
+          filter?: any
+          brand_filter: string
+          sub_brands: boolean
+          purchased_events: {
+            url_name: string
+            event_name: string
+          }[]
+          tickets: {
+            id: string
+            orderId: string
+            hash: string
+            qrData: string
+            ticketType: string
+            ticketTypeHash: string
+            description?: any
+            descriptionPlain?: any
+            currency: string
+            price: string
+            retainAmountOnSale: number
+            status: string
+            holderName: string
+            holderEmail?: any
+            holderPhone?: any
+            isTable: boolean
+            isSellable: boolean
+            isOnSale: boolean
+            createdAt: Date
+            pdfLink: string
+            eventId: string
+            eventName: string
+            eventUrl: string
+            eventTimezone: string
+            eventStartDate: Date
+            eventEndDate: Date
+            eventSalesStartDate?: any
+            eventSalesEndDate: Date
+            eventImage: string
+            eventBackgroundImage: string
+            eventIsOnlineEvent: boolean
+            venueCountry: string
+            venueCity: string
+            venueState: string
+            hideVenueUntil?: any
+            hideVenue: boolean
+            venueName?: string //Optional
+            venueGooglePlaceId?: string //Optional
+            venueLatitude?: string //Optional
+            venueLongitude?: string //Optional
+            venuePostalCode?: string //Optional
+            venueStreet?: string //Optional
+            venueStreetNumber?: string //Optional
+          }[]
+        }
+        relationships: any[]
+        type: string
+      },  
+      error?: IError>
 }>
 
 
@@ -2589,6 +2873,17 @@ getOrderDetails(orderId: string): Promise<{
   }
 }>
 ```
+
+## MyOrderRequestFromType
+```
+MyOrderRequestFromType =
+  | 'upcoming_events'
+  | 'ongoing_and_upcoming_events'
+  | 'ongoing_events'
+  | 'past_events'
+  | ''
+```
+
 ---
 ## OrderDetailsCore
 Allows to re-sale the tickets or to remove them from the re-sale system.
@@ -2752,6 +3047,18 @@ Wrap your component with the Core component.
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+
+## Version 1.0.28
+- Add `getAccountTickets` request in `MyOrdersCore` and `TicketsCore`, it will allow get Tickets from the logged-in user.
+- Add filter to `getMyOrders` request in `MyOrdersCore` component, to filter by time frame by passing the following string:
+
+```ts
+'upcoming_events' | 'ongoing_and_upcoming_events' | 'ongoing_events' | 'past_events'
+```
+
+- Add more data to the `getMyOrders` success response.
+- Add more data to the `getOrderDetails` success response.
+- Add `ticketsSold` prop to Event's object in fetchEvent success data.
 
 ## Version 1.0.27
 - Make `EVENT_ID` optional in the `setConfig` function. An error will be returned when `EVENT_ID` is not set and trying to make a request that requires it.

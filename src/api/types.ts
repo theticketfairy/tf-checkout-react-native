@@ -2,16 +2,17 @@ import { AxiosInstance } from 'axios'
 
 import { IOnCheckoutSuccess } from '..'
 import { IError, IEvent, ITicket, IUserProfile } from '../types'
+import { ICountry } from '../types/ICountry'
 
 export interface IClientRequest extends AxiosInstance {
-  setGuestToken: (token: string) => void
+  removeAccessToken: () => void
+  removeGuestToken: () => void
   setAccessToken: (token: string) => void
   setBaseUrl: (baseUrl: string) => void
-  setTimeOut: (timeOut: number) => void
-  setDomain: (domain: string) => void
   setContentType: (contentType: string) => void
-  removeGuestToken: () => void
-  removeAccessToken: () => void
+  setDomain: (domain: string) => void
+  setGuestToken: (token: string) => void
+  setTimeOut: (timeOut: number) => void
 }
 
 //#region Tickets
@@ -21,16 +22,16 @@ export interface IPromoCodeResponse {
 }
 
 export interface IFetchTicketsResponse {
-  tickets?: ITicket[]
   error?: IError
-  promoCodeResult?: IPromoCodeResponse
-  isInWaitingList?: boolean
   isAccessCodeRequired?: boolean
+  isInWaitingList?: boolean
+  promoCodeResult?: IPromoCodeResponse
+  tickets?: ITicket[]
 }
 
 export interface IAuthorizeResponse {
-  error?: IError
   code?: string
+  error?: IError
 }
 
 export interface IAddToCartParams {
@@ -56,28 +57,28 @@ export interface IAddToCartParams {
 
 //#region WaitingList
 export interface IAddToWaitingListResponse {
-  addToWaitingListError?: IError
   addToWaitingListData?: {
     error: boolean
     message: string
     status: number
     success: boolean
   }
+  addToWaitingListError?: IError
 }
 
 //#endregion
 
 export interface IEventData {
-  slug: string
-  name: string
   description?: string
+  name: string
+  slug: string
   title: string
 }
 
 // Event types
 export interface IEventResponse {
-  eventError?: IError
   eventData?: IEvent
+  eventError?: IError
 }
 
 //#region Checkout
@@ -111,16 +112,16 @@ export interface ICheckoutBody {
 }
 
 export interface IFreeRegistrationData {
-  id: string
-  customerId: string
-  total: string
   currency: string
+  customerId: string
+  id: string
   orderHash: string
+  total: string
 }
 
 export interface IFreeRegistrationResponse {
-  freeRegistrationError?: IError
   freeRegistrationData?: IFreeRegistrationData
+  freeRegistrationError?: IError
 }
 //#endregion
 
@@ -145,9 +146,9 @@ export interface IRegisterNewUserBody {
 }
 
 export interface IRegisterNewUserProfileResponseData {
+  email: string
   firstName: string
   lastName: string
-  email: string
 }
 
 export interface IRegisterNewUserSuccessData {
@@ -162,14 +163,14 @@ export interface IRegisterNewUserError {
 }
 
 export interface IRegisterNewUserResponse {
-  registerNewUserResponseError?: IRegisterNewUserError
   registerNewUserResponseData?: IRegisterNewUserSuccessData
+  registerNewUserResponseError?: IRegisterNewUserError
 }
 
 // Billing information
 export interface ICheckoutResponse {
-  error?: IError
   data?: IOnCheckoutSuccess
+  error?: IError
 }
 
 // Checkout
@@ -184,12 +185,18 @@ export interface IPaymentConfig {
 export interface IPaymentAddress {
   city: string
   line1: string
-  state: string
   postalCode: string
+  state: string
 }
 
 export interface IOrderReview {
+  addressData: IPaymentAddress
+  billingData: {
+    firstName: string
+    lastName: string
+  }
   expiresAt: number
+  paymentData: IPaymentConfig
   reviewData: {
     event: string
     price: string
@@ -198,64 +205,90 @@ export interface IOrderReview {
     numberOfTickets: string
     currency: string
   }
-  paymentData: IPaymentConfig
-  addressData: IPaymentAddress
-  billingData: {
-    firstName: string
-    lastName: string
-  }
 }
 
 export interface IOrderReviewResponse {
-  orderReviewError?: IError
   orderReviewData?: IOrderReview
+  orderReviewError?: IError
 }
 
 //#region MyOrders
 export interface IMyOrdersEvent {
-  url_name: string
   event_name: string
+  url_name: string
 }
 
 export interface IMyOrdersOrder {
-  id: string
-  date: string
-  currency: string
   amount: string
+  currency: string
+  date: string
+  eventEndDate: string
+  eventId: string
   eventName: string
+  eventSalesEndDate: string
+  eventSalesStartDate: string | null
+  eventStartDate: string
   eventUrl: string
+  hideVenue: boolean
+  hideVenueUntil: string | null
+  id: string
   image: string
+  timezone: string
+  venueCity: string
+  venueCountry: string
+  venueGooglePlaceId?: string
+  venueLatitude?: string
+  venueLongitude?: string
+  venueName?: string
+  venuePostalCode?: string
+  venueState: string
+  venueStreet?: string
+  venueStreetNumber?: string
 }
 export interface IMyOrdersData {
-  events: IMyOrdersEvent[]
-  orders: IMyOrdersOrder[]
-  filter?: string
   brandFilter?: string
-  subBrands?: boolean
+  events: IMyOrdersEvent[]
+  filter?: string
+  orders: IMyOrdersOrder[]
   pagination: {
     page: number
     limit: number
     totalCount: number
     totalPages: number
   }
+  subBrands?: boolean
 }
 
 export interface IMyOrdersResponse {
   myOrdersData?: IMyOrdersData
   myOrdersError?: IError
 }
+
+export type MyOrderRequestFromType =
+  | 'upcoming_events'
+  | 'ongoing_and_upcoming_events'
+  | 'ongoing_events'
+  | 'past_events'
+  | ''
+
+export interface IMyOrdersRequestParams {
+  page: number
+  limit?: number
+  filter?: string
+  from?: MyOrderRequestFromType
+}
 //#endregion
 
 //#region My Order Details
 export interface IMyOrderDetailsItem {
-  isActive: boolean
   currency: string
   discount: string
+  hash: string
+  isActive: boolean
   name: string
   price: string
   quantity: string
   total: string
-  hash: string
 }
 
 export interface IMyOrderDetailsTicket {
@@ -269,6 +302,7 @@ export interface IMyOrderDetailsTicket {
   holderPhone?: string
   isOnSale: boolean
   isSellable: boolean
+  isTable: boolean
   pdfLink: string
   qrData: string
   resaleFeeAmount: number
@@ -278,10 +312,36 @@ export interface IMyOrderDetailsTicket {
 }
 
 export interface IMyOrderDetailsHeader {
+  currency: string
+  date: string
+  eventEndDate: string
+  eventId: string
+  eventName: string
+  eventSalesEndDate: string
+  eventSalesStartDate: string
+  eventStartDate: string
+  eventUrl: string
+  hideVenueUntil: string | null
+  id: string
+  image: string
   isReferralDisabled: boolean
-  shareLink: string
-  total: string
+  isVenueHidden: boolean
   salesReferred: string
+  shareLink: string
+  timeZone: string
+  total: string
+  venue: {
+    city: string
+    country: string
+    googlePlaceId?: string
+    latitude?: string
+    longitude?: string
+    name?: string
+    postalCode?: string
+    state: string
+    street?: string
+    streetNumber?: string
+  }
 }
 
 export interface IMyOrderDetailsData {
@@ -291,31 +351,27 @@ export interface IMyOrderDetailsData {
 }
 
 export interface IMyOrderDetailsResponse {
-  orderDetailsError?: IError
   orderDetailsData?: IMyOrderDetailsData
+  orderDetailsError?: IError
 }
 //#endregion
 
 export interface ICartData {
-  quantity: number
-  isTfOptInHidden?: boolean
-  isTfOptIn: boolean // Ticket fairy
-  isMarketingOptedIn: boolean // Brand
   expiresAt: number
+  isMarketingOptedIn: boolean // Brand
+  isTfOptIn: boolean // Ticket fairy
+  isTfOptInHidden?: boolean
+  quantity: number
 }
 
 export interface ICartResponse {
-  cartError?: IError
   cartData?: ICartData
-}
-
-export interface ICountryData {
-  [key: number | string]: string
+  cartError?: IError
 }
 
 export interface ICountriesResponse {
+  countriesData?: ICountry[]
   countriesError?: IError
-  countriesData?: ICountryData
 }
 
 export interface IStateData {
@@ -323,13 +379,13 @@ export interface IStateData {
 }
 
 export interface IStatesResponse {
-  statesError?: IError
   statesData?: IStateData
+  statesError?: IError
 }
 
 export interface IUserProfileResponse {
-  userProfileError?: IError
   userProfileData?: IUserProfile
+  userProfileError?: IError
 }
 
 export interface IPurchaseConfirmationData {
@@ -337,28 +393,28 @@ export interface IPurchaseConfirmationData {
   currency: { currency: string; decimalPlaces: number; symbol: string }
   customConfirmationPageText?: string
   customerId: string
-  isReferralDisabled: boolean
   eventDate: string
   eventDescription: string
   eventType: string
+  isReferralDisabled: boolean
   message: string
   orderTotal: number
   personalShareLink: string
+  personalShareSales: {
+    price: number
+    sales: number
+  }[]
   productId: string
   productImage: string
   productName: string
   productPrice: number
   productUrl: string
   twitterHashtag?: string
-  personalShareSales: {
-    price: number
-    sales: number
-  }[]
 }
 
 export interface IPurchaseConfirmationResponse {
-  purchaseConfirmationError?: IError
   purchaseConfirmationData?: IPurchaseConfirmationData
+  purchaseConfirmationError?: IError
 }
 
 export interface IResaleTicketData {
@@ -366,8 +422,8 @@ export interface IResaleTicketData {
 }
 
 export interface IResaleTicketResponse {
-  resaleTicketError?: IError
   resaleTicketData?: IResaleTicketData
+  resaleTicketError?: IError
 }
 
 export interface IRemoveTicketFromResaleData {
@@ -375,8 +431,8 @@ export interface IRemoveTicketFromResaleData {
 }
 
 export interface IRemoveTicketFromResaleResponse {
-  removeTicketFromResaleError?: IError
   removeTicketFromResaleData?: IRemoveTicketFromResaleData
+  removeTicketFromResaleError?: IError
 }
 
 export interface IPostReferralData {
@@ -385,8 +441,8 @@ export interface IPostReferralData {
 }
 
 export interface IPostReferralResponse {
-  postReferralError?: IError
   postReferralData?: IPostReferralData
+  postReferralError?: IError
 }
 
 export interface ICloseSessionData {
@@ -394,14 +450,14 @@ export interface ICloseSessionData {
 }
 
 export interface ICloseSessionResponse {
-  closeSessionError?: IError
   closeSessionData?: ICloseSessionData
+  closeSessionError?: IError
 }
 
 export interface IResetPasswordRequestData {
-  token: string
   password: string
   password_confirmation: string
+  token: string
 }
 
 export interface IRestorePasswordData {
@@ -420,12 +476,12 @@ export interface IResetPasswordResponse extends IRestorePasswordResponse {}
 export interface IFetchAccessTokenData {
   accessToken: string
   refreshToken: string
-  tokenType: string
   scope: string
+  tokenType: string
 }
 
 export interface IFetchAccessTokenResponse {
-  accessTokenError?: IError
   accessTokenData?: IFetchAccessTokenData
+  accessTokenError?: IError
 }
 //#endregion Refresh AccessToken

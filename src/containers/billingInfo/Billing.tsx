@@ -387,6 +387,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       let phoneCountry = 'US'
       const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
       const usrProfile = { ...userProfile }
+
       onLoginSuccess?.({
         userProfile,
         accessTokenData,
@@ -438,7 +439,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       onLoginError?.(error)
     }
 
-    const handleOnLogoutSuccess = () => {
+    const handleOnLogoutSuccess = async () => {
       setFirstName('')
       setLastName('')
       setEmail('')
@@ -451,9 +452,13 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setPasswordConfirmation('')
       setCountryId('')
       setStateId('')
+
+      const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
+
       setSelectedCountry({
         value: '-1',
         label: texts?.form?.country || 'Country',
+        code: '__',
       })
       setStates([
         {
@@ -845,6 +850,22 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
     //#endregion
 
+    const setCountryByEvent = async () => {
+      const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
+
+      if (!eventCountry) {
+        return
+      }
+
+      if (countries.length > 1 && eventCountry) {
+        const selectedCountryItem = _find(countries, (item) => {
+          const stringValue = item.code as string
+          return stringValue.toUpperCase() === eventCountry?.toUpperCase()
+        })
+        setSelectedCountry(selectedCountryItem)
+      }
+    }
+
     //#region Fetch Initial Data
     const fetchData = async () => {
       if (!billingCoreRef.current) {
@@ -854,18 +875,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       setIsLoading(true)
 
-      let phoneCountry = 'US'
-      let phoneCountryDialCode = '+1'
       let usrPrfl: IUserProfile | undefined
-
-      try {
-        const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY)
-        phoneCountry = deviceCountry.code.toUpperCase()
-        phoneCountryDialCode = getCountryDialCode(phoneCountry)
-      } catch (err) {
-        phoneCountry = 'US'
-      }
-
       const usrTkn = await getData(LocalStorageKeys.ACCESS_TOKEN)
       let skippingStatusInner: SkippingStatusType
 
@@ -879,14 +889,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         return showAlert(countriesError.message || 'Error fetching countries')
       }
 
-      onFetchCountriesSuccess?.()
+      onFetchCountriesSuccess?.(countriesData!)
 
-      const parsedCountries: IDropdownItem[] = _map(
-        countriesData,
-        (item, index) => {
-          return { label: item, value: index }
-        }
-      )
+      const parsedCountries: IDropdownItem[] = _map(countriesData, (item) => {
+        return { label: item.name, value: item.id, code: item.code }
+      })
 
       if (usrTkn) {
         storedToken.current = usrTkn
@@ -914,10 +921,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         parsedCountries.unshift({
           value: '-1',
           label: texts?.form?.country || 'Country',
+          code: '__',
         })
         setSelectedCountry({
           value: '-1',
           label: texts?.form?.country || 'Country',
+          code: '__',
         })
       }
 
@@ -955,6 +964,23 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           email: i === 0 && usrPrfl ? usrPrfl.email : '',
           phone: i === 0 && usrPrfl ? usrPrfl.phone : '',
         })
+      }
+
+      let phoneCountry = 'US'
+      let phoneCountryDialCode = '+1'
+      const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
+
+      if (eventCountry) {
+        phoneCountry = eventCountry.toUpperCase()
+        phoneCountryDialCode = getCountryDialCode(phoneCountry)
+      } else {
+        try {
+          const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY)
+          phoneCountry = deviceCountry.code.toUpperCase()
+          phoneCountryDialCode = getCountryDialCode(phoneCountry)
+        } catch (err) {
+          phoneCountry = 'US'
+        }
       }
 
       if (usrPrfl) {
@@ -1022,12 +1048,16 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }, [handleOnSkippingStatusChange, skippingStatus])
 
     useEffect(() => {
-      if (countries.length > 1 && countryId) {
-        const selectedCountryItem = _find(
-          countries,
-          (item) => item.value === countryId
-        )
-        setSelectedCountry(selectedCountryItem)
+      if (countryId) {
+        if (countries.length > 1) {
+          const selectedCountryItem = _find(
+            countries,
+            (item) => item.value === countryId
+          )
+          setSelectedCountry(selectedCountryItem)
+        }
+      } else {
+        setCountryByEvent()
       }
     }, [countries, countryId])
 
@@ -1324,6 +1354,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 }}
               />
             )}
+
             {!isTicketFree && (
               <>
                 <Input

@@ -19,6 +19,7 @@ export interface IMyOrdersConfig {
   isEventsDropdownHidden?: boolean
   areActivityIndicatorsEnabled?: boolean
   areAlertsEnabled?: boolean
+  isTimeFilterDropdownHidden?: boolean
 }
 
 export interface IMyOrdersStyles {
@@ -32,11 +33,24 @@ export interface IMyOrdersStyles {
   rootContainer?: StyleProp<ViewStyle>
   eventsSelectionContainer?: StyleProp<ViewStyle>
   clearEventSelectionIcon?: StyleProp<ImageStyle>
+  timeFilters?: {
+    container?: StyleProp<ViewStyle>
+    dropdown?: IDropdownStyles
+    selectionContainer?: StyleProp<ViewStyle>
+    clearSelectionIcon?: StyleProp<ImageStyle>
+  }
 }
 
 export interface IMyOrdersTexts {
   selectEventPlaceholder?: string
+  selectTimeFilterPlaceholder?: string
   title?: string
+  timeFilters?: {
+    upcoming?: string
+    ongoingAndUpcoming?: string
+    ongoing?: string
+    past?: string
+  }
 }
 
 export interface IMyOrdersProps {
@@ -66,9 +80,14 @@ export interface IMyOrdersViewProps {
   onSelectOrder: (order: IMyOrdersOrder) => void
   isGettingEventDetails?: boolean
   isLoading?: boolean
+  isRefreshing?: boolean
   styles?: IMyOrdersStyles
   onRefresh?: () => void
   config?: IMyOrdersConfig
   onFetchMoreOrders: () => void
   texts?: IMyOrdersTexts
+
+  timeFilters: IDropdownItem[]
+  selectedTimeFilter?: IDropdownItem
+  onChangeTimeFilter: (event: IDropdownItem) => void
 }

@@ -15,13 +15,14 @@ import {
   LocalStorageKeys,
   storeData,
 } from '../helpers/LocalStorage'
-import { IError, IEvent, IUserProfile } from '../types'
+import { IAccountTicketsResponse, IError, IEvent, IUserProfile } from '../types'
 import {
   IAddToCartResponse,
   ITicket,
   ITicketsResponseData,
 } from '../types/ITicket'
 import Constants from './Constants'
+import { getApiError } from './ErrorHandler'
 import {
   IAddToCartParams,
   IAddToWaitingListResponse,
@@ -44,6 +45,7 @@ import {
   IMyOrderDetailsResponse,
   IMyOrderDetailsTicket,
   IMyOrdersData,
+  IMyOrdersRequestParams,
   IMyOrdersResponse,
   IOrderReview,
   IOrderReviewResponse,
@@ -378,11 +380,12 @@ export const addToWaitingList = async (
 //#endregion
 
 //#region MyOrders
-export const fetchMyOrders = async (
-  page: number = 1,
-  filter: string = ''
-): Promise<IMyOrdersResponse> => {
-  const limit = 20
+export const fetchMyOrders = async ({
+  page,
+  limit = 20,
+  filter = '',
+  from = '',
+}: IMyOrdersRequestParams): Promise<IMyOrdersResponse> => {
   const data: IMyOrdersData = {
     events: [],
     orders: [],
@@ -400,14 +403,12 @@ export const fetchMyOrders = async (
   const withSubBrands = Config.ARE_SUB_BRANDS_INCLUDED
     ? `&filter[subbrands]=${Config.ARE_SUB_BRANDS_INCLUDED}`
     : ''
-  const endpoint = `/v1/account/orders/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}`
+  const withFrom = from ? `&filter[from]=${from}` : ''
 
+  const endpoint = `/v1/account/orders/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}${withFrom}`
   const response: AxiosResponse | void = await Client.get(endpoint).catch(
     (error: AxiosError) => {
-      responseError = {
-        message: error.response?.data.message || 'Error fetching My Orders',
-        code: error.response?.status,
-      }
+      responseError = getApiError(error, 'Error fetching My Orders')
     }
   )
 
@@ -488,15 +489,42 @@ export const fetchOrderDetails = async (
           isOnSale: item.is_on_sale,
           resaleFeeAmount: item.resale_fee_amount,
           ticketTypeHash: item.ticket_type_hash,
+          isTable: item.is_table,
         }
       }
     )
     responseData = {
       header: {
+        currency: attributes.currency,
+        date: attributes.date,
         isReferralDisabled: attributes.disable_referral,
+        eventEndDate: attributes.event_end_date,
+        eventStartDate: attributes.event_start_date,
+        eventId: attributes.event_id,
+        eventName: attributes.event_name,
+        eventSalesEndDate: attributes.event_sales_end_date,
+        eventSalesStartDate: attributes.event_sales_start_date,
+        eventUrl: attributes.event_url,
+        isVenueHidden: attributes.hide_venue,
+        id: attributes.id,
+        image: attributes.image,
         shareLink: attributes.personal_share_link,
         salesReferred: attributes.sales_referred,
         total: attributes.total,
+        hideVenueUntil: attributes.hide_venue_until,
+        timeZone: attributes.timezone,
+        venue: {
+          city: attributes.venue_city,
+          country: attributes.venue_country,
+          googlePlaceId: attributes.venue_google_place_id || undefined,
+          latitude: attributes.venue_latitude || undefined,
+          longitude: attributes.venue_longitude || undefined,
+          name: attributes.venue_name || undefined,
+          postalCode: attributes.venue_postal_code || undefined,
+          state: attributes.venue_state,
+          street: attributes.venue_street || undefined,
+          streetNumber: attributes.venue_street_number || undefined,
+        },
       },
       items: items,
       tickets: tickets,
@@ -664,6 +692,10 @@ export const fetchEvent = async (): Promise<IEventResponse> => {
     event = response.data.data.attributes
   }
 
+  if (event?.country) {
+    await storeData(LocalStorageKeys.EVENT_COUNTRY, event.country)
+  }
+
   return {
     eventError: responseError,
     eventData: event,
@@ -777,14 +809,14 @@ export const unlockPasswordProtectedEvent = async (
 //#region Billing Information
 export const fetchCountries = async (): Promise<ICountriesResponse> => {
   let responseError: IError | undefined
-  const response: AxiosResponse | void = await Client.get('/countries/').catch(
-    (error: AxiosError) => {
-      responseError = {
-        message: error.response?.data.message,
-        code: error.response?.status!,
-      }
+  const response: AxiosResponse | void = await Client.get(
+    '/countries/list'
+  ).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status!,
     }
-  )
+  })
 
   if (response?.status === 200) {
     setCustomHeader(response)
@@ -1248,3 +1280,47 @@ export const requestResetPassword = async (
   }
 }
 //#endregion Request Password
+
+//#region Account Tickets
+export const fetchAccountTickets = async ({
+  page = 1,
+  limit = 20,
+  filter = '',
+  from = '',
+}: IMyOrdersRequestParams): Promise<IAccountTicketsResponse> => {
+  let responseError: IError | undefined
+
+  const withFilterEvent = filter ? `&filter[event]=${filter}` : ''
+  const withBrand = Config.BRAND ? `&filter[brand]=${Config.BRAND}` : ''
+  const withSubBrands = Config.ARE_SUB_BRANDS_INCLUDED
+    ? `&filter[subbrands]=${Config.ARE_SUB_BRANDS_INCLUDED}`
+    : ''
+  const withFrom = from ? `&filter[from]=${from}` : ''
+
+  const endpoint = `/v1/account/tickets/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}${withFrom}`
+
+  const response: AxiosResponse | void = await Client.get(endpoint).catch(
+    (error: AxiosError) => {
+      responseError = getApiError(error)
+    }
+  )
+
+  if (responseError) {
+    return {
+      error: responseError,
+    }
+  }
+
+  if (response?.data) {
+    return {
+      data: response.data.data,
+    }
+  }
+
+  return {
+    error: {
+      message: 'No data was received in Account Tickets.',
+    },
+  }
+}
+//#endregion Account Tickets

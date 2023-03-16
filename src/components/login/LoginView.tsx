@@ -208,7 +208,6 @@ const LoginView: FC<ILoginViewProps> = ({
         return (
           <ResultDialog
             onPressButton={() => {
-              console.log('ALV')
               resultDialogPropsProps?.onPressButton()
             }}
             message={resultDialogPropsProps?.message}

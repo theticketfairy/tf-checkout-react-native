@@ -1,10 +1,16 @@
 import {
   ICloseSessionResponse,
   IEventResponse,
+  IMyOrdersRequestParams,
   IPostReferralResponse,
   IPromoCodeResponse,
 } from '../../api/types'
-import { IAddToCartResponse, IError, ITicket } from '../../types'
+import {
+  IAccountTicketsResponse,
+  IAddToCartResponse,
+  IError,
+  ITicket,
+} from '../../types'
 import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
 export interface IBookTicketsOptions {
@@ -44,6 +50,9 @@ export type TicketsCoreHandleType = {
   logout(): Promise<ICloseSessionResponse>
   postReferralVisit(referralId: string): Promise<IPostReferralResponse>
   unlockPasswordProtectedEvent(password: string): Promise<IEventResponse>
+  getAccountTickets(
+    params: IMyOrdersRequestParams
+  ): Promise<IAccountTicketsResponse>
 }
 
 export type TicketsCoreHandle = TicketsCoreHandleType & SessionCoreHandleType
