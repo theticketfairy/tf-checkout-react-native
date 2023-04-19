@@ -1,7 +1,7 @@
 import {
   CardFormView,
   InitStripeParams,
-  PaymentMethodCreateParams,
+  PaymentIntent,
 } from '@stripe/stripe-react-native'
 
 export interface IStripePaymentProps {
@@ -16,6 +16,6 @@ export type StripePaymentHandle = {
   initStripe(params: InitStripeParams): Promise<any>
   confirmPayment(
     stripeClientSecret: string,
-    params: PaymentMethodCreateParams.Params
+    params: PaymentIntent.ConfirmParams
   ): Promise<any>
 }

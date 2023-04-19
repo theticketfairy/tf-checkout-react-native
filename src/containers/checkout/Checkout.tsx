@@ -1,4 +1,5 @@
 import {
+  BillingDetails,
   CardForm,
   CardFormView,
   initStripe,
@@ -342,16 +343,20 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
       const { addressData } = orderReview
 
       showLoading()
+
+      const billingDetails: BillingDetails = {
+        name: `${orderReview.billingData.firstName} ${orderReview.billingData.lastName}`,
+        address: {
+          line1: addressData.line1,
+          city: addressData.city,
+          state: addressData.state,
+          postalCode: addressData.postalCode,
+        },
+      }
       const { error: confirmPaymentError, paymentIntent } =
         await confirmPayment(orderReview.paymentData!.stripeClientSecret!, {
-          type: 'Card',
-          billingDetails: {
-            addressCity: addressData.city,
-            addressLine1: addressData.line1,
-            addressState: addressData.state,
-            addressPostalCode: addressData.postalCode,
-            name: `${orderReview.billingData.firstName} ${orderReview.billingData.lastName}`,
-          },
+          paymentMethodType: 'Card',
+          paymentMethodData: { billingDetails },
         })
 
       if (confirmPaymentError || paymentIntent?.status !== 'Succeeded') {
