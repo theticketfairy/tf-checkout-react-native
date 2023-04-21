@@ -10,19 +10,18 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 
 ### React Native
 
-- Suggested ReactNative version `0.66.3`
-- Suggested Flipper version `0.99.0`
-- React version `0.17.1`
-- Node version `16.10.0`
+- Suggested ReactNative version `0.71.7`
+- Suggested Flipper version `0.125.0`
+- React version `18.2.0`
+- Node version `16.18.0`
 ### Android
 
 - Android 5.0 (API level 21) and above
 - Gradle plugin version `4.2.2`
 - Gradle version `6.7.1`
-- Compile Sdk Version and Target Sdk Version `30`
-- Build Tools Version `30.0.2`
+- Compile Sdk Version and Target Sdk Version `33`
+- Build Tools Version `33.0.0`
 - Java version `1.8`
-- Kotlin version `1.5.31`
 
 Add the following to your Android Manifest as activity property.
 
@@ -35,7 +34,7 @@ To download the PDFs, add the `WRITE_EXTERNAL_STORAGE` permission to the Android
 ### iOS
 
 - Compatible with apps targeting iOS 11 or above.
-- Pods version `1.10.1`
+- Pods version `1.12.2`
 - Command Line Tools version `13.0`
 
 To download the PDFs, add the following flags to `Info.plist` file:
@@ -3054,6 +3053,12 @@ Wrap your component with the Core component.
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+
+## Version 2.0.0
+- Update ReactNative version to 0.71.7.
+- Update Stripe SDK to version 0.26.0.
+  - Enables to better customize the card form.
+- Update dependencies.
 
 ## Version 1.0.28
 - Add `getAccountTickets` request in `MyOrdersCore` and `TicketsCore`, it will allow get Tickets from the logged-in user.
