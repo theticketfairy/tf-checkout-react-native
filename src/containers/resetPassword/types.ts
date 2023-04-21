@@ -1,9 +1,9 @@
-import { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
-import { IRestorePasswordData } from '../../api/types'
-import { IButtonStyles } from '../../components/button/types'
-import { IInputStyles } from '../../components/input/types'
-import { IError } from '../../types'
+import type { IRestorePasswordData } from '../../api/types'
+import type { IButtonStyles } from '../../components/button/types'
+import type { IInputStyles } from '../../components/input/types'
+import type { IError } from '../../types'
 
 export interface IResetPasswordTexts {
   title?: string

@@ -4,7 +4,7 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native'
 
 import R from '../../res'
 import s from './styles'
-import { IButtonProps } from './types'
+import type { IButtonProps } from './types'
 
 const Button = React.forwardRef(
   (

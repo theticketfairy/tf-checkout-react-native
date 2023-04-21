@@ -1,4 +1,4 @@
-import {
+import type {
   IResetPasswordRequestData,
   IResetPasswordResponse,
 } from '../../api/types'

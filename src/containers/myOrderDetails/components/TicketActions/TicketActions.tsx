@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native'
 
-import { ITicketActionsProps } from './TicketActionsTypes'
+import type { ITicketActionsProps } from './TicketActionsTypes'
 
 const TicketActions: FC<ITicketActionsProps> = ({
   onSelectAction,

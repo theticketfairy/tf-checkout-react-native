@@ -10,12 +10,12 @@ import {
   View,
 } from 'react-native'
 
-import { IMyOrdersOrder } from '../../api/types'
+import type { IMyOrdersOrder } from '../../api/types'
 import { Dropdown, Loading } from '../../components'
 import R from '../../res'
 import OrderListItem from './components/OrderListItem'
 import { MyOrdersViewStyles as s } from './styles'
-import { IMyOrdersViewProps } from './types'
+import type { IMyOrdersViewProps } from './types'
 
 const MyOrdersView: FC<IMyOrdersViewProps> = ({
   myEvents,

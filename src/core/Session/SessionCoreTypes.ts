@@ -1,4 +1,4 @@
-import { IFetchAccessTokenResponse } from '../../api/types'
+import type { IFetchAccessTokenResponse } from '../../api/types'
 
 export type SessionHandleType = {
   refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>

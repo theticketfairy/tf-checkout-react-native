@@ -1,4 +1,4 @@
-import {
+import type {
   ColorValue,
   ImageSourcePropType,
   ImageStyle,
@@ -7,32 +7,32 @@ import {
   ViewStyle,
 } from 'react-native'
 
-import {
+import type {
   IRegisterNewUserError,
   IRegisterNewUserSuccessData,
 } from '../../api/types'
-import { IButtonStyles } from '../../components/button/types'
-import {
+import type { IButtonStyles } from '../../components/button/types'
+import type {
   ICartTimerStyles,
   ICartTimerTexts,
 } from '../../components/cartTimer/types'
-import { ICheckboxStyles } from '../../components/checkbox/types'
-import { IDatePickerStyles } from '../../components/datePicker/types'
-import { IDropdownStyles } from '../../components/dropdown/types'
-import { IDropdownMaterialStyles } from '../../components/dropdownMaterial/types'
-import { IInputStyles } from '../../components/input/types'
-import {
+import type { ICheckboxStyles } from '../../components/checkbox/types'
+import type { IDatePickerStyles } from '../../components/datePicker/types'
+import type { IDropdownStyles } from '../../components/dropdown/types'
+import type { IDropdownMaterialStyles } from '../../components/dropdownMaterial/types'
+import type { IInputStyles } from '../../components/input/types'
+import type {
   ILoginBrandImages,
   ILoginSuccessData,
   ILoginViewStyles,
   ILoginViewTexts,
 } from '../../components/login/types'
-import {
+import type {
   IPhoneInputStyles,
   IPhoneInputTexts,
 } from '../../components/phoneInput/types'
-import { IError, ITicketsResponseData } from '../../types'
-import { ICountry } from '../../types/ICountry'
+import type { IError, ITicketsResponseData } from '../../types'
+import type { ICountry } from '../../types/ICountry'
 
 export interface ITokens {
   accessToken: string

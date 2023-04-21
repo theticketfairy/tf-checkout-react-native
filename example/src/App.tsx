@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Linking, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
   IMyOrderDetailsData,
@@ -17,8 +17,8 @@ import {
   ResetPassword,
   SessionHandleType
 } from 'tf-checkout-react-native'
-import { IMyOrderDetailsTicket } from '../../src/api/types'
-import { IConfig } from '../../src/helpers/Config'
+import type { IMyOrderDetailsTicket } from '../../src/api/types'
+import type { IConfig } from '../../src/helpers/Config'
 import R from '../../src/res'
 import Color from './Colors'
 import { ComponentEnum } from './enums'
@@ -361,7 +361,13 @@ const App = () => {
                     backgroundColor: Color.primary,
                   },
                 },
-                cardBackgroundColor: Platform.OS === 'ios' ? Color.white : Color.gray30,
+                cardStyle: {
+                  backgroundColor: R.colors.white,
+                  borderRadius: 10,
+                  cursorColor: R.colors.black,
+                  placeholderColor: R.colors.disabled,
+                  textColor: R.colors.validGreen
+                },
               },
             }}            
             texts={{

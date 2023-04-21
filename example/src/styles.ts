@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native'
-import { IBillingInfoViewStyles } from '../../src/containers/billingInfo/types'
 import Color from './Colors'
+import type { IBillingInfoViewStyles } from 'src/containers/billingInfo/types'
 
 export default StyleSheet.create({
   safeArea: {

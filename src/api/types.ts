@@ -1,8 +1,8 @@
-import { AxiosInstance } from 'axios'
+import type { AxiosInstance } from 'axios'
 
-import { IOnCheckoutSuccess } from '..'
-import { IError, IEvent, ITicket, IUserProfile } from '../types'
-import { ICountry } from '../types/ICountry'
+import type { IOnCheckoutSuccess } from '..'
+import type { IError, IEvent, ITicket, IUserProfile } from '../types'
+import type { ICountry } from '../types/ICountry'
 
 export interface IClientRequest extends AxiosInstance {
   removeAccessToken: () => void

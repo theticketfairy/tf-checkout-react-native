@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import axiosRetry from 'axios-retry'
 import _filter from 'lodash/filter'
@@ -5,8 +7,8 @@ import _get from 'lodash/get'
 import _map from 'lodash/map'
 import _sortBy from 'lodash/sortBy'
 
-import { IOnCheckoutSuccess } from '..'
-import { IWaitingListFields } from '../components/waitingList/types'
+import type { IOnCheckoutSuccess } from '..'
+import type { IWaitingListFields } from '../components/waitingList/types'
 import { Config } from '../helpers/Config'
 import { getDomainByClientAndEnv } from '../helpers/Domains'
 import {
@@ -15,15 +17,20 @@ import {
   LocalStorageKeys,
   storeData,
 } from '../helpers/LocalStorage'
-import { IAccountTicketsResponse, IError, IEvent, IUserProfile } from '../types'
-import {
+import type {
+  IAccountTicketsResponse,
+  IError,
+  IEvent,
+  IUserProfile,
+} from '../types'
+import type {
   IAddToCartResponse,
   ITicket,
   ITicketsResponseData,
 } from '../types/ITicket'
 import Constants from './Constants'
 import { getApiError } from './ErrorHandler'
-import {
+import type {
   IAddToCartParams,
   IAddToWaitingListResponse,
   IAuthorizeResponse,
@@ -117,6 +124,8 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 
 Client.interceptors.response.use(
   (response: AxiosResponse) => {
+    console.log('RESPONSE REQ', response.request.responseURL)
+    console.log('RESPONSE', response.data)
     return response
   },
   async (error: AxiosError) => {

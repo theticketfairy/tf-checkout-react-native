@@ -8,20 +8,20 @@ import {
   requestResetPassword,
   requestRestorePassword,
 } from '../../api/ApiClient'
-import {
+import type {
   ICloseSessionResponse,
   IResetPasswordRequestData,
 } from '../../api/types'
-import { ILoginFields } from '../../components/login/types'
+import type { ILoginFields } from '../../components/login/types'
 import {
   IStoredUserData,
   LocalStorageKeys,
   storeData,
 } from '../../helpers/LocalStorage'
-import { IUserProfilePublic } from '../../types'
-import { ICoreProps } from '../CoreProps'
+import type { IUserProfilePublic } from '../../types'
+import type { ICoreProps } from '../CoreProps'
 import { getFetchAccessTokenBody } from './LoginCoreHelper'
-import { ILoginCoreResponse, LoginCoreHandle } from './LoginCoreTypes'
+import type { ILoginCoreResponse, LoginCoreHandle } from './LoginCoreTypes'
 
 const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
@@ -34,8 +34,10 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
       bodyFormData.append('email', email)
       bodyFormData.append('password', password)
 
-      const { code: authorizationCode, error: authorizationError } =
-        await authorize(bodyFormData)
+      const {
+        code: authorizationCode,
+        error: authorizationError,
+      } = await authorize(bodyFormData)
 
       if (authorizationError) {
         return {

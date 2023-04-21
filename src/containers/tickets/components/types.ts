@@ -1,7 +1,7 @@
-import { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
-import { IDropdownStyles } from '../../../components/dropdown/types'
-import { ISelectedTicket, ITicket } from '../../../types'
+import type { IDropdownStyles } from '../../../components/dropdown/types'
+import type { ISelectedTicket, ITicket } from '../../../types'
 
 export interface ITicketListItemStyles {
   container?: ViewStyle

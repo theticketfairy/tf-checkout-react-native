@@ -3,7 +3,7 @@ import { Keyboard, Pressable, Text, View } from 'react-native'
 
 import { Button, Input } from '../../components'
 import s from './styles'
-import { IResetPasswordViewProps } from './types'
+import type { IResetPasswordViewProps } from './types'
 
 const ResetPasswordView: FC<IResetPasswordViewProps> = ({
   styles,

@@ -1,5 +1,5 @@
-import { IOnCheckoutSuccess } from '../..'
-import {
+import type { IOnCheckoutSuccess } from '../..'
+import type {
   ICartResponse,
   ICheckoutBody,
   ICountriesResponse,
@@ -7,9 +7,9 @@ import {
   IStatesResponse,
   IUserProfileResponse,
 } from '../../api/types'
-import { IError } from '../../types'
-import { ICoreProps } from '../CoreProps'
-import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
+import type { IError } from '../../types'
+import type { ICoreProps } from '../CoreProps'
+import type { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
 export interface ICheckoutResponse {
   error?: IError

@@ -1,7 +1,7 @@
-import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
-import { IButtonStyles } from '../../components/button/types'
-import { IError } from '../../types'
+import type { IButtonStyles } from '../../components/button/types'
+import type { IError } from '../../types'
 
 export interface IPurchaseConfirmationProps {
   orderHash: string

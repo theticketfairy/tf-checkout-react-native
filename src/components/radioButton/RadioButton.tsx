@@ -2,7 +2,7 @@ import React, { FC } from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 
 import s from './styles'
-import { IRadioButtonProps } from './types'
+import type { IRadioButtonProps } from './types'
 
 const RadioButton: FC<IRadioButtonProps> = ({
   styles,

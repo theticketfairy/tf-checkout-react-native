@@ -13,7 +13,7 @@ import Separator from '../../components/separator/Separator'
 import TicketGroupListHeader from './components/TicketGroupListHeader'
 import CartListItem from './components/TicketListItem'
 import s from './styles'
-import { ITicketsViewProps } from './types'
+import type { ITicketsViewProps } from './types'
 
 const TicketsView = ({
   isGettingTickets,
@@ -118,6 +118,7 @@ const TicketsView = ({
                 {...item}
               />
             )}
+            // eslint-disable-next-line react/no-unstable-nested-components
             ItemSeparatorComponent={() => <Separator />}
           />
         )}

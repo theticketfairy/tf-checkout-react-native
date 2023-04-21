@@ -17,7 +17,7 @@ import {
 
 import R from '../../res'
 import s from './BottomSheetModalStyles'
-import { IBottomSheetModalProps } from './BottomSheetModalTypes'
+import type { IBottomSheetModalProps } from './BottomSheetModalTypes'
 
 const animationDuration = 350
 const { height: screenHeight } = Dimensions.get('window')

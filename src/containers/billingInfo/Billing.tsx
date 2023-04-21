@@ -1,4 +1,3 @@
-/* eslint-disable no-unreachable */
 import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _forEach from 'lodash/forEach'
@@ -24,7 +23,7 @@ import DeviceCountry, { TYPE_ANY } from 'react-native-device-country'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import Constants from '../../api/Constants'
-import {
+import type {
   ICheckoutBody,
   ICheckoutTicketHolder,
   IFetchAccessTokenResponse,
@@ -41,11 +40,11 @@ import {
   Login,
   PhoneInput,
 } from '../../components'
-import { IDropdownItem } from '../../components/dropdown/types'
-import { ILoginSuccessData } from '../../components/login/types'
-import { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
+import type { IDropdownItem } from '../../components/dropdown/types'
+import type { ILoginSuccessData } from '../../components/login/types'
+import type { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
 import { BillingCore, BillingCoreHandle, SessionHandle } from '../../core'
-import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
+import type { SessionHandleType } from '../../core/Session/SessionCoreTypes'
 import { Config } from '../../helpers/Config'
 import { getCountryDialCode } from '../../helpers/CountryCodes'
 import { useDebounced } from '../../helpers/Debounced'
@@ -59,9 +58,9 @@ import {
   validatePhoneNumber,
 } from '../../helpers/Validators'
 import R from '../../res'
-import { IError, IUserProfile, IUserProfilePublic } from '../../types'
+import type { IError, IUserProfile, IUserProfilePublic } from '../../types'
 import s from './styles'
-import {
+import type {
   IBillingProps,
   ITicketHolderField,
   ITicketHolderFieldError,
@@ -203,8 +202,9 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const [countries, setCountries] = useState<IDropdownItem[]>([])
 
     const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
-    const [skippingStatus, setSkippingStatus] =
-      useState<SkippingStatusType>(undefined)
+    const [skippingStatus, setSkippingStatus] = useState<SkippingStatusType>(
+      undefined
+    )
     const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
 
     // Cart expiration timer
@@ -267,8 +267,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           }
         }
 
-        const { accessTokenError, accessTokenData } =
-          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+        const {
+          accessTokenError,
+          accessTokenData,
+        } = await sessionHandleRef.current!.refreshAccessToken(refreshToken)
         if (!accessTokenError && accessTokenData?.accessToken) {
           await fetchData()
         }
@@ -453,7 +455,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setCountryId('')
       setStateId('')
 
-      const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
+      // const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
 
       setSelectedCountry({
         value: '-1',
@@ -594,8 +596,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       const checkoutBody = checkoutBodyWhenSkipping || getCheckoutBody()
 
       setIsSubmittingData(true)
-      const { error: checkoutError, data: checkoutData } =
-        await billingCoreRef.current.checkoutOrder(checkoutBody)
+      const {
+        error: checkoutError,
+        data: checkoutData,
+      } = await billingCoreRef.current.checkoutOrder(checkoutBody)
       setIsSubmittingData(false)
 
       if (checkoutError) {
@@ -633,8 +637,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       const registerUserBody = getRegisterNewUserBody()
       const registerForm = getRegisterFormData(registerUserBody)
 
-      const { registerNewUserResponseData, registerNewUserResponseError } =
-        await billingCoreRef.current.registerNewUser(registerForm)
+      const {
+        registerNewUserResponseData,
+        registerNewUserResponseError,
+      } = await billingCoreRef.current.registerNewUser(registerForm)
 
       if (registerNewUserResponseError) {
         setIsSubmittingData(false)
@@ -709,10 +715,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       for (let i = 0; i <= numberOfTicketHolders! - 1; i++) {
         const individualHolder = {
-          first_name: ticketHoldersData[i].firstName || '',
-          last_name: ticketHoldersData[i].lastName || '',
-          phone: ticketHoldersData[i].phone || '',
-          email: ticketHoldersData[i].email || '',
+          first_name: ticketHoldersData[i]!.firstName || '',
+          last_name: ticketHoldersData[i]!.lastName || '',
+          phone: ticketHoldersData[i]!.phone || '',
+          email: ticketHoldersData[i]!.email || '',
         }
         parsedTicketHolders.push(individualHolder)
       }
@@ -850,7 +856,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
     //#endregion
 
-    const setCountryByEvent = async () => {
+    const setCountryByEvent = useCallback(async () => {
       const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
 
       if (!eventCountry) {
@@ -864,7 +870,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         })
         setSelectedCountry(selectedCountryItem)
       }
-    }
+    }, [countries])
 
     //#region Fetch Initial Data
     const fetchData = async () => {
@@ -879,8 +885,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       const usrTkn = await getData(LocalStorageKeys.ACCESS_TOKEN)
       let skippingStatusInner: SkippingStatusType
 
-      const { countriesData, countriesError } =
-        await billingCoreRef.current.getCountries()
+      const {
+        countriesData,
+        countriesError,
+      } = await billingCoreRef.current.getCountries()
 
       if (countriesError) {
         setSkippingStatus('fail')
@@ -897,8 +905,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       if (usrTkn) {
         storedToken.current = usrTkn
-        const { userProfileError, userProfileData } =
-          await billingCoreRef.current.getUserProfile()
+        const {
+          userProfileError,
+          userProfileData,
+        } = await billingCoreRef.current.getUserProfile()
 
         if (userProfileError || !userProfileData) {
           setSkippingStatus('fail')
@@ -1059,7 +1069,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       } else {
         setCountryByEvent()
       }
-    }, [countries, countryId])
+    }, [countries, countryId, setCountryByEvent])
 
     useEffect(() => {
       const getStates = async () => {
@@ -1072,10 +1082,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           return showAlert('BillingCoreRef not initialized')
         }
 
-        const { statesData, statesError } =
-          await billingCoreRef.current.getStates(
-            selectedCountry.value.toString()
-          )
+        const {
+          statesData,
+          statesError,
+        } = await billingCoreRef.current.getStates(
+          selectedCountry.value.toString()
+        )
 
         if (statesError) {
           onFetchStatesError?.(statesError!)
@@ -1170,30 +1182,30 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             </Text>
             <Input
               label={holderLabels.firstName}
-              value={ticketHoldersData[i].firstName}
+              value={ticketHoldersData[i]!.firstName}
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i].firstName = text
+                copyTicketHolders[i]!.firstName = text
                 setTicketHoldersData(copyTicketHolders)
               }}
               styles={styles?.inputStyles}
             />
             <Input
               label={holderLabels.lastName}
-              value={ticketHoldersData[i].lastName}
+              value={ticketHoldersData[i]!.lastName}
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i].lastName = text
+                copyTicketHolders[i]!.lastName = text
                 setTicketHoldersData(copyTicketHolders)
               }}
               styles={styles?.inputStyles}
             />
             <Input
               label={holderLabels.email}
-              value={ticketHoldersData[i].email}
+              value={ticketHoldersData[i]!.email}
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i].email = text
+                copyTicketHolders[i]!.email = text
                 setTicketHoldersData(copyTicketHolders)
               }}
               keyboardType='email-address'
@@ -1202,10 +1214,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             />
             <Input
               label={holderLabels.phone}
-              value={ticketHoldersData[i].phone}
+              value={ticketHoldersData[i]!.phone}
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i].phone = text
+                copyTicketHolders[i]!.phone = text
                 setTicketHoldersData(copyTicketHolders)
               }}
               keyboardType='phone-pad'

@@ -1,4 +1,5 @@
 import {
+  BillingDetails,
   CardForm,
   CardFormView,
   initStripe,
@@ -19,19 +20,19 @@ import React, {
 import { Alert, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { IFetchAccessTokenResponse, IOrderReview } from '../../api/types'
+import type { IFetchAccessTokenResponse, IOrderReview } from '../../api/types'
 import { CartTimer, Loading } from '../../components'
 import Button from '../../components/button/Button'
-import { IFormFieldProps } from '../../components/formField/types'
+import type { IFormFieldProps } from '../../components/formField/types'
 import { CheckoutCore, CheckoutCoreHandle, SessionHandle } from '../../core'
-import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
+import type { SessionHandleType } from '../../core/Session/SessionCoreTypes'
 import { Config } from '../../helpers/Config'
 import { priceWithCurrency } from '../../helpers/StringsHelper'
 import { orderReviewItems } from './CheckoutData'
 import Conditions from './components/Conditions'
 import OrderReview from './components/OrderReview'
 import s from './styles'
-import { ICheckoutProps, IOrderDetails, IOrderItem } from './types'
+import type { ICheckoutProps, IOrderDetails, IOrderItem } from './types'
 
 const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
   (
@@ -115,8 +116,10 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
           }
         }
 
-        const { accessTokenError, accessTokenData } =
-          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+        const {
+          accessTokenError,
+          accessTokenData,
+        } = await sessionHandleRef.current!.refreshAccessToken(refreshToken)
         if (!accessTokenError && accessTokenData?.accessToken) {
           await fetchInitialData()
         }
@@ -138,8 +141,10 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
         return
       }
 
-      const { error: conditionsError, data: conditionsData } =
-        await checkoutCoreRef.current!.getEventConditions()
+      const {
+        error: conditionsError,
+        data: conditionsData,
+      } = await checkoutCoreRef.current!.getEventConditions()
 
       if (conditionsError) {
         hideLoading()
@@ -157,8 +162,10 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
     }
 
     const fetchOrderReviewAsync = async () => {
-      const { orderReviewData, orderReviewError } =
-        await checkoutCoreRef.current!.getOrderReview(checkoutData.hash)
+      const {
+        orderReviewData,
+        orderReviewError,
+      } = await checkoutCoreRef.current!.getOrderReview(checkoutData.hash)
       hideLoading()
 
       if (orderReviewError) {
@@ -252,8 +259,12 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
 
     const handleFetchOrderDetails = async () => {
       showLoading()
-      const { orderDetailsData, orderDetailsError } =
-        await checkoutCoreRef.current!.getPurchaseOrderDetails(checkoutData.id)
+      const {
+        orderDetailsData,
+        orderDetailsError,
+      } = await checkoutCoreRef.current!.getPurchaseOrderDetails(
+        checkoutData.id
+      )
       hideLoading()
 
       if (orderDetailsError) {
@@ -291,9 +302,9 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
 
       const orderDetails: IOrderDetails = {
         eventId: eventIdNumber,
-        ticketName: orderDetailsData.items[0].name,
-        ticketCost: orderDetailsData.items[0].price,
-        numberOfTickets: parseInt(orderDetailsData.items[0].quantity, 10),
+        ticketName: orderDetailsData.items[0]?.name,
+        ticketCost: orderDetailsData.items[0]?.price,
+        numberOfTickets: parseInt(orderDetailsData.items[0]!.quantity, 10),
         eventUserTickets: _map(orderDetailsData.tickets, (ticket) => ({
           hash: ticket.hash,
           ticketType: ticket.ticketType,
@@ -312,8 +323,9 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
 
     const handleOnPressFreeRegistration = async () => {
       showLoading()
-      const { freeRegistrationError } =
-        await checkoutCoreRef.current!.freeRegistration(checkoutData.hash)
+      const {
+        freeRegistrationError,
+      } = await checkoutCoreRef.current!.freeRegistration(checkoutData.hash)
 
       if (freeRegistrationError) {
         hideLoading()
@@ -342,17 +354,23 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
       const { addressData } = orderReview
 
       showLoading()
-      const { error: confirmPaymentError, paymentIntent } =
-        await confirmPayment(orderReview.paymentData!.stripeClientSecret!, {
-          type: 'Card',
-          billingDetails: {
-            addressCity: addressData.city,
-            addressLine1: addressData.line1,
-            addressState: addressData.state,
-            addressPostalCode: addressData.postalCode,
-            name: `${orderReview.billingData.firstName} ${orderReview.billingData.lastName}`,
-          },
-        })
+
+      const billingDetails: BillingDetails = {
+        name: `${orderReview.billingData.firstName} ${orderReview.billingData.lastName}`,
+        address: {
+          line1: addressData.line1,
+          city: addressData.city,
+          state: addressData.state,
+          postalCode: addressData.postalCode,
+        },
+      }
+      const {
+        error: confirmPaymentError,
+        paymentIntent,
+      } = await confirmPayment(orderReview.paymentData!.stripeClientSecret!, {
+        paymentMethodType: 'Card',
+        paymentMethodData: { billingDetails },
+      })
 
       if (confirmPaymentError || paymentIntent?.status !== 'Succeeded') {
         hideLoading()
@@ -368,8 +386,9 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
 
       onCheckoutCompletedSuccess?.(checkoutData)
 
-      const { error: onPaymentSuccessError } =
-        await checkoutCoreRef.current!.paymentSuccess(checkoutData.hash)
+      const {
+        error: onPaymentSuccessError,
+      } = await checkoutCoreRef.current!.paymentSuccess(checkoutData.hash)
 
       if (onPaymentSuccessError) {
         hideLoading()
@@ -392,7 +411,7 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
           id: `condition${index}`,
           fieldType: 'checkbox',
           checkboxProps: {
-            isActive: conditionsValues[index],
+            isActive: conditionsValues[index] as boolean,
             text: conditionTxt,
             onPress: () => handleOnCheckCondition(index),
           },
@@ -484,14 +503,7 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
                   <CardForm
                     onFormComplete={handleOnChangePaymentInfo}
                     style={[s.card, styles?.payment?.cardContainer]}
-                    cardStyle={
-                      styles?.payment?.cardBackgroundColor
-                        ? {
-                            backgroundColor:
-                              styles?.payment?.cardBackgroundColor,
-                          }
-                        : s.cardBackground
-                    }
+                    cardStyle={styles?.payment?.cardStyle}
                   />
                 </View>
               )}

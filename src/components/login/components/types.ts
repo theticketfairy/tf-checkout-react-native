@@ -1,6 +1,8 @@
-import React from 'react'
+import type React from 'react'
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { IButtonStyles } from 'src/components/button/types'
 
-import { ILoginDialogViewProps } from '../types'
+import type { ILoginDialogViewProps } from '../types'
 
 //#region LoginForm
 export interface ILoginFormProps {
@@ -20,3 +22,45 @@ export interface ILoginFormProps {
   brandImages?: React.ReactNode
 }
 //#endregion LoginForm
+
+export interface ILoginGuestComponentProps {
+  styles?: ILoginGuestComponentStyles
+  texts?: ILoginGuestComponentTexts
+  onPressButton: () => void
+}
+
+export interface ILoginGuestComponentTexts {
+  message?: string
+  line1?: string
+  line2?: string
+  loginButton?: string
+}
+
+export interface ILoginGuestComponentStyles {
+  loginButton?: IButtonStyles
+  linesContainer?: StyleProp<ViewStyle>
+  line1?: StyleProp<TextStyle>
+  line2?: StyleProp<TextStyle>
+  message?: StyleProp<TextStyle>
+}
+
+export interface ILoginLoggedComponentProps {
+  styles?: ILoginLoggedComponentStyles
+  texts?: ILoginLoggedComponentTexts
+  onPressLogout: () => void
+  userFirstName: string
+}
+
+export interface ILoginLoggedComponentStyles {
+  container?: StyleProp<ViewStyle>
+  placeholder?: StyleProp<TextStyle>
+  value?: StyleProp<TextStyle>
+  button?: IButtonStyles
+  message?: StyleProp<TextStyle>
+}
+
+export interface ILoginLoggedComponentTexts {
+  loggedAs?: string
+  notYou?: string
+  logoutButton?: string
+}

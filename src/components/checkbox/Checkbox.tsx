@@ -3,7 +3,7 @@ import { Image, Text, TouchableOpacity, View } from 'react-native'
 
 import R from '../../res'
 import s from './styles'
-import { ICheckboxProps } from './types'
+import type { ICheckboxProps } from './types'
 
 const Checkbox = ({
   onPress,

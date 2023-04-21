@@ -1,4 +1,4 @@
-import {
+import type {
   ImageSourcePropType,
   ImageStyle,
   StyleProp,
@@ -6,7 +6,7 @@ import {
   ViewStyle,
 } from 'react-native'
 
-import { IMyOrderDetailsTicket } from '../../../../api/types'
+import type { IMyOrderDetailsTicket } from '../../../../api/types'
 
 export type TicketActionType =
   | 'download-pdf'

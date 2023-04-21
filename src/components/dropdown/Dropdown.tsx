@@ -1,5 +1,4 @@
 //@ts-nocheck
-
 import React, {
   MutableRefObject,
   useCallback,
@@ -21,7 +20,7 @@ import R from '../../res'
 import Separator from '../separator/Separator'
 import DropdownListItem from './DropdownListItem'
 import { DropdownStyles as s } from './styles'
-import { IDropdownItem, IDropdownProps } from './types'
+import type { IDropdownItem, IDropdownProps } from './types'
 
 const Dropdown = ({
   items,
@@ -75,7 +74,7 @@ const Dropdown = ({
   const renderSeparator = useCallback(() => <Separator />, [])
 
   const getItemLayout = useCallback(
-    (data, index) => ({
+    (_data, index) => ({
       length: 45,
       offset: 45 * index,
       index,

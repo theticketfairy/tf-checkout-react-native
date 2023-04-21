@@ -4,7 +4,7 @@ import { Text, View } from 'react-native'
 import Button from '../../button/Button'
 import Input from '../../input/Input'
 import s from '../styles'
-import { ILoginFormProps } from './types'
+import type { ILoginFormProps } from './types'
 
 const LoginForm: FC<ILoginFormProps> = ({
   viewProps,

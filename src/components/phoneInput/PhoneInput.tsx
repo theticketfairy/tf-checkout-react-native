@@ -5,7 +5,7 @@ import { Platform, View } from 'react-native'
 import R from '../../res'
 import Input from '../input/Input'
 import s from './/styles'
-import { IOnChangePhoneNumberPayload, IPhoneInputProps } from './types'
+import type { IOnChangePhoneNumberPayload, IPhoneInputProps } from './types'
 
 const PhoneInput: FC<IPhoneInputProps> = ({
   phoneNumber,

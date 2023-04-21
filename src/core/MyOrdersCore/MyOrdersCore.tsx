@@ -6,16 +6,16 @@ import {
   fetchMyOrders,
   fetchOrderDetails,
 } from '../../api/ApiClient'
-import {
+import type {
   IFetchAccessTokenResponse,
   IMyOrderDetailsResponse,
   IMyOrdersRequestParams,
   IMyOrdersResponse,
 } from '../../api/types'
 import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
-import { IAccountTicketsResponse } from '../../types'
-import { ICoreProps } from '../CoreProps'
-import { MyOrdersCoreHandle } from './MyOrdersCoreTypes'
+import type { IAccountTicketsResponse } from '../../types'
+import type { ICoreProps } from '../CoreProps'
+import type { MyOrdersCoreHandle } from './MyOrdersCoreTypes'
 
 const MyOrdersCore = forwardRef<MyOrdersCoreHandle, ICoreProps>(
   (props, ref) => {

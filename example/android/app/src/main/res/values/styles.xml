@@ -2,6 +2,9 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="colorPrimary">#FFF</item>
+        <!-- Customize your theme here. -->
+      <item name="colorPrimary">#FFF</item>
+      <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
     </style>
+
 </resources>

@@ -1,4 +1,4 @@
-import {
+import type {
   ImageSourcePropType,
   ImageStyle,
   StyleProp,
@@ -6,8 +6,8 @@ import {
   ViewStyle,
 } from 'react-native'
 
-import { IMyOrderDetailsTicket } from '../../../../api/types'
-import { IButtonStyles } from '../../../../components/button/types'
+import type { IMyOrderDetailsTicket } from '../../../../api/types'
+import type { IButtonStyles } from '../../../../components/button/types'
 
 export interface ITicketListItemTexts {
   ticketType: string

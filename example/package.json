@@ -1,61 +1,40 @@
 {
-  "name": "example",
+  "name": "TfCheckoutReactNativeExample",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "compile": "tsc -p .",
     "ios": "react-native run-ios",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "start": "react-native start",
-    "test": "jest",
-    "androidBuild": "cd ./android && ./gradlew assembleRelease -x bundleReleaseJsAndAssets",
-    "androidClear": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res"
+    "pods": "pod-install --quiet"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "1.15.14",
-    "@react-native-clipboard/clipboard": "1.8.5",
-    "@react-native-community/datetimepicker": "5.0.2",
-    "@sesamsolutions/phone-input": "jorgtz/react-native-phone-input",
-    "@stripe/stripe-react-native": "0.2.3",
-    "axios-retry": "3.2.4",
-    "react": "17.0.2",
-    "react-native": "0.66.3",
-    "react-native-background-timer": "2.4.1",
-    "react-native-config": "1.5.0",
+    "react": "18.2.0",
+    "react-native": "0.71.7",
+
+    "react-native-background-timer":"2.4.1",
+    "rn-material-ui-textfield": "1.0.5",
+    "react-native-modal-datetime-picker": "15.0.0",
+    "react-native-keyboard-aware-scroll-view": "0.9.5",
+    "react-native-fs": "2.20.0",
     "react-native-device-country": "1.0.2",
-    "react-native-fs": "2.18.0",
-    "react-native-modal-datetime-picker": "13.0.0",
-    "rn-material-ui-textfield": "1.0.5"
+    "lodash": "4.17.21",
+    "jwt-decode": "3.1.2",
+    "eslint-plugin-simple-import-sort": "10.0.0",
+    "axios-retry": "3.4.0",
+    "axios": "1.3.6",
+    "@sesamsolutions/phone-input": "jorgtz/react-native-phone-input",
+    "@stripe/stripe-react-native": "0.26.0",
+    "@react-native-async-storage/async-storage": "1.18.1",
+    "@react-native-clipboard/clipboard": "1.11.2",
+    "@react-native-community/datetimepicker": "7.0.1"
   },
   "devDependencies": {
-    "@babel/core": "7.16.0",
-    "@babel/runtime": "7.16.3",
-    "@react-native-community/eslint-config": "3.0.1",
-    "@types/jest": "27.0.3",
-    "@types/react-native": "0.66.5",
-    "@types/react-native-background-timer": "2.0.0",
-    "@types/react-test-renderer": "17.0.1",
-    "babel-jest": "27.3.1",
-    "eslint": "7.32.0",
-    "eslint-plugin-simple-import-sort": "7.0.0",
-    "jest": "27.3.1",
-    "metro-react-native-babel-preset": "0.66.2",
-    "react-test-renderer": "17.0.2",
-    "typescript": "4.5.2"
-  },
-  "resolutions": {
-    "@types/react": "17"
-  },
-  "jest": {
-    "preset": "react-native",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
+    "@babel/core": "7.20.2",
+    "@babel/preset-env": "7.20.2",
+    "@babel/runtime": "7.20.0",
+    "metro-react-native-babel-preset": "0.73.9",
+    "babel-plugin-module-resolver": "4.1.0",
+    "@types/react-native-background-timer": "2.0.0"
   }
 }

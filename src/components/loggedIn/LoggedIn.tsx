@@ -3,7 +3,7 @@ import { Alert, View } from 'react-native'
 
 import { Button } from '..'
 import s from './styles'
-import { ILoggedInProps } from './types'
+import type { ILoggedInProps } from './types'
 
 const LoggedIn: FC<ILoggedInProps> = ({
   styles,

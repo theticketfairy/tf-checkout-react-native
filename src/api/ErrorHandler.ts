@@ -1,6 +1,7 @@
-import { AxiosError } from 'axios'
+//@ts-nocheck
+import type { AxiosError } from 'axios'
 
-import { IError } from '../types'
+import type { IError } from '../types'
 
 const ERROR = 'Something went wrong!'
 
