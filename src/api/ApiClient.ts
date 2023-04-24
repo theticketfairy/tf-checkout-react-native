@@ -94,6 +94,8 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
   const storedTokenType = await getData(LocalStorageKeys.AUTH_TOKEN_TYPE)
   const tokenType = storedTokenType || 'Bearer'
 
+  console.log('REQUEST', config)
+
   if (accessToken) {
     const updatedHeaders = {
       ...config.headers,
@@ -163,8 +165,11 @@ Client.setDomain = (domain: string) =>
     origin: domain,
   })
 
-Client.setContentType = (contentType: string) =>
-  (Client.defaults.headers.common['Content-Type'] = contentType)
+Client.setContentType = (contentType: string) => {
+  console.log('SET CONTENtType', Client.defaults)
+  Client.defaults.headers.common['Content-Type'] = contentType
+  Client.defaults.headers['Content-Type'] = contentType
+}
 
 export const setCustomHeader = (response: any) => {
   const guestHeaderResponseValue = _get(response, 'headers.authorization-guest')
@@ -193,9 +198,16 @@ export const authorize = async (
 ): Promise<IAuthorizeResponse> => {
   let responseError: IError | undefined
 
+  //Client.setContentType('multipart/form-data')
+
   const response = await Client.post(
     `/v1/oauth/authorize-rn?client_id=${Config.CLIENT_ID}`,
-    data
+    data,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
   ).catch((error: AxiosError) => {
     responseError = {
       message: error?.response?.data.message || 'Authorization failed',
@@ -213,14 +225,16 @@ export const fetchAccessToken = async (
   data: FormData
 ): Promise<IFetchAccessTokenResponse> => {
   let responseError: IError | undefined
-  const response = await Client.post('/v1/oauth/access_token', data).catch(
-    (error: AxiosError) => {
-      responseError = {
-        message: error.response?.data.message,
-        code: error.response?.status,
-      }
+  const response = await Client.post('/v1/oauth/access_token', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status,
     }
-  )
+  })
 
   const accessToken = _get(response, 'data.access_token')
   if (accessToken) {

@@ -3979,10 +3979,10 @@ react-native-codegen@^0.71.5:
     jscodeshift "^0.13.1"
     nullthrows "^1.1.1"
 
-react-native-device-country@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/react-native-device-country/-/react-native-device-country-1.0.2.tgz#7db290f91ca6296bbb041ec73708be19570ac138"
-  integrity sha512-msj1IQX+MsUeV/qSbgaoVmXoPG+rk6gm5elLDI8DqBNgnyJLSlQ/8HT3zjkTRofyWGzRH2hOusZxfmNiJIZNZQ==
+react-native-device-country@1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-device-country/-/react-native-device-country-1.0.3.tgz#f1b9638a224882e13ac3b9478c03b53caeeadf08"
+  integrity sha512-XkPsyCAcvkyYCS61MmY3Ol9lK0ms/aksM++p/SxZmU90ehEW+llOsQIJXGDI0o9/GM9jffb/b1h2TolNyyEMng==
 
 react-native-fs@2.20.0:
   version "2.20.0"
