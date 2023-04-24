@@ -94,8 +94,6 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
   const storedTokenType = await getData(LocalStorageKeys.AUTH_TOKEN_TYPE)
   const tokenType = storedTokenType || 'Bearer'
 
-  console.log('REQUEST', config)
-
   if (accessToken) {
     const updatedHeaders = {
       ...config.headers,
@@ -126,8 +124,6 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 
 Client.interceptors.response.use(
   (response: AxiosResponse) => {
-    console.log('RESPONSE REQ', response.request.responseURL)
-    console.log('RESPONSE', response.data)
     return response
   },
   async (error: AxiosError) => {
@@ -166,7 +162,6 @@ Client.setDomain = (domain: string) =>
   })
 
 Client.setContentType = (contentType: string) => {
-  console.log('SET CONTENtType', Client.defaults)
   Client.defaults.headers.common['Content-Type'] = contentType
   Client.defaults.headers['Content-Type'] = contentType
 }
@@ -1248,7 +1243,7 @@ export const requestRestorePassword = async (
   let successData: IRestorePasswordData | undefined
 
   const response: AxiosResponse | void = await Client.post(
-    `v1/oauth/restore-password-rn`,
+    `/auth/restore-password`,
     {
       email: email,
     }
