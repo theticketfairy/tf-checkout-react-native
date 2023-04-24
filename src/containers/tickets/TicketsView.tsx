@@ -10,6 +10,7 @@ import {
 } from '../../components'
 import Button from '../../components/button/Button'
 import Separator from '../../components/separator/Separator'
+import { Config } from '../../helpers/Config'
 import TicketGroupListHeader from './components/TicketGroupListHeader'
 import CartListItem from './components/TicketListItem'
 import s from './styles'
@@ -156,6 +157,13 @@ const TicketsView = ({
         )}
         {(isGettingTickets || isGettingEvent) &&
           areLoadingIndicatorsEnabled && <Loading />}
+        <View style={{ flexDirection: 'row', widht: '100%', flexWrap: 'wrap' }}>
+          <Text>Config - </Text>
+          <Text>EVENT ID: {Config.EVENT_ID} </Text>
+          <Text>CLIENT: {Config.CLIENT} </Text>
+          <Text>BRAND: {Config.BRAND} </Text>
+          <Text>ENV: {Config.ENV} </Text>
+        </View>
       </View>
     </View>
   )
