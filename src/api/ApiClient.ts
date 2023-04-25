@@ -304,7 +304,12 @@ export const registerNewUser = async (
 
   const res: AxiosResponse | void = await Client.post(
     '/v1/oauth/register-rn',
-    data
+    data,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
   ).catch((error: AxiosError) => {
     resultData.registerNewUserResponseError = error.response?.data.message
 
