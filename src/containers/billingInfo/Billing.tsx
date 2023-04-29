@@ -368,6 +368,16 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setStateId(userProfile.stateId)
       setLoggedUserFirstName(userProfile.firstName)
 
+      if (userProfile.dateOfBirth) {
+        const dobSplitted = userProfile.dateOfBirth.split('-')
+        const dob = new Date(
+          parseInt(dobSplitted[0]!, 10),
+          parseInt(dobSplitted[1]!, 10),
+          parseInt(dobSplitted[2]!, 10)
+        )
+        handleOnSelectDate(dob)
+      }
+
       const thData = [...ticketHoldersData]
       thData.forEach((th, index) => {
         th.firstName = index === 0 ? userProfile.firstName : ''
@@ -705,6 +715,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       if (body.attributes.phone === undefined) {
         delete body.attributes.phone
+      }
+
+      if (isAgeRequired) {
+        body.attributes.dob_day = dateOfBirth.getDate()
+        body.attributes.dob_month = dateOfBirth.getMonth() + 1
+        body.attributes.dob_year = dateOfBirth.getFullYear()
       }
 
       return body

@@ -11,6 +11,7 @@ export interface IUserProfilePublic {
   state: string
   stateId: string
   city: string
+  dateOfBirth?: string
 }
 
 export interface IUserProfile extends IUserProfilePublic {
