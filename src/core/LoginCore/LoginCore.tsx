@@ -116,6 +116,7 @@ const LoginCore = forwardRef<LoginCoreHandle, ICoreProps>((props, ref) => {
         state: userProfileData.state,
         company: userProfileData.company,
         stateId: userProfileData.stateId,
+        dateOfBirth: userProfileData.dateOfBirth,
       }
 
       await storeData(
