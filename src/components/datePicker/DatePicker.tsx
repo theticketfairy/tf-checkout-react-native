@@ -52,6 +52,7 @@ const DatePicker = ({
           mode='date'
           onConfirm={handleOnSelectDate}
           onCancel={handleOnCancel}
+          date={selectedDate}
         />
       )}
       {!!error && <Text style={styles?.error}>{error}</Text>}
