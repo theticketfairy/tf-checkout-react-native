@@ -372,7 +372,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         const dobSplitted = userProfile.dateOfBirth.split('-')
         const dob = new Date(
           parseInt(dobSplitted[0]!, 10),
-          parseInt(dobSplitted[1]!, 10),
+          parseInt(dobSplitted[1]!, 10) - 1,
           parseInt(dobSplitted[2]!, 10)
         )
         handleOnSelectDate(dob)
