@@ -71,6 +71,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
     const [tickets, setTickets] = useState<ITicket[]>([])
     const [groupedTickets, setGroupedTickets] = useState<IGroupedTickets[]>([])
     const [isWaitingListVisible, setIsWaitingListVisible] = useState(false)
+    const [arePromoCodesEnabled, setArePromoCodesEnabled] = useState(false)
     const [isAccessCode, setIsAccessCode] = useState(false)
     const [selectedTicket, setSelectedTicket] = useState<ISelectedTicket>()
     const [promoCodeResponse, setPromoCodeResponse] = useState<
@@ -196,6 +197,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
         isInWaitingList,
         isAccessCodeRequired,
         areGroupsShown,
+        arePromoCodesEnabled: promoCodesEnabled,
       } = await getTicketsCore(promoCode)
       setIsGettingTickets(false)
 
@@ -208,6 +210,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
       setIsWaitingListVisible(!!isInWaitingList)
       setIsAccessCode(!!isAccessCodeRequired)
       setAreTicketGroupsShown(areGroupsShown || false)
+      setArePromoCodesEnabled(promoCodesEnabled || false)
 
       if (responseTickets && !_isEmpty(responseTickets)) {
         if (config.areTicketsGrouped) {
@@ -494,6 +497,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
             passwordProtectedEventData={passwordProtectedEventData}
             onPressSubmitEventPassword={handleOnSubmitEventPassword}
             isCheckingCurrentSession={isCheckingCurrentSession}
+            arePromoCodesEnabled={arePromoCodesEnabled}
           />
         </SessionHandle>
       </TicketsCore>

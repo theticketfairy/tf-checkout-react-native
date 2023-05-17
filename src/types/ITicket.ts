@@ -72,4 +72,5 @@ export interface IOnFetchTicketsSuccess {
   isInWaitingList?: boolean
   isAccessCodeRequired?: boolean
   areTicketsGroupsShown?: boolean
+  arePromoCodesEnabled?: boolean
 }

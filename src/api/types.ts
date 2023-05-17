@@ -27,6 +27,7 @@ export interface IFetchTicketsResponse {
   isInWaitingList?: boolean
   promoCodeResult?: IPromoCodeResponse
   tickets?: ITicket[]
+  arePromoCodesEnabled?: boolean
 }
 
 export interface IAuthorizeResponse {

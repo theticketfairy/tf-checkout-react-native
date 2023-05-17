@@ -76,6 +76,8 @@ export interface ITicketsViewProps {
   // Event password protected
   onPressSubmitEventPassword?: (password: string) => void
   passwordProtectedEventData?: IPasswordProtectedEventData
+
+  arePromoCodesEnabled?: boolean
 }
 
 export interface ITicketListStyles {

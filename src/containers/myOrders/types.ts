@@ -42,6 +42,10 @@ export interface IMyOrdersStyles {
     selectionContainer?: StyleProp<ViewStyle>
     clearSelectionIcon?: StyleProp<ImageStyle>
   }
+  emptyOrders?: {
+    container?: StyleProp<ViewStyle>
+    message?: StyleProp<TextStyle>
+  }
 }
 
 export interface IMyOrdersTexts {
@@ -54,6 +58,7 @@ export interface IMyOrdersTexts {
     ongoing?: string
     past?: string
   }
+  emptyOrdersMessage?: string
 }
 
 export interface IMyOrdersProps {

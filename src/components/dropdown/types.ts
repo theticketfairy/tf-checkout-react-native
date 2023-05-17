@@ -35,4 +35,5 @@ export interface IDropdownProps {
   selectedOption?: IDropdownItem
   onSelectItem: (item: IDropdownItem) => void
   styles?: IDropdownStyles
+  isDisabled?: boolean
 }

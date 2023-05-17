@@ -453,6 +453,14 @@ const App = () => {
               onLoadingChange={(loading) => setIsLoading(loading)}
               onSelectOrder={handleOnSelectOrder}
               styles={{
+                emptyOrders: {
+                  container: {
+                    alignItems: 'center'
+                  },
+                  message: {
+                    color: R.colors.white
+                  }
+                },
                 timeFilters: { 
                   container: {
                     paddingHorizontal: 16
@@ -513,7 +521,9 @@ const App = () => {
               texts={{
                 title: '_My Orders_',
                 selectEventPlaceholder: '_CUSTOM EVENT_',
-                selectTimeFilterPlaceholder: 'Custom placeholder time filter'
+                selectTimeFilterPlaceholder: 'Custom placeholder time filter',
+                emptyOrdersMessage: '_No orders were found_',
+                
               }}
             />
             <TouchableOpacity

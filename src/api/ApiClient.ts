@@ -633,6 +633,10 @@ export const fetchTickets = async (
     promoCodeResult: promoCodeResult,
     isInWaitingList: _get(response, 'data.data.attributes.showWaitingList'),
     isAccessCodeRequired: _get(response, 'data.data.attributes.is_access_code'),
+    arePromoCodesEnabled: _get(
+      response,
+      'data.data.attributes.isPromotionsEnabled'
+    ),
   }
 }
 //#endregion Tickets

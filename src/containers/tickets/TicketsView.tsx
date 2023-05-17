@@ -46,6 +46,7 @@ const TicketsView = ({
   areTicketsGroupsShown,
   passwordProtectedEventData,
   onPressSubmitEventPassword,
+  arePromoCodesEnabled,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -70,15 +71,17 @@ const TicketsView = ({
         <View style={s.header}>
           <Text style={[s.headerText, styles?.title]}>{title}</Text>
         </View>
-        <PromoCode
-          onPressApply={onPressApplyPromoCode}
-          promoCodeValidationMessage={promoCodeValidationMessage}
-          isPromoCodeValid={isPromoCodeValid}
-          isAccessCodeEnabled={isAccessCodeEnabled}
-          styles={styles?.promoCode}
-          texts={texts?.promoCode}
-          closeButtonIcon={promoCodeCloseIcon}
-        />
+        {arePromoCodesEnabled && (
+          <PromoCode
+            onPressApply={onPressApplyPromoCode}
+            promoCodeValidationMessage={promoCodeValidationMessage}
+            isPromoCodeValid={isPromoCodeValid}
+            isAccessCodeEnabled={isAccessCodeEnabled}
+            styles={styles?.promoCode}
+            texts={texts?.promoCode}
+            closeButtonIcon={promoCodeCloseIcon}
+          />
+        )}
         {areTicketsGroupsShown ? (
           <SectionList
             sections={groupedTickets}

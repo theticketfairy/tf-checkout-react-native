@@ -27,11 +27,16 @@ const Dropdown = ({
   selectedOption,
   onSelectItem,
   styles,
+  isDisabled,
 }: IDropdownProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const flatListRef: MutableRefObject<FlatList> = useRef()
 
   const showModal = () => {
+    if (isDisabled) {
+      return
+    }
+
     requestAnimationFrame(() => {
       setIsModalVisible(true)
     })

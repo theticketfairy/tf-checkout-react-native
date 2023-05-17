@@ -40,6 +40,7 @@ export interface IGetTicketsPayload {
   promoCodeResult?: IPromoCodeResponse
   isInWaitingList?: boolean
   isAccessCodeRequired?: boolean
+  arePromoCodesEnabled?: boolean
 }
 
 export type TicketsCoreHandleType = {
