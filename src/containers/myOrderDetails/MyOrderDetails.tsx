@@ -8,8 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import type { Permission } from 'react-native'
-import { Alert, PermissionsAndroid, Platform } from 'react-native'
+import { Alert, Permission, PermissionsAndroid, Platform } from 'react-native'
 import {
   DocumentDirectoryPath,
   DownloadDirectoryPath,
