@@ -98,7 +98,7 @@ android {
         applicationId "com.tfcheckoutreactnativeexample"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5
+        versionCode 8
         versionName "1.0"
     }
 
