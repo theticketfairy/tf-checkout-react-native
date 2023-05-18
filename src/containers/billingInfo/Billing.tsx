@@ -436,10 +436,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       } catch (err) {
         phoneCountry = 'US'
       }
-      if (!usrProfile.phone?.includes('+')) {
-        usrProfile.phone = `${getCountryDialCode(phoneCountry)}${
-          usrProfile.phone
-        }`
+      if (!userProfile.phone) {
+        usrProfile.phone = ''
+      } else {
+        if (!usrProfile.phone?.includes('+')) {
+          usrProfile.phone = `${getCountryDialCode(phoneCountry)}${
+            usrProfile.phone
+          }`
+        }
       }
 
       if (!isBillingRequired && skippingStatus === 'fail') {
