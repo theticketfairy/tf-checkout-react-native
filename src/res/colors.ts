@@ -1,7 +1,7 @@
 const colors = {
-  primary: 'black',
-  disabled: 'gray',
-  white: 'white',
+  primary: '#000000',
+  disabled: '#DDDDDD',
+  white: '#FFFFFF',
   black: 'black',
   tint: 'rgba(0,0,0,0.1)',
   transparentBlack: 'rgba(0,0,0,0.5)',
