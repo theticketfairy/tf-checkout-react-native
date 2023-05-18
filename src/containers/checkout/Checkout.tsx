@@ -508,32 +508,30 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
                 </View>
               )}
               <Conditions {...getConditions()} />
-              {isPaymentRequired && !isStripeConfigMissing && (
-                <Button
-                  text={texts?.payButton || 'PAY'}
-                  onPress={handleOnPressPay}
-                  isLoading={isLoading || isLoadingPayment}
-                  isDisabled={!isDataValid}
-                  styles={{
-                    container: s.payButton,
-                    ...payButtonStyle,
-                  }}
-                />
-              )}
-              {isPaymentRequired !== undefined && !isPaymentRequired && (
-                <Button
-                  text={
-                    texts?.freeRegistrationButton || 'COMPLETE REGISTRATION'
-                  }
-                  onPress={handleOnPressFreeRegistration}
-                  isLoading={isLoading || isLoadingPayment}
-                  styles={styles?.freeRegistrationButton}
-                  isDisabled={secondsLeft === 0}
-                />
-              )}
             </View>
             {isLoading && areLoadingIndicatorsEnabled && <Loading />}
           </KeyboardAwareScrollView>
+          {isPaymentRequired && !isStripeConfigMissing && (
+            <Button
+              text={texts?.payButton || 'PAY'}
+              onPress={handleOnPressPay}
+              isLoading={isLoading || isLoadingPayment}
+              isDisabled={!isDataValid}
+              styles={{
+                container: s.payButton,
+                ...payButtonStyle,
+              }}
+            />
+          )}
+          {isPaymentRequired !== undefined && !isPaymentRequired && (
+            <Button
+              text={texts?.freeRegistrationButton || 'COMPLETE REGISTRATION'}
+              onPress={handleOnPressFreeRegistration}
+              isLoading={isLoading || isLoadingPayment}
+              styles={styles?.freeRegistrationButton}
+              isDisabled={secondsLeft === 0}
+            />
+          )}
           {secondsLeft !== undefined && (
             <CartTimer
               secondsLeft={secondsLeft!}
