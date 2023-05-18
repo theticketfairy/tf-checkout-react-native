@@ -76,6 +76,8 @@ import type {
   - Country
 */
 
+const IS_MANA = Config.BRAND === 'mana-common'
+
 const Billing = forwardRef<SessionHandleType, IBillingProps>(
   (
     {
@@ -117,27 +119,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     },
     ref
   ) => {
-    //#region Labels
-    const holderLabels = useMemo(() => {
-      const optional = isNameRequired
-        ? ''
-        : texts?.form?.optional || '(optional)'
-      return {
-        firstName: texts?.form?.holderFirstName
-          ? `${texts.form.holderFirstName} ${optional}`
-          : `First Name ${optional}`,
-        lastName: texts?.form?.holderLastName
-          ? `${texts.form.holderLastName} ${optional}`
-          : `Last Name ${optional}`,
-        email: texts?.form?.holderEmail
-          ? `${texts.form.holderEmail} ${texts?.form?.optional || '(optional)'}`
-          : `Email ${optional}`,
-        phone: texts?.form?.holderPhone
-          ? `${texts.form.holderPhone} ${texts?.form?.optional || '(optional)'}`
-          : `Phone ${optional}`,
-      }
-    }, [isNameRequired, texts])
-
     const brandCheckBoxText =
       texts?.form?.isSubToBrand ||
       'I would like to be updated on news, events and offers.'
@@ -196,7 +177,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
     const [numberOfTicketHolders, setNumberOfTicketHolders] = useState<
       number | undefined
-    >()
+    >(0)
 
     const [states, setStates] = useState<IDropdownItem[]>([])
     const [countries, setCountries] = useState<IDropdownItem[]>([])
@@ -234,12 +215,41 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     // End of errors state
     //#endregion
 
+    //#region Labels
+    const holderLabels = useMemo(() => {
+      if (numberOfTicketHolders === 1 && IS_MANA) {
+        return null
+      }
+      const optional = isNameRequired
+        ? ''
+        : texts?.form?.optional || '(optional)'
+      return {
+        firstName: texts?.form?.holderFirstName
+          ? `${texts.form.holderFirstName} ${optional}`
+          : `First Name ${optional}`,
+        lastName: texts?.form?.holderLastName
+          ? `${texts.form.holderLastName} ${optional}`
+          : `Last Name ${optional}`,
+        email: texts?.form?.holderEmail
+          ? `${texts.form.holderEmail} ${texts?.form?.optional || '(optional)'}`
+          : `Email ${optional}`,
+        phone: texts?.form?.holderPhone
+          ? `${texts.form.holderPhone} ${texts?.form?.optional || '(optional)'}`
+          : `Phone ${optional}`,
+      }
+    }, [isNameRequired, texts, numberOfTicketHolders])
+
     const getSkippingStatus = (numOfTickets: number): SkippingStatusType => {
+      // DO NOT SKIP IF
+      // * User is not logged in.
+      // * Event Collect_names is turned on and tickets are more than one.
+      // * Event validate_age is turned on.
+      // * phone_required is turned on and customer does not have a phone number.
       if (isBillingRequired || skippingStatus === 'fail') {
         return 'false'
       }
 
-      if (numOfTickets > 1 || isAgeRequired) {
+      if ((isNameRequired && numOfTickets > 1) || isAgeRequired) {
         return 'false'
       } else {
         return 'skipping'
@@ -368,6 +378,21 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setStateId(userProfile.stateId)
       setLoggedUserFirstName(userProfile.firstName)
 
+      const phoneValidError = validatePhoneNumber({
+        phoneNumber: userProfile.phone,
+        customError: texts?.form?.phoneInput?.customError,
+      })
+
+      if (phoneValidError) {
+        setIsLoading(false)
+        showAlert(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
+        return handleSetPhoneError(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
+      }
+
       if (userProfile.dateOfBirth) {
         const dobSplitted = userProfile.dateOfBirth.split('-')
         const dob = new Date(
@@ -418,25 +443,13 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       }
 
       if (!isBillingRequired && skippingStatus === 'fail') {
-        setSkippingStatus('skipping')
-
-        const phoneValidError = validatePhoneNumber({
-          phoneNumber: userProfile.phone,
-          customError: texts?.form?.phoneInput?.customError,
-        })
-
-        if (phoneValidError) {
+        if (isPhoneRequired && !usrProfile.phone) {
           setIsLoading(false)
-          showAlert(
-            texts?.invalidPhoneNumberError ||
-              'Please enter a valid phone number'
-          )
-          return handleSetPhoneError(
-            texts?.invalidPhoneNumberError ||
-              'Please enter a valid phone number'
-          )
+          return setSkippingStatus('fail')
         }
 
+        setSkippingStatus('skipping')
+        setIsLoading(false)
         await performCheckout(
           getCheckoutBodyWhenSkipping({
             userProfile: usrProfile,
@@ -1038,7 +1051,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             }
           }
         } else {
-          // We can perfom Checkout process since phone is valid
+          // We can perform Checkout process since phone is valid
           if (!isBillingRequired && usrTkn && cartData) {
             const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
               userProfile: usrPrfl,
@@ -1190,7 +1203,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
     //#region RENDER
     const renderTicketHolders = () => {
-      if (!numberOfTicketHolders) {
+      if (
+        !numberOfTicketHolders ||
+        !holderLabels ||
+        ticketHoldersData.length === 0
+      ) {
         return null
       }
 
@@ -1249,7 +1266,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         )
       }
 
-      return tHolders
+      return (
+        <>
+          <Text style={styles?.ticketHoldersTitle}>
+            {texts?.form?.ticketHoldersTitle || 'Ticket Holders'}
+          </Text>
+          {tHolders}
+        </>
+      )
     }
 
     const renderCheckingOut = () => {
@@ -1461,14 +1485,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               />
             )}
 
-            {ticketHoldersData.length > 0 && (
-              <>
-                <Text style={styles?.ticketHoldersTitle}>
-                  {texts?.form?.ticketHoldersTitle || 'Ticket Holders'}
-                </Text>
-                {renderTicketHolders()}
-              </>
-            )}
+            {renderTicketHolders()}
 
             <Button
               onPress={onSubmit}
