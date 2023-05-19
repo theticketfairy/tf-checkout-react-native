@@ -481,6 +481,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setPasswordConfirmation('')
       setCountryId('')
       setStateId('')
+      handleOnSelectDate(new Date())
 
       // const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
 
@@ -512,8 +513,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const handleOnSelectDate = (newDate: Date) => {
-      const ageError = validateAge(newDate, minimumAge)
       setDateOfBirth(newDate)
+      const ageError = validateAge(newDate, minimumAge)
       setDateOfBirthError(ageError)
     }
     //#endregion
