@@ -1070,10 +1070,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           }
         }
 
-        const userPhone = usrPrfl.phone === null ? '' : usrPrfl.phone
+        const userPhone =
+          usrPrfl.phone === null ? phoneCountryDialCode : usrPrfl.phone
         handleSetFormDataFromUserProfile({
           ...usrPrfl,
-          phone: `${phoneCountryDialCode}${userPhone}`,
+          phone: userPhone,
         })
       } else {
         // There is no user profile data
