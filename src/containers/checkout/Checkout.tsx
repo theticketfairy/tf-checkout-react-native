@@ -504,14 +504,7 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
                   <CardForm
                     onFormComplete={handleOnChangePaymentInfo}
                     style={[s.card, styles?.payment?.cardContainer]}
-                    cardStyle={
-                      styles?.payment?.cardBackgroundColor
-                        ? {
-                            backgroundColor:
-                              styles?.payment?.cardBackgroundColor,
-                          }
-                        : s.cardBackground
-                    }
+                    cardStyle={styles?.payment?.cardStyle}
                   />
                 </View>
               )}

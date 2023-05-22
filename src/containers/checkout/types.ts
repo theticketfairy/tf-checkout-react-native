@@ -24,7 +24,7 @@ export interface ICheckoutStyles {
   payment?: {
     container?: StyleProp<ViewStyle>
     title?: StyleProp<TextStyle>
-    cardBackgroundColor?: string
+    cardStyle?: CardFormView.Styles
     cardContainer?: StyleProp<ViewStyle>
     button?: IButtonStyles
     buttonDisabled?: IButtonStyles

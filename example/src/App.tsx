@@ -361,7 +361,6 @@ const App = () => {
                     backgroundColor: Color.primary,
                   },
                 },
-                cardBackgroundColor: Platform.OS === 'ios' ? Color.white : Color.gray30,
               },
             }}            
             texts={{

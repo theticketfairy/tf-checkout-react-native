@@ -17,10 +17,10 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 ### Android
 
 - Android 5.0 (API level 21) and above
-- Gradle plugin version `4.2.2`
-- Gradle version `6.7.1`
-- Compile Sdk Version and Target Sdk Version `30`
-- Build Tools Version `30.0.2`
+- Gradle plugin version `7.3.1`
+- Gradle version `7.5.1`
+- Compile Sdk Version and Target Sdk Version `33`
+- Build Tools Version `33.0.0`
 - Java version `1.8`
 - Kotlin version `1.5.31`
 
@@ -34,7 +34,7 @@ To download the PDFs, add the `WRITE_EXTERNAL_STORAGE` permission to the Android
 
 ### iOS
 
-- Compatible with apps targeting iOS 11 or above.
+- Compatible with apps targeting iOS `13.0` or above.
 - Pods version `1.10.1`
 - Command Line Tools version `13.0`
 
@@ -3047,6 +3047,30 @@ Wrap your component with the Core component.
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+
+## Version 1.0.29
+
+- Update Stripe SDK to version 0.26.0.
+  - Minimum iOS Deployment version  = `13`.
+- Expose styles to customize Stripe Card Form: 
+  - cardStyle?: CardFormView.Styles
+```
+{
+    backgroundColor?: string;
+    borderWidth?: number;
+    borderColor?: string;
+    borderRadius?: number;
+    textColor?: string;
+    fontSize?: number;
+    placeholderColor?: string;
+    cursorColor?: string;
+    textErrorColor?: string;
+    fontFamily?: string;
+}
+```
+  - cardContainer?: StyleProp<ViewStyle>
+
+
 
 ## Version 1.0.28
 - Add `getAccountTickets` request in `MyOrdersCore` and `TicketsCore`, it will allow get Tickets from the logged-in user.
