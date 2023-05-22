@@ -308,7 +308,12 @@ const App = () => {
               cartProps={cartProps!}
               onCheckoutSuccess={handleOnCheckoutSuccess}
               onLoginSuccess={handleOnLoginSuccess}
-              onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}        
+              onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}    
+              onLogoutSuccess={() => {
+                setComponentToShow(ComponentEnum.Tickets)
+                setCartProps(undefined)
+                setCheckOutProps(undefined)
+              }}    
               />
           </>
         )
