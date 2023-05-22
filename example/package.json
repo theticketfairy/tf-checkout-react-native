@@ -17,7 +17,7 @@
     "@react-native-clipboard/clipboard": "1.8.5",
     "@react-native-community/datetimepicker": "5.0.2",
     "@sesamsolutions/phone-input": "jorgtz/react-native-phone-input",
-    "@stripe/stripe-react-native": "0.2.3",
+    "@stripe/stripe-react-native": "0.26.0",
     "axios-retry": "3.2.4",
     "react": "17.0.2",
     "react-native": "0.66.3",
