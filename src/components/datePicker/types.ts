@@ -12,7 +12,7 @@ export interface IDatePickerProps {
   onSelectDate: (date: Date) => void
   onCancel?: () => void
   text: string
-  selectedDate: Date
+  selectedDate?: Date
   styles?: IDatePickerStyles
   error?: string
 }
