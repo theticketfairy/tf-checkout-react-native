@@ -68,7 +68,7 @@ const App = () => {
     IOnCheckoutSuccess | undefined
   >(undefined)
 
-  const [isPaymentSuccess, setIsPaymentSuccess] = useState(false)
+  const [isPaymentSuccess, setIsPaymentSuccess] = useState<boolean | undefined>(undefined)
   const [selectedOrderDetails, setSelectedOrderDetails] =
     useState<IMyOrderDetailsData>()
 
@@ -106,7 +106,13 @@ const App = () => {
   }
 
   const handleOnComplete = () => {
+    setCartProps(undefined)
+    setCheckOutProps(undefined)
     setComponentToShow(ComponentEnum.Tickets)
+    setIsLoading(false)
+    setIsPaymentSuccess(undefined)
+    setSkippingStatus(undefined)
+
   }
 
   const handleOnSelectOrder = (order: IMyOrderDetailsData) => {
@@ -353,6 +359,10 @@ const App = () => {
                 },
               },
               payment: {
+                cardStyle: {
+                  backgroundColor: '#FFFFFF',
+                  textColor: '#000000'
+                },
                 title: {
                   color: Color.textMain,
                 },
@@ -361,6 +371,8 @@ const App = () => {
                     backgroundColor: Color.primary,
                   },
                 },
+                
+                
               },
             }}            
             texts={{
