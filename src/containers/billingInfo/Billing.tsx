@@ -1037,10 +1037,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (usrPrfl) {
         if (!isPhoneHidden && isPhoneRequired) {
           if (!checkIsStoredPhoneNumberFormat(usrPrfl.phone)) {
-            showAlert(
-              texts?.invalidPhoneNumberError ||
-                'Please enter a valid phone number'
-            )
             skippingStatusInner = 'fail'
             setSkippingStatus('fail')
             setIsLoading(false)
