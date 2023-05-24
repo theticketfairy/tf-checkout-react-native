@@ -593,6 +593,9 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         return 'Please accept our Privacy Policy'
       }
       if (isAgeRequired) {
+        if (!dateOfBirth) {
+          return 'Please enter your date of birth'
+        }
         const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
         if (ageValidationMessage) {
           setDateOfBirthError(ageValidationMessage)
@@ -742,7 +745,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         delete body.attributes.phone
       }
 
-      if (isAgeRequired) {
+      if (isAgeRequired && dateOfBirth) {
         body.attributes.dob_day = dateOfBirth.getDate()
         body.attributes.dob_month = dateOfBirth.getMonth() + 1
         body.attributes.dob_year = dateOfBirth.getFullYear()
@@ -799,7 +802,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             },
           }
 
-      if (isAgeRequired) {
+      if (isAgeRequired && dateOfBirth) {
         checkoutBody.attributes.dob_day = dateOfBirth.getDate()
         checkoutBody.attributes.dob_month = dateOfBirth.getMonth() + 1
         checkoutBody.attributes.dob_year = dateOfBirth.getFullYear()
