@@ -733,7 +733,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         }
 
         if (Config.IS_BILLING_STREET_NAME_REQUIRED && !street) {
-          setIsLoading(false)
+          if (isLoading) {
+            setIsLoading(false)
+          }
+
           return false
         }
       }
@@ -746,7 +749,9 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           customError: texts?.form?.phoneInput?.customError,
         })
       ) {
-        setIsLoading(false)
+        if (isLoading) {
+          setIsLoading(false)
+        }
         return false
       }
 
