@@ -457,7 +457,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             texts?.invalidPhoneNumberError ||
               'Please enter a valid phone number'
           )
-          return handleSetPhoneError(
+          handleSetPhoneError(
             texts?.invalidPhoneNumberError ||
               'Please enter a valid phone number'
           )
@@ -613,7 +613,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const showErrorMessages = (data: IBillingFormFieldsData) => {
-
       if (secondsLeft === 0) {
         return false
       }
