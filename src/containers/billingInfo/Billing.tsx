@@ -430,7 +430,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           customError: texts?.form?.phoneInput?.customError,
         })
 
-        if (phoneValidError) {
+        if (phoneValidError && isPhoneRequired) {
           setIsLoading(false)
           showAlert(
             texts?.invalidPhoneNumberError ||
