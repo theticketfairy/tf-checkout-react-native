@@ -80,6 +80,14 @@ const App = () => {
     boolean | undefined
   >(undefined)
 
+  const resetData = () => {
+    setCartProps(undefined)
+    setIsLoading(false)
+    setSkippingStatus(undefined)
+    setCheckOutProps(undefined)
+    setIsPaymentSuccess(undefined)
+    setComponentToShow(ComponentEnum.Tickets)
+  }
   
   //#region Handlers
   const handleOnPressSellTicket = (ticket: IMyOrderDetailsTicket, isActive: boolean) => {
@@ -106,13 +114,7 @@ const App = () => {
   }
 
   const handleOnComplete = () => {
-    setCartProps(undefined)
-    setCheckOutProps(undefined)
-    setComponentToShow(ComponentEnum.Tickets)
-    setIsLoading(false)
-    setIsPaymentSuccess(undefined)
-    setSkippingStatus(undefined)
-
+    resetData()
   }
 
   const handleOnSelectOrder = (order: IMyOrderDetailsData) => {
@@ -203,7 +205,7 @@ const App = () => {
   }, [checkoutProps])
 
   useEffect(() => {
-    if (isPaymentSuccess) {
+    if (isPaymentSuccess !== undefined && isPaymentSuccess === true) {
       setTimeout(() => {
         setComponentToShow(ComponentEnum.PurchaseConfirmation)
       }, 250)
