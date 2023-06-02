@@ -476,7 +476,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setStateId('')
       handleOnSelectDate(undefined)
 
-      const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
+      //const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
 
       setSelectedCountry({
         value: '-1',
@@ -614,6 +614,9 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         )
       )
 
+      if (isAgeRequired) {
+        setDateOfBirthError(validateAge(dateOfBirth, minimumAge))
+      }
       console.log('selectedState?.value', selectedState?.value)
       console.log(
         'selectedState?.value',
@@ -1565,6 +1568,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                   styles={styles?.dropdownMaterialStyles}
                   materialInputProps={{
                     label: texts?.form?.country || 'Country',
+                    error: countryErrorState,
                   }}
                 />
                 <Input

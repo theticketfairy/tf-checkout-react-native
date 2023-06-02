@@ -42,7 +42,13 @@ const DatePicker = ({
           !!error && { borderColor: styles?.errorColor },
         ]}
       >
-        <Text style={[s.text, styles?.text]}>
+        <Text
+          style={[
+            s.text,
+            styles?.text,
+            !!error && { color: styles?.errorColor },
+          ]}
+        >
           {selectedDate?.toLocaleDateString() || text}
         </Text>
       </TouchableOpacity>
