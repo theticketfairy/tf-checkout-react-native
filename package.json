@@ -64,7 +64,7 @@
     "react-native-keyboard-aware-scroll-view": "0.9.5",
     "react-native-modal-datetime-picker": "13.0.0",
     "react-test-renderer": "17.0.2",
-    "rn-material-ui-textfield": "1.0.5",
+    "rn-material-ui-textfield": "jorgtz/rn-material-ui-textfield",
     "typescript": "4.5.2",
     "react-native-background-timer":"2.4.1"
   },
@@ -84,7 +84,7 @@
     "react-native-fs": "2.18.0",
     "react-native-keyboard-aware-scroll-view": "0.9.5",
     "react-native-modal-datetime-picker": "13.0.0",
-    "rn-material-ui-textfield": "1.0.5",
+    "rn-material-ui-textfield": "jorgtz/rn-material-ui-textfield",
     "react-native-background-timer":"2.4.1"
 
   },

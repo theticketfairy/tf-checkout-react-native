@@ -26,7 +26,7 @@
     "react-native-device-country": "1.0.2",
     "react-native-fs": "2.18.0",
     "react-native-modal-datetime-picker": "13.0.0",
-    "rn-material-ui-textfield": "1.0.5"
+    "rn-material-ui-textfield": "jorgtz/rn-material-ui-textfield"
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
