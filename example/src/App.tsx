@@ -223,6 +223,9 @@ const App = () => {
         return (
           <>
           <BillingInfo
+          config={{
+            isCheckoutButtonEnabled: true
+          }}
             ref={billingRef}
             onCartExpired={handleOnCartExpired}
             onSkippingStatusChange={setSkippingStatus}
