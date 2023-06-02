@@ -62,6 +62,7 @@ import R from '../../res'
 import { IError, IUserProfile, IUserProfilePublic } from '../../types'
 import s from './styles'
 import {
+  IBillingFormFieldsData,
   IBillingProps,
   ITicketHolderField,
   ITicketHolderFieldError,
@@ -386,6 +387,18 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setStateId(userProfile.stateId)
       setLoggedUserFirstName(userProfile.firstName)
 
+      let dob: Date | undefined
+
+      if (userProfile.dateOfBirth) {
+        const dobSplitted = userProfile.dateOfBirth.split('-')
+        dob = new Date(
+          parseInt(dobSplitted[0]!, 10),
+          parseInt(dobSplitted[1]!, 10) - 1,
+          parseInt(dobSplitted[2]!, 10)
+        )
+        handleOnSelectDate(dob)
+      }
+
       const thData = [...ticketHoldersData]
       thData.forEach((th, index) => {
         th.firstName = index === 0 ? userProfile.firstName : ''
@@ -599,53 +612,63 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       return true
     }
 
-    const showErrorMessages = () => {
+    const showErrorMessages = (data: IBillingFormFieldsData) => {
+
       if (secondsLeft === 0) {
         return false
       }
 
       if (isTicketFree) {
-        setStreetErrorState(validateEmpty(street))
-        setCityErrorState(validateEmpty(city))
-        setPostalCodeErrorState(validateEmpty(postalCode))
-
+        setStreetErrorState(validateEmpty(data.street))
+        setCityErrorState(validateEmpty(data.city))
+        setPostalCodeErrorState(validateEmpty(data.postalCode))
         return
       }
 
-      setStreetErrorState(validateEmpty(street))
-      setCityErrorState(validateEmpty(city))
-      setPostalCodeErrorState(validateEmpty(postalCode))
-      setFirstNameErrorState(validateEmpty(firstName))
-      setLastNameErrorState(validateEmpty(lastName))
-      setEmailErrorState(validateEmail(email, emailConfirmation))
-      setEmailConfirmationErrorState(validateEmail(emailConfirmation, email))
-
-      setPasswordErrorState(validatePasswords(password, passwordConfirmation))
-      setConfirmPasswordErrorState(
-        validatePasswords(passwordConfirmation, password)
+      setStreetErrorState(validateEmpty(data.street))
+      setCityErrorState(validateEmpty(data.city))
+      setPostalCodeErrorState(validateEmpty(data.postalCode))
+      setFirstNameErrorState(validateEmpty(data.firstName))
+      setLastNameErrorState(validateEmpty(data.lastName))
+      setEmailErrorState(validateEmail(data.email, data.confirmEmail))
+      setEmailConfirmationErrorState(
+        validateEmail(data.confirmEmail, data.email)
       )
+
+      if (data.isRegistering) {
+        setPasswordErrorState(
+          validatePasswords(data.password, data.confirmPassword)
+        )
+        setConfirmPasswordErrorState(
+          validatePasswords(data.confirmPassword, data.password)
+        )
+      }
 
       setCountryErrorState(
         validateEmpty(
-          selectedCountry?.value === '-1' ? '' : selectedCountry?.value
+          data.selectedCountry?.value === '-1'
+            ? ''
+            : data.selectedCountry?.value
         )
       )
 
       if (isAgeRequired) {
-        setDateOfBirthError(validateAge(dateOfBirth, minimumAge))
+        setDateOfBirthError(validateAge(data.dateOfBirth, minimumAge))
       }
 
       setStateErrorState(
-        validateEmpty(selectedState?.value === '-1' ? '' : selectedState?.value)
+        validateEmpty(
+          data.selectedState?.value === '-1' ? '' : data.selectedState?.value
+        )
       )
 
-      console.log('phone', phone)
+      console.log('phone', data.phoneNumber)
       console.log('phoneCountryCode', phoneCountryCode.current)
 
       if (isPhoneRequired && !isPhoneHidden) {
         setPhoneError(
           validatePhoneNumber({
-            phoneNumber: phone,
+            phoneNumber: data.phoneNumber,
             customError: texts?.form?.phoneInput?.customError,
             countryCode: phoneCountryCode.current,
           })
@@ -1035,7 +1058,23 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const onSubmit = async () => {
-      showErrorMessages()
+      showErrorMessages({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        confirmEmail: emailConfirmation,
+        password: password,
+        confirmPassword: passwordConfirmation,
+        street: street,
+        city: city,
+        selectedCountry: selectedCountry,
+        selectedState: selectedState,
+        postalCode: postalCode,
+        dateOfBirth: dateOfBirth,
+        phoneNumber: phone,
+        isRegistering: !loggedUserFirstName && !storedToken.current,
+      })
+
       const isExtraDataValid = checkExtraDataValid()
       if (isExtraDataValid) {
         return showAlert(isExtraDataValid)
@@ -1221,10 +1260,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           }
         }
 
-        const userPhone = usrPrfl.phone === null ? '' : usrPrfl.phone
+        const userPhone =
+          usrPrfl.phone === null ? phoneCountryDialCode : usrPrfl.phone
         handleSetFormDataFromUserProfile({
           ...usrPrfl,
-          phone: `${phoneCountryDialCode}${userPhone}`,
+          phone: userPhone,
         })
       } else {
         // There is no user profile data

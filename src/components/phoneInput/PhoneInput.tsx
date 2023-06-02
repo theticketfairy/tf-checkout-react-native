@@ -2,7 +2,6 @@ import InputPhone from '@sesamsolutions/phone-input'
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import { Platform, View } from 'react-native'
 
-import R from '../../res'
 import Input from '../input/Input'
 import s from './/styles'
 import { IOnChangePhoneNumberPayload, IPhoneInputProps } from './types'

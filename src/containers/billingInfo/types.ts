@@ -18,7 +18,7 @@ import {
 } from '../../components/cartTimer/types'
 import { ICheckboxStyles } from '../../components/checkbox/types'
 import { IDatePickerStyles } from '../../components/datePicker/types'
-import { IDropdownStyles } from '../../components/dropdown/types'
+import { IDropdownItem, IDropdownStyles } from '../../components/dropdown/types'
 import { IDropdownMaterialStyles } from '../../components/dropdownMaterial/types'
 import { IInputStyles } from '../../components/input/types'
 import {
@@ -206,3 +206,20 @@ export type SkippingStatusType =
   | 'success'
   | 'false'
   | undefined
+
+export interface IBillingFormFieldsData {
+  firstName: string
+  lastName: string
+  street: string
+  city: string
+  postalCode: string
+  email: string
+  confirmEmail: string
+  password?: string
+  confirmPassword?: string
+  selectedCountry: IDropdownItem | undefined
+  selectedState: IDropdownItem | undefined
+  dateOfBirth: Date | undefined
+  phoneNumber: string
+  isRegistering?: boolean
+}

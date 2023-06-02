@@ -40,7 +40,7 @@ export const validateEmail = (email: string, equalTo?: string) => {
   return !emailRegex.test(email) ? 'Please enter a valid email address' : ''
 }
 
-export const validatePasswords = (password: string, equalTo: string) => {
+export const validatePasswords = (password?: string, equalTo?: string) => {
   if (!password) {
     return 'Required'
   }
