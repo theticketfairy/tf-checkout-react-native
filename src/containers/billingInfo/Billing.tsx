@@ -243,7 +243,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const [postalCodeErrorState, setPostalCodeErrorState] = useState('')
     const [countryErrorState, setCountryErrorState] = useState('')
     const [stateErrorState, setStateErrorState] = useState('')
-
     const [passwordErrorState, setPasswordErrorState] = useState('')
     const [confirmPasswordErrorState, setConfirmPasswordErrorState] =
       useState('')
@@ -269,6 +268,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const phoneErrorCounter = useRef(0)
     const billingCoreRef = useRef<BillingCoreHandle>(null)
     const sessionHandleRef = useRef<SessionHandleType>(null)
+    const phoneCountryCode = useRef('')
+
     //#endregion
 
     //#region Imperative Handler
@@ -315,11 +316,13 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       payload: IOnChangePhoneNumberPayload
     ) => {
       setPhone(payload.input)
+
       if (!payload.isValid && phoneErrorCounter.current > 0) {
         return handleSetPhoneError(
           texts?.form?.phoneInput?.customError || 'Invalid phone number'
         )
       }
+
       phoneErrorCounter.current = phoneErrorCounter.current + 1
       setPhoneError('')
     }
@@ -401,7 +404,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       userProfile,
       accessTokenData,
     }: ILoginSuccessData) => {
-      let phoneCountry = 'US'
+      let countryCode = 'US'
       const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
       const usrProfile = { ...userProfile }
 
@@ -412,16 +415,16 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       try {
         const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY)
-        phoneCountry = deviceCountry.code.toUpperCase()
+        countryCode = deviceCountry.code.toUpperCase()
       } catch (err) {
-        phoneCountry = 'US'
+        countryCode = 'US'
       }
 
       if (!userProfile.phone) {
         usrProfile.phone = ''
       } else {
         if (!usrProfile.phone?.includes('+')) {
-          usrProfile.phone = `${getCountryDialCode(phoneCountry)}${
+          usrProfile.phone = `${getCountryDialCode(countryCode)}${
             usrProfile.phone
           }`
         }
@@ -631,22 +634,20 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (isAgeRequired) {
         setDateOfBirthError(validateAge(dateOfBirth, minimumAge))
       }
-      console.log('selectedState?.value', selectedState?.value)
-      console.log(
-        'selectedState?.value',
-        validateEmpty(selectedState?.value === '-1' ? '' : selectedState?.value)
-      )
+
       setStateErrorState(
         validateEmpty(selectedState?.value === '-1' ? '' : selectedState?.value)
       )
 
       console.log('phone', phone)
+      console.log('phoneCountryCode', phoneCountryCode.current)
 
       if (isPhoneRequired && !isPhoneHidden) {
         setPhoneError(
           validatePhoneNumber({
             phoneNumber: phone,
             customError: texts?.form?.phoneInput?.customError,
+            countryCode: phoneCountryCode.current,
           })
         )
       }
@@ -739,7 +740,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         setTtfPrivacyPolicyError(
           texts?.form?.ttfPrivacyPolicyRequiredError || 'Required'
         )
-        return 'Please accept our Privacy Policy'
+        return 'Please review the errors'
       }
 
       if (isAgeRequired) {
@@ -1227,6 +1228,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         })
       } else {
         // There is no user profile data
+        phoneCountryCode.current = phoneCountryDialCode
         setPhone(phoneCountryDialCode)
       }
 

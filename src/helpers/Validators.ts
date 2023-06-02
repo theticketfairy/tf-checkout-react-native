@@ -76,15 +76,20 @@ export const validateAge = (
 interface IValidatePhoneNumber {
   phoneNumber?: string
   customError?: string
+  countryCode?: string
 }
 
 export const validatePhoneNumber = ({
   phoneNumber,
   customError,
+  countryCode,
 }: IValidatePhoneNumber) => {
   if (!phoneNumber) {
     return customError || 'Please enter a phone number'
   }
+
+  if (phoneNumber === countryCode)
+    return customError || 'Please enter a valid phone number'
 
   return !phoneRegex.test(`${phoneNumber}`)
     ? customError || 'Please enter a valid phone number'

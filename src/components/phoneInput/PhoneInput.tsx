@@ -40,10 +40,15 @@ const PhoneInput: FC<IPhoneInputProps> = ({
         labelOffset={{
           x1: Platform.OS === 'ios' ? -40 : -40,
         }}
+        style={
+          error
+            ? { color: styles?.input?.errorColor }
+            : { color: styles?.input?.baseColor }
+        }
         styles={{
           container: s.phoneInputContainer,
           ...styles?.input,
-          errorColor: styles?.errorColor || R.colors.danger,
+          color: styles?.input?.color,
         }}
         renderLeftAccessory={() => (
           <View style={(s.countryContainer, styles?.country?.container)}>

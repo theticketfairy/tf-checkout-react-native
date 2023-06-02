@@ -22,7 +22,7 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
     container: { marginBottom: 16 },
     button: {
       borderColor: Color.white,
-      borderWidth: 2,
+      borderWidth: 1,
     },
     text: {
       color: Color.textMain,
@@ -215,9 +215,9 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
     input: {
       baseColor: Color.textMain,
       color: Color.textMain,
-      input: {
-        color: Color.textMain,
-      },
+      errorColor: Color.danger,
+      
     },
+    
   },
 }
