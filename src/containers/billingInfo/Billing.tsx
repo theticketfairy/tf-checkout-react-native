@@ -505,6 +505,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       onLogoutSuccess?.()
     }
 
+    //#region Handlers input changed
     const handleOnSelectDate = (newDate: Date | undefined) => {
       setDateOfBirth(newDate)
 
@@ -566,9 +567,22 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const handleOnStateChanged = (itm: IDropdownItem) => {
       if (stateErrorState.length > 0 && itm.value !== '-1') {
         setStateErrorState('')
+      } else if (itm.value === '-1') {
+        setStateErrorState('Required')
       }
       setSelectedState(itm)
     }
+
+    const handleOnCountryChanged = (itm: IDropdownItem) => {
+      if (countryErrorState.length > 0 && itm.value !== '-1') {
+        setCountryErrorState('')
+      } else if (itm.value === '-1') {
+        setCountryErrorState('Required')
+      }
+      setSelectedCountry(itm)
+    }
+    //#endregion Handlers input changed
+
     //#endregion
 
     //#region Form validation
@@ -1243,6 +1257,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       } else {
         setCountryByEvent()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [countries, countryId])
 
     useEffect(() => {
@@ -1563,7 +1578,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 />
                 <DropdownMaterial
                   items={countries}
-                  onSelectItem={setSelectedCountry}
+                  onSelectItem={handleOnCountryChanged}
                   selectedOption={selectedCountry}
                   styles={styles?.dropdownMaterialStyles}
                   materialInputProps={{
