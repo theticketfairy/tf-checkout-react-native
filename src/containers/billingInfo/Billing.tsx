@@ -184,7 +184,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const [countryId, setCountryId] = useState('')
     const [stateId, setStateId] = useState('')
     const [postalCode, setPostalCode] = useState('')
-    const [dateOfBirth, setDateOfBirth] = useState(new Date())
+    const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined)
     const [selectedCountry, setSelectedCountry] = useState<
       IDropdownItem | undefined
     >(undefined)
@@ -230,12 +230,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const streetError = useDebounced(street, validateEmpty)
     const cityError = useDebounced(city, validateEmpty)
     const postalCodeError = useDebounced(postalCode, validateEmpty)
-    const [dateOfBirthError, setDateOfBirthError] = useState('')
     const [ttfPrivacyPolicyError, setTtfPrivacyPolicyError] = useState('')
 
     const [firstNameErrorState, setFirstNameErrorState] = useState('')
     const [lastNameErrorState, setLastNameErrorState] = useState('')
     const [streetErrorState, setStreetErrorState] = useState('')
+    const [dateOfBirthError, setDateOfBirthError] = useState('')
     const [emailErrorState, setEmailErrorState] = useState('')
     const [emailConfirmationErrorState, setEmailConfirmationErrorState] =
       useState('')
@@ -469,6 +469,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setPasswordConfirmation('')
       setCountryId('')
       setStateId('')
+      handleOnSelectDate(undefined)
 
       const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
 
@@ -499,10 +500,13 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       onLogoutSuccess?.()
     }
 
-    const handleOnSelectDate = (newDate: Date) => {
-      const ageError = validateAge(newDate, minimumAge)
+    const handleOnSelectDate = (newDate: Date | undefined) => {
       setDateOfBirth(newDate)
-      setDateOfBirthError(ageError)
+
+      if (newDate) {
+        const ageError = validateAge(newDate, minimumAge)
+        setDateOfBirthError(ageError)
+      }
     }
 
     const handleOnStreetChanged = (text: string) => {
@@ -715,7 +719,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         )
         return 'Please accept our Privacy Policy'
       }
+
       if (isAgeRequired) {
+        if (!dateOfBirth) {
+          return 'Please enter your date of birth'
+        }
+
         const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
         if (ageValidationMessage) {
           setDateOfBirthError(ageValidationMessage)
@@ -861,6 +870,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         delete body.attributes.phone
       }
 
+      if (isAgeRequired && dateOfBirth) {
+        body.attributes.dob_day = dateOfBirth.getDate()
+        body.attributes.dob_month = dateOfBirth.getMonth() + 1
+        body.attributes.dob_year = dateOfBirth.getFullYear()
+      }
+
       return body
     }
 
@@ -912,7 +927,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             },
           }
 
-      if (isAgeRequired) {
+      if (isAgeRequired && dateOfBirth) {
         checkoutBody.attributes.dob_day = dateOfBirth.getDate()
         checkoutBody.attributes.dob_month = dateOfBirth.getMonth() + 1
         checkoutBody.attributes.dob_year = dateOfBirth.getFullYear()
