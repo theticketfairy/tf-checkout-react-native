@@ -25,7 +25,12 @@ export const validateMinLength = (
     : ''
 
 export const validateEmail = (email: string, equalTo?: string) => {
+  if (!email) {
+    return 'Required'
+  }
+
   let validation = ''
+
   if (equalTo) {
     validation = email === equalTo ? '' : 'Emails must match'
   }
@@ -36,6 +41,10 @@ export const validateEmail = (email: string, equalTo?: string) => {
 }
 
 export const validatePasswords = (password: string, equalTo: string) => {
+  if (!password) {
+    return 'Required'
+  }
+
   let validation = ''
   if (equalTo) {
     validation = password === equalTo ? '' : 'Passwords must match'
