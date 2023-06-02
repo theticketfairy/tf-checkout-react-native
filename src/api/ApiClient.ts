@@ -868,7 +868,7 @@ export const fetchCart = async (): Promise<ICartResponse> => {
     const quantityString = _get(attr, 'cart[0].quantity', '1')
     const tfOptIn = _get(attr, 'ttfOptIn', false)
     const isMarketingOptedIn = _get(attr, 'optedIn', false)
-    const expiresAt = _get(attr, 'expires_at', 420)
+    const expiresAt = _get(attr, 'expiresAt', 420)
 
     cartData = {
       quantity: parseInt(quantityString, 10),
