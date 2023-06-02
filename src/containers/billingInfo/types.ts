@@ -113,6 +113,8 @@ export interface IBillingProps {
   onSkippingStatusChange?: (status: SkippingStatusType) => void
 
   shouldCartTimerNotMinimizeOnTap?: boolean
+
+  config?: IBillingConfig
 }
 
 export interface ITicketHolderField {
@@ -192,6 +194,10 @@ export interface IBillingInfoViewTexts {
     ttfPrivacyPolicyRequiredError?: string
   }
   cartTimer?: ICartTimerTexts
+}
+
+export interface IBillingConfig {
+  isCheckoutButtonEnabled: boolean
 }
 
 export type SkippingStatusType =

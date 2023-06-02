@@ -115,6 +115,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       onLogoutError,
       onCartExpired,
       shouldCartTimerNotMinimizeOnTap,
+      config,
     },
     ref
   ) => {
@@ -210,7 +211,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     // Cart expiration timer
     const [secondsLeft, setSecondsLeft] = React.useState(420)
 
-    // Errors state
+    //#region Errors state
     const firstNameError = useDebounced(firstName, validateEmpty)
     const lastNameError = useDebounced(lastName, validateEmpty)
     const emailError = useDebounced(email, () =>
@@ -231,7 +232,23 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const postalCodeError = useDebounced(postalCode, validateEmpty)
     const [dateOfBirthError, setDateOfBirthError] = useState('')
     const [ttfPrivacyPolicyError, setTtfPrivacyPolicyError] = useState('')
-    // End of errors state
+
+    const [firstNameErrorState, setFirstNameErrorState] = useState('')
+    const [lastNameErrorState, setLastNameErrorState] = useState('')
+    const [streetErrorState, setStreetErrorState] = useState('')
+    const [emailErrorState, setEmailErrorState] = useState('')
+    const [emailConfirmationErrorState, setEmailConfirmationErrorState] =
+      useState('')
+    const [cityErrorState, setCityErrorState] = useState('')
+    const [postalCodeErrorState, setPostalCodeErrorState] = useState('')
+    const [countryErrorState, setCountryErrorState] = useState('')
+    const [stateErrorState, setStateErrorState] = useState('')
+
+    const [passwordErrorState, setPasswordErrorState] = useState('')
+    const [confirmPasswordErrorState, setConfirmPasswordErrorState] =
+      useState('')
+
+    //#endregion Errors state
     //#endregion
 
     const getSkippingStatus = (numOfTickets: number): SkippingStatusType => {
@@ -487,6 +504,62 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setDateOfBirth(newDate)
       setDateOfBirthError(ageError)
     }
+
+    const handleOnStreetChanged = (text: string) => {
+      if (streetErrorState.length > 0 && text.length > 0) {
+        setStreetErrorState('')
+      }
+      setStreet(text)
+    }
+
+    const handleOnCityChanged = (text: string) => {
+      if (cityErrorState.length > 0 && text.length > 0) {
+        setCityErrorState('')
+      }
+      setCity(text)
+    }
+
+    const handleOnFirstNameChanged = (text: string) => {
+      if (firstNameErrorState.length > 0 && text.length > 0) {
+        setFirstNameErrorState('')
+      }
+      setFirstName(text)
+    }
+
+    const handleOnLastNameChanged = (text: string) => {
+      if (lastNameErrorState.length > 0 && text.length > 0) {
+        setLastNameErrorState('')
+      }
+      setLastName(text)
+    }
+
+    const handleOnEmailChanged = (text: string) => {
+      if (emailErrorState.length > 0 && text.length > 0) {
+        setEmailErrorState('')
+      }
+      setEmail(text)
+    }
+
+    const handleOnEmailConfirmationChanged = (text: string) => {
+      if (emailConfirmationErrorState.length > 0 && text.length > 0) {
+        setEmailConfirmationErrorState('')
+      }
+      setEmailConfirmation(text)
+    }
+
+    const handleOnPostalCodeChanged = (text: string) => {
+      if (postalCodeErrorState.length > 0 && text.length > 0) {
+        setPostalCodeErrorState('')
+      }
+      setPostalCode(text)
+    }
+
+    const handleOnStateChanged = (itm: IDropdownItem) => {
+      if (stateErrorState.length > 0 && itm.value !== '-1') {
+        setStateErrorState('')
+      }
+      setSelectedState(itm)
+    }
     //#endregion
 
     //#region Form validation
@@ -498,6 +571,93 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         return false
       }
       return true
+    }
+
+    const showErrorMessages = () => {
+      if (secondsLeft === 0) {
+        return false
+      }
+
+      if (isTicketFree) {
+        setStreetErrorState(validateEmpty(street))
+        setCityErrorState(validateEmpty(city))
+        setPostalCodeErrorState(validateEmpty(postalCode))
+
+        return
+      }
+
+      setStreetErrorState(validateEmpty(street))
+      setCityErrorState(validateEmpty(city))
+      setPostalCodeErrorState(validateEmpty(postalCode))
+      setFirstNameErrorState(validateEmpty(firstName))
+      setLastNameErrorState(validateEmpty(lastName))
+      setEmailErrorState(validateEmail(email, emailConfirmation))
+      setEmailConfirmationErrorState(validateEmail(emailConfirmation, email))
+
+      setPasswordErrorState(validatePasswords(password, passwordConfirmation))
+      setConfirmPasswordErrorState(
+        validatePasswords(passwordConfirmation, password)
+      )
+
+      setCountryErrorState(
+        validateEmpty(
+          selectedCountry?.value === '-1' ? '' : selectedCountry?.value
+        )
+      )
+
+      console.log('selectedState?.value', selectedState?.value)
+      console.log(
+        'selectedState?.value',
+        validateEmpty(selectedState?.value === '-1' ? '' : selectedState?.value)
+      )
+      setStateErrorState(
+        validateEmpty(selectedState?.value === '-1' ? '' : selectedState?.value)
+      )
+
+      console.log('phone', phone)
+
+      if (isPhoneRequired && !isPhoneHidden) {
+        setPhoneError(
+          validatePhoneNumber({
+            phoneNumber: phone,
+            customError: texts?.form?.phoneInput?.customError,
+          })
+        )
+      }
+
+      /*
+      } else {
+        if (
+          !firstName ||
+          !lastName ||
+          !email ||
+          !emailConfirmation ||
+          !city ||
+          !postalCode ||
+          selectedState?.value === '-1' ||
+          selectedCountry?.value === '-1'
+        ) {
+          return false
+        }
+
+        if (Config.IS_BILLING_STREET_NAME_REQUIRED && !street) {
+          setIsLoading(false)
+          return false
+        }
+      }
+
+      if (
+        isPhoneRequired &&
+        !isPhoneHidden &&
+        validatePhoneNumber({
+          phoneNumber: phone,
+          customError: texts?.form?.phoneInput?.customError,
+        })
+      ) {
+        setIsLoading(false)
+        return false
+      }
+      */
     }
 
     const checkBasicDataValid = (): boolean => {
@@ -837,6 +997,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const onSubmit = async () => {
+      showErrorMessages()
       const isExtraDataValid = checkExtraDataValid()
       if (isExtraDataValid) {
         return showAlert(isExtraDataValid)
@@ -1154,6 +1315,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }, [])
     //#endregion
 
+    const isDataValid = checkBasicDataValid()
+
+    const isButtonDisabled = config?.isCheckoutButtonEnabled
+      ? false
+      : !isDataValid
+
     //#region RENDER
     const renderTicketHolders = () => {
       if (!numberOfTicketHolders) {
@@ -1269,15 +1436,15 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             <Input
               label={texts?.form?.firstName || 'First name'}
               value={firstName}
-              onChangeText={setFirstName}
-              error={firstNameError}
+              onChangeText={handleOnFirstNameChanged}
+              error={firstNameError || firstNameErrorState}
               styles={styles?.inputStyles}
             />
             <Input
               label={texts?.form?.lastName || 'Last name'}
               value={lastName}
-              onChangeText={setLastName}
-              error={lastNameError}
+              onChangeText={handleOnLastNameChanged}
+              error={lastNameError || lastNameErrorState}
               styles={styles?.inputStyles}
             />
 
@@ -1289,18 +1456,18 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             <Input
               label={texts?.form?.email || 'Email'}
               value={email}
-              onChangeText={setEmail}
+              onChangeText={handleOnEmailChanged}
               keyboardType='email-address'
-              error={emailError}
+              error={emailError || emailErrorState}
               styles={styles?.inputStyles}
               autoCapitalize='none'
             />
             <Input
               label={texts?.form?.confirmEmail || 'Confirm email'}
               value={emailConfirmation}
-              onChangeText={setEmailConfirmation}
+              onChangeText={handleOnEmailConfirmationChanged}
               keyboardType='email-address'
-              error={confirmEmailError}
+              error={confirmEmailError || emailConfirmationErrorState}
               styles={styles?.inputStyles}
               autoCapitalize='none'
             />
@@ -1323,7 +1490,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                   label={texts?.form?.password || 'Password'}
                   isSecure
                   onChangeText={setPassword}
-                  error={passwordError}
+                  error={passwordError || passwordErrorState}
                   styles={styles?.inputStyles}
                   autoCapitalize='none'
                   secureTextEntry={true}
@@ -1333,7 +1500,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                   label={texts?.form?.confirmPassword || 'Confirm password'}
                   isSecure
                   onChangeText={setPasswordConfirmation}
-                  error={confirmPasswordError}
+                  error={confirmPasswordError || confirmPasswordErrorState}
                   styles={styles?.inputStyles}
                   autoCapitalize='none'
                   secureTextEntry={true}
@@ -1360,15 +1527,15 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 <Input
                   label={addressLabel}
                   value={street}
-                  onChangeText={setStreet}
-                  error={streetError}
+                  onChangeText={handleOnStreetChanged}
+                  error={streetError || streetErrorState}
                   styles={styles?.inputStyles}
                 />
                 <Input
                   label={texts?.form?.city || 'City'}
                   value={city}
-                  onChangeText={setCity}
-                  error={cityError}
+                  onChangeText={handleOnCityChanged}
+                  error={cityError || cityErrorState}
                   styles={styles?.inputStyles}
                 />
                 <DropdownMaterial
@@ -1383,17 +1550,18 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 <Input
                   label={texts?.form?.zipCode || 'Postal Code / Zip Code'}
                   value={postalCode}
-                  onChangeText={setPostalCode}
-                  error={postalCodeError}
+                  onChangeText={handleOnPostalCodeChanged}
+                  error={postalCodeError || postalCodeErrorState}
                   styles={styles?.inputStyles}
                 />
                 <DropdownMaterial
                   items={states}
-                  onSelectItem={setSelectedState}
+                  onSelectItem={handleOnStateChanged}
                   selectedOption={selectedState}
                   styles={styles?.dropdownMaterialStyles}
                   materialInputProps={{
                     label: texts?.form?.state || 'State',
+                    error: stateErrorState,
                   }}
                 />
               </>
@@ -1439,10 +1607,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             <Button
               onPress={onSubmit}
               text={texts?.checkoutButton || 'CHECKOUT'}
-              isDisabled={!isDataValid}
+              isDisabled={isButtonDisabled}
               isLoading={isSubmittingData}
               styles={
-                !isDataValid
+                isButtonDisabled
                   ? {
                       button: s.submitButtonDisabled,
                       ...styles?.checkoutButtonDisabled,
@@ -1468,8 +1636,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         />
       </>
     )
-
-    const isDataValid = checkBasicDataValid()
 
     return (
       <BillingCore
