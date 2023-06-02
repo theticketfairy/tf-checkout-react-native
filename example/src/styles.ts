@@ -116,7 +116,8 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
   },
   dropdownMaterialStyles: {
     input: {
-      baseColor: Color.white
+      baseColor: Color.white,
+      errorColor: Color.danger    
     },
   },
   ticketHolderItemHeader: {
