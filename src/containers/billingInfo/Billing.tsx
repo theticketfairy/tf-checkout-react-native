@@ -116,56 +116,13 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       onLogoutError,
       onCartExpired,
       shouldCartTimerNotMinimizeOnTap,
-      config,
+      config = {
+        isCheckoutAlwaysButtonEnabled: false,
+        shouldHideTicketHolderSectionOnSingleTicket: false,
+      },
     },
     ref
   ) => {
-    //#region Labels
-    const holderLabels = useMemo(() => {
-      const optional = isNameRequired
-        ? ''
-        : texts?.form?.optional || '(optional)'
-      return {
-        firstName: texts?.form?.holderFirstName
-          ? `${texts.form.holderFirstName} ${optional}`
-          : `First Name ${optional}`,
-        lastName: texts?.form?.holderLastName
-          ? `${texts.form.holderLastName} ${optional}`
-          : `Last Name ${optional}`,
-        email: texts?.form?.holderEmail
-          ? `${texts.form.holderEmail} ${texts?.form?.optional || '(optional)'}`
-          : `Email ${optional}`,
-        phone: texts?.form?.holderPhone
-          ? `${texts.form.holderPhone} ${texts?.form?.optional || '(optional)'}`
-          : `Phone ${optional}`,
-      }
-    }, [isNameRequired, texts])
-
-    const brandCheckBoxText =
-      texts?.form?.isSubToBrand ||
-      'I would like to be updated on news, events and offers.'
-
-    const phoneLabel = useMemo(() => {
-      const optionalPhone = isPhoneRequired
-        ? ''
-        : texts?.form?.optional || ' (optional)'
-      return texts?.form?.phone
-        ? `${texts?.form?.phone} ${optionalPhone}`
-        : `Phone ${optionalPhone}`
-    }, [isPhoneRequired, texts])
-
-    const addressLabel = useMemo(() => {
-      const optionalAddress = Config.IS_BILLING_STREET_NAME_REQUIRED
-        ? ''
-        : texts?.form?.optional || ' (optional)'
-
-      return texts?.form?.street
-        ? `${texts.form.street} ${optionalAddress}`
-        : `Street ${optionalAddress}`
-    }, [texts])
-
-    //#endregion
-
     //#region State
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [isSubmittingData, setIsSubmittingData] = useState<boolean>(false)
@@ -199,7 +156,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
     const [numberOfTicketHolders, setNumberOfTicketHolders] = useState<
       number | undefined
-    >()
+    >(0)
 
     const [states, setStates] = useState<IDropdownItem[]>([])
     const [countries, setCountries] = useState<IDropdownItem[]>([])
@@ -208,6 +165,60 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const [skippingStatus, setSkippingStatus] =
       useState<SkippingStatusType>(undefined)
     const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
+    //#endregion State
+
+    //#region Labels
+    const holderLabels = useMemo(() => {
+      if (
+        numberOfTicketHolders === 1 &&
+        config.shouldHideTicketHolderSectionOnSingleTicket
+      ) {
+        return null
+      }
+
+      const optional = isNameRequired
+        ? ''
+        : texts?.form?.optional || '(optional)'
+      return {
+        firstName: texts?.form?.holderFirstName
+          ? `${texts.form.holderFirstName} ${optional}`
+          : `First Name ${optional}`,
+        lastName: texts?.form?.holderLastName
+          ? `${texts.form.holderLastName} ${optional}`
+          : `Last Name ${optional}`,
+        email: texts?.form?.holderEmail
+          ? `${texts.form.holderEmail} ${texts?.form?.optional || '(optional)'}`
+          : `Email ${optional}`,
+        phone: texts?.form?.holderPhone
+          ? `${texts.form.holderPhone} ${texts?.form?.optional || '(optional)'}`
+          : `Phone ${optional}`,
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isNameRequired, texts, numberOfTicketHolders])
+
+    const brandCheckBoxText =
+      texts?.form?.isSubToBrand ||
+      'I would like to be updated on news, events and offers.'
+
+    const phoneLabel = useMemo(() => {
+      const optionalPhone = isPhoneRequired
+        ? ''
+        : texts?.form?.optional || ' (optional)'
+      return texts?.form?.phone
+        ? `${texts?.form?.phone} ${optionalPhone}`
+        : `Phone ${optionalPhone}`
+    }, [isPhoneRequired, texts])
+
+    const addressLabel = useMemo(() => {
+      const optionalAddress = Config.IS_BILLING_STREET_NAME_REQUIRED
+        ? ''
+        : texts?.form?.optional || ' (optional)'
+
+      return texts?.form?.street
+        ? `${texts.form.street} ${optionalAddress}`
+        : `Street ${optionalAddress}`
+    }, [texts])
+    //#endregion Labels
 
     // Cart expiration timer
     const [secondsLeft, setSecondsLeft] = React.useState(420)
@@ -252,11 +263,17 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     //#endregion
 
     const getSkippingStatus = (numOfTickets: number): SkippingStatusType => {
+      // DO NOT SKIP IF
+      // * User is not logged in.
+      // * Event Collect_names is turned on and tickets are more than one.
+      // * Event validate_age is turned on.
+      // * phone_required is turned on and customer does not have a phone number.
+
       if (isBillingRequired || skippingStatus === 'fail') {
         return 'false'
       }
 
-      if (numOfTickets > 1 || isAgeRequired) {
+      if ((isNameRequired && numOfTickets > 1) || isAgeRequired) {
         return 'false'
       } else {
         return 'skipping'
@@ -525,10 +542,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const handleOnSelectDate = (newDate: Date | undefined) => {
       setDateOfBirth(newDate)
 
-      if (newDate) {
-        const ageError = validateAge(newDate, minimumAge)
-        setDateOfBirthError(ageError)
+      if (dateOfBirthError.length > 0 && newDate) {
+        setStreetErrorState('')
       }
+
+      const ageError = validateAge(newDate, minimumAge)
+      setDateOfBirthError(ageError)
     }
 
     const handleOnStreetChanged = (text: string) => {
@@ -661,9 +680,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         )
       )
 
-      console.log('phone', data.phoneNumber)
-      console.log('phoneCountryCode', phoneCountryCode.current)
-
       if (isPhoneRequired && !isPhoneHidden) {
         setPhoneError(
           validatePhoneNumber({
@@ -673,40 +689,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           })
         )
       }
-
-      /*
-      } else {
-        if (
-          !firstName ||
-          !lastName ||
-          !email ||
-          !emailConfirmation ||
-          !city ||
-          !postalCode ||
-          selectedState?.value === '-1' ||
-          selectedCountry?.value === '-1'
-        ) {
-          return false
-        }
-
-        if (Config.IS_BILLING_STREET_NAME_REQUIRED && !street) {
-          setIsLoading(false)
-          return false
-        }
-      }
-
-      if (
-        isPhoneRequired &&
-        !isPhoneHidden &&
-        validatePhoneNumber({
-          phoneNumber: phone,
-          customError: texts?.form?.phoneInput?.customError,
-        })
-      ) {
-        setIsLoading(false)
-        return false
-      }
-      */
     }
 
     const checkBasicDataValid = (): boolean => {
@@ -1401,13 +1383,17 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
     const isDataValid = checkBasicDataValid()
 
-    const isButtonDisabled = config?.isCheckoutButtonEnabled
+    const isButtonDisabled = config.isCheckoutAlwaysButtonEnabled
       ? false
       : !isDataValid
 
     //#region RENDER
     const renderTicketHolders = () => {
-      if (!numberOfTicketHolders) {
+      if (
+        !numberOfTicketHolders ||
+        !holderLabels ||
+        ticketHoldersData.length === 0
+      ) {
         return null
       }
 
@@ -1466,7 +1452,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         )
       }
 
-      return tHolders
+      return (
+        <>
+          <Text style={styles?.ticketHoldersTitle}>
+            {texts?.form?.ticketHoldersTitle || 'Ticket Holders'}
+          </Text>
+          {tHolders}
+        </>
+      )
     }
 
     const renderCheckingOut = () => {
@@ -1680,14 +1673,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               />
             )}
 
-            {ticketHoldersData.length > 0 && (
-              <>
-                <Text style={styles?.ticketHoldersTitle}>
-                  {texts?.form?.ticketHoldersTitle || 'Ticket Holders'}
-                </Text>
-                {renderTicketHolders()}
-              </>
-            )}
+            {renderTicketHolders()}
 
             <Button
               onPress={onSubmit}

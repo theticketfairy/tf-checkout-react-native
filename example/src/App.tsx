@@ -226,7 +226,8 @@ const App = () => {
           <>
           <BillingInfo
           config={{
-            isCheckoutButtonEnabled: true
+            isCheckoutAlwaysButtonEnabled: true,
+            shouldHideTicketHolderSectionOnSingleTicket: true,
           }}
             ref={billingRef}
             onCartExpired={handleOnCartExpired}

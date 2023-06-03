@@ -197,7 +197,8 @@ export interface IBillingInfoViewTexts {
 }
 
 export interface IBillingConfig {
-  isCheckoutButtonEnabled: boolean
+  isCheckoutAlwaysButtonEnabled?: boolean
+  shouldHideTicketHolderSectionOnSingleTicket?: boolean
 }
 
 export type SkippingStatusType =
