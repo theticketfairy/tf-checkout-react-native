@@ -787,6 +787,13 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         return ''
       }
 
+      if (
+        ticketHoldersData.length === 1 &&
+        config.shouldHideTicketHolderSectionOnSingleTicket
+      ) {
+        return ''
+      }
+
       return _every(
         _map(
           ticketHoldersData,
@@ -933,14 +940,26 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const getCheckoutBody = (): ICheckoutBody => {
       let parsedTicketHolders: ICheckoutTicketHolder[] = []
 
-      for (let i = 0; i <= numberOfTicketHolders! - 1; i++) {
-        const individualHolder = {
-          first_name: ticketHoldersData[i].firstName || '',
-          last_name: ticketHoldersData[i].lastName || '',
-          phone: ticketHoldersData[i].phone || '',
-          email: ticketHoldersData[i].email || '',
+      if (
+        config.shouldHideTicketHolderSectionOnSingleTicket &&
+        numberOfTicketHolders
+      ) {
+        parsedTicketHolders.push({
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone,
+          email: email,
+        })
+      } else {
+        for (let i = 0; i <= numberOfTicketHolders! - 1; i++) {
+          const individualHolder = {
+            first_name: ticketHoldersData[i].firstName || '',
+            last_name: ticketHoldersData[i].lastName || '',
+            phone: ticketHoldersData[i].phone || '',
+            email: ticketHoldersData[i].email || '',
+          }
+          parsedTicketHolders.push(individualHolder)
         }
-        parsedTicketHolders.push(individualHolder)
       }
 
       const formattedPhone = isPhoneRequired ? phone : emptyPhone(phone)
@@ -1082,7 +1101,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       const isExtraDataValid = checkExtraDataValid()
       if (isExtraDataValid) {
-        return showAlert(isExtraDataValid)
+        return
       }
 
       if (loggedUserFirstName && storedToken.current) {
