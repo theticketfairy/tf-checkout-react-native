@@ -375,6 +375,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const handleIsSubToTicketFairyToggle = () => {
+      if (!isSubToTicketFairy) {
+        setTtfPrivacyPolicyError('')
+      } else {
+        setTtfPrivacyPolicyError('Required')
+      }
       setIsSubToTicketFairy(!isSubToTicketFairy)
     }
 
