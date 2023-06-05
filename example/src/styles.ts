@@ -47,6 +47,10 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
     container: {
       width: '100%',
     },
+    errorColor: Color.danger,
+  },
+  privacyPolicyLinkStyle: {
+    color: Color.influencerCooler
   },
   passwordTitle: {
     color: Color.textMain,
@@ -76,6 +80,7 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
       marginTop: 8,
       marginLeft: 40,
     },
+    errorColor: Color.danger
   },
   checkoutButton: {
     button: {
