@@ -475,10 +475,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
         if (phoneValidError && isPhoneRequired) {
           setIsLoading(false)
-          showAlert(
-            texts?.invalidPhoneNumberError ||
-              'Please enter a valid phone number'
-          )
           handleSetPhoneError(
             texts?.invalidPhoneNumberError ||
               'Please enter a valid phone number'
@@ -1248,7 +1244,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (usrPrfl) {
         if (!isPhoneHidden && isPhoneRequired) {
           if (!checkIsStoredPhoneNumberFormat(usrPrfl.phone)) {
-            showAlert(
+            setPhoneError(
               texts?.invalidPhoneNumberError ||
                 'Please enter a valid phone number'
             )
