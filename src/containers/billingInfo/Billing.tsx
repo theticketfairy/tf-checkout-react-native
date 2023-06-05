@@ -616,6 +616,20 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       }
       setSelectedCountry(itm)
     }
+
+    const handleOnPasswordChanged = (text: string) => {
+      if (passwordErrorState.length > 0 && text.length > 0) {
+        setPasswordErrorState('')
+      }
+      setPassword(text)
+    }
+
+    const handleOnConfirmPasswordChanged = (text: string) => {
+      if (confirmPasswordErrorState.length > 0 && text.length > 0) {
+        setConfirmPasswordErrorState('')
+      }
+      setPasswordConfirmation(text)
+    }
     //#endregion Handlers input changed
 
     //#endregion
@@ -1566,7 +1580,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 <Input
                   label={texts?.form?.password || 'Password'}
                   isSecure
-                  onChangeText={setPassword}
+                  onChangeText={handleOnPasswordChanged}
                   error={passwordError || passwordErrorState}
                   styles={styles?.inputStyles}
                   autoCapitalize='none'
@@ -1576,7 +1590,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 <Input
                   label={texts?.form?.confirmPassword || 'Confirm password'}
                   isSecure
-                  onChangeText={setPasswordConfirmation}
+                  onChangeText={handleOnConfirmPasswordChanged}
                   error={confirmPasswordError || confirmPasswordErrorState}
                   styles={styles?.inputStyles}
                   autoCapitalize='none'
@@ -1656,7 +1670,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 onPress={handleIsSubToTicketFairyToggle}
                 isActive={isSubToTicketFairy}
                 customTextComp={
-                  <Text style={styles?.customCheckbox?.text}>
+                  <Text
+                    style={[
+                      styles?.customCheckbox?.text,
+                      !!ttfPrivacyPolicyError && {
+                        color: styles?.customCheckbox?.errorColor,
+                      },
+                    ]}
+                  >
                     {texts?.form?.isSubToTicketFairy ||
                       `I agree that The Ticket Fairy may use the personal data that have provided for marketing purposes, such as recommending events that I might be interested in, in accordance with its `}
                     <Text
