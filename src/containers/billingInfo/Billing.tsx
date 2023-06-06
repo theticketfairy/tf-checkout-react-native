@@ -738,18 +738,20 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         }
       }
 
-      if (
-        isPhoneRequired &&
-        !isPhoneHidden &&
-        validatePhoneNumber({
+      if (isPhoneRequired && !isPhoneHidden) {
+        const phoneValidation = validatePhoneNumber({
           phoneNumber: phone,
           customError: texts?.form?.phoneInput?.customError,
+          countryCode: phoneCountryCode.current,
         })
-      ) {
+
         if (isLoading) {
           setIsLoading(false)
         }
-        return false
+
+        if (phoneValidation) {
+          return false
+        }
       }
 
       return true
@@ -1095,8 +1097,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         isRegistering: !loggedUserFirstName && !storedToken.current,
       })
 
-      const isExtraDataValid = checkExtraDataValid()
-      if (isExtraDataValid) {
+      if (config.isCheckoutAlwaysButtonEnabled) {
+        if (!checkBasicDataValid()) {
+          return
+        }
+      }
+
+      const isExtraDataValidErrors = checkExtraDataValid()
+      if (isExtraDataValidErrors) {
         return
       }
 
