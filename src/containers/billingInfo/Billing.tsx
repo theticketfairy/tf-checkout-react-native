@@ -872,8 +872,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       if (!registerNewUserResponseData) {
         setIsSubmittingData(false)
-        handleOnRegisterFail('Register returned no data')
-        return showAlert('Register returned no data')
+        handleOnRegisterFail('Register user returned no data')
+        return showAlert('Register user returned no data')
       }
 
       storedToken.current =
