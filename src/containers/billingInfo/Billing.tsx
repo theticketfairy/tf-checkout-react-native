@@ -684,7 +684,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       }
 
       const validateFirstName = validateEmpty(data.firstName)
-      console.log('validateFirstName', validateFirstName)
       const validateLastName = validateEmpty(data.lastName)
       const validateEmails = validateEmail(data.email, data.confirmEmail)
       const validateEmailsConfirmation = validateEmail(
@@ -767,49 +766,36 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         return false
       }
 
-      console.log('=== ERRORS ===', errorsRef.current)
-
       if (isTicketFree) {
-        if (!firstName || !lastName || !email || !emailConfirmation) {
+        if (
+          errorsRef.current.firstName ||
+          errorsRef.current.lastName ||
+          errorsRef.current.email ||
+          errorsRef.current.confirmEmail
+        ) {
           return false
         }
       } else {
         if (
-          !firstName ||
-          !lastName ||
-          !email ||
-          !emailConfirmation ||
-          !city ||
-          !postalCode ||
-          selectedState?.value === '-1' ||
-          selectedCountry?.value === '-1'
+          errorsRef.current.firstName ||
+          errorsRef.current.lastName ||
+          errorsRef.current.email ||
+          errorsRef.current.confirmEmail ||
+          errorsRef.current.city ||
+          errorsRef.current.zipCode ||
+          errorsRef.current.state === '-1' ||
+          errorsRef.current.country === '-1' ||
+          errorsRef.current.street
         ) {
-          return false
-        }
-
-        if (Config.IS_BILLING_STREET_NAME_REQUIRED && validateEmpty(street)) {
-          if (isLoading) {
-            setIsLoading(false)
-          }
-
           return false
         }
       }
 
-      if (isPhoneRequired && !isPhoneHidden) {
-        const phoneValidation = validatePhoneNumber({
-          phoneNumber: phone,
-          customError: texts?.form?.phoneInput?.customError,
-          countryCode: phoneCountryCode.current,
-        })
-
+      if (isPhoneRequired && !isPhoneHidden && errorsRef.current.phone) {
         if (isLoading) {
           setIsLoading(false)
         }
-
-        if (phoneValidation) {
-          return false
-        }
+        return false
       }
 
       return true
