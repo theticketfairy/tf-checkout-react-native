@@ -53,6 +53,7 @@ import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import { emptyPhone } from '../../helpers/StringsHelper'
 import {
   validateAge,
+  validateDropDownEmpty,
   validateEmail,
   validateEmpty,
   validatePasswords,
@@ -287,6 +288,22 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const billingCoreRef = useRef<BillingCoreHandle>(null)
     const sessionHandleRef = useRef<SessionHandleType>(null)
     const phoneCountryCode = useRef('')
+    const errorsRef = useRef({
+      firstName: '',
+      lastName: '',
+      email: '',
+      confirmEmail: '',
+      password: '',
+      confirmPassword: '',
+      dateOfBirth: '',
+      phone: '',
+      street: '',
+      city: '',
+      country: '',
+      zipCode: '',
+      state: '',
+      privacy: '',
+    })
 
     //#endregion
 
@@ -651,65 +668,106 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         return false
       }
 
+      const validateStreet = validateEmpty(data.street)
+      const validateCity = validateEmpty(data.city)
+      const validatePostalCode = validateEmpty(data.postalCode)
+
       if (isTicketFree) {
-        setStreetErrorState(validateEmpty(data.street))
-        setCityErrorState(validateEmpty(data.city))
-        setPostalCodeErrorState(validateEmpty(data.postalCode))
+        setStreetErrorState(validateStreet)
+        setCityErrorState(validateCity)
+        setPostalCodeErrorState(validatePostalCode)
+
+        errorsRef.current.street = validateStreet
+        errorsRef.current.city = validateCity
+        errorsRef.current.zipCode = validatePostalCode
         return
       }
 
-      setStreetErrorState(validateEmpty(data.street))
-      setCityErrorState(validateEmpty(data.city))
-      setPostalCodeErrorState(validateEmpty(data.postalCode))
-      setFirstNameErrorState(validateEmpty(data.firstName))
-      setLastNameErrorState(validateEmpty(data.lastName))
-      setEmailErrorState(validateEmail(data.email, data.confirmEmail))
-      setEmailConfirmationErrorState(
-        validateEmail(data.confirmEmail, data.email)
+      const validateFirstName = validateEmpty(data.firstName)
+      console.log('validateFirstName', validateFirstName)
+      const validateLastName = validateEmpty(data.lastName)
+      const validateEmails = validateEmail(data.email, data.confirmEmail)
+      const validateEmailsConfirmation = validateEmail(
+        data.confirmEmail,
+        data.email
       )
+
+      setStreetErrorState(validateStreet)
+      setCityErrorState(validateCity)
+      setPostalCodeErrorState(validatePostalCode)
+      setFirstNameErrorState(validateFirstName)
+      setLastNameErrorState(validateLastName)
+      setEmailErrorState(validateEmails)
+      setEmailConfirmationErrorState(validateEmailsConfirmation)
+
+      errorsRef.current.street = validateStreet
+      errorsRef.current.city = validateCity
+      errorsRef.current.zipCode = validatePostalCode
+      errorsRef.current.firstName = validateFirstName
+      errorsRef.current.lastName = validateLastName
+      errorsRef.current.email = validateEmails
+      errorsRef.current.confirmEmail = validateEmailsConfirmation
 
       if (data.isRegistering) {
-        setPasswordErrorState(
-          validatePasswords(data.password, data.confirmPassword)
+        const validatePassword = validatePasswords(
+          data.password,
+          data.confirmPassword
         )
-        setConfirmPasswordErrorState(
-          validatePasswords(data.confirmPassword, data.password)
+        const validatePasswordConfirmation = validatePasswords(
+          data.confirmPassword,
+          data.password
         )
+
+        setPasswordErrorState(validatePassword)
+        setConfirmPasswordErrorState(validatePasswordConfirmation)
+
+        errorsRef.current.password = validatePassword
+        errorsRef.current.confirmPassword = validatePasswordConfirmation
       }
 
-      setCountryErrorState(
-        validateEmpty(
-          data.selectedCountry?.value === '-1'
-            ? ''
-            : data.selectedCountry?.value
-        )
+      const countryValidation = validateDropDownEmpty(
+        data.selectedCountry?.value
       )
+
+      setCountryErrorState(countryValidation)
+      errorsRef.current.country = countryValidation
 
       if (isAgeRequired) {
-        setDateOfBirthError(validateAge(data.dateOfBirth, minimumAge))
+        if (minimumAge) {
+          const birthdayValidation = validateAge(data.dateOfBirth, minimumAge)
+          setDateOfBirthError(birthdayValidation)
+          errorsRef.current.dateOfBirth = birthdayValidation
+        } else {
+          setDateOfBirthError(data.dateOfBirth ? '' : 'Required')
+          errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : 'Required'
+        }
       }
 
-      setStateErrorState(
-        validateEmpty(
-          data.selectedState?.value === '-1' ? '' : data.selectedState?.value
-        )
-      )
+      const validateState = validateDropDownEmpty(data.selectedState?.value)
+
+      setStateErrorState(validateState)
+      errorsRef.current.state = validateState
 
       if (isPhoneRequired && !isPhoneHidden) {
-        setPhoneError(
-          validatePhoneNumber({
-            phoneNumber: data.phoneNumber,
-            customError: texts?.form?.phoneInput?.customError,
-            countryCode: phoneCountryCode.current,
-          })
-        )
+        const validatePhone = validatePhoneNumber({
+          phoneNumber: data.phoneNumber,
+          customError: texts?.form?.phoneInput?.customError,
+          countryCode: phoneCountryCode.current,
+        })
+        setPhoneError(validatePhone)
+        errorsRef.current.phone = validatePhone
       }
+
+      setTtfPrivacyPolicyError(isSubToTicketFairy ? '' : 'Required')
+      errorsRef.current.privacy = isSubToTicketFairy ? '' : 'Required'
     }
 
     const checkBasicDataValid = (): boolean => {
       if (secondsLeft === 0) {
         return false
       }
+
+      console.log('=== ERRORS ===', errorsRef.current)
 
       if (isTicketFree) {
         if (!firstName || !lastName || !email || !emailConfirmation) {
@@ -729,7 +787,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           return false
         }
 
-        if (Config.IS_BILLING_STREET_NAME_REQUIRED && !street) {
+        if (Config.IS_BILLING_STREET_NAME_REQUIRED && validateEmpty(street)) {
           if (isLoading) {
             setIsLoading(false)
           }
@@ -771,13 +829,16 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       if (isAgeRequired) {
         if (!dateOfBirth) {
+          setDateOfBirthError('Required')
           return 'Please enter your date of birth'
         }
 
-        const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
-        if (ageValidationMessage) {
-          setDateOfBirthError(ageValidationMessage)
-          return ageValidationMessage
+        if (minimumAge) {
+          const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
+          if (ageValidationMessage) {
+            setDateOfBirthError(ageValidationMessage)
+            return ageValidationMessage
+          }
         }
       }
 

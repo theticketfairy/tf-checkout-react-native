@@ -4,13 +4,20 @@ export const emailRegex =
 //https://www.twilio.com/docs/glossary/what-e164
 const phoneRegex = /^\+[1-9]\d{1,14}$/
 
+const emptyRegex = /^\s+$/
+
 export const validateEmpty = (
   value?: string | number,
   message?: string
 ): string => {
   let errorMessage = ''
+
   if (!value) {
-    errorMessage = message || 'Required'
+    return message || 'Required'
+  }
+
+  if (typeof value === 'string') {
+    return emptyRegex.test(value) ? message || 'Required' : ''
   }
   return errorMessage
 }
@@ -94,4 +101,20 @@ export const validatePhoneNumber = ({
   return !phoneRegex.test(`${phoneNumber}`)
     ? customError || 'Please enter a valid phone number'
     : ''
+}
+
+export const validateDropDownEmpty = (
+  selectedOptionId?: string | number
+): string => {
+  if (!selectedOptionId) return 'Required'
+
+  if (typeof selectedOptionId === 'string') {
+    return selectedOptionId === '-1' ? 'Required' : ''
+  }
+
+  if (typeof selectedOptionId === 'number') {
+    return selectedOptionId === -1 ? 'Required' : ''
+  }
+
+  return ''
 }
