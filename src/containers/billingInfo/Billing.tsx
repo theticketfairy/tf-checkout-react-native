@@ -783,8 +783,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           errorsRef.current.confirmEmail ||
           errorsRef.current.city ||
           errorsRef.current.zipCode ||
-          errorsRef.current.state === '-1' ||
-          errorsRef.current.country === '-1' ||
+          errorsRef.current.state ||
+          errorsRef.current.country ||
           errorsRef.current.street
         ) {
           return false
