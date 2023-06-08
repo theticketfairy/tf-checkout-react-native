@@ -653,7 +653,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     //#endregion
 
     //#region Form validation
-    const checkIsStoredPhoneNumberFormat = (storedPhoneNumber: string) => {
+    const checkIsStoredPhoneNumberFormat = (storedPhoneNumber?: string) => {
+      if (!storedPhoneNumber) {
+        handleSetPhoneError(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
+        return false
+      }
+
       if (!storedPhoneNumber.includes('+')) {
         handleSetPhoneError(
           texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
