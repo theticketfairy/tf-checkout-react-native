@@ -1,8 +1,10 @@
 import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import axiosRetry from 'axios-retry'
 import _filter from 'lodash/filter'
+import _forEach from 'lodash/forEach'
 import _get from 'lodash/get'
 import _map from 'lodash/map'
+import _mapKeys from 'lodash/mapKeys'
 import _sortBy from 'lodash/sortBy'
 
 import { IOnCheckoutSuccess } from '..'
@@ -286,16 +288,37 @@ export const registerNewUser = async (
 
   const res: AxiosResponse | void = await Client.post(
     '/v1/oauth/register-rn',
-    data
+    data,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
   ).catch((error: AxiosError) => {
-    resultData.registerNewUserResponseError = error.response?.data.message
+    const messageObject = error.response?.data.message
+    let errorMessage = ''
 
-    if (error.response?.data.message.email) {
+    if (!messageObject) {
       resultData.registerNewUserResponseError = {
-        isAlreadyRegistered: true,
-        message:
-          'It appears this email is already attached to an account. Please log in here to complete your registration.',
-        raw: error.response,
+        message: 'Error registering user',
+      }
+    } else {
+      if (error.response?.data.message.email) {
+        resultData.registerNewUserResponseError = {
+          isAlreadyRegistered: true,
+          message:
+            'It appears this email is already attached to an account. Please log in here to complete your registration.',
+          raw: error.response,
+        }
+      } else {
+        _mapKeys(messageObject, (value) => {
+          _forEach(value, (eachVal) => {
+            errorMessage += `- ${eachVal} \n`
+          })
+        })
+        resultData.registerNewUserResponseError = {
+          message: errorMessage,
+        }
       }
     }
   })
@@ -868,7 +891,7 @@ export const fetchCart = async (): Promise<ICartResponse> => {
     const quantityString = _get(attr, 'cart[0].quantity', '1')
     const tfOptIn = _get(attr, 'ttfOptIn', false)
     const isMarketingOptedIn = _get(attr, 'optedIn', false)
-    const expiresAt = _get(attr, 'expires_at', 420)
+    const expiresAt = _get(attr, 'expiresAt', 420)
 
     cartData = {
       quantity: parseInt(quantityString, 10),

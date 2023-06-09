@@ -68,7 +68,7 @@ const App = () => {
     IOnCheckoutSuccess | undefined
   >(undefined)
 
-  const [isPaymentSuccess, setIsPaymentSuccess] = useState(false)
+  const [isPaymentSuccess, setIsPaymentSuccess] = useState<boolean | undefined>(undefined)
   const [selectedOrderDetails, setSelectedOrderDetails] =
     useState<IMyOrderDetailsData>()
 
@@ -80,6 +80,14 @@ const App = () => {
     boolean | undefined
   >(undefined)
 
+  const resetData = () => {
+    setCartProps(undefined)
+    setIsLoading(false)
+    setSkippingStatus(undefined)
+    setCheckOutProps(undefined)
+    setIsPaymentSuccess(undefined)
+    setComponentToShow(ComponentEnum.Tickets)
+  }
   
   //#region Handlers
   const handleOnPressSellTicket = (ticket: IMyOrderDetailsTicket, isActive: boolean) => {
@@ -106,7 +114,7 @@ const App = () => {
   }
 
   const handleOnComplete = () => {
-    setComponentToShow(ComponentEnum.Tickets)
+    resetData()
   }
 
   const handleOnSelectOrder = (order: IMyOrderDetailsData) => {
@@ -197,7 +205,7 @@ const App = () => {
   }, [checkoutProps])
 
   useEffect(() => {
-    if (isPaymentSuccess) {
+    if (isPaymentSuccess !== undefined && isPaymentSuccess === true) {
       setTimeout(() => {
         setComponentToShow(ComponentEnum.PurchaseConfirmation)
       }, 250)
@@ -217,6 +225,10 @@ const App = () => {
         return (
           <>
           <BillingInfo
+          config={{
+            isCheckoutAlwaysButtonEnabled: true,
+            shouldHideTicketHolderSectionOnSingleTicket: true,
+          }}
             ref={billingRef}
             onCartExpired={handleOnCartExpired}
             onSkippingStatusChange={setSkippingStatus}
@@ -299,7 +311,12 @@ const App = () => {
               cartProps={cartProps!}
               onCheckoutSuccess={handleOnCheckoutSuccess}
               onLoginSuccess={handleOnLoginSuccess}
-              onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}        
+              onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}       
+              onLogoutSuccess={() => {
+                setComponentToShow(ComponentEnum.Tickets)
+                setCartProps(undefined)
+                setCheckOutProps(undefined)
+              }}    
               />
           </>
         )
@@ -353,6 +370,10 @@ const App = () => {
                 },
               },
               payment: {
+                cardStyle: {
+                  backgroundColor: '#FFFFFF',
+                  textColor: '#000000'
+                },
                 title: {
                   color: Color.textMain,
                 },
@@ -361,7 +382,8 @@ const App = () => {
                     backgroundColor: Color.primary,
                   },
                 },
-                cardBackgroundColor: Platform.OS === 'ios' ? Color.white : Color.gray30,
+                
+                
               },
             }}            
             texts={{
