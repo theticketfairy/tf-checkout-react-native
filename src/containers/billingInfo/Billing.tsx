@@ -1,4 +1,3 @@
-/* eslint-disable no-unreachable */
 import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _forEach from 'lodash/forEach'
@@ -66,7 +65,6 @@ import {
   IBillingFormFieldsData,
   IBillingProps,
   ITicketHolderField,
-  ITicketHolderFieldError,
   SkippingStatusType,
 } from './types'
 
@@ -350,16 +348,30 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const handleOnChangePhoneNumber = (
       payload: IOnChangePhoneNumberPayload
     ) => {
+      console.log('handleOnChangePhoneNumber', payload)
+      console.log('phoneErrorCounter.current', phoneErrorCounter.current)
       setPhone(payload.input)
 
+      if (payload.isValid) {
+        console.log('PHON IS VALID')
+        errorsRef.current.phone = ''
+        setPhoneError('')
+
+        return
+      }
+
       if (!payload.isValid && phoneErrorCounter.current > 0) {
+        console.log('phnecx not valid')
+
+        errorsRef.current.phone =
+          texts?.form?.phoneInput?.customError || 'Invalid phone number'
+
         return handleSetPhoneError(
           texts?.form?.phoneInput?.customError || 'Invalid phone number'
         )
       }
 
       phoneErrorCounter.current = phoneErrorCounter.current + 1
-      setPhoneError('')
     }
 
     const handleOnLoadingChange = useCallback(
@@ -392,12 +404,18 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const handleIsSubToTicketFairyToggle = () => {
-      if (!isSubToTicketFairy) {
+      console.log('handleIsSubToTicketFairyToggle')
+      const newValue = !isSubToTicketFairy
+
+      if (newValue) {
+        errorsRef.current.privacy = ''
         setTtfPrivacyPolicyError('')
       } else {
+        errorsRef.current.privacy = 'Required'
         setTtfPrivacyPolicyError('Required')
       }
-      setIsSubToTicketFairy(!isSubToTicketFairy)
+
+      setIsSubToTicketFairy(newValue)
     }
 
     const handleOpenPrivacyLink = async () => {
@@ -413,6 +431,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       userProfile: IUserProfilePublic,
       accessToken?: string
     ) => {
+      console.log('handleSetFormDataFromUserProfile', userProfile)
       storedProfileData.current = userProfile
       setFirstName(userProfile.firstName)
       setLastName(userProfile.lastName)
@@ -450,16 +469,75 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (accessToken) {
         storedToken.current = accessToken
       }
+
+      showErrorMessages({
+        firstName: userProfile.firstName,
+        lastName: userProfile.lastName,
+        email: userProfile.email,
+        confirmEmail: userProfile.email,
+        street: userProfile.streetAddress,
+        city: userProfile.city,
+        selectedCountry: userProfile.countryId
+          ? {
+              label: '',
+              value: userProfile.countryId,
+            }
+          : undefined,
+        selectedState: userProfile.stateId
+          ? {
+              label: '',
+              value: userProfile.stateId,
+            }
+          : undefined,
+        postalCode: userProfile.zipCode,
+        dateOfBirth: dob,
+        phoneNumber: userProfile.phone,
+        isRegistering: !loggedUserFirstName && !storedToken.current,
+        ticketHolderData: ticketHoldersData,
+      })
+    }
+
+    const clearFormErrors = () => {
+      setFirstNameErrorState('')
+      setLastNameErrorState('')
+      setEmailErrorState('')
+      setEmailConfirmationErrorState('')
+      setDateOfBirthError('')
+      setPhoneError('')
+      setStreetErrorState('')
+      setCityErrorState('')
+      setCountryErrorState('')
+      setPostalCodeErrorState('')
+      setStateErrorState('')
+      setTtfPrivacyPolicyError('')
+      errorsRef.current = {
+        firstName: '',
+        lastName: '',
+        email: '',
+        confirmEmail: '',
+        password: '',
+        confirmPassword: '',
+        dateOfBirth: '',
+        phone: '',
+        street: '',
+        city: '',
+        country: '',
+        zipCode: '',
+        state: '',
+        privacy: '',
+      }
     }
 
     const handleOnLoginSuccess = async ({
       userProfile,
       accessTokenData,
     }: ILoginSuccessData) => {
+      clearFormErrors()
+
       let countryCode = 'US'
       const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
       const usrProfile = { ...userProfile }
-
+      console.log('userProfile....', userProfile)
       onLoginSuccess?.({
         userProfile,
         accessTokenData,
@@ -527,8 +605,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setStateId('')
       handleOnSelectDate(undefined)
 
-      //const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
-
       setSelectedCountry({
         value: '-1',
         label: texts?.form?.country || 'Country',
@@ -551,6 +627,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         th.lastName = ''
         th.email = ''
         th.phone = ''
+        th.firstNameError = ''
+        th.lastNameError = ''
       })
       setTicketHoldersData(thData)
       onLogoutSuccess?.()
@@ -561,11 +639,17 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setDateOfBirth(newDate)
 
       if (dateOfBirthError.length > 0 && newDate) {
-        setStreetErrorState('')
+        setDateOfBirthError('')
       }
 
-      const ageError = validateAge(newDate, minimumAge)
-      setDateOfBirthError(ageError)
+      if (minimumAge) {
+        const ageError = validateAge(newDate, minimumAge)
+        setDateOfBirthError(ageError)
+      } else {
+        if (!newDate) {
+          setDateOfBirthError('Required')
+        }
+      }
     }
 
     const handleOnStreetChanged = (text: string) => {
@@ -755,18 +839,49 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       errorsRef.current.state = validateState
 
       if (isPhoneRequired && !isPhoneHidden) {
+        console.log('data.phoneNumber', data.phoneNumber)
+        console.log('phoneCountryCode.current', phoneCountryCode.current)
         const validatePhone = validatePhoneNumber({
           phoneNumber: data.phoneNumber,
           customError: texts?.form?.phoneInput?.customError,
           countryCode: phoneCountryCode.current,
         })
+        console.log('====> validatePhone', validatePhone)
         setPhoneError(validatePhone)
         errorsRef.current.phone = validatePhone
       }
 
-      setTtfPrivacyPolicyError(isSubToTicketFairy ? '' : 'Required')
+      //setTtfPrivacyPolicyError(isSubToTicketFairy ? '' : 'Required')
       errorsRef.current.privacy = isSubToTicketFairy ? '' : 'Required'
+
+      const ticketHoldersDataCopy = [...data.ticketHolderData]
+
+      _map(data.ticketHolderData, (th, index) => {
+        if (isNameRequired) {
+          ticketHoldersDataCopy[index].firstNameError = validateEmpty(
+            th.firstName
+          )
+          ticketHoldersDataCopy[index].lastNameError = validateEmpty(
+            th.lastName
+          )
+        }
+      })
+
+      setTicketHoldersData(ticketHoldersDataCopy)
     }
+
+    useEffect(() => {
+      console.log('isSubToTicketFairy ERROR EFFECT', isSubToTicketFairy)
+      // if (isSubToTicketFairy === true) {
+      //   console.log('isSubToTicketFairy TRUE', isSubToTicketFairy)
+
+      //   setTtfPrivacyPolicyError('')
+      // } else {
+      //   console.log('isSubToTicketFairy FALSE', isSubToTicketFairy)
+
+      //   setTtfPrivacyPolicyError('Required')
+      // }
+    }, [isSubToTicketFairy])
 
     const checkBasicDataValid = (): boolean => {
       if (secondsLeft === 0) {
@@ -794,6 +909,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           errorsRef.current.country ||
           errorsRef.current.street
         ) {
+          console.log('DOS')
           return false
         }
       }
@@ -802,6 +918,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         if (isLoading) {
           setIsLoading(false)
         }
+        console.log('TRES')
+
         return false
       }
 
@@ -1149,22 +1267,36 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         dateOfBirth: dateOfBirth,
         phoneNumber: phone,
         isRegistering: !loggedUserFirstName && !storedToken.current,
+        ticketHolderData: ticketHoldersData,
       })
 
-      if (config.isCheckoutAlwaysButtonEnabled) {
-        if (!checkBasicDataValid()) {
-          return
-        }
-      }
-
+      const isBasicDataValid = checkBasicDataValid()
       const isExtraDataValidErrors = checkExtraDataValid()
-      if (isExtraDataValidErrors) {
+
+      console.log(
+        '%cBilling.tsx line:1222 isBasicDataValid',
+        'color: #007acc;',
+        isBasicDataValid
+      )
+
+      console.log(
+        '%cBilling.tsx line:1222 isExtraDataValidErrors',
+        'color: #29cc00;',
+        isExtraDataValidErrors
+      )
+
+      if (isExtraDataValidErrors || !isBasicDataValid) {
+        console.log('isExtraDataValidErrors || isBasicDataValid')
+
         return
       }
 
       if (loggedUserFirstName && storedToken.current) {
+        console.log('performCheckout')
         await performCheckout()
       } else {
+        console.log('performNewUserRegister')
+
         await performNewUserRegister()
       }
     }
@@ -1283,6 +1415,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           lastName: i === 0 && usrPrfl ? usrPrfl.lastName : '',
           email: i === 0 && usrPrfl ? usrPrfl.email : '',
           phone: i === 0 && usrPrfl ? usrPrfl.phone : '',
+          firstNameError: '',
+          lastNameError: '',
         })
       }
 
@@ -1344,6 +1478,13 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
         const userPhone =
           usrPrfl.phone === null ? phoneCountryDialCode : usrPrfl.phone
+
+        if (userPhone.length <= 5) {
+          phoneCountryCode.current = userPhone
+        }
+
+        console.log('userPhone', userPhone)
+        console.log('userData', usrPrfl)
         handleSetFormDataFromUserProfile({
           ...usrPrfl,
           phone: userPhone,
@@ -1444,21 +1585,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stateId, states])
 
-    const initTicketHoldersErrors = useCallback(() => {
-      if (ticketHoldersData.length > 1) {
-        const tHolders: ITicketHolderFieldError[] = []
-
-        for (let i = 0; i < ticketHoldersData.length; i++) {
-          tHolders.push({
-            firstNameError: '',
-            lastNameError: '',
-          })
-        }
-      }
-    }, [ticketHoldersData])
-
-    initTicketHoldersErrors()
-
     useEffect(() => {
       setCountries([
         {
@@ -1507,8 +1633,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
                 copyTicketHolders[i].firstName = text
+                copyTicketHolders[i].firstNameError = validateEmpty(text)
+
                 setTicketHoldersData(copyTicketHolders)
               }}
+              error={ticketHoldersData[i].firstNameError}
               styles={styles?.inputStyles}
             />
             <Input
@@ -1517,8 +1646,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
                 copyTicketHolders[i].lastName = text
+                copyTicketHolders[i].lastNameError = validateEmpty(text)
+
                 setTicketHoldersData(copyTicketHolders)
               }}
+              error={ticketHoldersData[i].lastNameError}
               styles={styles?.inputStyles}
             />
             <Input

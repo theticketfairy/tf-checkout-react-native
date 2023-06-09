@@ -34,7 +34,6 @@ const PhoneInput: FC<IPhoneInputProps> = ({
         onChangeText={setLocalValue}
         label={texts?.label || 'Phone number'}
         keyboardType='phone-pad'
-        error={error}
         value={localValue}
         labelOffset={{
           x1: Platform.OS === 'ios' ? -40 : -40,
@@ -61,6 +60,7 @@ const PhoneInput: FC<IPhoneInputProps> = ({
             />
           </View>
         )}
+        error={error}
       />
     </View>
   )

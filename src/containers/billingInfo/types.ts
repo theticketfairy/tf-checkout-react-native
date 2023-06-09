@@ -119,7 +119,9 @@ export interface IBillingProps {
 
 export interface ITicketHolderField {
   firstName: string
+  firstNameError: string
   lastName: string
+  lastNameError: string
   email: string
   phone: string
 }
@@ -218,9 +220,11 @@ export interface IBillingFormFieldsData {
   confirmEmail: string
   password?: string
   confirmPassword?: string
-  selectedCountry: IDropdownItem | undefined
-  selectedState: IDropdownItem | undefined
+  selectedCountry?: IDropdownItem | undefined
+  selectedState?: IDropdownItem | undefined
   dateOfBirth: Date | undefined
   phoneNumber: string
+  ticketHolderData: ITicketHolderField[]
+
   isRegistering?: boolean
 }
