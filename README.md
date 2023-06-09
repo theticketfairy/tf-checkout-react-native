@@ -2,7 +2,7 @@
 
 React Native library for Ticket Fairy checkout.
 
-For Single Sign-On (SSO) Please be awere that this is the first version of the implementation, we are working to release a V2, that will cover other use cases, in the near future.
+For Single Sign-On (SSO) Please be aware that this is the first version of the implementation, we are working to release a V2, that will cover other use cases, in the near future.
 
 # Requirements
 
@@ -949,6 +949,11 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
     image1Style?: StyleProp<ImageStyle>
     image2?: ImageSourcePropType
     image2Style?: StyleProp<ImageStyle>
+  }
+
+  config?: {
+    isCheckoutAlwaysButtonEnabled?: boolean
+    shouldHideTicketHolderSectionOnSingleTicket?: boolean 
   }
 />
 ```
@@ -3047,6 +3052,17 @@ Wrap your component with the Core component.
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+## Version 1.0.30
+- Show errors in Billing UI form fields.
+- Add config prop to Billing UI component, includes 2 configuration flags. 
+```
+  config?: {
+    isCheckoutAlwaysButtonEnabled?: boolean
+    shouldHideTicketHolderSectionOnSingleTicket?: boolean 
+  }
+```
+
+- Replacing `"rn-material-ui-textfield": "1.0.5"` library with `"rn-material-ui-textfield": "jorgtz/rn-material-ui-textfield"`, make sure to replace it in all the package.json files.
 
 ## Version 1.0.29
 
