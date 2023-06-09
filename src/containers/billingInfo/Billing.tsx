@@ -759,28 +759,91 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         return false
       }
 
-      const validateStreet = validateEmpty(data.street)
-      const validateCity = validateEmpty(data.city)
-      const validatePostalCode = validateEmpty(data.postalCode)
-
-      if (isTicketFree) {
-        setStreetErrorState(validateStreet)
-        setCityErrorState(validateCity)
-        setPostalCodeErrorState(validatePostalCode)
-
-        errorsRef.current.street = validateStreet
-        errorsRef.current.city = validateCity
-        errorsRef.current.zipCode = validatePostalCode
-        return
-      }
-
       const validateFirstName = validateEmpty(data.firstName)
       const validateLastName = validateEmpty(data.lastName)
+
       const validateEmails = validateEmail(data.email, data.confirmEmail)
       const validateEmailsConfirmation = validateEmail(
         data.confirmEmail,
         data.email
       )
+
+      if (isTicketFree) {
+        setFirstNameErrorState(validateFirstName)
+        setLastNameErrorState(validateLastName)
+        errorsRef.current.firstName = validateFirstName
+        errorsRef.current.lastName = validateLastName
+
+        setEmailErrorState(validateEmails)
+        setEmailConfirmationErrorState(validateEmailsConfirmation)
+        errorsRef.current.email = validateEmails
+        errorsRef.current.confirmEmail = validateEmailsConfirmation
+
+        if (data.isRegistering) {
+          const validatePassword = validatePasswords(
+            data.password,
+            data.confirmPassword
+          )
+          const validatePasswordConfirmation = validatePasswords(
+            data.confirmPassword,
+            data.password
+          )
+
+          setPasswordErrorState(validatePassword)
+          setConfirmPasswordErrorState(validatePasswordConfirmation)
+
+          errorsRef.current.password = validatePassword
+          errorsRef.current.confirmPassword = validatePasswordConfirmation
+        }
+
+        if (isAgeRequired) {
+          if (minimumAge) {
+            const birthdayValidation = validateAge(data.dateOfBirth, minimumAge)
+            setDateOfBirthError(birthdayValidation)
+            errorsRef.current.dateOfBirth = birthdayValidation
+          } else {
+            setDateOfBirthError(data.dateOfBirth ? '' : 'Required')
+            errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : 'Required'
+          }
+        }
+
+        if (isPhoneRequired && !isPhoneHidden) {
+          console.log('data.phoneNumber', data.phoneNumber)
+          console.log('phoneCountryCode.current', phoneCountryCode.current)
+          const validatePhone = validatePhoneNumber({
+            phoneNumber: data.phoneNumber,
+            customError: texts?.form?.phoneInput?.customError,
+            countryCode: phoneCountryCode.current,
+          })
+          console.log('====> validatePhone', validatePhone)
+          setPhoneError(validatePhone)
+          errorsRef.current.phone = validatePhone
+        }
+
+        errorsRef.current.privacy = isSubToTicketFairy ? '' : 'Required'
+
+        if (isNameRequired) {
+          const ticketHoldersDataCopy = [...data.ticketHolderData]
+          _map(data.ticketHolderData, (th, index) => {
+            if (isNameRequired) {
+              ticketHoldersDataCopy[index].firstNameError = validateEmpty(
+                th.firstName
+              )
+              ticketHoldersDataCopy[index].lastNameError = validateEmpty(
+                th.lastName
+              )
+            }
+          })
+
+          setTicketHoldersData(ticketHoldersDataCopy)
+        }
+
+        return
+      } // end of Ticket Free
+
+      const validateStreet = validateEmpty(data.street)
+      const validateCity = validateEmpty(data.city)
+      const validatePostalCode = validateEmpty(data.postalCode)
 
       setStreetErrorState(validateStreet)
       setCityErrorState(validateCity)
@@ -854,20 +917,21 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       //setTtfPrivacyPolicyError(isSubToTicketFairy ? '' : 'Required')
       errorsRef.current.privacy = isSubToTicketFairy ? '' : 'Required'
 
-      const ticketHoldersDataCopy = [...data.ticketHolderData]
+      if (isNameRequired) {
+        const ticketHoldersDataCopy = [...data.ticketHolderData]
+        _map(data.ticketHolderData, (th, index) => {
+          if (isNameRequired) {
+            ticketHoldersDataCopy[index].firstNameError = validateEmpty(
+              th.firstName
+            )
+            ticketHoldersDataCopy[index].lastNameError = validateEmpty(
+              th.lastName
+            )
+          }
+        })
 
-      _map(data.ticketHolderData, (th, index) => {
-        if (isNameRequired) {
-          ticketHoldersDataCopy[index].firstNameError = validateEmpty(
-            th.firstName
-          )
-          ticketHoldersDataCopy[index].lastNameError = validateEmpty(
-            th.lastName
-          )
-        }
-      })
-
-      setTicketHoldersData(ticketHoldersDataCopy)
+        setTicketHoldersData(ticketHoldersDataCopy)
+      }
     }
 
     useEffect(() => {
