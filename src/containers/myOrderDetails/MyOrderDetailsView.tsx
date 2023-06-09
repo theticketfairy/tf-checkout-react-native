@@ -118,7 +118,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
       <Text style={styles?.header?.title}>{title}</Text>
       <Text style={styles?.header?.subTitle}>{subTitle}</Text>
       <Text style={styles?.header?.shareLink?.message}>{referralLink} </Text>
-      {renderShareLink()}
+      {header?.shareLink && renderShareLink()}
       <Text style={styles?.header?.shareLink?.referrals}>
         {soFarText}{' '}
         <Text style={styles?.header?.shareLink?.referralValue}>

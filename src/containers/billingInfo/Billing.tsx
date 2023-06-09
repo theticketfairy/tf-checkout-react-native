@@ -1,4 +1,3 @@
-/* eslint-disable no-unreachable */
 import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _forEach from 'lodash/forEach'
@@ -53,6 +52,7 @@ import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import { emptyPhone } from '../../helpers/StringsHelper'
 import {
   validateAge,
+  validateDropDownEmpty,
   validateEmail,
   validateEmpty,
   validatePasswords,
@@ -62,9 +62,9 @@ import R from '../../res'
 import { IError, IUserProfile, IUserProfilePublic } from '../../types'
 import s from './styles'
 import {
+  IBillingFormFieldsData,
   IBillingProps,
   ITicketHolderField,
-  ITicketHolderFieldError,
   SkippingStatusType,
 } from './types'
 
@@ -115,11 +115,66 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       onLogoutError,
       onCartExpired,
       shouldCartTimerNotMinimizeOnTap,
+      config = {
+        isCheckoutAlwaysButtonEnabled: false,
+        shouldHideTicketHolderSectionOnSingleTicket: false,
+      },
     },
     ref
   ) => {
+    //#region State
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [isSubmittingData, setIsSubmittingData] = useState<boolean>(false)
+    const [loggedUserFirstName, setLoggedUserFirstName] = useState<string>('')
+    const [loginMessage, setLoginMessage] = useState('')
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
+    const [email, setEmail] = useState('')
+    const [emailConfirmation, setEmailConfirmation] = useState('')
+    const [password, setPassword] = useState('')
+    const [passwordConfirmation, setPasswordConfirmation] = useState('')
+    const [isSubToTicketFairy, setIsSubToTicketFairy] = useState(false)
+    const [isSubToBrand, setIsSubToBrand] = useState(false)
+    const [phone, setPhone] = useState('')
+    const [street, setStreet] = useState('')
+    const [city, setCity] = useState('')
+    const [countryId, setCountryId] = useState('')
+    const [stateId, setStateId] = useState('')
+    const [postalCode, setPostalCode] = useState('')
+    const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined)
+    const [selectedCountry, setSelectedCountry] = useState<
+      IDropdownItem | undefined
+    >(undefined)
+    const [selectedState, setSelectedState] = useState<
+      IDropdownItem | undefined
+    >(undefined)
+
+    const [ticketHoldersData, setTicketHoldersData] = useState<
+      ITicketHolderField[]
+    >([])
+
+    const [numberOfTicketHolders, setNumberOfTicketHolders] = useState<
+      number | undefined
+    >(0)
+
+    const [states, setStates] = useState<IDropdownItem[]>([])
+    const [countries, setCountries] = useState<IDropdownItem[]>([])
+
+    const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
+    const [skippingStatus, setSkippingStatus] =
+      useState<SkippingStatusType>(undefined)
+    const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
+    //#endregion State
+
     //#region Labels
     const holderLabels = useMemo(() => {
+      if (
+        numberOfTicketHolders === 1 &&
+        config.shouldHideTicketHolderSectionOnSingleTicket
+      ) {
+        return null
+      }
+
       const optional = isNameRequired
         ? ''
         : texts?.form?.optional || '(optional)'
@@ -137,7 +192,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           ? `${texts.form.holderPhone} ${texts?.form?.optional || '(optional)'}`
           : `Phone ${optional}`,
       }
-    }, [isNameRequired, texts])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isNameRequired, texts, numberOfTicketHolders])
 
     const brandCheckBoxText =
       texts?.form?.isSubToBrand ||
@@ -161,56 +217,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         ? `${texts.form.street} ${optionalAddress}`
         : `Street ${optionalAddress}`
     }, [texts])
-
-    //#endregion
-
-    //#region State
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [isSubmittingData, setIsSubmittingData] = useState<boolean>(false)
-    const [loggedUserFirstName, setLoggedUserFirstName] = useState<string>('')
-    const [loginMessage, setLoginMessage] = useState('')
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
-    const [email, setEmail] = useState('')
-    const [emailConfirmation, setEmailConfirmation] = useState('')
-    const [password, setPassword] = useState('')
-    const [passwordConfirmation, setPasswordConfirmation] = useState('')
-    const [isSubToTicketFairy, setIsSubToTicketFairy] = useState(false)
-    const [isSubToBrand, setIsSubToBrand] = useState(false)
-    const [phone, setPhone] = useState('')
-    const [street, setStreet] = useState('')
-    const [city, setCity] = useState('')
-    const [countryId, setCountryId] = useState('')
-    const [stateId, setStateId] = useState('')
-    const [postalCode, setPostalCode] = useState('')
-    const [dateOfBirth, setDateOfBirth] = useState(new Date())
-    const [selectedCountry, setSelectedCountry] = useState<
-      IDropdownItem | undefined
-    >(undefined)
-    const [selectedState, setSelectedState] = useState<
-      IDropdownItem | undefined
-    >(undefined)
-
-    const [ticketHoldersData, setTicketHoldersData] = useState<
-      ITicketHolderField[]
-    >([])
-
-    const [numberOfTicketHolders, setNumberOfTicketHolders] = useState<
-      number | undefined
-    >()
-
-    const [states, setStates] = useState<IDropdownItem[]>([])
-    const [countries, setCountries] = useState<IDropdownItem[]>([])
-
-    const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
-    const [skippingStatus, setSkippingStatus] =
-      useState<SkippingStatusType>(undefined)
-    const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
+    //#endregion Labels
 
     // Cart expiration timer
     const [secondsLeft, setSecondsLeft] = React.useState(420)
 
-    // Errors state
+    //#region Errors state
     const firstNameError = useDebounced(firstName, validateEmpty)
     const lastNameError = useDebounced(lastName, validateEmpty)
     const emailError = useDebounced(email, () =>
@@ -229,17 +241,38 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const streetError = useDebounced(street, validateEmpty)
     const cityError = useDebounced(city, validateEmpty)
     const postalCodeError = useDebounced(postalCode, validateEmpty)
-    const [dateOfBirthError, setDateOfBirthError] = useState('')
     const [ttfPrivacyPolicyError, setTtfPrivacyPolicyError] = useState('')
-    // End of errors state
+
+    const [firstNameErrorState, setFirstNameErrorState] = useState('')
+    const [lastNameErrorState, setLastNameErrorState] = useState('')
+    const [streetErrorState, setStreetErrorState] = useState('')
+    const [dateOfBirthError, setDateOfBirthError] = useState('')
+    const [emailErrorState, setEmailErrorState] = useState('')
+    const [emailConfirmationErrorState, setEmailConfirmationErrorState] =
+      useState('')
+    const [cityErrorState, setCityErrorState] = useState('')
+    const [postalCodeErrorState, setPostalCodeErrorState] = useState('')
+    const [countryErrorState, setCountryErrorState] = useState('')
+    const [stateErrorState, setStateErrorState] = useState('')
+    const [passwordErrorState, setPasswordErrorState] = useState('')
+    const [confirmPasswordErrorState, setConfirmPasswordErrorState] =
+      useState('')
+
+    //#endregion Errors state
     //#endregion
 
     const getSkippingStatus = (numOfTickets: number): SkippingStatusType => {
+      // DO NOT SKIP IF
+      // * User is not logged in.
+      // * Event Collect_names is turned on and tickets are more than one.
+      // * Event validate_age is turned on.
+      // * phone_required is turned on and customer does not have a phone number.
+
       if (isBillingRequired || skippingStatus === 'fail') {
         return 'false'
       }
 
-      if (numOfTickets > 1 || isAgeRequired) {
+      if ((isNameRequired && numOfTickets > 1) || isAgeRequired) {
         return 'false'
       } else {
         return 'skipping'
@@ -252,6 +285,24 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const phoneErrorCounter = useRef(0)
     const billingCoreRef = useRef<BillingCoreHandle>(null)
     const sessionHandleRef = useRef<SessionHandleType>(null)
+    const phoneCountryCode = useRef('')
+    const errorsRef = useRef({
+      firstName: '',
+      lastName: '',
+      email: '',
+      confirmEmail: '',
+      password: '',
+      confirmPassword: '',
+      dateOfBirth: '',
+      phone: '',
+      street: '',
+      city: '',
+      country: '',
+      zipCode: '',
+      state: '',
+      privacy: '',
+    })
+
     //#endregion
 
     //#region Imperative Handler
@@ -298,13 +349,24 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       payload: IOnChangePhoneNumberPayload
     ) => {
       setPhone(payload.input)
+
+      if (payload.isValid) {
+        errorsRef.current.phone = ''
+        setPhoneError('')
+
+        return
+      }
+
       if (!payload.isValid && phoneErrorCounter.current > 0) {
+        errorsRef.current.phone =
+          texts?.form?.phoneInput?.customError || 'Invalid phone number'
+
         return handleSetPhoneError(
           texts?.form?.phoneInput?.customError || 'Invalid phone number'
         )
       }
+
       phoneErrorCounter.current = phoneErrorCounter.current + 1
-      setPhoneError('')
     }
 
     const handleOnLoadingChange = useCallback(
@@ -337,7 +399,17 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const handleIsSubToTicketFairyToggle = () => {
-      setIsSubToTicketFairy(!isSubToTicketFairy)
+      const newValue = !isSubToTicketFairy
+
+      if (newValue) {
+        errorsRef.current.privacy = ''
+        setTtfPrivacyPolicyError('')
+      } else {
+        errorsRef.current.privacy = 'Required'
+        setTtfPrivacyPolicyError('Required')
+      }
+
+      setIsSubToTicketFairy(newValue)
     }
 
     const handleOpenPrivacyLink = async () => {
@@ -366,6 +438,18 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setStateId(userProfile.stateId)
       setLoggedUserFirstName(userProfile.firstName)
 
+      let dob: Date | undefined
+
+      if (userProfile.dateOfBirth) {
+        const dobSplitted = userProfile.dateOfBirth.split('-')
+        dob = new Date(
+          parseInt(dobSplitted[0]!, 10),
+          parseInt(dobSplitted[1]!, 10) - 1,
+          parseInt(dobSplitted[2]!, 10)
+        )
+        handleOnSelectDate(dob)
+      }
+
       const thData = [...ticketHoldersData]
       thData.forEach((th, index) => {
         th.firstName = index === 0 ? userProfile.firstName : ''
@@ -378,13 +462,72 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (accessToken) {
         storedToken.current = accessToken
       }
+
+      showErrorMessages({
+        firstName: userProfile.firstName,
+        lastName: userProfile.lastName,
+        email: userProfile.email,
+        confirmEmail: userProfile.email,
+        street: userProfile.streetAddress,
+        city: userProfile.city,
+        selectedCountry: userProfile.countryId
+          ? {
+              label: '',
+              value: userProfile.countryId,
+            }
+          : undefined,
+        selectedState: userProfile.stateId
+          ? {
+              label: '',
+              value: userProfile.stateId,
+            }
+          : undefined,
+        postalCode: userProfile.zipCode,
+        dateOfBirth: dob,
+        phoneNumber: userProfile.phone,
+        isRegistering: !loggedUserFirstName && !storedToken.current,
+        ticketHolderData: ticketHoldersData,
+      })
+    }
+
+    const clearFormErrors = () => {
+      setFirstNameErrorState('')
+      setLastNameErrorState('')
+      setEmailErrorState('')
+      setEmailConfirmationErrorState('')
+      setDateOfBirthError('')
+      setPhoneError('')
+      setStreetErrorState('')
+      setCityErrorState('')
+      setCountryErrorState('')
+      setPostalCodeErrorState('')
+      setStateErrorState('')
+      setTtfPrivacyPolicyError('')
+      errorsRef.current = {
+        firstName: '',
+        lastName: '',
+        email: '',
+        confirmEmail: '',
+        password: '',
+        confirmPassword: '',
+        dateOfBirth: '',
+        phone: '',
+        street: '',
+        city: '',
+        country: '',
+        zipCode: '',
+        state: '',
+        privacy: '',
+      }
     }
 
     const handleOnLoginSuccess = async ({
       userProfile,
       accessTokenData,
     }: ILoginSuccessData) => {
-      let phoneCountry = 'US'
+      clearFormErrors()
+
+      let countryCode = 'US'
       const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
       const usrProfile = { ...userProfile }
 
@@ -395,14 +538,19 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       try {
         const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY)
-        phoneCountry = deviceCountry.code.toUpperCase()
+        countryCode = deviceCountry.code.toUpperCase()
       } catch (err) {
-        phoneCountry = 'US'
+        countryCode = 'US'
       }
-      if (!usrProfile.phone?.includes('+')) {
-        usrProfile.phone = `${getCountryDialCode(phoneCountry)}${
-          usrProfile.phone
-        }`
+
+      if (!userProfile.phone) {
+        usrProfile.phone = ''
+      } else {
+        if (!usrProfile.phone?.includes('+')) {
+          usrProfile.phone = `${getCountryDialCode(countryCode)}${
+            usrProfile.phone
+          }`
+        }
       }
 
       if (!isBillingRequired && skippingStatus === 'fail') {
@@ -413,13 +561,9 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           customError: texts?.form?.phoneInput?.customError,
         })
 
-        if (phoneValidError) {
+        if (phoneValidError && isPhoneRequired) {
           setIsLoading(false)
-          showAlert(
-            texts?.invalidPhoneNumberError ||
-              'Please enter a valid phone number'
-          )
-          return handleSetPhoneError(
+          handleSetPhoneError(
             texts?.invalidPhoneNumberError ||
               'Please enter a valid phone number'
           )
@@ -452,8 +596,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setPasswordConfirmation('')
       setCountryId('')
       setStateId('')
-
-      const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
+      handleOnSelectDate(undefined)
 
       setSelectedCountry({
         value: '-1',
@@ -477,20 +620,124 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         th.lastName = ''
         th.email = ''
         th.phone = ''
+        th.firstNameError = ''
+        th.lastNameError = ''
       })
       setTicketHoldersData(thData)
       onLogoutSuccess?.()
     }
 
-    const handleOnSelectDate = (newDate: Date) => {
-      const ageError = validateAge(newDate, minimumAge)
+    //#region Handlers input changed
+    const handleOnSelectDate = (newDate: Date | undefined) => {
       setDateOfBirth(newDate)
-      setDateOfBirthError(ageError)
+
+      if (dateOfBirthError.length > 0 && newDate) {
+        setDateOfBirthError('')
+      }
+
+      if (minimumAge) {
+        const ageError = validateAge(newDate, minimumAge)
+        setDateOfBirthError(ageError)
+      } else {
+        if (!newDate) {
+          setDateOfBirthError('Required')
+        }
+      }
     }
+
+    const handleOnStreetChanged = (text: string) => {
+      if (streetErrorState.length > 0 && text.length > 0) {
+        setStreetErrorState('')
+      }
+      setStreet(text)
+    }
+
+    const handleOnCityChanged = (text: string) => {
+      if (cityErrorState.length > 0 && text.length > 0) {
+        setCityErrorState('')
+      }
+      setCity(text)
+    }
+
+    const handleOnFirstNameChanged = (text: string) => {
+      if (firstNameErrorState.length > 0 && text.length > 0) {
+        setFirstNameErrorState('')
+      }
+      setFirstName(text)
+    }
+
+    const handleOnLastNameChanged = (text: string) => {
+      if (lastNameErrorState.length > 0 && text.length > 0) {
+        setLastNameErrorState('')
+      }
+      setLastName(text)
+    }
+
+    const handleOnEmailChanged = (text: string) => {
+      if (emailErrorState.length > 0 && text.length > 0) {
+        setEmailErrorState('')
+      }
+      setEmail(text)
+    }
+
+    const handleOnEmailConfirmationChanged = (text: string) => {
+      if (emailConfirmationErrorState.length > 0 && text.length > 0) {
+        setEmailConfirmationErrorState('')
+      }
+      setEmailConfirmation(text)
+    }
+
+    const handleOnPostalCodeChanged = (text: string) => {
+      if (postalCodeErrorState.length > 0 && text.length > 0) {
+        setPostalCodeErrorState('')
+      }
+      setPostalCode(text)
+    }
+
+    const handleOnStateChanged = (itm: IDropdownItem) => {
+      if (stateErrorState.length > 0 && itm.value !== '-1') {
+        setStateErrorState('')
+      } else if (itm.value === '-1') {
+        setStateErrorState('Required')
+      }
+      setSelectedState(itm)
+    }
+
+    const handleOnCountryChanged = (itm: IDropdownItem) => {
+      if (countryErrorState.length > 0 && itm.value !== '-1') {
+        setCountryErrorState('')
+      } else if (itm.value === '-1') {
+        setCountryErrorState('Required')
+      }
+      setSelectedCountry(itm)
+    }
+
+    const handleOnPasswordChanged = (text: string) => {
+      if (passwordErrorState.length > 0 && text.length > 0) {
+        setPasswordErrorState('')
+      }
+      setPassword(text)
+    }
+
+    const handleOnConfirmPasswordChanged = (text: string) => {
+      if (confirmPasswordErrorState.length > 0 && text.length > 0) {
+        setConfirmPasswordErrorState('')
+      }
+      setPasswordConfirmation(text)
+    }
+    //#endregion Handlers input changed
+
     //#endregion
 
     //#region Form validation
-    const checkIsStoredPhoneNumberFormat = (storedPhoneNumber: string) => {
+    const checkIsStoredPhoneNumberFormat = (storedPhoneNumber?: string) => {
+      if (!storedPhoneNumber) {
+        handleSetPhoneError(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
+        return false
+      }
+
       if (!storedPhoneNumber.includes('+')) {
         handleSetPhoneError(
           texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
@@ -500,44 +747,216 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       return true
     }
 
+    const showErrorMessages = (data: IBillingFormFieldsData) => {
+      if (secondsLeft === 0) {
+        return false
+      }
+
+      const validateFirstName = validateEmpty(data.firstName)
+      const validateLastName = validateEmpty(data.lastName)
+
+      const validateEmails = validateEmail(data.email, data.confirmEmail)
+      const validateEmailsConfirmation = validateEmail(
+        data.confirmEmail,
+        data.email
+      )
+
+      if (isTicketFree) {
+        setFirstNameErrorState(validateFirstName)
+        setLastNameErrorState(validateLastName)
+        errorsRef.current.firstName = validateFirstName
+        errorsRef.current.lastName = validateLastName
+
+        setEmailErrorState(validateEmails)
+        setEmailConfirmationErrorState(validateEmailsConfirmation)
+        errorsRef.current.email = validateEmails
+        errorsRef.current.confirmEmail = validateEmailsConfirmation
+
+        if (data.isRegistering) {
+          const validatePassword = validatePasswords(
+            data.password,
+            data.confirmPassword
+          )
+          const validatePasswordConfirmation = validatePasswords(
+            data.confirmPassword,
+            data.password
+          )
+
+          setPasswordErrorState(validatePassword)
+          setConfirmPasswordErrorState(validatePasswordConfirmation)
+
+          errorsRef.current.password = validatePassword
+          errorsRef.current.confirmPassword = validatePasswordConfirmation
+        }
+
+        if (isAgeRequired) {
+          if (minimumAge) {
+            const birthdayValidation = validateAge(data.dateOfBirth, minimumAge)
+            setDateOfBirthError(birthdayValidation)
+            errorsRef.current.dateOfBirth = birthdayValidation
+          } else {
+            setDateOfBirthError(data.dateOfBirth ? '' : 'Required')
+            errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : 'Required'
+          }
+        }
+
+        if (isPhoneRequired && !isPhoneHidden) {
+          const validatePhone = validatePhoneNumber({
+            phoneNumber: data.phoneNumber,
+            customError: texts?.form?.phoneInput?.customError,
+            countryCode: phoneCountryCode.current,
+          })
+          setPhoneError(validatePhone)
+          errorsRef.current.phone = validatePhone
+        }
+
+        errorsRef.current.privacy = isSubToTicketFairy ? '' : 'Required'
+
+        if (isNameRequired) {
+          const ticketHoldersDataCopy = [...data.ticketHolderData]
+          _map(data.ticketHolderData, (th, index) => {
+            if (isNameRequired) {
+              ticketHoldersDataCopy[index].firstNameError = validateEmpty(
+                th.firstName
+              )
+              ticketHoldersDataCopy[index].lastNameError = validateEmpty(
+                th.lastName
+              )
+            }
+          })
+
+          setTicketHoldersData(ticketHoldersDataCopy)
+        }
+
+        return
+      } // end of Ticket Free
+
+      const validateStreet = validateEmpty(data.street)
+      const validateCity = validateEmpty(data.city)
+      const validatePostalCode = validateEmpty(data.postalCode)
+
+      setStreetErrorState(validateStreet)
+      setCityErrorState(validateCity)
+      setPostalCodeErrorState(validatePostalCode)
+      setFirstNameErrorState(validateFirstName)
+      setLastNameErrorState(validateLastName)
+      setEmailErrorState(validateEmails)
+      setEmailConfirmationErrorState(validateEmailsConfirmation)
+
+      errorsRef.current.street = validateStreet
+      errorsRef.current.city = validateCity
+      errorsRef.current.zipCode = validatePostalCode
+      errorsRef.current.firstName = validateFirstName
+      errorsRef.current.lastName = validateLastName
+      errorsRef.current.email = validateEmails
+      errorsRef.current.confirmEmail = validateEmailsConfirmation
+
+      if (data.isRegistering) {
+        const validatePassword = validatePasswords(
+          data.password,
+          data.confirmPassword
+        )
+        const validatePasswordConfirmation = validatePasswords(
+          data.confirmPassword,
+          data.password
+        )
+
+        setPasswordErrorState(validatePassword)
+        setConfirmPasswordErrorState(validatePasswordConfirmation)
+
+        errorsRef.current.password = validatePassword
+        errorsRef.current.confirmPassword = validatePasswordConfirmation
+      }
+
+      const countryValidation = validateDropDownEmpty(
+        data.selectedCountry?.value
+      )
+
+      setCountryErrorState(countryValidation)
+      errorsRef.current.country = countryValidation
+
+      if (isAgeRequired) {
+        if (minimumAge) {
+          const birthdayValidation = validateAge(data.dateOfBirth, minimumAge)
+          setDateOfBirthError(birthdayValidation)
+          errorsRef.current.dateOfBirth = birthdayValidation
+        } else {
+          setDateOfBirthError(data.dateOfBirth ? '' : 'Required')
+          errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : 'Required'
+        }
+      }
+
+      const validateState = validateDropDownEmpty(data.selectedState?.value)
+
+      setStateErrorState(validateState)
+      errorsRef.current.state = validateState
+
+      if (isPhoneRequired && !isPhoneHidden) {
+        const validatePhone = validatePhoneNumber({
+          phoneNumber: data.phoneNumber,
+          customError: texts?.form?.phoneInput?.customError,
+          countryCode: phoneCountryCode.current,
+        })
+
+        setPhoneError(validatePhone)
+        errorsRef.current.phone = validatePhone
+      }
+
+      //setTtfPrivacyPolicyError(isSubToTicketFairy ? '' : 'Required')
+      errorsRef.current.privacy = isSubToTicketFairy ? '' : 'Required'
+
+      if (isNameRequired) {
+        const ticketHoldersDataCopy = [...data.ticketHolderData]
+        _map(data.ticketHolderData, (th, index) => {
+          if (isNameRequired) {
+            ticketHoldersDataCopy[index].firstNameError = validateEmpty(
+              th.firstName
+            )
+            ticketHoldersDataCopy[index].lastNameError = validateEmpty(
+              th.lastName
+            )
+          }
+        })
+
+        setTicketHoldersData(ticketHoldersDataCopy)
+      }
+    }
+
     const checkBasicDataValid = (): boolean => {
       if (secondsLeft === 0) {
         return false
       }
 
       if (isTicketFree) {
-        if (!firstName || !lastName || !email || !emailConfirmation) {
+        if (
+          errorsRef.current.firstName ||
+          errorsRef.current.lastName ||
+          errorsRef.current.email ||
+          errorsRef.current.confirmEmail
+        ) {
           return false
         }
       } else {
         if (
-          !firstName ||
-          !lastName ||
-          !email ||
-          !emailConfirmation ||
-          !city ||
-          !postalCode ||
-          selectedState?.value === '-1' ||
-          selectedCountry?.value === '-1'
+          errorsRef.current.firstName ||
+          errorsRef.current.lastName ||
+          errorsRef.current.email ||
+          errorsRef.current.confirmEmail ||
+          errorsRef.current.city ||
+          errorsRef.current.zipCode ||
+          errorsRef.current.state ||
+          errorsRef.current.country ||
+          errorsRef.current.street
         ) {
-          return false
-        }
-
-        if (Config.IS_BILLING_STREET_NAME_REQUIRED && !street) {
-          setIsLoading(false)
           return false
         }
       }
 
-      if (
-        isPhoneRequired &&
-        !isPhoneHidden &&
-        validatePhoneNumber({
-          phoneNumber: phone,
-          customError: texts?.form?.phoneInput?.customError,
-        })
-      ) {
-        setIsLoading(false)
+      if (isPhoneRequired && !isPhoneHidden && errorsRef.current.phone) {
+        if (isLoading) {
+          setIsLoading(false)
+        }
+
         return false
       }
 
@@ -553,17 +972,32 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         setTtfPrivacyPolicyError(
           texts?.form?.ttfPrivacyPolicyRequiredError || 'Required'
         )
-        return 'Please accept our Privacy Policy'
+        return 'Please review the errors'
       }
+
       if (isAgeRequired) {
-        const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
-        if (ageValidationMessage) {
-          setDateOfBirthError(ageValidationMessage)
-          return ageValidationMessage
+        if (!dateOfBirth) {
+          setDateOfBirthError('Required')
+          return 'Please enter your date of birth'
+        }
+
+        if (minimumAge) {
+          const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
+          if (ageValidationMessage) {
+            setDateOfBirthError(ageValidationMessage)
+            return ageValidationMessage
+          }
         }
       }
 
       if (!isNameRequired) {
+        return ''
+      }
+
+      if (
+        ticketHoldersData.length === 1 &&
+        config.shouldHideTicketHolderSectionOnSingleTicket
+      ) {
         return ''
       }
 
@@ -649,8 +1083,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       if (!registerNewUserResponseData) {
         setIsSubmittingData(false)
-        handleOnRegisterFail('Register returned no data')
-        return showAlert('Register returned no data')
+        handleOnRegisterFail('Register user returned no data')
+        return showAlert('Register user returned no data')
       }
 
       storedToken.current =
@@ -701,20 +1135,38 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         delete body.attributes.phone
       }
 
+      if (isAgeRequired && dateOfBirth) {
+        body.attributes.dob_day = dateOfBirth.getDate()
+        body.attributes.dob_month = dateOfBirth.getMonth() + 1
+        body.attributes.dob_year = dateOfBirth.getFullYear()
+      }
+
       return body
     }
 
     const getCheckoutBody = (): ICheckoutBody => {
       let parsedTicketHolders: ICheckoutTicketHolder[] = []
 
-      for (let i = 0; i <= numberOfTicketHolders! - 1; i++) {
-        const individualHolder = {
-          first_name: ticketHoldersData[i].firstName || '',
-          last_name: ticketHoldersData[i].lastName || '',
-          phone: ticketHoldersData[i].phone || '',
-          email: ticketHoldersData[i].email || '',
+      if (
+        config.shouldHideTicketHolderSectionOnSingleTicket &&
+        numberOfTicketHolders
+      ) {
+        parsedTicketHolders.push({
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone,
+          email: email,
+        })
+      } else {
+        for (let i = 0; i <= numberOfTicketHolders! - 1; i++) {
+          const individualHolder = {
+            first_name: ticketHoldersData[i].firstName || '',
+            last_name: ticketHoldersData[i].lastName || '',
+            phone: ticketHoldersData[i].phone || '',
+            email: ticketHoldersData[i].email || '',
+          }
+          parsedTicketHolders.push(individualHolder)
         }
-        parsedTicketHolders.push(individualHolder)
       }
 
       const formattedPhone = isPhoneRequired ? phone : emptyPhone(phone)
@@ -752,7 +1204,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             },
           }
 
-      if (isAgeRequired) {
+      if (isAgeRequired && dateOfBirth) {
         checkoutBody.attributes.dob_day = dateOfBirth.getDate()
         checkoutBody.attributes.dob_month = dateOfBirth.getMonth() + 1
         checkoutBody.attributes.dob_year = dateOfBirth.getFullYear()
@@ -837,9 +1289,29 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const onSubmit = async () => {
-      const isExtraDataValid = checkExtraDataValid()
-      if (isExtraDataValid) {
-        return showAlert(isExtraDataValid)
+      showErrorMessages({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        confirmEmail: emailConfirmation,
+        password: password,
+        confirmPassword: passwordConfirmation,
+        street: street,
+        city: city,
+        selectedCountry: selectedCountry,
+        selectedState: selectedState,
+        postalCode: postalCode,
+        dateOfBirth: dateOfBirth,
+        phoneNumber: phone,
+        isRegistering: !loggedUserFirstName && !storedToken.current,
+        ticketHolderData: ticketHoldersData,
+      })
+
+      const isBasicDataValid = checkBasicDataValid()
+      const isExtraDataValidErrors = checkExtraDataValid()
+
+      if (isExtraDataValidErrors || !isBasicDataValid) {
+        return
       }
 
       if (loggedUserFirstName && storedToken.current) {
@@ -963,6 +1435,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           lastName: i === 0 && usrPrfl ? usrPrfl.lastName : '',
           email: i === 0 && usrPrfl ? usrPrfl.email : '',
           phone: i === 0 && usrPrfl ? usrPrfl.phone : '',
+          firstNameError: '',
+          lastNameError: '',
         })
       }
 
@@ -986,7 +1460,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (usrPrfl) {
         if (!isPhoneHidden && isPhoneRequired) {
           if (!checkIsStoredPhoneNumberFormat(usrPrfl.phone)) {
-            showAlert(
+            setPhoneError(
               texts?.invalidPhoneNumberError ||
                 'Please enter a valid phone number'
             )
@@ -1022,13 +1496,20 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           }
         }
 
-        const userPhone = usrPrfl.phone === null ? '' : usrPrfl.phone
+        const userPhone =
+          usrPrfl.phone === null ? phoneCountryDialCode : usrPrfl.phone
+
+        if (userPhone.length <= 5) {
+          phoneCountryCode.current = userPhone
+        }
+
         handleSetFormDataFromUserProfile({
           ...usrPrfl,
-          phone: `${phoneCountryDialCode}${userPhone}`,
+          phone: userPhone,
         })
       } else {
         // There is no user profile data
+        phoneCountryCode.current = phoneCountryDialCode
         setPhone(phoneCountryDialCode)
       }
 
@@ -1059,6 +1540,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       } else {
         setCountryByEvent()
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [countries, countryId])
 
     useEffect(() => {
@@ -1121,21 +1603,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stateId, states])
 
-    const initTicketHoldersErrors = useCallback(() => {
-      if (ticketHoldersData.length > 1) {
-        const tHolders: ITicketHolderFieldError[] = []
-
-        for (let i = 0; i < ticketHoldersData.length; i++) {
-          tHolders.push({
-            firstNameError: '',
-            lastNameError: '',
-          })
-        }
-      }
-    }, [ticketHoldersData])
-
-    initTicketHoldersErrors()
-
     useEffect(() => {
       setCountries([
         {
@@ -1154,9 +1621,19 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }, [])
     //#endregion
 
+    const isDataValid = checkBasicDataValid()
+
+    const isButtonDisabled = config.isCheckoutAlwaysButtonEnabled
+      ? false
+      : !isDataValid
+
     //#region RENDER
     const renderTicketHolders = () => {
-      if (!numberOfTicketHolders) {
+      if (
+        !numberOfTicketHolders ||
+        !holderLabels ||
+        ticketHoldersData.length === 0
+      ) {
         return null
       }
 
@@ -1174,8 +1651,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
                 copyTicketHolders[i].firstName = text
+                copyTicketHolders[i].firstNameError = validateEmpty(text)
+
                 setTicketHoldersData(copyTicketHolders)
               }}
+              error={ticketHoldersData[i].firstNameError}
               styles={styles?.inputStyles}
             />
             <Input
@@ -1184,8 +1664,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
                 copyTicketHolders[i].lastName = text
+                copyTicketHolders[i].lastNameError = validateEmpty(text)
+
                 setTicketHoldersData(copyTicketHolders)
               }}
+              error={ticketHoldersData[i].lastNameError}
               styles={styles?.inputStyles}
             />
             <Input
@@ -1215,7 +1698,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         )
       }
 
-      return tHolders
+      return (
+        <>
+          <Text style={styles?.ticketHoldersTitle}>
+            {texts?.form?.ticketHoldersTitle || 'Ticket Holders'}
+          </Text>
+          {tHolders}
+        </>
+      )
     }
 
     const renderCheckingOut = () => {
@@ -1269,15 +1759,15 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             <Input
               label={texts?.form?.firstName || 'First name'}
               value={firstName}
-              onChangeText={setFirstName}
-              error={firstNameError}
+              onChangeText={handleOnFirstNameChanged}
+              error={firstNameError || firstNameErrorState}
               styles={styles?.inputStyles}
             />
             <Input
               label={texts?.form?.lastName || 'Last name'}
               value={lastName}
-              onChangeText={setLastName}
-              error={lastNameError}
+              onChangeText={handleOnLastNameChanged}
+              error={lastNameError || lastNameErrorState}
               styles={styles?.inputStyles}
             />
 
@@ -1289,18 +1779,18 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             <Input
               label={texts?.form?.email || 'Email'}
               value={email}
-              onChangeText={setEmail}
+              onChangeText={handleOnEmailChanged}
               keyboardType='email-address'
-              error={emailError}
+              error={emailError || emailErrorState}
               styles={styles?.inputStyles}
               autoCapitalize='none'
             />
             <Input
               label={texts?.form?.confirmEmail || 'Confirm email'}
               value={emailConfirmation}
-              onChangeText={setEmailConfirmation}
+              onChangeText={handleOnEmailConfirmationChanged}
               keyboardType='email-address'
-              error={confirmEmailError}
+              error={confirmEmailError || emailConfirmationErrorState}
               styles={styles?.inputStyles}
               autoCapitalize='none'
             />
@@ -1322,8 +1812,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 <Input
                   label={texts?.form?.password || 'Password'}
                   isSecure
-                  onChangeText={setPassword}
-                  error={passwordError}
+                  onChangeText={handleOnPasswordChanged}
+                  error={passwordError || passwordErrorState}
                   styles={styles?.inputStyles}
                   autoCapitalize='none'
                   secureTextEntry={true}
@@ -1332,8 +1822,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 <Input
                   label={texts?.form?.confirmPassword || 'Confirm password'}
                   isSecure
-                  onChangeText={setPasswordConfirmation}
-                  error={confirmPasswordError}
+                  onChangeText={handleOnConfirmPasswordChanged}
+                  error={confirmPasswordError || confirmPasswordErrorState}
                   styles={styles?.inputStyles}
                   autoCapitalize='none'
                   secureTextEntry={true}
@@ -1360,40 +1850,42 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 <Input
                   label={addressLabel}
                   value={street}
-                  onChangeText={setStreet}
-                  error={streetError}
+                  onChangeText={handleOnStreetChanged}
+                  error={streetError || streetErrorState}
                   styles={styles?.inputStyles}
                 />
                 <Input
                   label={texts?.form?.city || 'City'}
                   value={city}
-                  onChangeText={setCity}
-                  error={cityError}
+                  onChangeText={handleOnCityChanged}
+                  error={cityError || cityErrorState}
                   styles={styles?.inputStyles}
                 />
                 <DropdownMaterial
                   items={countries}
-                  onSelectItem={setSelectedCountry}
+                  onSelectItem={handleOnCountryChanged}
                   selectedOption={selectedCountry}
                   styles={styles?.dropdownMaterialStyles}
                   materialInputProps={{
                     label: texts?.form?.country || 'Country',
+                    error: countryErrorState,
                   }}
                 />
                 <Input
                   label={texts?.form?.zipCode || 'Postal Code / Zip Code'}
                   value={postalCode}
-                  onChangeText={setPostalCode}
-                  error={postalCodeError}
+                  onChangeText={handleOnPostalCodeChanged}
+                  error={postalCodeError || postalCodeErrorState}
                   styles={styles?.inputStyles}
                 />
                 <DropdownMaterial
                   items={states}
-                  onSelectItem={setSelectedState}
+                  onSelectItem={handleOnStateChanged}
                   selectedOption={selectedState}
                   styles={styles?.dropdownMaterialStyles}
                   materialInputProps={{
                     label: texts?.form?.state || 'State',
+                    error: stateErrorState,
                   }}
                 />
               </>
@@ -1410,7 +1902,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 onPress={handleIsSubToTicketFairyToggle}
                 isActive={isSubToTicketFairy}
                 customTextComp={
-                  <Text style={styles?.customCheckbox?.text}>
+                  <Text
+                    style={[
+                      styles?.customCheckbox?.text,
+                      !!ttfPrivacyPolicyError && {
+                        color: styles?.customCheckbox?.errorColor,
+                      },
+                    ]}
+                  >
                     {texts?.form?.isSubToTicketFairy ||
                       `I agree that The Ticket Fairy may use the personal data that have provided for marketing purposes, such as recommending events that I might be interested in, in accordance with its `}
                     <Text
@@ -1427,22 +1926,15 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               />
             )}
 
-            {ticketHoldersData.length > 0 && (
-              <>
-                <Text style={styles?.ticketHoldersTitle}>
-                  {texts?.form?.ticketHoldersTitle || 'Ticket Holders'}
-                </Text>
-                {renderTicketHolders()}
-              </>
-            )}
+            {renderTicketHolders()}
 
             <Button
               onPress={onSubmit}
               text={texts?.checkoutButton || 'CHECKOUT'}
-              isDisabled={!isDataValid}
+              isDisabled={isButtonDisabled}
               isLoading={isSubmittingData}
               styles={
-                !isDataValid
+                isButtonDisabled
                   ? {
                       button: s.submitButtonDisabled,
                       ...styles?.checkoutButtonDisabled,
@@ -1468,8 +1960,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         />
       </>
     )
-
-    const isDataValid = checkBasicDataValid()
 
     return (
       <BillingCore

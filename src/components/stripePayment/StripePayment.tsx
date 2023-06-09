@@ -2,7 +2,7 @@ import {
   CardForm,
   initStripe,
   InitStripeParams,
-  PaymentMethodCreateParams,
+  PaymentIntent,
   useConfirmPayment,
 } from '@stripe/stripe-react-native'
 import React, {
@@ -37,7 +37,7 @@ const StripePayment = forwardRef<StripePaymentHandle, IStripePaymentProps>(
 
       async confirmPayment(
         stripeClientSecret: string,
-        params: PaymentMethodCreateParams.Params
+        params: PaymentIntent.ConfirmParams
       ): Promise<any> {
         return await confirmPayment(stripeClientSecret, params)
       },

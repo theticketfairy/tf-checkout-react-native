@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8C064C3D2A1C1C8B00C9B08E /* Fix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C064C3C2A1C1C8B00C9B08E /* Fix.swift */; };
 		AD0F37EFFB33AF9F720C5746 /* libPods-example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E3F9DD7861D38FA3D1B8633 /* libPods-example.a */; };
 		FAA6DE282607FC1C0044CA6D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA6DE272607FC1C0044CA6D /* AppDelegate.swift */; };
 		FAE31FCD265B9F6F007094C1 /* libTFCheckoutRNModule.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE31FCC265B9F5F007094C1 /* libTFCheckoutRNModule.a */; };
@@ -31,6 +32,7 @@
 		3280BA3E22763ADD16C5AB44 /* Pods-example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-example.release.xcconfig"; path = "Target Support Files/Pods-example/Pods-example.release.xcconfig"; sourceTree = "<group>"; };
 		686B058E28ABDFC10022EE51 /* example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = example.entitlements; path = example/example.entitlements; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = example/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8C064C3C2A1C1C8B00C9B08E /* Fix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fix.swift; sourceTree = "<group>"; };
 		8E3F9DD7861D38FA3D1B8633 /* libPods-example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B4E3EE3226F263437D36C23 /* Pods-example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-example.debug.xcconfig"; path = "Target Support Files/Pods-example/Pods-example.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -94,6 +96,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				8C064C3C2A1C1C8B00C9B08E /* Fix.swift */,
 				13B07FAE1A68108700A75B9A /* example */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -303,6 +306,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FAA6DE282607FC1C0044CA6D /* AppDelegate.swift in Sources */,
+				8C064C3D2A1C1C8B00C9B08E /* Fix.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -316,12 +320,68 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = example/example.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = W9RF2JXKUP;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = example/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/DoubleConversion\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/FBReactNativeSpec\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-Boost-iOSX\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-Fmt\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-Folly\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-Glog\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-PeerTalk\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-RSocket\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/FlipperKit\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RCT-Folly\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RCTTypeSafety\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RNCAsyncStorage\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RNCClipboard\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RNDateTimePicker\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RNFS\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-Core\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-CoreModules\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTAnimation\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTBlob\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTImage\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTLinking\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTNetwork\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTSettings\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTText\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTVibration\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsi\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsiexecutor\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsinspector\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-logger\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-perflogger\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Stripe\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripeApplePay\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripeCore\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripeFinancialConnections\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripePaymentSheet\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripePayments\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripePaymentsUI\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripeUICore\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Yoga\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/YogaKit\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/fmt\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/glog\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/libevent\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/react-native-background-timer\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/react-native-config\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/react-native-device-country\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/stripe-react-native\"",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -329,6 +389,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.$(PRODUCT_NAME:rfc1034identifier:lower)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.theticketfairy.tfcheckoutreactnative.example;
 				PRODUCT_NAME = example;
 				SWIFT_OBJC_BRIDGING_HEADER = "example/example-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -344,11 +405,59 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = example/example.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = W9RF2JXKUP;
 				INFOPLIST_FILE = example/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/DoubleConversion\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/FBReactNativeSpec\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RCT-Folly\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RCTTypeSafety\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RNCAsyncStorage\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RNCClipboard\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RNDateTimePicker\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RNFS\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-Core\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-CoreModules\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTAnimation\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTBlob\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTImage\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTLinking\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTNetwork\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTSettings\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTText\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTVibration\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsi\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsiexecutor\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsinspector\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-logger\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-perflogger\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Stripe\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripeApplePay\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripeCore\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripeFinancialConnections\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripePaymentSheet\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripePayments\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripePaymentsUI\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/StripeUICore\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Yoga\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/YogaKit\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/fmt\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/glog\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/libevent\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/react-native-background-timer\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/react-native-config\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/react-native-device-country\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/stripe-react-native\"",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -356,6 +465,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.$(PRODUCT_NAME:rfc1034identifier:lower)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.theticketfairy.tfcheckoutreactnative.example;
 				PRODUCT_NAME = example;
 				SWIFT_OBJC_BRIDGING_HEADER = "example/example-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -396,7 +506,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64 ";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -412,7 +522,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -462,7 +572,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64 ";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -471,7 +581,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",

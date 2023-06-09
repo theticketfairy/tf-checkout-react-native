@@ -142,6 +142,9 @@ export interface IRegisterNewUserBody {
     zip?: string
     phone?: string
     check_cart_expiration: boolean
+    dob_day?: number
+    dob_month?: number
+    dob_year?: number
   }
 }
 

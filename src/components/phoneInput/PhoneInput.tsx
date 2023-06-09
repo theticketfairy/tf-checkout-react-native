@@ -2,7 +2,6 @@ import InputPhone from '@sesamsolutions/phone-input'
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import { Platform, View } from 'react-native'
 
-import R from '../../res'
 import Input from '../input/Input'
 import s from './/styles'
 import { IOnChangePhoneNumberPayload, IPhoneInputProps } from './types'
@@ -35,15 +34,19 @@ const PhoneInput: FC<IPhoneInputProps> = ({
         onChangeText={setLocalValue}
         label={texts?.label || 'Phone number'}
         keyboardType='phone-pad'
-        error={error}
         value={localValue}
         labelOffset={{
           x1: Platform.OS === 'ios' ? -40 : -40,
         }}
+        style={
+          error
+            ? { color: styles?.input?.errorColor }
+            : { color: styles?.input?.baseColor }
+        }
         styles={{
           container: s.phoneInputContainer,
           ...styles?.input,
-          errorColor: styles?.errorColor || R.colors.danger,
+          color: styles?.input?.color,
         }}
         renderLeftAccessory={() => (
           <View style={(s.countryContainer, styles?.country?.container)}>
@@ -57,6 +60,7 @@ const PhoneInput: FC<IPhoneInputProps> = ({
             />
           </View>
         )}
+        error={error}
       />
     </View>
   )
