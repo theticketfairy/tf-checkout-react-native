@@ -1,5 +1,11 @@
-import type { ReactNode } from 'react'
-import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import { ReactNode } from 'react'
+import {
+  ColorValue,
+  ImageStyle,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 
 export interface ICheckboxStyles {
   container?: StyleProp<ViewStyle>
@@ -10,6 +16,7 @@ export interface ICheckboxStyles {
   box?: StyleProp<ViewStyle>
   icon?: StyleProp<ImageStyle>
   error?: StyleProp<TextStyle>
+  errorColor?: ColorValue
 }
 
 export interface ICheckboxProps {

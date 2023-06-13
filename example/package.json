@@ -13,7 +13,7 @@
     "react-native": "0.71.7",
 
     "react-native-background-timer":"2.4.1",
-    "rn-material-ui-textfield": "1.0.5",
+    "rn-material-ui-textfield": "jorgtz/rn-material-ui-textfield",
     "react-native-modal-datetime-picker": "15.0.0",
     "react-native-keyboard-aware-scroll-view": "0.9.5",
     "react-native-fs": "2.20.0",

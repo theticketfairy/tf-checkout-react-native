@@ -1,4 +1,4 @@
-import type { ColorValue, StyleProp, ViewStyle } from 'react-native'
+import { StyleProp, ViewStyle } from 'react-native'
 
 import type { IInputStyles } from '../input/types'
 
@@ -26,7 +26,6 @@ export interface IPhoneInputTexts {
 
 export interface IPhoneInputStyles {
   rootContainer?: StyleProp<ViewStyle>
-  errorColor?: ColorValue
   country?: {
     container?: StyleProp<ViewStyle>
     button?: StyleProp<ViewStyle>

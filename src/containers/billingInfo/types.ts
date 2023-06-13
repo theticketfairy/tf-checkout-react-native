@@ -1,4 +1,4 @@
-import type {
+import {
   ColorValue,
   ImageSourcePropType,
   ImageStyle,
@@ -7,32 +7,32 @@ import type {
   ViewStyle,
 } from 'react-native'
 
-import type {
+import {
   IRegisterNewUserError,
   IRegisterNewUserSuccessData,
 } from '../../api/types'
-import type { IButtonStyles } from '../../components/button/types'
-import type {
+import { IButtonStyles } from '../../components/button/types'
+import {
   ICartTimerStyles,
   ICartTimerTexts,
 } from '../../components/cartTimer/types'
-import type { ICheckboxStyles } from '../../components/checkbox/types'
-import type { IDatePickerStyles } from '../../components/datePicker/types'
-import type { IDropdownStyles } from '../../components/dropdown/types'
-import type { IDropdownMaterialStyles } from '../../components/dropdownMaterial/types'
-import type { IInputStyles } from '../../components/input/types'
-import type {
+import { ICheckboxStyles } from '../../components/checkbox/types'
+import { IDatePickerStyles } from '../../components/datePicker/types'
+import { IDropdownItem, IDropdownStyles } from '../../components/dropdown/types'
+import { IDropdownMaterialStyles } from '../../components/dropdownMaterial/types'
+import { IInputStyles } from '../../components/input/types'
+import {
   ILoginBrandImages,
   ILoginSuccessData,
   ILoginViewStyles,
   ILoginViewTexts,
 } from '../../components/login/types'
-import type {
+import {
   IPhoneInputStyles,
   IPhoneInputTexts,
 } from '../../components/phoneInput/types'
-import type { IError, ITicketsResponseData } from '../../types'
-import type { ICountry } from '../../types/ICountry'
+import { IError, ITicketsResponseData } from '../../types'
+import { ICountry } from '../../types/ICountry'
 
 export interface ITokens {
   accessToken: string
@@ -113,11 +113,15 @@ export interface IBillingProps {
   onSkippingStatusChange?: (status: SkippingStatusType) => void
 
   shouldCartTimerNotMinimizeOnTap?: boolean
+
+  config?: IBillingConfig
 }
 
 export interface ITicketHolderField {
   firstName: string
+  firstNameError: string
   lastName: string
+  lastNameError: string
   email: string
   phone: string
 }
@@ -194,9 +198,33 @@ export interface IBillingInfoViewTexts {
   cartTimer?: ICartTimerTexts
 }
 
+export interface IBillingConfig {
+  isCheckoutAlwaysButtonEnabled?: boolean
+  shouldHideTicketHolderSectionOnSingleTicket?: boolean
+}
+
 export type SkippingStatusType =
   | 'skipping'
   | 'fail'
   | 'success'
   | 'false'
   | undefined
+
+export interface IBillingFormFieldsData {
+  firstName: string
+  lastName: string
+  street: string
+  city: string
+  postalCode: string
+  email: string
+  confirmEmail: string
+  password?: string
+  confirmPassword?: string
+  selectedCountry?: IDropdownItem | undefined
+  selectedState?: IDropdownItem | undefined
+  dateOfBirth: Date | undefined
+  phoneNumber: string
+  ticketHolderData: ITicketHolderField[]
+
+  isRegistering?: boolean
+}

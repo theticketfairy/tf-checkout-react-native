@@ -22,7 +22,7 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
     container: { marginBottom: 16 },
     button: {
       borderColor: Color.white,
-      borderWidth: 2,
+      borderWidth: 1,
     },
     text: {
       color: Color.textMain,
@@ -47,6 +47,10 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
     container: {
       width: '100%',
     },
+    errorColor: Color.danger,
+  },
+  privacyPolicyLinkStyle: {
+    color: Color.influencerCooler
   },
   passwordTitle: {
     color: Color.textMain,
@@ -76,6 +80,7 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
       marginTop: 8,
       marginLeft: 40,
     },
+    errorColor: Color.danger
   },
   checkoutButton: {
     button: {
@@ -116,7 +121,8 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
   },
   dropdownMaterialStyles: {
     input: {
-      baseColor: Color.white
+      baseColor: Color.white,
+      errorColor: Color.danger    
     },
   },
   ticketHolderItemHeader: {
@@ -214,9 +220,9 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
     input: {
       baseColor: Color.textMain,
       color: Color.textMain,
-      input: {
-        color: Color.textMain,
-      },
+      errorColor: Color.danger,
+      
     },
+    
   },
 }

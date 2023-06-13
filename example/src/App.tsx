@@ -87,7 +87,6 @@ const App = () => {
     setCheckOutProps(undefined)
     setIsPaymentSuccess(undefined)
     setComponentToShow(ComponentEnum.Tickets)
-
   }
   
   //#region Handlers
@@ -226,6 +225,10 @@ const App = () => {
         return (
           <>
           <BillingInfo
+          config={{
+            isCheckoutAlwaysButtonEnabled: true,
+            shouldHideTicketHolderSectionOnSingleTicket: true,
+          }}
             ref={billingRef}
             onCartExpired={handleOnCartExpired}
             onSkippingStatusChange={setSkippingStatus}

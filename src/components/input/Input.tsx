@@ -57,12 +57,11 @@ const Input = (props: IInputProps) => {
         onChangeText={(text: string) =>
           id && onTextChanged ? onTextChanged(id, text) : onChangeText
         }
-        {...props}
         label={label}
         tintColor={mainColor}
         containerStyle={[s.fieldWrapper, styles?.fieldWrapper]}
         baseColor={mainColor}
-        activeLineWidth={styles?.activeLineWidth || 2}
+        activeLineWidth={styles?.activeLineWidth || 1}
         lineWidth={styles?.lineWidth || 1}
         textContentType={props.isSecure ? 'oneTimeCode' : 'none'}
         autoCorrect={false}
@@ -70,6 +69,7 @@ const Input = (props: IInputProps) => {
         errorColor={styles?.errorColor}
         secureTextEntry={secureTextEntry && !isShowingPassword}
         renderRightAccessory={showPasswordButton}
+        {...props}
       />
     </View>
   )

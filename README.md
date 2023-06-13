@@ -2,7 +2,7 @@
 
 React Native library for Ticket Fairy checkout.
 
-For Single Sign-On (SSO) Please be awere that this is the first version of the implementation, we are working to release a V2, that will cover other use cases, in the near future.
+For Single Sign-On (SSO) Please be aware that this is the first version of the implementation, we are working to release a V2, that will cover other use cases, in the near future.
 
 # Requirements
 
@@ -17,8 +17,8 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 ### Android
 
 - Android 5.0 (API level 21) and above
-- Gradle plugin version `4.2.2`
-- Gradle version `6.7.1`
+- Gradle plugin version `7.3.1`
+- Gradle version `7.5.1`
 - Compile Sdk Version and Target Sdk Version `33`
 - Build Tools Version `33.0.0`
 - Java version `1.8`
@@ -33,8 +33,8 @@ To download the PDFs, add the `WRITE_EXTERNAL_STORAGE` permission to the Android
 
 ### iOS
 
-- Compatible with apps targeting iOS 11 or above.
-- Pods version `1.12.2`
+- Compatible with apps targeting iOS `13.0` or above.
+- Pods version `1.10.1`
 - Command Line Tools version `13.0`
 
 To download the PDFs, add the following flags to `Info.plist` file:
@@ -948,6 +948,11 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
     image1Style?: StyleProp<ImageStyle>
     image2?: ImageSourcePropType
     image2Style?: StyleProp<ImageStyle>
+  }
+
+  config?: {
+    isCheckoutAlwaysButtonEnabled?: boolean
+    shouldHideTicketHolderSectionOnSingleTicket?: boolean 
   }
 />
 ```
@@ -3053,12 +3058,47 @@ Wrap your component with the Core component.
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
-
 ## Version 2.0.0
 - Update ReactNative version to 0.71.7.
 - Update Stripe SDK to version 0.26.0.
   - Enables to better customize the card form.
 - Update dependencies.
+
+## Version 1.0.30
+- Show errors in Billing UI form fields.
+- Add config prop to Billing UI component, includes 2 configuration flags. 
+```
+  config?: {
+    isCheckoutAlwaysButtonEnabled?: boolean
+    shouldHideTicketHolderSectionOnSingleTicket?: boolean 
+  }
+```
+
+- Replacing `"rn-material-ui-textfield": "1.0.5"` library with `"rn-material-ui-textfield": "jorgtz/rn-material-ui-textfield"`, make sure to replace it in all the package.json files.
+
+## Version 1.0.29
+
+- Update Stripe SDK to version 0.26.0.
+  - Minimum iOS Deployment version  = `13`.
+- Expose styles to customize Stripe Card Form: 
+  - cardStyle?: CardFormView.Styles
+```
+{
+    backgroundColor?: string;
+    borderWidth?: number;
+    borderColor?: string;
+    borderRadius?: number;
+    textColor?: string;
+    fontSize?: number;
+    placeholderColor?: string;
+    cursorColor?: string;
+    textErrorColor?: string;
+    fontFamily?: string;
+}
+```
+  - cardContainer?: StyleProp<ViewStyle>
+
+
 
 ## Version 1.0.28
 - Add `getAccountTickets` request in `MyOrdersCore` and `TicketsCore`, it will allow get Tickets from the logged-in user.

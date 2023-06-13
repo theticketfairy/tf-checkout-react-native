@@ -23,7 +23,7 @@ import DeviceCountry, { TYPE_ANY } from 'react-native-device-country'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import Constants from '../../api/Constants'
-import type {
+import {
   ICheckoutBody,
   ICheckoutTicketHolder,
   IFetchAccessTokenResponse,
@@ -40,11 +40,11 @@ import {
   Login,
   PhoneInput,
 } from '../../components'
-import type { IDropdownItem } from '../../components/dropdown/types'
-import type { ILoginSuccessData } from '../../components/login/types'
-import type { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
+import { IDropdownItem } from '../../components/dropdown/types'
+import { ILoginSuccessData } from '../../components/login/types'
+import { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
 import { BillingCore, BillingCoreHandle, SessionHandle } from '../../core'
-import type { SessionHandleType } from '../../core/Session/SessionCoreTypes'
+import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
 import { Config } from '../../helpers/Config'
 import { getCountryDialCode } from '../../helpers/CountryCodes'
 import { useDebounced } from '../../helpers/Debounced'
@@ -52,18 +52,19 @@ import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import { emptyPhone } from '../../helpers/StringsHelper'
 import {
   validateAge,
+  validateDropDownEmpty,
   validateEmail,
   validateEmpty,
   validatePasswords,
   validatePhoneNumber,
 } from '../../helpers/Validators'
 import R from '../../res'
-import type { IError, IUserProfile, IUserProfilePublic } from '../../types'
+import { IError, IUserProfile, IUserProfilePublic } from '../../types'
 import s from './styles'
-import type {
+import {
+  IBillingFormFieldsData,
   IBillingProps,
   ITicketHolderField,
-  ITicketHolderFieldError,
   SkippingStatusType,
 } from './types'
 
@@ -75,8 +76,6 @@ import type {
   - Post Code/Zip
   - Country
 */
-
-const IS_MANA = Config.BRAND === 'mana-common'
 
 const Billing = forwardRef<SessionHandleType, IBillingProps>(
   (
@@ -116,34 +115,13 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       onLogoutError,
       onCartExpired,
       shouldCartTimerNotMinimizeOnTap,
+      config = {
+        isCheckoutAlwaysButtonEnabled: false,
+        shouldHideTicketHolderSectionOnSingleTicket: false,
+      },
     },
     ref
   ) => {
-    const brandCheckBoxText =
-      texts?.form?.isSubToBrand ||
-      'I would like to be updated on news, events and offers.'
-
-    const phoneLabel = useMemo(() => {
-      const optionalPhone = isPhoneRequired
-        ? ''
-        : texts?.form?.optional || ' (optional)'
-      return texts?.form?.phone
-        ? `${texts?.form?.phone} ${optionalPhone}`
-        : `Phone ${optionalPhone}`
-    }, [isPhoneRequired, texts])
-
-    const addressLabel = useMemo(() => {
-      const optionalAddress = Config.IS_BILLING_STREET_NAME_REQUIRED
-        ? ''
-        : texts?.form?.optional || ' (optional)'
-
-      return texts?.form?.street
-        ? `${texts.form.street} ${optionalAddress}`
-        : `Street ${optionalAddress}`
-    }, [texts])
-
-    //#endregion
-
     //#region State
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [isSubmittingData, setIsSubmittingData] = useState<boolean>(false)
@@ -183,15 +161,68 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const [countries, setCountries] = useState<IDropdownItem[]>([])
 
     const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
-    const [skippingStatus, setSkippingStatus] = useState<SkippingStatusType>(
-      undefined
-    )
+    const [skippingStatus, setSkippingStatus] =
+      useState<SkippingStatusType>(undefined)
     const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
+    //#endregion State
+
+    //#region Labels
+    const holderLabels = useMemo(() => {
+      if (
+        numberOfTicketHolders === 1 &&
+        config.shouldHideTicketHolderSectionOnSingleTicket
+      ) {
+        return null
+      }
+
+      const optional = isNameRequired
+        ? ''
+        : texts?.form?.optional || '(optional)'
+      return {
+        firstName: texts?.form?.holderFirstName
+          ? `${texts.form.holderFirstName} ${optional}`
+          : `First Name ${optional}`,
+        lastName: texts?.form?.holderLastName
+          ? `${texts.form.holderLastName} ${optional}`
+          : `Last Name ${optional}`,
+        email: texts?.form?.holderEmail
+          ? `${texts.form.holderEmail} ${texts?.form?.optional || '(optional)'}`
+          : `Email ${optional}`,
+        phone: texts?.form?.holderPhone
+          ? `${texts.form.holderPhone} ${texts?.form?.optional || '(optional)'}`
+          : `Phone ${optional}`,
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isNameRequired, texts, numberOfTicketHolders])
+
+    const brandCheckBoxText =
+      texts?.form?.isSubToBrand ||
+      'I would like to be updated on news, events and offers.'
+
+    const phoneLabel = useMemo(() => {
+      const optionalPhone = isPhoneRequired
+        ? ''
+        : texts?.form?.optional || ' (optional)'
+      return texts?.form?.phone
+        ? `${texts?.form?.phone} ${optionalPhone}`
+        : `Phone ${optionalPhone}`
+    }, [isPhoneRequired, texts])
+
+    const addressLabel = useMemo(() => {
+      const optionalAddress = Config.IS_BILLING_STREET_NAME_REQUIRED
+        ? ''
+        : texts?.form?.optional || ' (optional)'
+
+      return texts?.form?.street
+        ? `${texts.form.street} ${optionalAddress}`
+        : `Street ${optionalAddress}`
+    }, [texts])
+    //#endregion Labels
 
     // Cart expiration timer
     const [secondsLeft, setSecondsLeft] = React.useState(420)
 
-    // Errors state
+    //#region Errors state
     const firstNameError = useDebounced(firstName, validateEmpty)
     const lastNameError = useDebounced(lastName, validateEmpty)
     const emailError = useDebounced(email, () =>
@@ -210,34 +241,25 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const streetError = useDebounced(street, validateEmpty)
     const cityError = useDebounced(city, validateEmpty)
     const postalCodeError = useDebounced(postalCode, validateEmpty)
-    const [dateOfBirthError, setDateOfBirthError] = useState('')
     const [ttfPrivacyPolicyError, setTtfPrivacyPolicyError] = useState('')
-    // End of errors state
-    //#endregion
 
-    //#region Labels
-    const holderLabels = useMemo(() => {
-      if (numberOfTicketHolders === 1 && IS_MANA) {
-        return null
-      }
-      const optional = isNameRequired
-        ? ''
-        : texts?.form?.optional || '(optional)'
-      return {
-        firstName: texts?.form?.holderFirstName
-          ? `${texts.form.holderFirstName} ${optional}`
-          : `First Name ${optional}`,
-        lastName: texts?.form?.holderLastName
-          ? `${texts.form.holderLastName} ${optional}`
-          : `Last Name ${optional}`,
-        email: texts?.form?.holderEmail
-          ? `${texts.form.holderEmail} ${texts?.form?.optional || '(optional)'}`
-          : `Email ${optional}`,
-        phone: texts?.form?.holderPhone
-          ? `${texts.form.holderPhone} ${texts?.form?.optional || '(optional)'}`
-          : `Phone ${optional}`,
-      }
-    }, [isNameRequired, texts, numberOfTicketHolders])
+    const [firstNameErrorState, setFirstNameErrorState] = useState('')
+    const [lastNameErrorState, setLastNameErrorState] = useState('')
+    const [streetErrorState, setStreetErrorState] = useState('')
+    const [dateOfBirthError, setDateOfBirthError] = useState('')
+    const [emailErrorState, setEmailErrorState] = useState('')
+    const [emailConfirmationErrorState, setEmailConfirmationErrorState] =
+      useState('')
+    const [cityErrorState, setCityErrorState] = useState('')
+    const [postalCodeErrorState, setPostalCodeErrorState] = useState('')
+    const [countryErrorState, setCountryErrorState] = useState('')
+    const [stateErrorState, setStateErrorState] = useState('')
+    const [passwordErrorState, setPasswordErrorState] = useState('')
+    const [confirmPasswordErrorState, setConfirmPasswordErrorState] =
+      useState('')
+
+    //#endregion Errors state
+    //#endregion
 
     const getSkippingStatus = (numOfTickets: number): SkippingStatusType => {
       // DO NOT SKIP IF
@@ -245,6 +267,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       // * Event Collect_names is turned on and tickets are more than one.
       // * Event validate_age is turned on.
       // * phone_required is turned on and customer does not have a phone number.
+
       if (isBillingRequired || skippingStatus === 'fail') {
         return 'false'
       }
@@ -262,6 +285,24 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const phoneErrorCounter = useRef(0)
     const billingCoreRef = useRef<BillingCoreHandle>(null)
     const sessionHandleRef = useRef<SessionHandleType>(null)
+    const phoneCountryCode = useRef('')
+    const errorsRef = useRef({
+      firstName: '',
+      lastName: '',
+      email: '',
+      confirmEmail: '',
+      password: '',
+      confirmPassword: '',
+      dateOfBirth: '',
+      phone: '',
+      street: '',
+      city: '',
+      country: '',
+      zipCode: '',
+      state: '',
+      privacy: '',
+    })
+
     //#endregion
 
     //#region Imperative Handler
@@ -277,10 +318,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           }
         }
 
-        const {
-          accessTokenError,
-          accessTokenData,
-        } = await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+        const { accessTokenError, accessTokenData } =
+          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
         if (!accessTokenError && accessTokenData?.accessToken) {
           await fetchData()
         }
@@ -310,13 +349,24 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       payload: IOnChangePhoneNumberPayload
     ) => {
       setPhone(payload.input)
+
+      if (payload.isValid) {
+        errorsRef.current.phone = ''
+        setPhoneError('')
+
+        return
+      }
+
       if (!payload.isValid && phoneErrorCounter.current > 0) {
+        errorsRef.current.phone =
+          texts?.form?.phoneInput?.customError || 'Invalid phone number'
+
         return handleSetPhoneError(
           texts?.form?.phoneInput?.customError || 'Invalid phone number'
         )
       }
+
       phoneErrorCounter.current = phoneErrorCounter.current + 1
-      setPhoneError('')
     }
 
     const handleOnLoadingChange = useCallback(
@@ -349,7 +399,17 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const handleIsSubToTicketFairyToggle = () => {
-      setIsSubToTicketFairy(!isSubToTicketFairy)
+      const newValue = !isSubToTicketFairy
+
+      if (newValue) {
+        errorsRef.current.privacy = ''
+        setTtfPrivacyPolicyError('')
+      } else {
+        errorsRef.current.privacy = 'Required'
+        setTtfPrivacyPolicyError('Required')
+      }
+
+      setIsSubToTicketFairy(newValue)
     }
 
     const handleOpenPrivacyLink = async () => {
@@ -378,24 +438,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setStateId(userProfile.stateId)
       setLoggedUserFirstName(userProfile.firstName)
 
-      const phoneValidError = validatePhoneNumber({
-        phoneNumber: userProfile.phone,
-        customError: texts?.form?.phoneInput?.customError,
-      })
-
-      if (phoneValidError && isPhoneRequired) {
-        setIsLoading(false)
-        showAlert(
-          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
-        )
-        handleSetPhoneError(
-          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
-        )
-      }
+      let dob: Date | undefined
 
       if (userProfile.dateOfBirth) {
         const dobSplitted = userProfile.dateOfBirth.split('-')
-        const dob = new Date(
+        dob = new Date(
           parseInt(dobSplitted[0]!, 10),
           parseInt(dobSplitted[1]!, 10) - 1,
           parseInt(dobSplitted[2]!, 10)
@@ -415,13 +462,72 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (accessToken) {
         storedToken.current = accessToken
       }
+
+      showErrorMessages({
+        firstName: userProfile.firstName,
+        lastName: userProfile.lastName,
+        email: userProfile.email,
+        confirmEmail: userProfile.email,
+        street: userProfile.streetAddress,
+        city: userProfile.city,
+        selectedCountry: userProfile.countryId
+          ? {
+              label: '',
+              value: userProfile.countryId,
+            }
+          : undefined,
+        selectedState: userProfile.stateId
+          ? {
+              label: '',
+              value: userProfile.stateId,
+            }
+          : undefined,
+        postalCode: userProfile.zipCode,
+        dateOfBirth: dob,
+        phoneNumber: userProfile.phone,
+        isRegistering: !loggedUserFirstName && !storedToken.current,
+        ticketHolderData: ticketHoldersData,
+      })
+    }
+
+    const clearFormErrors = () => {
+      setFirstNameErrorState('')
+      setLastNameErrorState('')
+      setEmailErrorState('')
+      setEmailConfirmationErrorState('')
+      setDateOfBirthError('')
+      setPhoneError('')
+      setStreetErrorState('')
+      setCityErrorState('')
+      setCountryErrorState('')
+      setPostalCodeErrorState('')
+      setStateErrorState('')
+      setTtfPrivacyPolicyError('')
+      errorsRef.current = {
+        firstName: '',
+        lastName: '',
+        email: '',
+        confirmEmail: '',
+        password: '',
+        confirmPassword: '',
+        dateOfBirth: '',
+        phone: '',
+        street: '',
+        city: '',
+        country: '',
+        zipCode: '',
+        state: '',
+        privacy: '',
+      }
     }
 
     const handleOnLoginSuccess = async ({
       userProfile,
       accessTokenData,
     }: ILoginSuccessData) => {
-      let phoneCountry = 'US'
+      clearFormErrors()
+
+      let countryCode = 'US'
       const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
       const usrProfile = { ...userProfile }
 
@@ -432,28 +538,37 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       try {
         const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY)
-        phoneCountry = deviceCountry.code.toUpperCase()
+        countryCode = deviceCountry.code.toUpperCase()
       } catch (err) {
-        phoneCountry = 'US'
+        countryCode = 'US'
       }
+
       if (!userProfile.phone) {
         usrProfile.phone = ''
       } else {
         if (!usrProfile.phone?.includes('+')) {
-          usrProfile.phone = `${getCountryDialCode(phoneCountry)}${
+          usrProfile.phone = `${getCountryDialCode(countryCode)}${
             usrProfile.phone
           }`
         }
       }
 
       if (!isBillingRequired && skippingStatus === 'fail') {
-        if (isPhoneRequired && !usrProfile.phone) {
+        setSkippingStatus('skipping')
+
+        const phoneValidError = validatePhoneNumber({
+          phoneNumber: userProfile.phone,
+          customError: texts?.form?.phoneInput?.customError,
+        })
+
+        if (phoneValidError && isPhoneRequired) {
           setIsLoading(false)
-          return setSkippingStatus('fail')
+          handleSetPhoneError(
+            texts?.invalidPhoneNumberError ||
+              'Please enter a valid phone number'
+          )
         }
 
-        setSkippingStatus('skipping')
-        setIsLoading(false)
         await performCheckout(
           getCheckoutBodyWhenSkipping({
             userProfile: usrProfile,
@@ -483,8 +598,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setStateId('')
       handleOnSelectDate(undefined)
 
-      // const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
-
       setSelectedCountry({
         value: '-1',
         label: texts?.form?.country || 'Country',
@@ -507,23 +620,124 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         th.lastName = ''
         th.email = ''
         th.phone = ''
+        th.firstNameError = ''
+        th.lastNameError = ''
       })
       setTicketHoldersData(thData)
       onLogoutSuccess?.()
     }
 
+    //#region Handlers input changed
     const handleOnSelectDate = (newDate: Date | undefined) => {
       setDateOfBirth(newDate)
-      console.log('handleOnSelectDate', newDate)
-      if (newDate) {
+
+      if (dateOfBirthError.length > 0 && newDate) {
+        setDateOfBirthError('')
+      }
+
+      if (minimumAge) {
         const ageError = validateAge(newDate, minimumAge)
         setDateOfBirthError(ageError)
+      } else {
+        if (!newDate) {
+          setDateOfBirthError('Required')
+        }
       }
     }
+
+    const handleOnStreetChanged = (text: string) => {
+      if (streetErrorState.length > 0 && text.length > 0) {
+        setStreetErrorState('')
+      }
+      setStreet(text)
+    }
+
+    const handleOnCityChanged = (text: string) => {
+      if (cityErrorState.length > 0 && text.length > 0) {
+        setCityErrorState('')
+      }
+      setCity(text)
+    }
+
+    const handleOnFirstNameChanged = (text: string) => {
+      if (firstNameErrorState.length > 0 && text.length > 0) {
+        setFirstNameErrorState('')
+      }
+      setFirstName(text)
+    }
+
+    const handleOnLastNameChanged = (text: string) => {
+      if (lastNameErrorState.length > 0 && text.length > 0) {
+        setLastNameErrorState('')
+      }
+      setLastName(text)
+    }
+
+    const handleOnEmailChanged = (text: string) => {
+      if (emailErrorState.length > 0 && text.length > 0) {
+        setEmailErrorState('')
+      }
+      setEmail(text)
+    }
+
+    const handleOnEmailConfirmationChanged = (text: string) => {
+      if (emailConfirmationErrorState.length > 0 && text.length > 0) {
+        setEmailConfirmationErrorState('')
+      }
+      setEmailConfirmation(text)
+    }
+
+    const handleOnPostalCodeChanged = (text: string) => {
+      if (postalCodeErrorState.length > 0 && text.length > 0) {
+        setPostalCodeErrorState('')
+      }
+      setPostalCode(text)
+    }
+
+    const handleOnStateChanged = (itm: IDropdownItem) => {
+      if (stateErrorState.length > 0 && itm.value !== '-1') {
+        setStateErrorState('')
+      } else if (itm.value === '-1') {
+        setStateErrorState('Required')
+      }
+      setSelectedState(itm)
+    }
+
+    const handleOnCountryChanged = (itm: IDropdownItem) => {
+      if (countryErrorState.length > 0 && itm.value !== '-1') {
+        setCountryErrorState('')
+      } else if (itm.value === '-1') {
+        setCountryErrorState('Required')
+      }
+      setSelectedCountry(itm)
+    }
+
+    const handleOnPasswordChanged = (text: string) => {
+      if (passwordErrorState.length > 0 && text.length > 0) {
+        setPasswordErrorState('')
+      }
+      setPassword(text)
+    }
+
+    const handleOnConfirmPasswordChanged = (text: string) => {
+      if (confirmPasswordErrorState.length > 0 && text.length > 0) {
+        setConfirmPasswordErrorState('')
+      }
+      setPasswordConfirmation(text)
+    }
+    //#endregion Handlers input changed
+
     //#endregion
 
     //#region Form validation
-    const checkIsStoredPhoneNumberFormat = (storedPhoneNumber: string) => {
+    const checkIsStoredPhoneNumberFormat = (storedPhoneNumber?: string) => {
+      if (!storedPhoneNumber) {
+        handleSetPhoneError(
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+        )
+        return false
+      }
+
       if (!storedPhoneNumber.includes('+')) {
         handleSetPhoneError(
           texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
@@ -533,48 +747,216 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       return true
     }
 
+    const showErrorMessages = (data: IBillingFormFieldsData) => {
+      if (secondsLeft === 0) {
+        return false
+      }
+
+      const validateFirstName = validateEmpty(data.firstName)
+      const validateLastName = validateEmpty(data.lastName)
+
+      const validateEmails = validateEmail(data.email, data.confirmEmail)
+      const validateEmailsConfirmation = validateEmail(
+        data.confirmEmail,
+        data.email
+      )
+
+      if (isTicketFree) {
+        setFirstNameErrorState(validateFirstName)
+        setLastNameErrorState(validateLastName)
+        errorsRef.current.firstName = validateFirstName
+        errorsRef.current.lastName = validateLastName
+
+        setEmailErrorState(validateEmails)
+        setEmailConfirmationErrorState(validateEmailsConfirmation)
+        errorsRef.current.email = validateEmails
+        errorsRef.current.confirmEmail = validateEmailsConfirmation
+
+        if (data.isRegistering) {
+          const validatePassword = validatePasswords(
+            data.password,
+            data.confirmPassword
+          )
+          const validatePasswordConfirmation = validatePasswords(
+            data.confirmPassword,
+            data.password
+          )
+
+          setPasswordErrorState(validatePassword)
+          setConfirmPasswordErrorState(validatePasswordConfirmation)
+
+          errorsRef.current.password = validatePassword
+          errorsRef.current.confirmPassword = validatePasswordConfirmation
+        }
+
+        if (isAgeRequired) {
+          if (minimumAge) {
+            const birthdayValidation = validateAge(data.dateOfBirth, minimumAge)
+            setDateOfBirthError(birthdayValidation)
+            errorsRef.current.dateOfBirth = birthdayValidation
+          } else {
+            setDateOfBirthError(data.dateOfBirth ? '' : 'Required')
+            errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : 'Required'
+          }
+        }
+
+        if (isPhoneRequired && !isPhoneHidden) {
+          const validatePhone = validatePhoneNumber({
+            phoneNumber: data.phoneNumber,
+            customError: texts?.form?.phoneInput?.customError,
+            countryCode: phoneCountryCode.current,
+          })
+          setPhoneError(validatePhone)
+          errorsRef.current.phone = validatePhone
+        }
+
+        errorsRef.current.privacy = isSubToTicketFairy ? '' : 'Required'
+
+        if (isNameRequired) {
+          const ticketHoldersDataCopy = [...data.ticketHolderData]
+          _map(data.ticketHolderData, (th, index) => {
+            if (isNameRequired) {
+              ticketHoldersDataCopy[index].firstNameError = validateEmpty(
+                th.firstName
+              )
+              ticketHoldersDataCopy[index].lastNameError = validateEmpty(
+                th.lastName
+              )
+            }
+          })
+
+          setTicketHoldersData(ticketHoldersDataCopy)
+        }
+
+        return
+      } // end of Ticket Free
+
+      const validateStreet = validateEmpty(data.street)
+      const validateCity = validateEmpty(data.city)
+      const validatePostalCode = validateEmpty(data.postalCode)
+
+      setStreetErrorState(validateStreet)
+      setCityErrorState(validateCity)
+      setPostalCodeErrorState(validatePostalCode)
+      setFirstNameErrorState(validateFirstName)
+      setLastNameErrorState(validateLastName)
+      setEmailErrorState(validateEmails)
+      setEmailConfirmationErrorState(validateEmailsConfirmation)
+
+      errorsRef.current.street = validateStreet
+      errorsRef.current.city = validateCity
+      errorsRef.current.zipCode = validatePostalCode
+      errorsRef.current.firstName = validateFirstName
+      errorsRef.current.lastName = validateLastName
+      errorsRef.current.email = validateEmails
+      errorsRef.current.confirmEmail = validateEmailsConfirmation
+
+      if (data.isRegistering) {
+        const validatePassword = validatePasswords(
+          data.password,
+          data.confirmPassword
+        )
+        const validatePasswordConfirmation = validatePasswords(
+          data.confirmPassword,
+          data.password
+        )
+
+        setPasswordErrorState(validatePassword)
+        setConfirmPasswordErrorState(validatePasswordConfirmation)
+
+        errorsRef.current.password = validatePassword
+        errorsRef.current.confirmPassword = validatePasswordConfirmation
+      }
+
+      const countryValidation = validateDropDownEmpty(
+        data.selectedCountry?.value
+      )
+
+      setCountryErrorState(countryValidation)
+      errorsRef.current.country = countryValidation
+
+      if (isAgeRequired) {
+        if (minimumAge) {
+          const birthdayValidation = validateAge(data.dateOfBirth, minimumAge)
+          setDateOfBirthError(birthdayValidation)
+          errorsRef.current.dateOfBirth = birthdayValidation
+        } else {
+          setDateOfBirthError(data.dateOfBirth ? '' : 'Required')
+          errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : 'Required'
+        }
+      }
+
+      const validateState = validateDropDownEmpty(data.selectedState?.value)
+
+      setStateErrorState(validateState)
+      errorsRef.current.state = validateState
+
+      if (isPhoneRequired && !isPhoneHidden) {
+        const validatePhone = validatePhoneNumber({
+          phoneNumber: data.phoneNumber,
+          customError: texts?.form?.phoneInput?.customError,
+          countryCode: phoneCountryCode.current,
+        })
+
+        setPhoneError(validatePhone)
+        errorsRef.current.phone = validatePhone
+      }
+
+      //setTtfPrivacyPolicyError(isSubToTicketFairy ? '' : 'Required')
+      errorsRef.current.privacy = isSubToTicketFairy ? '' : 'Required'
+
+      if (isNameRequired) {
+        const ticketHoldersDataCopy = [...data.ticketHolderData]
+        _map(data.ticketHolderData, (th, index) => {
+          if (isNameRequired) {
+            ticketHoldersDataCopy[index].firstNameError = validateEmpty(
+              th.firstName
+            )
+            ticketHoldersDataCopy[index].lastNameError = validateEmpty(
+              th.lastName
+            )
+          }
+        })
+
+        setTicketHoldersData(ticketHoldersDataCopy)
+      }
+    }
+
     const checkBasicDataValid = (): boolean => {
       if (secondsLeft === 0) {
         return false
       }
 
       if (isTicketFree) {
-        if (!firstName || !lastName || !email || !emailConfirmation) {
+        if (
+          errorsRef.current.firstName ||
+          errorsRef.current.lastName ||
+          errorsRef.current.email ||
+          errorsRef.current.confirmEmail
+        ) {
           return false
         }
       } else {
         if (
-          !firstName ||
-          !lastName ||
-          !email ||
-          !emailConfirmation ||
-          !city ||
-          !postalCode ||
-          selectedState?.value === '-1' ||
-          selectedCountry?.value === '-1'
+          errorsRef.current.firstName ||
+          errorsRef.current.lastName ||
+          errorsRef.current.email ||
+          errorsRef.current.confirmEmail ||
+          errorsRef.current.city ||
+          errorsRef.current.zipCode ||
+          errorsRef.current.state ||
+          errorsRef.current.country ||
+          errorsRef.current.street
         ) {
-          return false
-        }
-
-        if (Config.IS_BILLING_STREET_NAME_REQUIRED && !street) {
-          if (isLoading) {
-            setIsLoading(false)
-          }
           return false
         }
       }
 
-      if (
-        isPhoneRequired &&
-        !isPhoneHidden &&
-        validatePhoneNumber({
-          phoneNumber: phone,
-          customError: texts?.form?.phoneInput?.customError,
-        })
-      ) {
+      if (isPhoneRequired && !isPhoneHidden && errorsRef.current.phone) {
         if (isLoading) {
           setIsLoading(false)
         }
+
         return false
       }
 
@@ -590,20 +972,32 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         setTtfPrivacyPolicyError(
           texts?.form?.ttfPrivacyPolicyRequiredError || 'Required'
         )
-        return 'Please accept our Privacy Policy'
+        return 'Please review the errors'
       }
+
       if (isAgeRequired) {
         if (!dateOfBirth) {
+          setDateOfBirthError('Required')
           return 'Please enter your date of birth'
         }
-        const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
-        if (ageValidationMessage) {
-          setDateOfBirthError(ageValidationMessage)
-          return ageValidationMessage
+
+        if (minimumAge) {
+          const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
+          if (ageValidationMessage) {
+            setDateOfBirthError(ageValidationMessage)
+            return ageValidationMessage
+          }
         }
       }
 
       if (!isNameRequired) {
+        return ''
+      }
+
+      if (
+        ticketHoldersData.length === 1 &&
+        config.shouldHideTicketHolderSectionOnSingleTicket
+      ) {
         return ''
       }
 
@@ -634,10 +1028,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       const checkoutBody = checkoutBodyWhenSkipping || getCheckoutBody()
 
       setIsSubmittingData(true)
-      const {
-        error: checkoutError,
-        data: checkoutData,
-      } = await billingCoreRef.current.checkoutOrder(checkoutBody)
+      const { error: checkoutError, data: checkoutData } =
+        await billingCoreRef.current.checkoutOrder(checkoutBody)
       setIsSubmittingData(false)
 
       if (checkoutError) {
@@ -675,10 +1067,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       const registerUserBody = getRegisterNewUserBody()
       const registerForm = getRegisterFormData(registerUserBody)
 
-      const {
-        registerNewUserResponseData,
-        registerNewUserResponseError,
-      } = await billingCoreRef.current.registerNewUser(registerForm)
+      const { registerNewUserResponseData, registerNewUserResponseError } =
+        await billingCoreRef.current.registerNewUser(registerForm)
 
       if (registerNewUserResponseError) {
         setIsSubmittingData(false)
@@ -693,8 +1083,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       if (!registerNewUserResponseData) {
         setIsSubmittingData(false)
-        handleOnRegisterFail('Register returned no data')
-        return showAlert('Register returned no data')
+        handleOnRegisterFail('Register user returned no data')
+        return showAlert('Register user returned no data')
       }
 
       storedToken.current =
@@ -757,14 +1147,26 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const getCheckoutBody = (): ICheckoutBody => {
       let parsedTicketHolders: ICheckoutTicketHolder[] = []
 
-      for (let i = 0; i <= numberOfTicketHolders! - 1; i++) {
-        const individualHolder = {
-          first_name: ticketHoldersData[i]!.firstName || '',
-          last_name: ticketHoldersData[i]!.lastName || '',
-          phone: ticketHoldersData[i]!.phone || '',
-          email: ticketHoldersData[i]!.email || '',
+      if (
+        config.shouldHideTicketHolderSectionOnSingleTicket &&
+        numberOfTicketHolders
+      ) {
+        parsedTicketHolders.push({
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone,
+          email: email,
+        })
+      } else {
+        for (let i = 0; i <= numberOfTicketHolders! - 1; i++) {
+          const individualHolder = {
+            first_name: ticketHoldersData[i].firstName || '',
+            last_name: ticketHoldersData[i].lastName || '',
+            phone: ticketHoldersData[i].phone || '',
+            email: ticketHoldersData[i].email || '',
+          }
+          parsedTicketHolders.push(individualHolder)
         }
-        parsedTicketHolders.push(individualHolder)
       }
 
       const formattedPhone = isPhoneRequired ? phone : emptyPhone(phone)
@@ -887,9 +1289,29 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const onSubmit = async () => {
-      const isExtraDataValid = checkExtraDataValid()
-      if (isExtraDataValid) {
-        return showAlert(isExtraDataValid)
+      showErrorMessages({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        confirmEmail: emailConfirmation,
+        password: password,
+        confirmPassword: passwordConfirmation,
+        street: street,
+        city: city,
+        selectedCountry: selectedCountry,
+        selectedState: selectedState,
+        postalCode: postalCode,
+        dateOfBirth: dateOfBirth,
+        phoneNumber: phone,
+        isRegistering: !loggedUserFirstName && !storedToken.current,
+        ticketHolderData: ticketHoldersData,
+      })
+
+      const isBasicDataValid = checkBasicDataValid()
+      const isExtraDataValidErrors = checkExtraDataValid()
+
+      if (isExtraDataValidErrors || !isBasicDataValid) {
+        return
       }
 
       if (loggedUserFirstName && storedToken.current) {
@@ -900,7 +1322,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
     //#endregion
 
-    const setCountryByEvent = useCallback(async () => {
+    const setCountryByEvent = async () => {
       const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
 
       if (!eventCountry) {
@@ -914,7 +1336,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         })
         setSelectedCountry(selectedCountryItem)
       }
-    }, [countries])
+    }
 
     //#region Fetch Initial Data
     const fetchData = async () => {
@@ -929,10 +1351,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       const usrTkn = await getData(LocalStorageKeys.ACCESS_TOKEN)
       let skippingStatusInner: SkippingStatusType
 
-      const {
-        countriesData,
-        countriesError,
-      } = await billingCoreRef.current.getCountries()
+      const { countriesData, countriesError } =
+        await billingCoreRef.current.getCountries()
 
       if (countriesError) {
         setSkippingStatus('fail')
@@ -949,10 +1369,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       if (usrTkn) {
         storedToken.current = usrTkn
-        const {
-          userProfileError,
-          userProfileData,
-        } = await billingCoreRef.current.getUserProfile()
+        const { userProfileError, userProfileData } =
+          await billingCoreRef.current.getUserProfile()
 
         if (userProfileError || !userProfileData) {
           setSkippingStatus('fail')
@@ -1017,6 +1435,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           lastName: i === 0 && usrPrfl ? usrPrfl.lastName : '',
           email: i === 0 && usrPrfl ? usrPrfl.email : '',
           phone: i === 0 && usrPrfl ? usrPrfl.phone : '',
+          firstNameError: '',
+          lastNameError: '',
         })
       }
 
@@ -1040,6 +1460,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (usrPrfl) {
         if (!isPhoneHidden && isPhoneRequired) {
           if (!checkIsStoredPhoneNumberFormat(usrPrfl.phone)) {
+            setPhoneError(
+              texts?.invalidPhoneNumberError ||
+                'Please enter a valid phone number'
+            )
             skippingStatusInner = 'fail'
             setSkippingStatus('fail')
             setIsLoading(false)
@@ -1058,7 +1482,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             }
           }
         } else {
-          // We can perform Checkout process since phone is valid
+          // We can perfom Checkout process since phone is valid
           if (!isBillingRequired && usrTkn && cartData) {
             const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
               userProfile: usrPrfl,
@@ -1074,12 +1498,18 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
         const userPhone =
           usrPrfl.phone === null ? phoneCountryDialCode : usrPrfl.phone
+
+        if (userPhone.length <= 5) {
+          phoneCountryCode.current = userPhone
+        }
+
         handleSetFormDataFromUserProfile({
           ...usrPrfl,
           phone: userPhone,
         })
       } else {
         // There is no user profile data
+        phoneCountryCode.current = phoneCountryDialCode
         setPhone(phoneCountryDialCode)
       }
 
@@ -1110,7 +1540,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       } else {
         setCountryByEvent()
       }
-    }, [countries, countryId, setCountryByEvent])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [countries, countryId])
 
     useEffect(() => {
       const getStates = async () => {
@@ -1123,12 +1554,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           return showAlert('BillingCoreRef not initialized')
         }
 
-        const {
-          statesData,
-          statesError,
-        } = await billingCoreRef.current.getStates(
-          selectedCountry.value.toString()
-        )
+        const { statesData, statesError } =
+          await billingCoreRef.current.getStates(
+            selectedCountry.value.toString()
+          )
 
         if (statesError) {
           onFetchStatesError?.(statesError!)
@@ -1174,21 +1603,6 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stateId, states])
 
-    const initTicketHoldersErrors = useCallback(() => {
-      if (ticketHoldersData.length > 1) {
-        const tHolders: ITicketHolderFieldError[] = []
-
-        for (let i = 0; i < ticketHoldersData.length; i++) {
-          tHolders.push({
-            firstNameError: '',
-            lastNameError: '',
-          })
-        }
-      }
-    }, [ticketHoldersData])
-
-    initTicketHoldersErrors()
-
     useEffect(() => {
       setCountries([
         {
@@ -1208,6 +1622,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     //#endregion
 
     const isDataValid = checkBasicDataValid()
+
+    const isButtonDisabled = config.isCheckoutAlwaysButtonEnabled
+      ? false
+      : !isDataValid
 
     //#region RENDER
     const renderTicketHolders = () => {
@@ -1229,30 +1647,36 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             </Text>
             <Input
               label={holderLabels.firstName}
-              value={ticketHoldersData[i]!.firstName}
+              value={ticketHoldersData[i].firstName}
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i]!.firstName = text
+                copyTicketHolders[i].firstName = text
+                copyTicketHolders[i].firstNameError = validateEmpty(text)
+
                 setTicketHoldersData(copyTicketHolders)
               }}
+              error={ticketHoldersData[i].firstNameError}
               styles={styles?.inputStyles}
             />
             <Input
               label={holderLabels.lastName}
-              value={ticketHoldersData[i]!.lastName}
+              value={ticketHoldersData[i].lastName}
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i]!.lastName = text
+                copyTicketHolders[i].lastName = text
+                copyTicketHolders[i].lastNameError = validateEmpty(text)
+
                 setTicketHoldersData(copyTicketHolders)
               }}
+              error={ticketHoldersData[i].lastNameError}
               styles={styles?.inputStyles}
             />
             <Input
               label={holderLabels.email}
-              value={ticketHoldersData[i]!.email}
+              value={ticketHoldersData[i].email}
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i]!.email = text
+                copyTicketHolders[i].email = text
                 setTicketHoldersData(copyTicketHolders)
               }}
               keyboardType='email-address'
@@ -1261,10 +1685,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             />
             <Input
               label={holderLabels.phone}
-              value={ticketHoldersData[i]!.phone}
+              value={ticketHoldersData[i].phone}
               onChangeText={(text) => {
                 const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i]!.phone = text
+                copyTicketHolders[i].phone = text
                 setTicketHoldersData(copyTicketHolders)
               }}
               keyboardType='phone-pad'
@@ -1335,15 +1759,15 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             <Input
               label={texts?.form?.firstName || 'First name'}
               value={firstName}
-              onChangeText={setFirstName}
-              error={firstNameError}
+              onChangeText={handleOnFirstNameChanged}
+              error={firstNameError || firstNameErrorState}
               styles={styles?.inputStyles}
             />
             <Input
               label={texts?.form?.lastName || 'Last name'}
               value={lastName}
-              onChangeText={setLastName}
-              error={lastNameError}
+              onChangeText={handleOnLastNameChanged}
+              error={lastNameError || lastNameErrorState}
               styles={styles?.inputStyles}
             />
 
@@ -1355,18 +1779,18 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             <Input
               label={texts?.form?.email || 'Email'}
               value={email}
-              onChangeText={setEmail}
+              onChangeText={handleOnEmailChanged}
               keyboardType='email-address'
-              error={emailError}
+              error={emailError || emailErrorState}
               styles={styles?.inputStyles}
               autoCapitalize='none'
             />
             <Input
               label={texts?.form?.confirmEmail || 'Confirm email'}
               value={emailConfirmation}
-              onChangeText={setEmailConfirmation}
+              onChangeText={handleOnEmailConfirmationChanged}
               keyboardType='email-address'
-              error={confirmEmailError}
+              error={confirmEmailError || emailConfirmationErrorState}
               styles={styles?.inputStyles}
               autoCapitalize='none'
             />
@@ -1388,8 +1812,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 <Input
                   label={texts?.form?.password || 'Password'}
                   isSecure
-                  onChangeText={setPassword}
-                  error={passwordError}
+                  onChangeText={handleOnPasswordChanged}
+                  error={passwordError || passwordErrorState}
                   styles={styles?.inputStyles}
                   autoCapitalize='none'
                   secureTextEntry={true}
@@ -1398,8 +1822,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 <Input
                   label={texts?.form?.confirmPassword || 'Confirm password'}
                   isSecure
-                  onChangeText={setPasswordConfirmation}
-                  error={confirmPasswordError}
+                  onChangeText={handleOnConfirmPasswordChanged}
+                  error={confirmPasswordError || confirmPasswordErrorState}
                   styles={styles?.inputStyles}
                   autoCapitalize='none'
                   secureTextEntry={true}
@@ -1426,40 +1850,42 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 <Input
                   label={addressLabel}
                   value={street}
-                  onChangeText={setStreet}
-                  error={streetError}
+                  onChangeText={handleOnStreetChanged}
+                  error={streetError || streetErrorState}
                   styles={styles?.inputStyles}
                 />
                 <Input
                   label={texts?.form?.city || 'City'}
                   value={city}
-                  onChangeText={setCity}
-                  error={cityError}
+                  onChangeText={handleOnCityChanged}
+                  error={cityError || cityErrorState}
                   styles={styles?.inputStyles}
                 />
                 <DropdownMaterial
                   items={countries}
-                  onSelectItem={setSelectedCountry}
+                  onSelectItem={handleOnCountryChanged}
                   selectedOption={selectedCountry}
                   styles={styles?.dropdownMaterialStyles}
                   materialInputProps={{
                     label: texts?.form?.country || 'Country',
+                    error: countryErrorState,
                   }}
                 />
                 <Input
                   label={texts?.form?.zipCode || 'Postal Code / Zip Code'}
                   value={postalCode}
-                  onChangeText={setPostalCode}
-                  error={postalCodeError}
+                  onChangeText={handleOnPostalCodeChanged}
+                  error={postalCodeError || postalCodeErrorState}
                   styles={styles?.inputStyles}
                 />
                 <DropdownMaterial
                   items={states}
-                  onSelectItem={setSelectedState}
+                  onSelectItem={handleOnStateChanged}
                   selectedOption={selectedState}
                   styles={styles?.dropdownMaterialStyles}
                   materialInputProps={{
                     label: texts?.form?.state || 'State',
+                    error: stateErrorState,
                   }}
                 />
               </>
@@ -1476,7 +1902,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                 onPress={handleIsSubToTicketFairyToggle}
                 isActive={isSubToTicketFairy}
                 customTextComp={
-                  <Text style={styles?.customCheckbox?.text}>
+                  <Text
+                    style={[
+                      styles?.customCheckbox?.text,
+                      !!ttfPrivacyPolicyError && {
+                        color: styles?.customCheckbox?.errorColor,
+                      },
+                    ]}
+                  >
                     {texts?.form?.isSubToTicketFairy ||
                       `I agree that The Ticket Fairy may use the personal data that have provided for marketing purposes, such as recommending events that I might be interested in, in accordance with its `}
                     <Text
@@ -1498,10 +1931,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             <Button
               onPress={onSubmit}
               text={texts?.checkoutButton || 'CHECKOUT'}
-              isDisabled={!isDataValid}
+              isDisabled={isButtonDisabled}
               isLoading={isSubmittingData}
               styles={
-                !isDataValid
+                isButtonDisabled
                   ? {
                       button: s.submitButtonDisabled,
                       ...styles?.checkoutButtonDisabled,

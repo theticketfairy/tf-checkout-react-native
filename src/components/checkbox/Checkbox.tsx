@@ -1,5 +1,12 @@
 import React from 'react'
-import { Image, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Image,
+  StyleProp,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native'
 
 import R from '../../res'
 import s from './styles'
@@ -13,6 +20,14 @@ const Checkbox = ({
   customTextComp,
   error,
 }: ICheckboxProps) => {
+  let indicatorStyles: StyleProp<ViewStyle> = isActive
+    ? [s.indicatorOn, styles?.indicator]
+    : [s.indicator, styles?.indicatorDisabled]
+
+  if (error) {
+    indicatorStyles = [...indicatorStyles, { borderColor: styles?.errorColor }]
+  }
+
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -21,19 +36,21 @@ const Checkbox = ({
     >
       <>
         <View style={[s.content, styles?.content]}>
-          <View
-            style={
-              isActive
-                ? [s.indicatorOn, styles?.indicator]
-                : [s.indicator, styles?.indicatorDisabled]
-            }
-          >
+          <View style={indicatorStyles}>
             {isActive && (
               <Image source={R.icons.check} style={[s.check, styles?.icon]} />
             )}
           </View>
           {customTextComp || (
-            <Text style={[s.textContainer, styles?.text]}>{text}</Text>
+            <Text
+              style={[
+                s.textContainer,
+                styles?.text,
+                !!error && { color: styles?.errorColor },
+              ]}
+            >
+              {text}
+            </Text>
           )}
         </View>
         {!!error && <Text style={styles?.error}>{error}</Text>}
