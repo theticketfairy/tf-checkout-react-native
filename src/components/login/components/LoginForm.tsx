@@ -45,6 +45,7 @@ const LoginForm: FC<ILoginFormProps> = ({
         value={email}
         onChangeText={onEmailChanged}
         autoCapitalize='none'
+        styles={styles?.dialog?.input}
       />
       <Input
         label={texts?.dialog?.passwordLabel || 'Password'}
@@ -55,6 +56,7 @@ const LoginForm: FC<ILoginFormProps> = ({
         autoCapitalize='none'
         secureTextEntry={true}
         isShowPasswordButtonVisible={isShowPasswordButtonVisible}
+        styles={styles?.dialog?.input}
       />
 
       {!!loginApiError && <Text style={[s.error]}>{loginApiError}</Text>}
