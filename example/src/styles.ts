@@ -175,11 +175,18 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
       title: {
         color: Color.textMain,
       },
+      message: { 
+        color: Color.textMain
+      },
       input: {
+        color: Color.textMain,
         baseColor: Color.textMain,
         input: {
-          color: Color.textMain,
-        },
+          color: Color.textMain
+        }
+      },
+      forgotPassword: {
+        color: Color.textMain
       },
       loginButton: {
         button: {

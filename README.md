@@ -3058,11 +3058,15 @@ Wrap your component with the Core component.
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+
 ## Version 2.0.0
 - Update ReactNative version to 0.71.7.
 - Update Stripe SDK to version 0.26.0.
   - Enables to better customize the card form.
 - Update dependencies.
+
+## Version 1.0.31
+- Add missing styles to LoginForm.
 
 ## Version 1.0.30
 - Show errors in Billing UI form fields.
