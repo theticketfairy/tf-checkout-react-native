@@ -3052,6 +3052,8 @@ Wrap your component with the Core component.
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+## Version 1.0.31
+- Add missing styles to LoginForm.
 ## Version 1.0.30
 - Show errors in Billing UI form fields.
 - Add config prop to Billing UI component, includes 2 configuration flags. 
