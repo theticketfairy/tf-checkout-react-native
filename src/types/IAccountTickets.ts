@@ -1,4 +1,4 @@
-import { IError } from './IError'
+import type { IError } from './IError'
 
 export interface IAccountOrdersPurchasedEvent {
   url_name: string

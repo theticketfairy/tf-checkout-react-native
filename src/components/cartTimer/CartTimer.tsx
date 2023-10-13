@@ -1,9 +1,11 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { type FC, useEffect, useState } from 'react'
 import { Image, Pressable, Text, View } from 'react-native'
 
 import R from '../../res'
 import s from './styles'
-import { ICartTimerProps } from './types'
+import type { ICartTimerProps } from './types'
+
+
 
 const CartTimer: FC<ICartTimerProps> = ({
   shouldNotMinimize,

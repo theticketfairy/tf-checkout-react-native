@@ -1,5 +1,5 @@
-import { IAddToWaitingListResponse } from '../../api/types'
-import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
+import type { IAddToWaitingListResponse } from '../../api/types'
+import type { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
 export interface IAddToWaitingListCoreParams {
   firstName: string

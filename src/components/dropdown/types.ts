@@ -1,4 +1,4 @@
-import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
 export interface IDropdownItem {
   label: string
   value: string | number
@@ -35,4 +35,5 @@ export interface IDropdownProps {
   selectedOption?: IDropdownItem
   onSelectItem: (item: IDropdownItem) => void
   styles?: IDropdownStyles
+  isDisabled?: boolean
 }

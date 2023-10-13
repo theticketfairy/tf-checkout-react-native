@@ -1,4 +1,5 @@
-import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
+//@ts-nocheck
+import Axios, { AxiosError, type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import axiosRetry from 'axios-retry'
 import _filter from 'lodash/filter'
 import _forEach from 'lodash/forEach'
@@ -7,8 +8,8 @@ import _map from 'lodash/map'
 import _mapKeys from 'lodash/mapKeys'
 import _sortBy from 'lodash/sortBy'
 
-import { IOnCheckoutSuccess } from '..'
-import { IWaitingListFields } from '../components/waitingList/types'
+import type { IOnCheckoutSuccess } from '..'
+import type { IWaitingListFields } from '../components/waitingList/types'
 import { Config } from '../helpers/Config'
 import { getDomainByClientAndEnv } from '../helpers/Domains'
 import {
@@ -17,15 +18,20 @@ import {
   LocalStorageKeys,
   storeData,
 } from '../helpers/LocalStorage'
-import { IAccountTicketsResponse, IError, IEvent, IUserProfile } from '../types'
-import {
+import type {
+  IAccountTicketsResponse,
+  IError,
+  IEvent,
+  IUserProfile,
+} from '../types'
+import type {
   IAddToCartResponse,
   ITicket,
   ITicketsResponseData,
 } from '../types/ITicket'
 import Constants from './Constants'
 import { getApiError } from './ErrorHandler'
-import {
+import type {
   IAddToCartParams,
   IAddToWaitingListResponse,
   IAuthorizeResponse,
@@ -119,6 +125,8 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 
 Client.interceptors.response.use(
   (response: AxiosResponse) => {
+    console.log(`Request url: ${response.request._url}`)
+    console.log(`Response `, response.data.data)
     return response
   },
   async (error: AxiosError) => {
@@ -156,8 +164,10 @@ Client.setDomain = (domain: string) =>
     origin: domain,
   })
 
-Client.setContentType = (contentType: string) =>
-  (Client.defaults.headers.common['Content-Type'] = contentType)
+Client.setContentType = (contentType: string) => {
+  Client.defaults.headers.common['Content-Type'] = contentType
+  Client.defaults.headers['Content-Type'] = contentType
+}
 
 export const setCustomHeader = (response: any) => {
   const guestHeaderResponseValue = _get(response, 'headers.authorization-guest')
@@ -186,9 +196,16 @@ export const authorize = async (
 ): Promise<IAuthorizeResponse> => {
   let responseError: IError | undefined
 
+  //Client.setContentType('multipart/form-data')
+
   const response = await Client.post(
     `/v1/oauth/authorize-rn?client_id=${Config.CLIENT_ID}`,
-    data
+    data,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
   ).catch((error: AxiosError) => {
     responseError = {
       message: error?.response?.data.message || 'Authorization failed',
@@ -206,14 +223,16 @@ export const fetchAccessToken = async (
   data: FormData
 ): Promise<IFetchAccessTokenResponse> => {
   let responseError: IError | undefined
-  const response = await Client.post('/v1/oauth/access_token', data).catch(
-    (error: AxiosError) => {
-      responseError = {
-        message: error.response?.data.message,
-        code: error.response?.status,
-      }
+  const response = await Client.post('/v1/oauth/access_token', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status,
     }
-  )
+  })
 
   const accessToken = _get(response, 'data.access_token')
   if (accessToken) {
@@ -633,6 +652,10 @@ export const fetchTickets = async (
     promoCodeResult: promoCodeResult,
     isInWaitingList: _get(response, 'data.data.attributes.showWaitingList'),
     isAccessCodeRequired: _get(response, 'data.data.attributes.is_access_code'),
+    arePromoCodesEnabled: _get(
+      response,
+      'data.data.attributes.isPromotionsEnabled'
+    ),
   }
 }
 //#endregion Tickets
@@ -1248,7 +1271,7 @@ export const requestRestorePassword = async (
   let successData: IRestorePasswordData | undefined
 
   const response: AxiosResponse | void = await Client.post(
-    `v1/oauth/restore-password-rn`,
+    `/auth/restore-password`,
     {
       email: email,
     }

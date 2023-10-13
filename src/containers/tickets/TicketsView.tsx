@@ -10,10 +10,13 @@ import {
 } from '../../components'
 import Button from '../../components/button/Button'
 import Separator from '../../components/separator/Separator'
+import { Config } from '../../helpers/Config'
 import TicketGroupListHeader from './components/TicketGroupListHeader'
 import CartListItem from './components/TicketListItem'
 import s from './styles'
-import { ITicketsViewProps } from './types'
+import type { ITicketsViewProps } from './types'
+
+
 
 const TicketsView = ({
   isGettingTickets,
@@ -45,6 +48,7 @@ const TicketsView = ({
   areTicketsGroupsShown,
   passwordProtectedEventData,
   onPressSubmitEventPassword,
+  arePromoCodesEnabled,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
     !selectedTicket || selectedTicket.selectedOption?.value === 0
@@ -69,15 +73,17 @@ const TicketsView = ({
         <View style={s.header}>
           <Text style={[s.headerText, styles?.title]}>{title}</Text>
         </View>
-        <PromoCode
-          onPressApply={onPressApplyPromoCode}
-          promoCodeValidationMessage={promoCodeValidationMessage}
-          isPromoCodeValid={isPromoCodeValid}
-          isAccessCodeEnabled={isAccessCodeEnabled}
-          styles={styles?.promoCode}
-          texts={texts?.promoCode}
-          closeButtonIcon={promoCodeCloseIcon}
-        />
+        {arePromoCodesEnabled && (
+          <PromoCode
+            onPressApply={onPressApplyPromoCode}
+            promoCodeValidationMessage={promoCodeValidationMessage}
+            isPromoCodeValid={isPromoCodeValid}
+            isAccessCodeEnabled={isAccessCodeEnabled}
+            styles={styles?.promoCode}
+            texts={texts?.promoCode}
+            closeButtonIcon={promoCodeCloseIcon}
+          />
+        )}
         {areTicketsGroupsShown ? (
           <SectionList
             sections={groupedTickets}
@@ -118,6 +124,7 @@ const TicketsView = ({
                 {...item}
               />
             )}
+            // eslint-disable-next-line react/no-unstable-nested-components
             ItemSeparatorComponent={() => <Separator />}
           />
         )}
@@ -155,6 +162,13 @@ const TicketsView = ({
         )}
         {(isGettingTickets || isGettingEvent) &&
           areLoadingIndicatorsEnabled && <Loading />}
+        <View style={{ flexDirection: 'row', width: '100%', flexWrap: 'wrap' }}>
+          <Text>Config - </Text>
+          <Text>EVENT ID: {Config.EVENT_ID} </Text>
+          <Text>CLIENT: {Config.CLIENT} </Text>
+          <Text>BRAND: {Config.BRAND} </Text>
+          <Text>ENV: {Config.ENV} </Text>
+        </View>
       </View>
     </View>
   )

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { type FC, useState } from 'react'
 import { Text, View } from 'react-native'
 
 import { useDebounced } from '../../helpers/Debounced'
@@ -6,7 +6,7 @@ import { validateEmail } from '../../helpers/Validators'
 import Button from '../button/Button'
 import Input from '../input/Input'
 import { restorePasswordStyles as s } from './styles'
-import { IRestorePasswordProps } from './types'
+import type { IRestorePasswordProps } from './types'
 
 const RestorePassword: FC<IRestorePasswordProps> = ({
   styles,

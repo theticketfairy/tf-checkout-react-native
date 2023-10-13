@@ -1,4 +1,4 @@
-import {
+import type {
   ColorValue,
   ImageStyle,
   StyleProp,
@@ -6,26 +6,26 @@ import {
   ViewStyle,
 } from 'react-native'
 
-import {
+import type {
   IMyOrderDetailsData,
   IMyOrderDetailsItem,
   IMyOrderDetailsTicket,
 } from '../../api/types'
-import {
+import type {
   IBottomSheetModalStyles,
   IBottomSheetModalTexts,
 } from '../../components/bottomSheetModal/BottomSheetModalTypes'
-import { IButtonStyles } from '../../components/button/types'
-import { IError } from '../../types'
-import { INotificationIcons } from './components/Notification'
-import {
+import type { IButtonStyles } from '../../components/button/types'
+import type { IError } from '../../types'
+import type { INotificationIcons } from './components/Notification'
+import type {
   ITicketActionIcons,
   ITicketActionsStyles,
   ITicketActionTexts,
   TicketActionType,
 } from './components/TicketActions/TicketActionsTypes'
-import { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem'
-import {
+import type { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem'
+import type {
   ITicketListItemStyles,
   ITicketListItemTexts,
 } from './components/TicketListItem/TicketListItemTypes'

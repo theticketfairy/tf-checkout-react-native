@@ -9,14 +9,19 @@ import {
   postOnFreeRegistration,
   postOnPaymentSuccess,
 } from '../../api/ApiClient'
-import {
+import type {
   IFetchAccessTokenResponse,
   IFreeRegistrationResponse,
   IMyOrderDetailsResponse,
   IOrderReviewResponse,
 } from '../../api/types'
 import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
-import { CheckoutCoreHandle, ICheckoutCoreProps } from './CheckoutCoreTypes'
+import type {
+  CheckoutCoreHandle,
+  ICheckoutCoreProps,
+} from './CheckoutCoreTypes'
+
+
 
 const CheckoutCore = forwardRef<CheckoutCoreHandle, ICheckoutCoreProps>(
   (props, ref) => {

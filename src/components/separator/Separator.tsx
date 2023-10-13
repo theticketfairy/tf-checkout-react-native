@@ -1,7 +1,9 @@
 import React from 'react'
 import { View } from 'react-native'
 
-import { ISeparatorProps } from './types'
+import type { ISeparatorProps } from './types'
+
+
 
 const Separator = ({
   color,

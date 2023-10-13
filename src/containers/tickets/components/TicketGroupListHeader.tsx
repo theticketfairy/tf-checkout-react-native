@@ -1,7 +1,9 @@
-import React, { FC } from 'react'
+import React, { type FC } from 'react'
 import { Text, View } from 'react-native'
 
-import { ITicketGroupListHeaderProps } from './types'
+import type { ITicketGroupListHeaderProps } from './types'
+
+
 
 const TicketGroupListHeader: FC<ITicketGroupListHeaderProps> = ({
   styles,

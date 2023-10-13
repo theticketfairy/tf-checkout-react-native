@@ -1,9 +1,11 @@
-import React, { FC } from 'react'
+import React, { type FC } from 'react'
 import { Image, Text, TouchableOpacity, View } from 'react-native'
 
 import R from '../../../res'
 import { OrderListItemStyles as s } from './styles'
-import { IOrderListItemProps } from './types'
+import type { IOrderListItemProps } from './types'
+
+
 
 const OrderListItem: FC<IOrderListItemProps> = ({
   order,

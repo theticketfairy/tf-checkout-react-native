@@ -3,7 +3,9 @@ import { ActivityIndicator, Modal, Text, View } from 'react-native'
 
 import R from '../../res'
 import s from './styles'
-import { ILoadingProps } from './types'
+import type { ILoadingProps } from './types'
+
+
 
 const Loading = ({
   text = 'Loading...',

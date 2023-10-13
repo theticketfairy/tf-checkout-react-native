@@ -2,7 +2,9 @@ import React from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 
 import { DropdownListItemStyles as s } from './styles'
-import { IDropdownListItemProps } from './types'
+import type { IDropdownListItemProps } from './types'
+
+
 
 const DropdownListItem = ({
   item,

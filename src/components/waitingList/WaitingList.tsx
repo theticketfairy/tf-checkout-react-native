@@ -8,13 +8,13 @@ import React, {
 } from 'react'
 import { Alert } from 'react-native'
 
-import { IFetchAccessTokenResponse } from '../../api/types'
-import { WaitingListCore, WaitingListCoreHandle } from '../../core'
-import { SessionCoreHandleType } from '../../core/Session/SessionCoreTypes'
-import { IAddToWaitingListCoreParams } from '../../core/WaitingListCore/WaitingListCoreTypes'
+import type { IFetchAccessTokenResponse } from '../../api/types'
+import { WaitingListCore, type WaitingListCoreHandle } from '../../core'
+import type { SessionCoreHandleType } from '../../core/Session/SessionCoreTypes'
+import type { IAddToWaitingListCoreParams } from '../../core/WaitingListCore/WaitingListCoreTypes'
 import { useDebounced } from '../../helpers/Debounced'
 import { validateEmail, validateEmpty } from '../../helpers/Validators'
-import { IWaitingListProps } from './types'
+import type { IWaitingListProps } from './types'
 import WaitingListView from './WaitingListView'
 
 const WaitingList = forwardRef<SessionCoreHandleType, IWaitingListProps>(
@@ -60,8 +60,10 @@ const WaitingList = forwardRef<SessionCoreHandleType, IWaitingListProps>(
       async refreshAccessToken(
         refreshToken: string
       ): Promise<IFetchAccessTokenResponse> {
-        const { accessTokenError, accessTokenData } =
-          await waitingListCoreRef.current!.refreshAccessToken(refreshToken)
+        const {
+          accessTokenError,
+          accessTokenData,
+        } = await waitingListCoreRef.current!.refreshAccessToken(refreshToken)
 
         return {
           accessTokenData,
@@ -90,8 +92,10 @@ const WaitingList = forwardRef<SessionCoreHandleType, IWaitingListProps>(
 
       setIsLoading(true)
 
-      const { addToWaitingListData, addToWaitingListError } =
-        await waitingListCoreRef.current.addToWaitingList(values)
+      const {
+        addToWaitingListData,
+        addToWaitingListError,
+      } = await waitingListCoreRef.current.addToWaitingList(values)
 
       setIsLoading(false)
       if (addToWaitingListError) {

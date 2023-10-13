@@ -4,6 +4,8 @@ import R from '../../res'
 
 const { width: screenWidth } = Dimensions.get('window')
 
+
+
 export default StyleSheet.create({
   rootContainer: {
     backgroundColor: R.colors.transparentBlack,

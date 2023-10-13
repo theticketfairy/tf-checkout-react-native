@@ -1,5 +1,5 @@
 import {
-  BillingDetails,
+  type BillingDetails,
   CardForm,
   CardFormView,
   initStripe,
@@ -20,19 +20,19 @@ import React, {
 import { Alert, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { IFetchAccessTokenResponse, IOrderReview } from '../../api/types'
+import type { IFetchAccessTokenResponse, IOrderReview } from '../../api/types'
 import { CartTimer, Loading } from '../../components'
 import Button from '../../components/button/Button'
-import { IFormFieldProps } from '../../components/formField/types'
-import { CheckoutCore, CheckoutCoreHandle, SessionHandle } from '../../core'
-import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
+import type { IFormFieldProps } from '../../components/formField/types'
+import { CheckoutCore, type CheckoutCoreHandle, SessionHandle } from '../../core'
+import type { SessionHandleType } from '../../core/Session/SessionCoreTypes'
 import { Config } from '../../helpers/Config'
 import { priceWithCurrency } from '../../helpers/StringsHelper'
 import { orderReviewItems } from './CheckoutData'
 import Conditions from './components/Conditions'
 import OrderReview from './components/OrderReview'
 import s from './styles'
-import { ICheckoutProps, IOrderDetails, IOrderItem } from './types'
+import type { ICheckoutProps, IOrderDetails, IOrderItem } from './types'
 
 const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
   (
@@ -302,9 +302,9 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
 
       const orderDetails: IOrderDetails = {
         eventId: eventIdNumber,
-        ticketName: orderDetailsData.items[0].name,
-        ticketCost: orderDetailsData.items[0].price,
-        numberOfTickets: parseInt(orderDetailsData.items[0].quantity, 10),
+        ticketName: orderDetailsData.items[0]?.name,
+        ticketCost: orderDetailsData.items[0]?.price,
+        numberOfTickets: parseInt(orderDetailsData.items[0]!.quantity, 10),
         eventUserTickets: _map(orderDetailsData.tickets, (ticket) => ({
           hash: ticket.hash,
           ticketType: ticket.ticketType,
@@ -364,7 +364,7 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
           postalCode: addressData.postalCode,
         },
       }
-
+      
       const {
         error: confirmPaymentError,
         paymentIntent,
@@ -412,7 +412,7 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
           id: `condition${index}`,
           fieldType: 'checkbox',
           checkboxProps: {
-            isActive: conditionsValues[index],
+            isActive: conditionsValues[index] as boolean,
             text: conditionTxt,
             onPress: () => handleOnCheckCondition(index),
           },
@@ -509,32 +509,30 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
                 </View>
               )}
               <Conditions {...getConditions()} />
-              {isPaymentRequired && !isStripeConfigMissing && (
-                <Button
-                  text={texts?.payButton || 'PAY'}
-                  onPress={handleOnPressPay}
-                  isLoading={isLoading || isLoadingPayment}
-                  isDisabled={!isDataValid}
-                  styles={{
-                    container: s.payButton,
-                    ...payButtonStyle,
-                  }}
-                />
-              )}
-              {isPaymentRequired !== undefined && !isPaymentRequired && (
-                <Button
-                  text={
-                    texts?.freeRegistrationButton || 'COMPLETE REGISTRATION'
-                  }
-                  onPress={handleOnPressFreeRegistration}
-                  isLoading={isLoading || isLoadingPayment}
-                  styles={styles?.freeRegistrationButton}
-                  isDisabled={secondsLeft === 0}
-                />
-              )}
             </View>
             {isLoading && areLoadingIndicatorsEnabled && <Loading />}
           </KeyboardAwareScrollView>
+          {isPaymentRequired && !isStripeConfigMissing && (
+            <Button
+              text={texts?.payButton || 'PAY'}
+              onPress={handleOnPressPay}
+              isLoading={isLoading || isLoadingPayment}
+              isDisabled={!isDataValid}
+              styles={{
+                container: s.payButton,
+                ...payButtonStyle,
+              }}
+            />
+          )}
+          {isPaymentRequired !== undefined && !isPaymentRequired && (
+            <Button
+              text={texts?.freeRegistrationButton || 'COMPLETE REGISTRATION'}
+              onPress={handleOnPressFreeRegistration}
+              isLoading={isLoading || isLoadingPayment}
+              styles={styles?.freeRegistrationButton}
+              isDisabled={secondsLeft === 0}
+            />
+          )}
           {secondsLeft !== undefined && (
             <CartTimer
               secondsLeft={secondsLeft!}

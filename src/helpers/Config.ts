@@ -70,6 +70,8 @@ export const setConfig = async (
 
   Config.IS_BILLING_STREET_NAME_REQUIRED = true
 
+  Client.setContentType('application/vnd.api+json')
+
   if (Config.AUTH) {
     await storeData(LocalStorageKeys.ACCESS_TOKEN, Config.AUTH.ACCESS_TOKEN)
     await storeData(

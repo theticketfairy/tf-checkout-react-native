@@ -1,10 +1,10 @@
-import {
+import type {
   IMyOrderDetailsResponse,
   IMyOrdersRequestParams,
   IMyOrdersResponse,
 } from '../../api/types'
-import { IAccountTicketsResponse } from '../../types'
-import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
+import type { IAccountTicketsResponse } from '../../types'
+import type { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
 export type MyOrdersCoreHandleType = {
   getMyOrders(params: IMyOrdersRequestParams): Promise<IMyOrdersResponse>

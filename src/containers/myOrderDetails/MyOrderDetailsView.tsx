@@ -1,17 +1,23 @@
 import Clipboard from '@react-native-clipboard/clipboard'
 import _map from 'lodash/map'
-import React, { FC } from 'react'
+import React, { type FC } from 'react'
 import { Image, SectionList, Text, TouchableOpacity, View } from 'react-native'
 
-import { IMyOrderDetailsItem, IMyOrderDetailsTicket } from '../../api/types'
+import type {
+  IMyOrderDetailsItem,
+  IMyOrderDetailsTicket,
+} from '../../api/types'
 import { BottomSheetModal, Loading } from '../../components'
 import R from '../../res'
 import Notification from './components/Notification'
 import TicketActions from './components/TicketActions/TicketActions'
-import { TicketActionType } from './components/TicketActions/TicketActionsTypes'
+import type { TicketActionType } from './components/TicketActions/TicketActionsTypes'
 import TicketListItem from './components/TicketListItem/TicketListItem'
 import s from './styles'
-import { IMyOrderDetailsViewProps, IOrderDetailsSectionData } from './types'
+import type {
+  IMyOrderDetailsViewProps,
+  IOrderDetailsSectionData,
+} from './types'
 
 const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
   data: { header, items, tickets },
@@ -240,7 +246,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
               >
                 <Text style={styles?.section0Footer?.label}>{itemsTotal}</Text>
                 <Text style={styles?.section0Footer?.value}>
-                  {parsedItems ? parsedItems[0].item.currency : ''}{' '}
+                  {parsedItems ? parsedItems[0]!!.item.currency : ''}{' '}
                   {header.total}
                 </Text>
               </View>

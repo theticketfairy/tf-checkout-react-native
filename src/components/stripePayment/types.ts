@@ -1,9 +1,9 @@
-import {
+import type {
   CardFormView,
   InitStripeParams,
   PaymentIntent,
 } from '@stripe/stripe-react-native'
-import { StyleProp, ViewStyle } from 'react-native'
+import type { StyleProp, ViewStyle } from 'react-native'
 
 export interface IStripePaymentProps {
   onChangePaymentInfo: (paymentInfo: CardFormView.Details) => void

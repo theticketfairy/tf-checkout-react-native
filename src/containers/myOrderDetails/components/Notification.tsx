@@ -1,5 +1,5 @@
-import React, { FC } from 'react'
-import { Image, ImageSourcePropType, Text, View } from 'react-native'
+import React, { type FC } from 'react'
+import { Image, type ImageSourcePropType, Text, View } from 'react-native'
 
 import R from '../../../res'
 import { NotificationStyles as s } from './styles'
@@ -16,6 +16,8 @@ export interface INotificationProps {
 
   icons?: INotificationIcons
 }
+
+
 
 const Notification: FC<INotificationProps> = ({
   isSuccess,

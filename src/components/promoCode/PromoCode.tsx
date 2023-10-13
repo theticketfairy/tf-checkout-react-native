@@ -1,10 +1,12 @@
-import React, { FC, useState } from 'react'
+import React, { type FC, useState } from 'react'
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 import R from '../../res'
 import Button from '../button/Button'
 import s from './styles'
-import { IPromoCodeProps } from './types'
+import type { IPromoCodeProps } from './types'
+
+
 
 const PromoCode: FC<IPromoCodeProps> = ({
   onPressApply,
@@ -40,6 +42,7 @@ const PromoCode: FC<IPromoCodeProps> = ({
     } else if (typeof isPromoCodeValid === 'number') {
       return isPromoCodeValid > 0
     }
+    return false
   }
 
   const isApplyButtonDisabled = promoCode.length === 0

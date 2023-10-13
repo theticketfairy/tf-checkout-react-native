@@ -1,8 +1,9 @@
+//@ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as React from 'react' //Needed to render
 import { LogBox, NativeModules } from 'react-native'
 
-import {
+import type {
   IMyOrderDetailsData,
   IMyOrdersOrder,
   MyOrderRequestFromType,
@@ -18,43 +19,43 @@ import {
   ResetPassword,
   Tickets,
 } from './containers'
-import {
+import type {
   IBillingProps,
   IOnCheckoutSuccess,
   SkippingStatusType,
 } from './containers/billingInfo/types'
-import { ICheckoutProps } from './containers/checkout/types'
-import { IMyOrderDetailsProps } from './containers/myOrderDetails/types'
-import { IMyOrdersProps } from './containers/myOrders/types'
-import { IPurchaseConfirmationProps } from './containers/purchaseConfirmation/types'
-import { IResaleTicketsProps } from './containers/resaleTickets/types'
-import { ITicketsProps } from './containers/tickets/types'
+import type { ICheckoutProps } from './containers/checkout/types'
+import type { IMyOrderDetailsProps } from './containers/myOrderDetails/types'
+import type { IMyOrdersProps } from './containers/myOrders/types'
+import type { IPurchaseConfirmationProps } from './containers/purchaseConfirmation/types'
+import type { IResaleTicketsProps } from './containers/resaleTickets/types'
+import type { ITicketsProps } from './containers/tickets/types'
 import {
   BillingCore,
-  BillingCoreHandle,
+  type BillingCoreHandle,
   CheckoutCore,
-  CheckoutCoreHandle,
+  type CheckoutCoreHandle,
   LoginCore,
-  LoginCoreHandle,
+  type LoginCoreHandle,
   MyOrdersCore,
-  MyOrdersCoreHandle,
+  type MyOrdersCoreHandle,
   OrderDetailsCore,
-  OrderDetailsCoreHandle,
+  type OrderDetailsCoreHandle,
   PurchaseConfirmationCore,
-  PurchaseConfirmationCoreHandle,
+  type PurchaseConfirmationCoreHandle,
   ResetPasswordCore,
-  ResetPasswordCoreHandle,
-  SessionCoreHandleType,
-  SessionHandleType,
+  type ResetPasswordCoreHandle,
+  type SessionCoreHandleType,
+  type SessionHandleType,
   TicketsCore,
-  TicketsCoreHandle,
+  type TicketsCoreHandle,
   WaitingListCore,
-  WaitingListCoreHandle,
+  type WaitingListCoreHandle,
 } from './core'
 import { setConfig } from './helpers/Config'
 import { deleteAllData } from './helpers/LocalStorage'
 import { refreshAccessToken } from './helpers/RefreshAccessToken'
-import {
+import type {
   IAccountOrdersPurchasedEvent,
   IAccountOrdersTicket,
   IAccountTicketsAttributes,
@@ -69,14 +70,24 @@ LogBox.ignoreAllLogs()
 console.reportErrorsAsExceptions = false
 
 export {
-  BillingCore,
-  BillingCoreHandle,
+  BillingCore, 
   BillingInfo,
   Checkout,
-  CheckoutCore,
-  CheckoutCoreHandle,
-  deleteAllData,
-  IAccountOrdersPurchasedEvent,
+  CheckoutCore, 
+  deleteAllData, 
+  LoggedIn,
+  Login,
+  LoginCore, 
+  MyOrderDetails, MyOrders,
+  MyOrdersCore, OrderDetailsCore, PurchaseConfirmation,
+  PurchaseConfirmationCore, refreshAccessToken,
+  ResaleTickets,
+  ResetPassword,
+  ResetPasswordCore, setConfig, Tickets,
+  TicketsCore, WaitingListCore
+}
+export type {
+  BillingCoreHandle, CheckoutCoreHandle, IAccountOrdersPurchasedEvent,
   IAccountOrdersTicket,
   IAccountTicketsAttributes,
   IAccountTicketsData,
@@ -92,35 +103,9 @@ export {
   IResaleTicketsProps,
   ITicketsProps,
   ITicketsResponseData,
-  IUserProfile,
-  LoggedIn,
-  Login,
-  LoginCore,
-  LoginCoreHandle,
-  MyOrderDetails,
-  MyOrderRequestFromType,
-  MyOrders,
-  MyOrdersCore,
-  MyOrdersCoreHandle,
-  OrderDetailsCore,
-  OrderDetailsCoreHandle,
-  PurchaseConfirmation,
-  PurchaseConfirmationCore,
-  PurchaseConfirmationCoreHandle,
-  refreshAccessToken,
-  ResaleTickets,
-  ResetPassword,
-  ResetPasswordCore,
-  ResetPasswordCoreHandle,
+  IUserProfile, LoginCoreHandle, MyOrderRequestFromType, MyOrdersCoreHandle, OrderDetailsCoreHandle, PurchaseConfirmationCoreHandle, ResetPasswordCoreHandle,
   SessionCoreHandleType,
-  SessionHandleType,
-  setConfig,
-  SkippingStatusType,
-  Tickets,
-  TicketsCore,
-  TicketsCoreHandle,
-  WaitingListCore,
-  WaitingListCoreHandle,
+  SessionHandleType, SkippingStatusType, TicketsCoreHandle, WaitingListCoreHandle
 }
 
 export default NativeModules.TFCheckoutRNModule

@@ -1,11 +1,11 @@
-import {
+import type {
   ICloseSessionResponse,
   IFetchAccessTokenData,
   IResetPasswordRequestData,
   IRestorePasswordResponse,
 } from '../../api/types'
-import { ILoginFields } from '../../components/login/types'
-import { IError, IUserProfilePublic } from '../../types'
+import type { ILoginFields } from '../../components/login/types'
+import type { IError, IUserProfilePublic } from '../../types'
 
 export interface ILoginCoreResponse {
   error?: IError

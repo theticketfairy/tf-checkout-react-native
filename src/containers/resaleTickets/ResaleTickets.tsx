@@ -1,19 +1,19 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 
-import { IFetchAccessTokenResponse } from '../../api/types'
+import type { IFetchAccessTokenResponse } from '../../api/types'
 import {
   OrderDetailsCore,
-  OrderDetailsCoreHandle,
+  type OrderDetailsCoreHandle,
   SessionHandle,
 } from '../../core'
-import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
+import type { SessionHandleType } from '../../core/Session/SessionCoreTypes'
 import { useDebounced } from '../../helpers/Debounced'
 import { validateEmail, validateEmpty } from '../../helpers/Validators'
 import ResaleTicketsView from './ResaleTicketsView'
 import {
-  IResaleTicketsProps,
-  IResaleToWhomData,
+  type IResaleTicketsProps,
+  type IResaleToWhomData,
   ResaleToWhomFieldIdEnum,
 } from './types'
 
@@ -89,8 +89,10 @@ const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
           }
         }
 
-        const { accessTokenError, accessTokenData } =
-          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+        const {
+          accessTokenError,
+          accessTokenData,
+        } = await sessionHandleRef.current!.refreshAccessToken(refreshToken)
 
         return {
           accessTokenData,
@@ -117,8 +119,10 @@ const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
       formData.append('confirm_email', emailConfirm)
       formData.append('confirm', String(isTermsAgreed))
 
-      const { resaleTicketData, resaleTicketError } =
-        await orderDetailsCoreRef.current!.resaleTicket(formData, ticket.hash)
+      const {
+        resaleTicketData,
+        resaleTicketError,
+      } = await orderDetailsCoreRef.current!.resaleTicket(formData, ticket.hash)
 
       setIsLoading(false)
 

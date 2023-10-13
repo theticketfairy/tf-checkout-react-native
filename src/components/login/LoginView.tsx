@@ -1,20 +1,23 @@
-import React, { FC, useMemo, useState } from 'react'
-import { Alert, Image, Modal, Text, TouchableOpacity, View } from 'react-native'
+import React, { type FC, useMemo, useState } from 'react'
+import { Alert, Image, Modal, TouchableOpacity, View } from 'react-native'
 
 import { useDebounced } from '../../helpers/Debounced'
 import { validateEmail, validateMinLength } from '../../helpers/Validators'
 import R from '../../res'
-import Button from '../button/Button'
 import RestorePassword from '../restorePassword/RestorePassword'
 import ResultDialog from '../restorePassword/ResultDialog'
+import GuestComponent from './components/GuestComponent'
+import LoggedComponent from './components/LoggedComponent'
 import LoginForm from './components/LoginForm'
 import s from './styles'
-import { ILoginViewProps, ILoginViewState } from './types'
+import type { ILoginViewProps, ILoginViewState } from './types'
 
 const initialState: ILoginViewState = {
   loginEmail: '',
   loginPassword: '',
 }
+
+
 
 const LoginView: FC<ILoginViewProps> = ({
   showDialog,
@@ -85,41 +88,6 @@ const LoginView: FC<ILoginViewProps> = ({
     }
     return true
   }
-
-  const LoggedComponent = () => (
-    <View style={styles?.loggedIn?.container}>
-      <Text style={styles?.loggedIn?.placeholder}>
-        {texts?.loggedIn?.loggedAs || 'Logged in as:'}{' '}
-        <Text style={styles?.loggedIn?.value}>{userFirstName}</Text>
-      </Text>
-      <Text style={styles?.loggedIn?.message}>
-        {texts?.loggedIn?.notYou || 'Not you?'}
-      </Text>
-      <Button
-        text={texts?.logoutButton || 'LOGOUT'}
-        onPress={handleOnPressLogout}
-        styles={{ container: s.button, ...styles?.loggedIn?.button }}
-      />
-    </View>
-  )
-
-  const GuestComponent = () => (
-    <>
-      {texts?.message ? (
-        <Text style={styles?.guest?.message}>{texts?.message}</Text>
-      ) : (
-        <View style={styles?.guest?.linesContainer}>
-          <Text style={styles?.guest?.line1}>{line1}</Text>
-          <Text style={styles?.guest?.line2}>{line2}</Text>
-        </View>
-      )}
-      <Button
-        styles={{ container: s.button, ...styles?.guest?.loginButton }}
-        text={texts?.loginButton || 'LOGIN'}
-        onPress={showDialog}
-      />
-    </>
-  )
 
   const BrandImages = useMemo(
     () => (
@@ -222,7 +190,25 @@ const LoginView: FC<ILoginViewProps> = ({
   //#region Render main component
   return (
     <View style={s.rootContainer}>
-      {userFirstName ? LoggedComponent() : GuestComponent()}
+      {userFirstName ? (
+        <LoggedComponent
+          onPressLogout={handleOnPressLogout}
+          userFirstName={userFirstName}
+          styles={styles?.loggedIn}
+          texts={texts?.loggedIn}
+        />
+      ) : (
+        <GuestComponent
+          texts={{
+            line1: line1,
+            line2: line2,
+            message: texts?.message,
+            loginButton: texts?.loginButton,
+          }}
+          styles={styles?.guest}
+          onPressButton={showDialog}
+        />
+      )}
 
       {isDialogVisible && (
         <Modal transparent={true} presentationStyle='overFullScreen'>

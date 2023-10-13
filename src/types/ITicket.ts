@@ -1,6 +1,6 @@
-import { IDropdownItem } from '../components/dropdown/types'
-import { TicketsType } from '../core/TicketsCore/TicketsCoreTypes'
-import { IError } from './IError'
+import type { IDropdownItem } from '../components/dropdown/types'
+import type { TicketsType } from '../core/TicketsCore/TicketsCoreTypes'
+import type { IError } from './IError'
 
 export interface ITicket {
   sortOrder: number
@@ -72,4 +72,5 @@ export interface IOnFetchTicketsSuccess {
   isInWaitingList?: boolean
   isAccessCodeRequired?: boolean
   areTicketsGroupsShown?: boolean
+  arePromoCodesEnabled?: boolean
 }

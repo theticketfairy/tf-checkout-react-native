@@ -15,7 +15,7 @@ import {
   postReferralVisit,
   unlockPasswordProtectedEvent,
 } from '../../api/ApiClient'
-import {
+import type {
   IAddToCartParams,
   ICloseSessionResponse,
   IEventResponse,
@@ -30,13 +30,13 @@ import {
   LocalStorageKeys,
 } from '../../helpers/LocalStorage'
 import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
-import {
+import type {
   IAccountTicketsResponse,
   IAddToCartResponse,
   ITicket,
 } from '../../types'
-import { ICoreProps } from '../CoreProps'
-import {
+import type { ICoreProps } from '../CoreProps'
+import type {
   IBookTicketsOptions,
   IGetTicketsOptions,
   IGetTicketsPayload,

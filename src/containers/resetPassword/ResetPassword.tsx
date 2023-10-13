@@ -1,10 +1,10 @@
-import React, { FC, useRef, useState } from 'react'
+import React, { type FC, useRef, useState } from 'react'
 
-import { ResetPasswordCore, ResetPasswordCoreHandle } from '../../core'
+import { ResetPasswordCore, type ResetPasswordCoreHandle } from '../../core'
 import { useDebounced } from '../../helpers/Debounced'
 import { validatePasswords } from '../../helpers/Validators'
 import ResetPasswordView from './ResetPasswordView'
-import { IResetPasswordProps } from './types'
+import type { IResetPasswordProps } from './types'
 
 const ResetPassword: FC<IResetPasswordProps> = ({
   token,

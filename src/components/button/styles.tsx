@@ -2,6 +2,8 @@ import { StyleSheet } from 'react-native'
 
 import R from '../../res'
 
+
+
 export default StyleSheet.create({
   container: {
     alignItems: 'center',

@@ -1,14 +1,16 @@
-import React, { FC } from 'react'
+import React, { type FC } from 'react'
 import {
   Image,
-  ImageSourcePropType,
+  type ImageSourcePropType,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native'
 
-import { ITicketActionsProps } from './TicketActionsTypes'
+import type { ITicketActionsProps } from './TicketActionsTypes'
+
+
 
 const TicketActions: FC<ITicketActionsProps> = ({
   onSelectAction,

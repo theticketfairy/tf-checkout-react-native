@@ -21,6 +21,7 @@ export interface IStoredUserData {
   email: string
 }
 
+//@ts-ignore
 export const storeData = async (key: string, value: string) => {
   try {
     await AsyncStorage.setItem(key, value)
@@ -29,6 +30,7 @@ export const storeData = async (key: string, value: string) => {
   }
 }
 
+//@ts-ignore
 export const getData = async (key: string) => {
   try {
     const value = await AsyncStorage.getItem(key)
@@ -93,5 +95,6 @@ export const checkStoredData = async () => {
     return values
   } catch (ex) {
     console.log('Local Storage GetData Error - checkStoredData')
+    return undefined
   }
 }

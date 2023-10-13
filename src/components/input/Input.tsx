@@ -1,12 +1,13 @@
 //@ts-nocheck
-
 import React from 'react'
 import { Image, TouchableOpacity, View } from 'react-native'
 import { OutlinedTextField as TextField } from 'rn-material-ui-textfield'
 
 import R from '../../res'
 import s from './styles'
-import { IInputProps } from './types'
+import type { IInputProps } from './types'
+
+
 
 const Input = (props: IInputProps) => {
   const {

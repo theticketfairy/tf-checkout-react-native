@@ -1,4 +1,4 @@
-import { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 export interface IDatePickerStyles {
   container?: StyleProp<ViewStyle>

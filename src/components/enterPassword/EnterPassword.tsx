@@ -1,10 +1,12 @@
-import React, { FC, useState } from 'react'
+import React, { type FC, useState } from 'react'
 import { Modal, Text, View } from 'react-native'
 
 import Button from '../button/Button'
 import Input from '../input/Input'
 import s from './styles'
-import { IEnterPasswordProps } from './types'
+import type { IEnterPasswordProps } from './types'
+
+
 
 const EnterPassword: FC<IEnterPasswordProps> = ({
   styles,

@@ -10,7 +10,7 @@ import {
   fetchUserProfile,
   registerNewUser,
 } from '../../api/ApiClient'
-import {
+import type {
   ICartResponse,
   ICheckoutBody,
   ICountriesResponse,
@@ -20,7 +20,7 @@ import {
   IUserProfileResponse,
 } from '../../api/types'
 import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
-import {
+import type {
   BillingCoreHandle,
   IBillingCoreProps,
   ICheckoutResponse,

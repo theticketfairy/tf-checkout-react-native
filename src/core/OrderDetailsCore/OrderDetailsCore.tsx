@@ -1,14 +1,14 @@
 import React, { forwardRef, useImperativeHandle } from 'react'
 
 import { removeTicketFromResale, resaleTicket } from '../../api/ApiClient'
-import {
+import type {
   IFetchAccessTokenResponse,
   IRemoveTicketFromResaleResponse,
   IResaleTicketResponse,
 } from '../../api/types'
 import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
-import { ICoreProps } from '../CoreProps'
-import { OrderDetailsCoreHandle } from './OrderDetailsCoreTypes'
+import type { ICoreProps } from '../CoreProps'
+import type { OrderDetailsCoreHandle } from './OrderDetailsCoreTypes'
 
 const OrderDetailsCore = forwardRef<OrderDetailsCoreHandle, ICoreProps>(
   (props, ref) => {

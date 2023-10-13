@@ -3,7 +3,9 @@ import { Text, TouchableOpacity, View } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 
 import s from './styles'
-import { IDatePickerProps } from './types'
+import type { IDatePickerProps } from './types'
+
+
 
 const DatePicker = ({
   onSelectDate,
@@ -25,7 +27,7 @@ const DatePicker = ({
     setIsVisible(false)
   }
 
-  const handleOnCancel = (_: Date) => {
+  const handleOnCancel = () => {
     if (onCancel) {
       onCancel()
     }

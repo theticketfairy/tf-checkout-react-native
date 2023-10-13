@@ -3,8 +3,10 @@ import React from 'react'
 import { View } from 'react-native'
 
 import { Checkbox } from '../../../components'
-import { IFormFieldProps } from '../../../components/formField/types'
+import type { IFormFieldProps } from '../../../components/formField/types'
 import { ConditionsStyles as s } from './styles'
+
+
 
 const ConditionItem = ({ id, checkboxProps }: IFormFieldProps) => (
   <Checkbox

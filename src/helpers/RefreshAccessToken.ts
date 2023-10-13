@@ -1,5 +1,5 @@
 import { fetchAccessToken } from '../api/ApiClient'
-import { IFetchAccessTokenResponse } from '../api/types'
+import type { IFetchAccessTokenResponse } from '../api/types'
 import { getRefreshAccessTokenBody } from '../core/LoginCore/LoginCoreHelper'
 import { getData, LocalStorageKeys } from './LocalStorage'
 

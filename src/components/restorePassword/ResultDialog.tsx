@@ -1,9 +1,11 @@
-import React, { FC } from 'react'
+import React, { type FC } from 'react'
 import { Text, View } from 'react-native'
 
 import Button from '../button/Button'
 import { restorePasswordSuccessStyles as s } from './styles'
-import { IResultDialogProps } from './types'
+import type { IResultDialogProps } from './types'
+
+
 
 const ResultDialog: FC<IResultDialogProps> = ({
   styles,

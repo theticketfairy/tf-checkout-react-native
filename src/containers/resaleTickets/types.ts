@@ -1,11 +1,11 @@
-import { StyleProp, Text, TextStyle, ViewStyle } from 'react-native'
+import type { StyleProp, Text, TextStyle, ViewStyle } from 'react-native'
 
-import { IMyOrderDetailsTicket, IResaleTicketData } from '../../api/types'
-import { IButtonStyles } from '../../components/button/types'
-import { ICheckboxStyles } from '../../components/checkbox/types'
-import { IInputStyles } from '../../components/input/types'
-import { IRadioButtonStyles } from '../../components/radioButton/types'
-import { IError } from '../../types'
+import type { IMyOrderDetailsTicket, IResaleTicketData } from '../../api/types'
+import type { IButtonStyles } from '../../components/button/types'
+import type { ICheckboxStyles } from '../../components/checkbox/types'
+import type { IInputStyles } from '../../components/input/types'
+import type { IRadioButtonStyles } from '../../components/radioButton/types'
+import type { IError } from '../../types'
 
 //#region Order Details
 export interface ITicketOrderDetailsStyles {
@@ -127,7 +127,6 @@ export interface IResaleTicketsViewTexts {
   resaleTicketsButton?: string
 }
 
-// eslint-disable-next-line no-shadow
 export enum ResaleToWhomFieldIdEnum {
   firstName,
   lastName,
