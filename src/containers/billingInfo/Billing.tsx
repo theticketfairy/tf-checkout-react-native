@@ -1152,7 +1152,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       if (
         config.shouldHideTicketHolderSectionOnSingleTicket &&
-        numberOfTicketHolders
+        numberOfTicketHolders == 1
       ) {
         parsedTicketHolders.push({
           first_name: firstName,
