@@ -19,7 +19,11 @@ import type {
   MyOrderRequestFromType,
 } from '../../api/types'
 import type { IDropdownItem } from '../../components/dropdown/types'
-import { MyOrdersCore, MyOrdersCoreHandle, SessionHandle } from '../../core'
+import {
+  MyOrdersCore,
+  type MyOrdersCoreHandle,
+  SessionHandle,
+} from '../../core'
 import type { SessionHandleType } from '../../core/Session/SessionCoreTypes'
 import type { IError } from '../../types'
 import MyOrdersView from './MyOrdersView'
@@ -38,7 +42,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
       texts,
       config,
     },
-    ref
+    ref,
   ) => {
     //#region State
     const [isLoading, setIsLoading] = useState(true)
@@ -54,7 +58,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
       {
         label: texts?.selectTimeFilterPlaceholder || 'Select time filter',
         value: '',
-      }
+      },
     )
     const [myOrders, setMyOrders] = useState<IMyOrdersOrder[]>([])
     //#endregion
@@ -127,10 +131,8 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
             : (selectedTimeFilter.value as MyOrderRequestFromType),
       }
 
-      const {
-        myOrdersData,
-        myOrdersError,
-      } = await myOrdersCoreRef.current!.getMyOrders(myOrdersRequestParams)
+      const { myOrdersData, myOrdersError } =
+        await myOrdersCoreRef.current!.getMyOrders(myOrdersRequestParams)
 
       setIsLoading(false)
 
@@ -158,7 +160,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
             value: item.url_name,
           }
         }),
-        'value'
+        'value',
       )
 
       setMyEvents(events)
@@ -175,7 +177,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
       const fetchedOrders = await getOrdersAsync()
       const uniqOrders = _uniqBy(
         [...myOrders, ...(fetchedOrders?.orders ?? [])],
-        (item) => item.id
+        (item) => item.id,
       )
       setMyOrders(uniqOrders)
     }
@@ -184,7 +186,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
     //#region Imperative Handler
     useImperativeHandle(ref, () => ({
       async refreshAccessToken(
-        refreshToken: string
+        refreshToken: string,
       ): Promise<IFetchAccessTokenResponse> {
         if (!sessionHandleRef.current) {
           return {
@@ -194,10 +196,8 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
           }
         }
 
-        const {
-          accessTokenError,
-          accessTokenData,
-        } = await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+        const { accessTokenError, accessTokenData } =
+          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
         if (!accessTokenError && accessTokenData?.accessToken) {
           await getOrders()
         }
@@ -224,7 +224,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
       (loading: boolean) => {
         onLoadingChange?.(loading)
       },
-      [onLoadingChange]
+      [onLoadingChange],
     )
 
     const handleOnChangeTimeFilter = (item: IDropdownItem) => {
@@ -266,10 +266,8 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
 
       setIsGettingEventDetails(true)
 
-      const {
-        orderDetailsData,
-        orderDetailsError,
-      } = await myOrdersCoreRef.current!.getOrderDetails(order.id)
+      const { orderDetailsData, orderDetailsError } =
+        await myOrdersCoreRef.current!.getOrderDetails(order.id)
 
       setIsGettingEventDetails(false)
 
@@ -281,7 +279,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
         return onFetchOrderDetailsError(
           orderDetailsError || {
             message: 'Order details returned no data',
-          }
+          },
         )
       }
 
@@ -339,7 +337,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
       </MyOrdersCore>
     )
     //#endregion Return
-  }
+  },
 )
 
 export default MyOrders

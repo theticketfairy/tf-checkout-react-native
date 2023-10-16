@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useRef } from 'react'
+import React, { type FC, useCallback, useMemo, useRef } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -65,16 +65,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [handleOnSelectOrder]
-  )
-
-  const renderRefreshControl = (
-    <RefreshControl
-      enabled={false}
-      tintColor={styles?.refreshControlColor || R.colors.primary}
-      refreshing={!!isLoading}
-      onRefresh={onRefresh}
-    />
+    [handleOnSelectOrder],
   )
 
   const dropdownStyles = useMemo(() => {
@@ -175,7 +166,6 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
             <FlatList
               data={myOrders}
               renderItem={renderOrderListItem}
-              refreshControl={renderRefreshControl}
               onEndReached={handleOnReachEnd}
               onMomentumScrollBegin={handleOnMomentumScrollBegin}
               onEndReachedThreshold={0.2}
@@ -187,13 +177,14 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
           {isLoading && myOrders.length > 8 && !isRefreshing && (
             <ActivityIndicator
               size={'large'}
-              color={styles?.refreshControlColor || R.colors.primary}
+              color={styles?.refreshControlColor || R.colors.white}
             />
           )}
         </View>
-        {config?.areActivityIndicatorsEnabled && isGettingEventDetails && (
-          <Loading />
-        )}
+        {config?.areActivityIndicatorsEnabled &&
+          (isGettingEventDetails || (isLoading && myOrders.length < 8)) && (
+            <Loading />
+          )}
       </SafeAreaView>
     </View>
   )

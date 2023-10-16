@@ -452,7 +452,7 @@ const App = () => {
           <View style={{ flex: 1 }}>
             <MyOrders
               config={{
-                areActivityIndicatorsEnabled: false,
+                areActivityIndicatorsEnabled: true,
                 areAlertsEnabled: true,
               }}
               onFetchMyOrdersSuccess={(data) => {
