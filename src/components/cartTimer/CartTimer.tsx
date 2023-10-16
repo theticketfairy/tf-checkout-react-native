@@ -1,4 +1,5 @@
-import React, { FC, useEffect, useState } from 'react'
+import type { FC } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Image, Pressable, Text, View } from 'react-native'
 
 import R from '../../res'

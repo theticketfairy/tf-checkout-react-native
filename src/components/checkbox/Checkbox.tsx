@@ -1,11 +1,11 @@
 import React from 'react'
 import {
   Image,
-  StyleProp,
+  type StyleProp,
   Text,
   TouchableOpacity,
   View,
-  ViewStyle,
+  type ViewStyle,
 } from 'react-native'
 
 import R from '../../res'

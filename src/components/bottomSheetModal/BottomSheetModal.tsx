@@ -4,12 +4,12 @@ import React, {
   useImperativeHandle,
   useRef,
 } from 'react'
+import type { StyleProp } from 'react-native'
 import {
   Animated,
   Dimensions,
   Image,
   Modal as RNModal,
-  StyleProp,
   Text,
   TouchableOpacity,
   View,
