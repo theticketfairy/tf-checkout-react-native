@@ -8,7 +8,7 @@ const emptyRegex = /^\s+$/
 
 export const validateEmpty = (
   value?: string | number,
-  message?: string
+  message?: string,
 ): string => {
   let errorMessage = ''
 
@@ -25,7 +25,7 @@ export const validateEmpty = (
 export const validateMinLength = (
   value: string,
   minLength: number,
-  fieldName: string = 'Field'
+  fieldName: string = 'Field',
 ) =>
   value.length < minLength
     ? `${fieldName} requires at least ${minLength} characters`
@@ -69,7 +69,7 @@ export const validatePasswords = (password?: string, equalTo?: string) => {
 
 export const validateAge = (
   dateOfBirth?: Date,
-  minimumAge: number = 18
+  minimumAge: number = 18,
 ): string => {
   if (!dateOfBirth) {
     return 'Required'
@@ -104,7 +104,7 @@ export const validatePhoneNumber = ({
 }
 
 export const validateDropDownEmpty = (
-  selectedOptionId?: string | number
+  selectedOptionId?: string | number,
 ): string => {
   if (!selectedOptionId) return 'Required'
 
