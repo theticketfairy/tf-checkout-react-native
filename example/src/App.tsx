@@ -3,19 +3,19 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Linking, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
-  IMyOrderDetailsData,
-  IOnCheckoutSuccess,
+  type IMyOrderDetailsData,
+  type IOnCheckoutSuccess,
   MyOrderDetails,
   MyOrders,
   PurchaseConfirmation,
   Tickets,
   BillingInfo,
   setConfig,
-  ITicketsResponseData,
-  SkippingStatusType,
+  type ITicketsResponseData,
+  type SkippingStatusType,
   ResaleTickets,
   ResetPassword,
-  SessionHandleType
+  type SessionHandleType
 } from 'tf-checkout-react-native'
 import type { IMyOrderDetailsTicket } from '../../src/api/types'
 import type { IConfig } from '../../src/helpers/Config'
