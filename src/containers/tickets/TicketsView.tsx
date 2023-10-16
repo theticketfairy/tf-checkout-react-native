@@ -160,7 +160,7 @@ const TicketsView = ({
         )}
         {(isGettingTickets || isGettingEvent) &&
           areLoadingIndicatorsEnabled && <Loading />}
-        <View style={{ flexDirection: 'row', widht: '100%', flexWrap: 'wrap' }}>
+        <View style={s.configContainer}>
           <Text>Config - </Text>
           <Text>EVENT ID: {Config.EVENT_ID} </Text>
           <Text>CLIENT: {Config.CLIENT} </Text>

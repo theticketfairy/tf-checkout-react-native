@@ -19,4 +19,9 @@ export default StyleSheet.create({
     fontWeight: '800',
     color: R.colors.primary,
   },
+  configContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    flexWrap: 'wrap',
+  },
 })
