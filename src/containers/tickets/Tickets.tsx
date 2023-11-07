@@ -59,6 +59,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
         areAlertsEnabled: true,
         areTicketsSortedBySoldOut: true,
       },
+      referrerId,
     },
     ref
   ) => {
@@ -141,6 +142,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
       }
 
       return await ticketsCoreRef.current.getTickets({
+        referredId: referrerId,
         promoCode,
         areTicketsSortedBySoldOut: config.areTicketsSortedBySoldOut,
         areTicketsGrouped: config.areTicketsGrouped,

@@ -680,6 +680,7 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
   // For SSO
   isCheckingCurrentSession?: boolean
+  referrerId?: string
 }
 ```
 
@@ -2013,7 +2014,7 @@ This is the initial component to show. It will retrieve the tickets, event, pres
 
 Exposes the following functions: 
 
-`getTickets` Fetches the tickets from the event set in the config function. It receives a promoCode parameter to apply to the tickets.
+`getTickets` Fetches the tickets from the event set in the config function. It receives a promoCode and referrerId parameters to apply to the tickets. PromoCode is higher priority than referrerId
 
 `getEvent` Fetches the event from the eventId set in the config function.
 
@@ -2028,7 +2029,7 @@ Exposes the following functions:
 ```js
 {
   // Fetches the tickets from the event set in the config function. It receives a promoCode parameter to apply to the tickets.
-  getTickets(promoCode?: string): Promise<{
+  getTickets({ promoCode?: string, referredId?: string }): Promise<{
     tickets?: {
       sortOrder: number
       displayTicket?: boolean
@@ -3052,6 +3053,8 @@ Wrap your component with the Core component.
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+## Version 1.0.32
+- Add `referredId` property to Tickets component and getTickets method.
 ## Version 1.0.31
 - Add missing styles to LoginForm.
 ## Version 1.0.30

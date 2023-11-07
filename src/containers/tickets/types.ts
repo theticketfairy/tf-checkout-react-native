@@ -144,6 +144,8 @@ export interface ITicketsProps {
   isPromoEnabled?: boolean
   isAccessCodeEnabled?: boolean
 
+  referrerId?: string
+
   onPressMyOrders: () => void
   onPressLogout?: () => void
 

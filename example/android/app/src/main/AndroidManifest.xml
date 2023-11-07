@@ -27,7 +27,9 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="restlessnites"/>
+                <data android:scheme="manacommon"/>
+                <data android:scheme="https" android:host="tickets-staging.manacommon.com" />
+
             </intent-filter>
 
             <intent-filter android:autoVerify="true">
@@ -36,7 +38,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="https"
-                    android:host="restlessnites.com"
+                    android:host="tickets-staging.manacommon.com"
                     android:pathPrefix="/reset-password" />
             </intent-filter>
 
