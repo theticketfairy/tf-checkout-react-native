@@ -680,6 +680,8 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
   // For SSO
   isCheckingCurrentSession?: boolean
+
+  // Referral discounts
   referrerId?: string
 }
 ```
@@ -3052,12 +3054,23 @@ Wrap your component with the Core component.
 
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
+
+
 # Changelog
 ## Version 1.0.32
-- Add `referredId` property to Tickets component and getTickets method.
+
+- Add `referredId` property to Tickets component and getTickets method. This will apply special prices fo the passed `refferentId` property.
+
+
+
 ## Version 1.0.31
+
 - Add missing styles to LoginForm.
+
+
+
 ## Version 1.0.30
+
 - Show errors in Billing UI form fields.
 - Add config prop to Billing UI component, includes 2 configuration flags. 
 ```
@@ -3068,6 +3081,8 @@ Wrap your component with the Core component.
 ```
 
 - Replacing `"rn-material-ui-textfield": "1.0.5"` library with `"rn-material-ui-textfield": "jorgtz/rn-material-ui-textfield"`, make sure to replace it in all the package.json files.
+
+
 
 ## Version 1.0.29
 
@@ -3093,7 +3108,9 @@ Wrap your component with the Core component.
 
 
 
+
 ## Version 1.0.28
+
 - Add `getAccountTickets` request in `MyOrdersCore` and `TicketsCore`, it will allow get Tickets from the logged-in user.
 - Add filter to `getMyOrders` request in `MyOrdersCore` component, to filter by time frame by passing the following string:
 
@@ -3105,7 +3122,10 @@ Wrap your component with the Core component.
 - Add more data to the `getOrderDetails` success response.
 - Add `ticketsSold` prop to Event's object in fetchEvent success data.
 
+
+
 ## Version 1.0.27
+
 - Make `EVENT_ID` optional in the `setConfig` function. An error will be returned when `EVENT_ID` is not set and trying to make a request that requires it.
 
 - Remove `eventId` prop from `Checkout UI` component in favor of use the one on the Config.
@@ -3114,7 +3134,10 @@ Wrap your component with the Core component.
 
 - Add missing success data in `onFetchOrderDetailsSuccess` response.
 
+
+
 ## Version 1.0.26
+
 - Add the possibility to remove all of the following Billing/Street Address fields from free tickets:
   - Billing Street Address
   - City
@@ -3128,7 +3151,10 @@ isTicketFree?: boolean
 isPhoneHidden?: boolean
   ```
 
+
+
 ## Version 1.0.25
+
 - Exposes `refreshAccessToken` function.
 - Changed returned `data` prop to `userProfile` in LoginCore response.
 - In **LoginCore Component**:
@@ -3143,7 +3169,10 @@ isPhoneHidden?: boolean
   - Export function `refreshAccessToken`
 - Add `reloadData` to re-fetch servers data in UI components.
 
+
+
 ## Version 1.0.24
+
 - Add **SingleSignOn** feature.
 - Add show Tickets in groups and the option to sort them by sold out.
 - Add config prop to Tickets component:
@@ -3163,13 +3192,21 @@ isPhoneHidden?: boolean
 - Added `styles` and `texts` props for TTF Privacy Policy checkbox.
 - Added **Password Protected** event feature.
 
+
+
 ## Version 1.0.23
+
 - Fix Checkout not allowing free registrations
 
+
+
 ## Version 1.0.22
+
 - Added cartTimer component, that will show the cart's remaining expiration time in the Billing screen.
 - setConfig not longer receives the `DOMAIN` prop, instead it receives the `CLIENT` 
 - Added a three dot button to my orders to show the possible actions.
+
+
 
 
 
