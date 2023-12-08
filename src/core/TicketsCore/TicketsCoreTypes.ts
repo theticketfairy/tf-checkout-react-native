@@ -24,6 +24,7 @@ export interface IGetTicketsOptions {
   areTicketsSortedBySoldOut?: boolean
   areTicketsGrouped?: boolean
   promoCode?: string
+  referredId?: string
 }
 
 export interface IGroupedTickets {

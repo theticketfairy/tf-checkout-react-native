@@ -39,6 +39,7 @@ import {
   ICountriesResponse,
   IEventResponse,
   IFetchAccessTokenResponse,
+  IFetchTicketsParams,
   IFetchTicketsResponse,
   IFreeRegistrationData,
   IFreeRegistrationResponse,
@@ -563,9 +564,11 @@ export const fetchOrderDetails = async (
 //#endregion
 
 //#region Tickets
-export const fetchTickets = async (
-  promoCode?: string
-): Promise<IFetchTicketsResponse> => {
+// PromoCode higher priority than ReferredId
+export const fetchTickets = async ({
+  promoCode,
+  referredId,
+}: IFetchTicketsParams): Promise<IFetchTicketsResponse> => {
   if (!Config.EVENT_ID) {
     return {
       error: {
@@ -578,15 +581,28 @@ export const fetchTickets = async (
   const headers = {
     'Promotion-Event': eventId,
     'Promotion-Code': promoCode,
+    'Referrer-Id': referredId,
   }
 
   let responseError
 
+  if (!referredId) {
+    delete headers['Referrer-Id']
+  }
+
   if (!promoCode) {
     //@ts-ignore
-    delete headers['Promotion-Event']
-    //@ts-ignore
     delete headers['Promotion-Code']
+  }
+
+  if (!promoCode && !referredId) {
+    //@ts-ignore
+    delete headers['Promotion-Event']
+  }
+
+  // If there are promoCode and referredId, then we need to remove the Referrer-Id header
+  if (promoCode && referredId && headers['Referrer-Id']) {
+    delete headers['Referrer-Id']
   }
 
   const response = await Client.get(`v1/event/${eventId}/tickets/`, {
