@@ -32,7 +32,7 @@ interface IDeepLinkUrl {
   url: string
 }
 
-const EVENT_ID = 13090
+const EVENT_ID = 13369
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
@@ -48,6 +48,8 @@ const config: IConfig = {
 
 const App = () => {
   const resetPasswordTokenRef = useRef('')
+  const isAppLoaded = useRef<null | boolean>(null)
+
   const billingRef = useRef<SessionHandleType>(null)
   const ticketsRef = useRef<SessionHandleType>(null)
 
@@ -60,6 +62,7 @@ const App = () => {
   )
 
   //#region Loadings
+  const [referredId, setReferredId] = useState<undefined | string>(undefined)
   const [isCheckingCurrentSession, setIsCheckingCurrentSession] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [skippingStatus, setSkippingStatus] = useState<SkippingStatusType>(undefined)
@@ -79,8 +82,9 @@ const App = () => {
   const [isTicketToSellActive, setIsTicketToSellActive] = useState<
     boolean | undefined
   >(undefined)
-
+  
   const resetData = () => {
+    console.log('%cApp.tsx line:85 Reseting data', 'color: white; background-color: #FF0000;');
     setCartProps(undefined)
     setIsLoading(false)
     setSkippingStatus(undefined)
@@ -152,31 +156,43 @@ const App = () => {
   }
 
   //#endregion
-  const handleOpenUrl = ({url}: IDeepLinkUrl) =>{
-    const splitted = url.split("token=")
-    if (splitted.length <= 1) {
-      return 
+  const handleOpenUrl = ({url}: IDeepLinkUrl) => {
+    console.log('===  Deep link   ===', url)
+
+    const resetPasswordToken = url.split("token=")
+
+    console.log('%cApp.tsx line:160 resetPasswordToken', 'color: #007acc;', resetPasswordToken);
+
+    if (resetPasswordToken[1])  {
+      resetPasswordTokenRef.current = resetPasswordToken[1] 
+      setComponentToShow(ComponentEnum.ResetPassword)
     }
 
-    if (splitted[1])  {
-      resetPasswordTokenRef.current = splitted[1] 
-      setComponentToShow(ComponentEnum.ResetPassword)
+    const referrerId = url.split("ttf_r=")
+    console.log('%cApp.tsx line:160 resetPasswordToken', 'color: #00FFcc;', referrerId);
+    
+    if (referrerId[1])  {
+      setReferredId(referrerId[1])
+      resetData()
+      ticketsRef.current?.reloadData()
     }
     
   }
 
   const getInitialURL = async () => { 
+    console.log('getInitialURL')
     const initialUrl = await Linking.getInitialURL();
+    console.log('initialUrl', initialUrl)
       if (initialUrl === null) {
         return;
       }
 
-      return initialUrl
+      return handleOpenUrl({url: initialUrl})
   }
 
   //#region effects
   useEffect(() => {
-
+    console.log('initial useEffect')
     setTimeout(() => { ticketsRef.current?.refreshAccessToken() }, 2000)
     const setConfigAsync = async () => {
       setIsCheckingCurrentSession(true)
@@ -186,8 +202,10 @@ const App = () => {
 
     setConfigAsync()
     Linking.addEventListener('url', handleOpenUrl)
+    isAppLoaded.current = true
 
     return () => {
+      console.log('Removing all event listeners')
       Linking.removeAllListeners('url')
     }
   }, [])
@@ -218,6 +236,10 @@ const App = () => {
     }
   }, [selectedOrderDetails])
   //#endregion
+
+  if (!isAppLoaded.current) {
+    getInitialURL()
+  }
 
   const RenderComponent = () => {
     switch (componentToShow) {
@@ -925,6 +947,7 @@ const App = () => {
           <View style={{ flex: 1 }}>
             <Tickets
             ref={ticketsRef}
+            referrerId={referredId}
             config={{
               areTicketsGrouped: true,
             }}

@@ -21,6 +21,11 @@ export interface IPromoCodeResponse {
   message: string
 }
 
+export interface IFetchTicketsParams {
+  promoCode?: string
+  referredId?: string
+}
+
 export interface IFetchTicketsResponse {
   error?: IError
   isAccessCodeRequired?: boolean

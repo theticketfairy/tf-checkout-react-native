@@ -26,10 +26,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>restlessnites</string>
+			<string>tickets-staging.manacommon.com</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>restlessnites</string>
+				<string>tickets-staging.manacommon.com</string>
 			</array>
 		</dict>
 	</array>

@@ -50,6 +50,7 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
       promoCode,
       areTicketsSortedBySoldOut,
       areTicketsGrouped,
+      referredId,
     }: IGetTicketsOptions): Promise<IGetTicketsPayload> {
       const groupTickets = (tickets: ITicket[]) => {
         // Create an array of tickets with the GroupName set
@@ -70,8 +71,12 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
 
         return ticketsSections
       }
+      // PromoCode higher priority than ReferredId
 
-      const ticketsResponse = await fetchTickets(promoCode)
+      const ticketsResponse = await fetchTickets({
+        promoCode: promoCode,
+        referredId: referredId,
+      })
 
       if (ticketsResponse.error || !ticketsResponse.tickets) {
         return ticketsResponse
