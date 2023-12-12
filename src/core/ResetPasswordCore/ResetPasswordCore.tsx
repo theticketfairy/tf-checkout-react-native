@@ -1,12 +1,12 @@
 import React, { forwardRef, useImperativeHandle } from 'react'
 
 import { requestResetPassword } from '../../api/ApiClient'
-import {
+import type {
   IResetPasswordRequestData,
   IResetPasswordResponse,
 } from '../../api/types'
-import { ICoreProps } from '../CoreProps'
-import { ResetPasswordCoreHandle } from './ResetPasswordCoreTypes'
+import type { ICoreProps } from '../CoreProps'
+import type { ResetPasswordCoreHandle } from './ResetPasswordCoreTypes'
 
 const ResetPasswordCore = forwardRef<ResetPasswordCoreHandle, ICoreProps>(
   (props, ref) => {

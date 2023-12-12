@@ -1,10 +1,10 @@
-import { ReactNode } from 'react'
-import { StyleProp, TextStyle } from 'react-native'
+import type { ReactNode } from 'react'
+import type { StyleProp, TextStyle } from 'react-native'
 
-import { ICheckboxStyles } from '../checkbox/types'
-import { IDatePickerProps } from '../datePicker/types'
-import { IDropdownItem, IDropdownStyles } from '../dropdown/types'
-import { IInputProps } from '../input/types'
+import type { ICheckboxStyles } from '../checkbox/types'
+import type { IDatePickerProps } from '../datePicker/types'
+import type { IDropdownItem, IDropdownStyles } from '../dropdown/types'
+import type { IInputProps } from '../input/types'
 
 export type FieldType =
   | 'input'

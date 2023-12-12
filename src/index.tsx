@@ -1,8 +1,9 @@
+//@ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as React from 'react' //Needed to render
 import { LogBox, NativeModules } from 'react-native'
 
-import {
+import type {
   IMyOrderDetailsData,
   IMyOrdersOrder,
   MyOrderRequestFromType,
@@ -18,17 +19,17 @@ import {
   ResetPassword,
   Tickets,
 } from './containers'
-import {
+import type {
   IBillingProps,
   IOnCheckoutSuccess,
   SkippingStatusType,
 } from './containers/billingInfo/types'
-import { ICheckoutProps } from './containers/checkout/types'
-import { IMyOrderDetailsProps } from './containers/myOrderDetails/types'
-import { IMyOrdersProps } from './containers/myOrders/types'
-import { IPurchaseConfirmationProps } from './containers/purchaseConfirmation/types'
-import { IResaleTicketsProps } from './containers/resaleTickets/types'
-import { ITicketsProps } from './containers/tickets/types'
+import type { ICheckoutProps } from './containers/checkout/types'
+import type { IMyOrderDetailsProps } from './containers/myOrderDetails/types'
+import type { IMyOrdersProps } from './containers/myOrders/types'
+import type { IPurchaseConfirmationProps } from './containers/purchaseConfirmation/types'
+import type { IResaleTicketsProps } from './containers/resaleTickets/types'
+import type { ITicketsProps } from './containers/tickets/types'
 import {
   BillingCore,
   BillingCoreHandle,
@@ -54,7 +55,7 @@ import {
 import { setConfig } from './helpers/Config'
 import { deleteAllData } from './helpers/LocalStorage'
 import { refreshAccessToken } from './helpers/RefreshAccessToken'
-import {
+import type {
   IAccountOrdersPurchasedEvent,
   IAccountOrdersTicket,
   IAccountTicketsAttributes,

@@ -1,3 +1,4 @@
+//@ts-nocheck
 import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _forEach from 'lodash/forEach'
@@ -23,7 +24,7 @@ import DeviceCountry, { TYPE_ANY } from 'react-native-device-country'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import Constants from '../../api/Constants'
-import {
+import type {
   ICheckoutBody,
   ICheckoutTicketHolder,
   IFetchAccessTokenResponse,
@@ -40,11 +41,11 @@ import {
   Login,
   PhoneInput,
 } from '../../components'
-import { IDropdownItem } from '../../components/dropdown/types'
-import { ILoginSuccessData } from '../../components/login/types'
-import { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
+import type { IDropdownItem } from '../../components/dropdown/types'
+import type { ILoginSuccessData } from '../../components/login/types'
+import type { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
 import { BillingCore, BillingCoreHandle, SessionHandle } from '../../core'
-import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
+import type { SessionHandleType } from '../../core/Session/SessionCoreTypes'
 import { Config } from '../../helpers/Config'
 import { getCountryDialCode } from '../../helpers/CountryCodes'
 import { useDebounced } from '../../helpers/Debounced'
@@ -59,9 +60,9 @@ import {
   validatePhoneNumber,
 } from '../../helpers/Validators'
 import R from '../../res'
-import { IError, IUserProfile, IUserProfilePublic } from '../../types'
+import type { IError, IUserProfile, IUserProfilePublic } from '../../types'
 import s from './styles'
-import {
+import type {
   IBillingFormFieldsData,
   IBillingProps,
   ITicketHolderField,
@@ -120,7 +121,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         shouldHideTicketHolderSectionOnSingleTicket: false,
       },
     },
-    ref
+    ref,
   ) => {
     //#region State
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -226,16 +227,16 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const firstNameError = useDebounced(firstName, validateEmpty)
     const lastNameError = useDebounced(lastName, validateEmpty)
     const emailError = useDebounced(email, () =>
-      validateEmail(email, emailConfirmation)
+      validateEmail(email, emailConfirmation),
     )
     const confirmEmailError = useDebounced(emailConfirmation, () =>
-      validateEmail(emailConfirmation, email)
+      validateEmail(emailConfirmation, email),
     )
     const passwordError = useDebounced(password, () =>
-      validatePasswords(password, passwordConfirmation)
+      validatePasswords(password, passwordConfirmation),
     )
     const confirmPasswordError = useDebounced(passwordConfirmation, () =>
-      validatePasswords(passwordConfirmation, password)
+      validatePasswords(passwordConfirmation, password),
     )
     const [phoneError, setPhoneError] = useState('')
     const streetError = useDebounced(street, validateEmpty)
@@ -308,7 +309,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     //#region Imperative Handler
     useImperativeHandle(ref, () => ({
       async refreshAccessToken(
-        refreshToken: string
+        refreshToken: string,
       ): Promise<IFetchAccessTokenResponse> {
         if (!sessionHandleRef.current) {
           return {
@@ -342,11 +343,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           setPhoneError(error)
         }
       },
-      [isPhoneRequired, phone.length]
+      [isPhoneRequired, phone.length],
     )
 
     const handleOnChangePhoneNumber = (
-      payload: IOnChangePhoneNumberPayload
+      payload: IOnChangePhoneNumberPayload,
     ) => {
       setPhone(payload.input)
 
@@ -362,7 +363,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           texts?.form?.phoneInput?.customError || 'Invalid phone number'
 
         return handleSetPhoneError(
-          texts?.form?.phoneInput?.customError || 'Invalid phone number'
+          texts?.form?.phoneInput?.customError || 'Invalid phone number',
         )
       }
 
@@ -375,14 +376,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           onLoadingChange(loading)
         }
       },
-      [onLoadingChange]
+      [onLoadingChange],
     )
 
     const handleOnSkippingStatusChange = useCallback(
       (status: SkippingStatusType) => {
         onSkippingStatusChange?.(status)
       },
-      [onSkippingStatusChange]
+      [onSkippingStatusChange],
     )
 
     const showAlert = (text: string) => {
@@ -414,7 +415,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
     const handleOpenPrivacyLink = async () => {
       const canOpenLink = await Linking.canOpenURL(
-        Constants.PRIVACY_POLICY_LINK
+        Constants.PRIVACY_POLICY_LINK,
       )
       if (canOpenLink) {
         await Linking.openURL(Constants.PRIVACY_POLICY_LINK)
@@ -423,7 +424,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
     const handleSetFormDataFromUserProfile = (
       userProfile: IUserProfilePublic,
-      accessToken?: string
+      accessToken?: string,
     ) => {
       storedProfileData.current = userProfile
       setFirstName(userProfile.firstName)
@@ -445,7 +446,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         dob = new Date(
           parseInt(dobSplitted[0]!, 10),
           parseInt(dobSplitted[1]!, 10) - 1,
-          parseInt(dobSplitted[2]!, 10)
+          parseInt(dobSplitted[2]!, 10),
         )
         handleOnSelectDate(dob)
       }
@@ -565,7 +566,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           setIsLoading(false)
           handleSetPhoneError(
             texts?.invalidPhoneNumberError ||
-              'Please enter a valid phone number'
+              'Please enter a valid phone number',
           )
         }
 
@@ -573,7 +574,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           getCheckoutBodyWhenSkipping({
             userProfile: usrProfile,
             ticketsQuantity: numberOfTicketHolders || 1,
-          })
+          }),
         )
       }
       handleSetFormDataFromUserProfile(usrProfile, accessToken)
@@ -733,14 +734,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const checkIsStoredPhoneNumberFormat = (storedPhoneNumber?: string) => {
       if (!storedPhoneNumber) {
         handleSetPhoneError(
-          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number',
         )
         return false
       }
 
       if (!storedPhoneNumber.includes('+')) {
         handleSetPhoneError(
-          texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
+          texts?.invalidPhoneNumberError || 'Please enter a valid phone number',
         )
         return false
       }
@@ -758,7 +759,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       const validateEmails = validateEmail(data.email, data.confirmEmail)
       const validateEmailsConfirmation = validateEmail(
         data.confirmEmail,
-        data.email
+        data.email,
       )
 
       if (isTicketFree) {
@@ -775,11 +776,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         if (data.isRegistering) {
           const validatePassword = validatePasswords(
             data.password,
-            data.confirmPassword
+            data.confirmPassword,
           )
           const validatePasswordConfirmation = validatePasswords(
             data.confirmPassword,
-            data.password
+            data.password,
           )
 
           setPasswordErrorState(validatePassword)
@@ -817,10 +818,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           _map(data.ticketHolderData, (th, index) => {
             if (isNameRequired) {
               ticketHoldersDataCopy[index].firstNameError = validateEmpty(
-                th.firstName
+                th.firstName,
               )
               ticketHoldersDataCopy[index].lastNameError = validateEmpty(
-                th.lastName
+                th.lastName,
               )
             }
           })
@@ -854,11 +855,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (data.isRegistering) {
         const validatePassword = validatePasswords(
           data.password,
-          data.confirmPassword
+          data.confirmPassword,
         )
         const validatePasswordConfirmation = validatePasswords(
           data.confirmPassword,
-          data.password
+          data.password,
         )
 
         setPasswordErrorState(validatePassword)
@@ -869,7 +870,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       }
 
       const countryValidation = validateDropDownEmpty(
-        data.selectedCountry?.value
+        data.selectedCountry?.value,
       )
 
       setCountryErrorState(countryValidation)
@@ -910,10 +911,10 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         _map(data.ticketHolderData, (th, index) => {
           if (isNameRequired) {
             ticketHoldersDataCopy[index].firstNameError = validateEmpty(
-              th.firstName
+              th.firstName,
             )
             ticketHoldersDataCopy[index].lastNameError = validateEmpty(
-              th.lastName
+              th.lastName,
             )
           }
         })
@@ -970,7 +971,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const checkExtraDataValid = (): string => {
       if (!isTtfCheckboxHidden && !isSubToTicketFairy) {
         setTtfPrivacyPolicyError(
-          texts?.form?.ttfPrivacyPolicyRequiredError || 'Required'
+          texts?.form?.ttfPrivacyPolicyRequiredError || 'Required',
         )
         return 'Please review the errors'
       }
@@ -1004,9 +1005,9 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       return _every(
         _map(
           ticketHoldersData,
-          (th) => validateEmpty(th.firstName) || validateEmpty(th.lastName)
+          (th) => validateEmpty(th.firstName) || validateEmpty(th.lastName),
         ),
-        (itm) => itm === ''
+        (itm) => itm === '',
       )
         ? ''
         : fillAllRequiredFieldsAlert
@@ -1019,7 +1020,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     }
 
     const performCheckout = async (
-      checkoutBodyWhenSkipping?: ICheckoutBody
+      checkoutBodyWhenSkipping?: ICheckoutBody,
     ) => {
       if (!billingCoreRef.current) {
         return onCheckoutError?.({ message: 'BillingCore is not ready' })
@@ -1149,7 +1150,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       if (
         config.shouldHideTicketHolderSectionOnSingleTicket &&
-        numberOfTicketHolders
+        numberOfTicketHolders === 1
       ) {
         parsedTicketHolders.push({
           first_name: firstName,
@@ -1378,7 +1379,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           onFetchUserProfileError?.(userProfileError!)
 
           return showAlert(
-            userProfileError?.message || 'Error fetching user profile'
+            userProfileError?.message || 'Error fetching user profile',
           )
         }
 
@@ -1462,7 +1463,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           if (!checkIsStoredPhoneNumberFormat(usrPrfl.phone)) {
             setPhoneError(
               texts?.invalidPhoneNumberError ||
-                'Please enter a valid phone number'
+                'Please enter a valid phone number',
             )
             skippingStatusInner = 'fail'
             setSkippingStatus('fail')
@@ -1533,7 +1534,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         if (countries.length > 1) {
           const selectedCountryItem = _find(
             countries,
-            (item) => item.value === countryId
+            (item) => item.value === countryId,
           )
           setSelectedCountry(selectedCountryItem)
         }
@@ -1556,7 +1557,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
         const { statesData, statesError } =
           await billingCoreRef.current.getStates(
-            selectedCountry.value.toString()
+            selectedCountry.value.toString(),
           )
 
         if (statesError) {
@@ -1568,7 +1569,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           statesData,
           (item, index) => {
             return { label: item, value: index }
-          }
+          },
         )
 
         onFetchStatesSuccess?.()
@@ -1585,7 +1586,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (states.length > 1 && stateId) {
         const selectedStateItem = _find(
           states,
-          (item) => item.value === stateId
+          (item) => item.value === stateId,
         )
         if (!selectedStateItem) {
           return setSelectedState({
@@ -1694,7 +1695,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               keyboardType='phone-pad'
               styles={styles?.inputStyles}
             />
-          </View>
+          </View>,
         )
       }
 
@@ -1975,7 +1976,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       </BillingCore>
     )
     //#endregion
-  }
+  },
 )
 
 export default Billing

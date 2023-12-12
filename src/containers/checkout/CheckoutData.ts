@@ -1,4 +1,4 @@
-import { IOrderItem } from './types'
+import type { IOrderItem } from './types'
 
 export const orderReviewItems: IOrderItem[] = [
   {

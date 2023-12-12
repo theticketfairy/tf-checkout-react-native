@@ -1,6 +1,6 @@
-import { StyleProp, ViewStyle } from 'react-native'
+import type { StyleProp, ViewStyle } from 'react-native'
 
-import { IButtonStyles } from '../button/types'
+import type { IButtonStyles } from '../button/types'
 
 export interface ILoggedInTexts {
   logoutDialog?: {

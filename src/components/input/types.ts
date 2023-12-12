@@ -1,5 +1,5 @@
-import { LegacyRef } from 'react'
-import {
+import type { LegacyRef } from 'react'
+import type {
   ColorValue,
   ImageSourcePropType,
   ImageStyle,
@@ -7,7 +7,7 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native'
-import { TextField, TextFieldProps } from 'rn-material-ui-textfield'
+import type { TextField, TextFieldProps } from 'rn-material-ui-textfield'
 
 export interface IInputStyles {
   color?: ColorValue

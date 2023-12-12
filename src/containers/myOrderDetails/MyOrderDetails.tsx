@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { Alert, PermissionsAndroid, Platform } from 'react-native'
+import { Alert, Permission, PermissionsAndroid, Platform } from 'react-native'
 import {
   DocumentDirectoryPath,
   DownloadDirectoryPath,
@@ -16,19 +16,19 @@ import {
   DownloadFileOptions,
 } from 'react-native-fs'
 
-import {
+import type {
   IFetchAccessTokenResponse,
   IMyOrderDetailsData,
   IMyOrderDetailsTicket,
 } from '../../api/types'
-import { BottomSheetHandle } from '../../components/bottomSheetModal/BottomSheetModal'
+import type { BottomSheetHandle } from '../../components/bottomSheetModal/BottomSheetModal'
 import { OrderDetailsCore, SessionHandle, SessionHandleType } from '../../core'
-import { OrderDetailsCoreHandle } from '../../core/OrderDetailsCore/OrderDetailsCoreTypes'
+import type { OrderDetailsCoreHandle } from '../../core/OrderDetailsCore/OrderDetailsCoreTypes'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
-import { TicketActionType } from './components/TicketActions/TicketActionsTypes'
-import { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem'
+import type { TicketActionType } from './components/TicketActions/TicketActionsTypes'
+import type { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem'
 import MyOrderDetailsView from './MyOrderDetailsView'
-import { DownloadStatus, IMyOrderDetailsProps } from './types'
+import type { DownloadStatus, IMyOrderDetailsProps } from './types'
 
 const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
   (
@@ -92,8 +92,10 @@ const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
           }
         }
 
-        const { accessTokenError, accessTokenData } =
-          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+        const {
+          accessTokenError,
+          accessTokenData,
+        } = await sessionHandleRef.current!.refreshAccessToken(refreshToken)
 
         return {
           accessTokenData,
@@ -159,8 +161,12 @@ const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
       }
 
       setIsLoading(true)
-      const { removeTicketFromResaleData, removeTicketFromResaleError } =
-        await myOrderDetailsCoreRef.current.removeTicketFromResale(ticket.hash)
+      const {
+        removeTicketFromResaleData,
+        removeTicketFromResaleError,
+      } = await myOrderDetailsCoreRef.current.removeTicketFromResale(
+        ticket.hash
+      )
       setIsLoading(false)
 
       if (removeTicketFromResaleError || !removeTicketFromResaleData) {
@@ -267,7 +273,7 @@ const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
       }
 
       PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE as Permission
       ).then((result) => {
         setIsWriteStorageEnabled(result)
       })
@@ -280,7 +286,7 @@ const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
 
       if (isWriteStorageEnabled === false && Platform.OS === 'android') {
         PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE as Permission
         ).then((result) => {
           setIsWriteStorageEnabled(result === 'granted')
         })

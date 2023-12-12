@@ -11,19 +11,19 @@ import React, {
 } from 'react'
 import { Alert } from 'react-native'
 
-import {
+import type {
   IEventResponse,
   IFetchAccessTokenResponse,
   IPromoCodeResponse,
 } from '../../api/types'
 import { SessionHandle, TicketsCore, TicketsCoreHandle } from '../../core'
-import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
-import {
+import type { SessionHandleType } from '../../core/Session/SessionCoreTypes'
+import type {
   IBookTicketsOptions,
   IGetTicketsPayload,
   IGroupedTickets,
 } from '../../core/TicketsCore/TicketsCoreTypes'
-import {
+import type {
   IAddToCartResponse,
   IEvent,
   IOnFetchTicketsSuccess,
@@ -31,7 +31,7 @@ import {
   ITicket,
 } from '../../types'
 import TicketsView from './TicketsView'
-import { IPasswordProtectedEventData, ITicketsProps } from './types'
+import type { IPasswordProtectedEventData, ITicketsProps } from './types'
 
 const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
   (
@@ -71,14 +71,17 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
     const [tickets, setTickets] = useState<ITicket[]>([])
     const [groupedTickets, setGroupedTickets] = useState<IGroupedTickets[]>([])
     const [isWaitingListVisible, setIsWaitingListVisible] = useState(false)
+    const [arePromoCodesEnabled, setArePromoCodesEnabled] = useState(false)
     const [isAccessCode, setIsAccessCode] = useState(false)
     const [selectedTicket, setSelectedTicket] = useState<ISelectedTicket>()
     const [promoCodeResponse, setPromoCodeResponse] = useState<
       IPromoCodeResponse | undefined
     >(undefined)
     const [isFirstCall, setIsFirstCall] = useState(true)
-    const [passwordProtectedEventData, setPasswordProtectedEventData] =
-      useState<IPasswordProtectedEventData | undefined>()
+    const [
+      passwordProtectedEventData,
+      setPasswordProtectedEventData,
+    ] = useState<IPasswordProtectedEventData | undefined>()
 
     //#region Refs
     const eventErrorCodeRef = useRef(0)
@@ -130,7 +133,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
         return { eventError: { message: 'Ticket core is not initialized' } }
       }
 
-      setIsUserLogged(await ticketsCoreRef.current.getIsUserLoggedIn())
+      return setIsUserLogged(await ticketsCoreRef.current.getIsUserLoggedIn())
     }
 
     const getTicketsCore = async (
@@ -194,6 +197,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
         isInWaitingList,
         isAccessCodeRequired,
         areGroupsShown,
+        arePromoCodesEnabled: promoCodesEnabled,
       } = await getTicketsCore(promoCode)
       setIsGettingTickets(false)
 
@@ -206,6 +210,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
       setIsWaitingListVisible(!!isInWaitingList)
       setIsAccessCode(!!isAccessCodeRequired)
       setAreTicketGroupsShown(areGroupsShown || false)
+      setArePromoCodesEnabled(promoCodesEnabled || false)
 
       if (responseTickets && !_isEmpty(responseTickets)) {
         if (config.areTicketsGrouped) {
@@ -368,8 +373,10 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
           }
         }
 
-        const { accessTokenError, accessTokenData } =
-          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+        const {
+          accessTokenError,
+          accessTokenData,
+        } = await sessionHandleRef.current!.refreshAccessToken(refreshToken)
         if (!accessTokenError && accessTokenData?.accessToken) {
           await fetchInitialData()
         }
@@ -415,6 +422,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
 
       await getEventData()
       onPressLogout?.()
+      return
     }
 
     const handleOnLoadingChange = (loading: boolean) => {
@@ -489,6 +497,7 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
             passwordProtectedEventData={passwordProtectedEventData}
             onPressSubmitEventPassword={handleOnSubmitEventPassword}
             isCheckingCurrentSession={isCheckingCurrentSession}
+            arePromoCodesEnabled={arePromoCodesEnabled}
           />
         </SessionHandle>
       </TicketsCore>

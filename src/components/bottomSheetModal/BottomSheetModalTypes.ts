@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { ReactNode } from 'react'
+import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 export interface IBottomSheetModalStyles {
   rootContainer?: StyleProp<ViewStyle>

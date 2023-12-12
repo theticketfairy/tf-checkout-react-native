@@ -1,5 +1,4 @@
 //@ts-nocheck
-
 import React, {
   MutableRefObject,
   useCallback,
@@ -21,18 +20,23 @@ import R from '../../res'
 import Separator from '../separator/Separator'
 import DropdownListItem from './DropdownListItem'
 import { DropdownStyles as s } from './styles'
-import { IDropdownItem, IDropdownProps } from './types'
+import type { IDropdownItem, IDropdownProps } from './types'
 
 const Dropdown = ({
   items,
   selectedOption,
   onSelectItem,
   styles,
+  isDisabled,
 }: IDropdownProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const flatListRef: MutableRefObject<FlatList> = useRef()
 
   const showModal = () => {
+    if (isDisabled) {
+      return
+    }
+
     requestAnimationFrame(() => {
       setIsModalVisible(true)
     })
@@ -75,7 +79,7 @@ const Dropdown = ({
   const renderSeparator = useCallback(() => <Separator />, [])
 
   const getItemLayout = useCallback(
-    (data, index) => ({
+    (_data, index) => ({
       length: 45,
       offset: 45 * index,
       index,

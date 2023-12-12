@@ -3,7 +3,7 @@ import { Text, View } from 'react-native'
 
 import { Button, Input } from '..'
 import s from './styles'
-import { IWaitingListViewProps } from './types'
+import type { IWaitingListViewProps } from './types'
 
 const WaitingListView: FC<IWaitingListViewProps> = ({
   styles,

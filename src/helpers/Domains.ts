@@ -1,4 +1,4 @@
-import { EnvType } from './Config'
+import type { EnvType } from './Config'
 
 export const getDomainByClientAndEnv = (
   client: string = 'ttf',

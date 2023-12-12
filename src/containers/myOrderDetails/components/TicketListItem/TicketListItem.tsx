@@ -3,7 +3,7 @@ import { Image, Text, TouchableOpacity, View } from 'react-native'
 
 import R from '../../../../res'
 import s from './TicketListItemStyles'
-import { ITicketListItemProps } from './TicketListItemTypes'
+import type { ITicketListItemProps } from './TicketListItemTypes'
 
 export interface IOnPressTicketDownload {
   pdfLink?: string

@@ -1,12 +1,12 @@
-import { ImageSourcePropType, ImageStyle } from 'react-native'
-import { TextStyle } from 'react-native'
-import { StyleProp, ViewStyle } from 'react-native'
+import type { ImageSourcePropType, ImageStyle } from 'react-native'
+import type { TextStyle } from 'react-native'
+import type { StyleProp, ViewStyle } from 'react-native'
 
-import { IFetchAccessTokenData } from '../../api/types'
-import { IError, IUserProfilePublic } from '../../types'
-import { IButtonStyles } from '../button/types'
-import { IInputStyles } from '../input/types'
-import {
+import type { IFetchAccessTokenData } from '../../api/types'
+import type { IError, IUserProfilePublic } from '../../types'
+import type { IButtonStyles } from '../button/types'
+import type { IInputStyles } from '../input/types'
+import type {
   IRestorePasswordCoreProps,
   IRestorePasswordStyles,
   IRestorePasswordTexts,
@@ -14,6 +14,10 @@ import {
   IResultDialogStyles,
   IResultDialogTexts,
 } from '../restorePassword/types'
+import type {
+  ILoginGuestComponentStyles,
+  ILoginLoggedComponentStyles,
+} from './components/types'
 
 export interface ILoginRefs {
   inputs?: {
@@ -76,13 +80,7 @@ export interface ILoginProps {
 }
 
 export interface ILoginViewStyles {
-  guest?: {
-    loginButton?: IButtonStyles
-    linesContainer?: StyleProp<ViewStyle>
-    line1?: StyleProp<TextStyle>
-    line2?: StyleProp<TextStyle>
-    message?: StyleProp<TextStyle>
-  }
+  guest?: ILoginGuestComponentStyles
   dialog?: {
     container?: StyleProp<ViewStyle>
     loginButton?: IButtonStyles
@@ -93,13 +91,7 @@ export interface ILoginViewStyles {
     showPasswordIcon?: StyleProp<ImageStyle>
     forgotPassword?: StyleProp<TextStyle>
   }
-  loggedIn?: {
-    container?: StyleProp<ViewStyle>
-    placeholder?: StyleProp<TextStyle>
-    value?: StyleProp<TextStyle>
-    button?: IButtonStyles
-    message?: StyleProp<TextStyle>
-  }
+  loggedIn?: ILoginLoggedComponentStyles
   restorePassword?: IRestorePasswordStyles
   restorePasswordSuccess?: IResultDialogStyles
 }

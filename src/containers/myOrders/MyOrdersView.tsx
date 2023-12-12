@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useRef } from 'react'
+import React, { type FC, useCallback, useMemo, useRef } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -10,12 +10,12 @@ import {
   View,
 } from 'react-native'
 
-import { IMyOrdersOrder } from '../../api/types'
+import type { IMyOrdersOrder } from '../../api/types'
 import { Dropdown, Loading } from '../../components'
 import R from '../../res'
 import OrderListItem from './components/OrderListItem'
 import { MyOrdersViewStyles as s } from './styles'
-import { IMyOrdersViewProps } from './types'
+import type { IMyOrdersViewProps } from './types'
 
 const MyOrdersView: FC<IMyOrdersViewProps> = ({
   myEvents,
@@ -65,16 +65,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [handleOnSelectOrder]
-  )
-
-  const renderRefreshControl = (
-    <RefreshControl
-      enabled={false}
-      tintColor={styles?.refreshControlColor || R.colors.primary}
-      refreshing={!!isLoading}
-      onRefresh={onRefresh}
-    />
+    [handleOnSelectOrder],
   )
 
   const dropdownStyles = useMemo(() => {
@@ -110,6 +101,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
           onSelectItem={onChangeEvent}
           selectedOption={selectedEvent}
           styles={dropdownStyles}
+          isDisabled={isLoading || isRefreshing}
         />
         <TouchableOpacity onPress={onClearSelectedEvent}>
           <Image
@@ -149,6 +141,15 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
   )
   //#endregion Renders
 
+  const renderEmptyOrders = () => (
+    <View style={styles?.emptyOrders?.container}>
+      <Text style={styles?.emptyOrders?.message}>
+        {texts?.emptyOrdersMessage ||
+          'No orders were found for the selected filters'}
+      </Text>
+    </View>
+  )
+
   //#region Return
   return (
     <View style={[s.rootContainer, styles?.rootContainer]}>
@@ -157,27 +158,33 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
           {texts?.title || 'Events'}
         </Text>
         {!config?.isTimeFilterDropdownHidden && timeFilterDropdown}
-        {!config?.isEventsDropdownHidden && eventsDropdown}
+        {!config?.isEventsDropdownHidden &&
+          myEvents?.length > 0 &&
+          eventsDropdown}
         <View style={[s.listContainer, styles?.listContainer]}>
-          <FlatList
-            data={myOrders}
-            renderItem={renderOrderListItem}
-            refreshControl={renderRefreshControl}
-            onEndReached={handleOnReachEnd}
-            onMomentumScrollBegin={handleOnMomentumScrollBegin}
-            onEndReachedThreshold={0.2}
-            extraData={myOrders}
-          />
+          {myOrders?.length > 0 ? (
+            <FlatList
+              data={myOrders}
+              renderItem={renderOrderListItem}
+              onEndReached={handleOnReachEnd}
+              onMomentumScrollBegin={handleOnMomentumScrollBegin}
+              onEndReachedThreshold={0.2}
+              extraData={myOrders}
+            />
+          ) : (
+            !isLoading && renderEmptyOrders()
+          )}
           {isLoading && myOrders.length > 8 && !isRefreshing && (
             <ActivityIndicator
               size={'large'}
-              color={styles?.refreshControlColor || R.colors.primary}
+              color={styles?.refreshControlColor || R.colors.white}
             />
           )}
         </View>
-        {config?.areActivityIndicatorsEnabled && isGettingEventDetails && (
-          <Loading />
-        )}
+        {config?.areActivityIndicatorsEnabled &&
+          (isGettingEventDetails || (isLoading && myOrders.length < 8)) && (
+            <Loading />
+          )}
       </SafeAreaView>
     </View>
   )

@@ -1,10 +1,10 @@
 import React, { forwardRef, useImperativeHandle } from 'react'
 
 import { fetchPurchaseConfirmation } from '../../api/ApiClient'
-import { IFetchAccessTokenResponse } from '../../api/types'
+import type { IFetchAccessTokenResponse } from '../../api/types'
 import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
-import { ICoreProps } from '../CoreProps'
-import { PurchaseConfirmationCoreHandle } from './PurchaseConfirmationCoreTypes'
+import type { ICoreProps } from '../CoreProps'
+import type { PurchaseConfirmationCoreHandle } from './PurchaseConfirmationCoreTypes'
 
 const PurchaseConfirmationCore = forwardRef<
   PurchaseConfirmationCoreHandle,

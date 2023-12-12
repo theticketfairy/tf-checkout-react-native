@@ -1,5 +1,4 @@
 //@ts-nocheck
-
 import React, {
   MutableRefObject,
   useCallback,
@@ -18,10 +17,11 @@ import {
 
 import R from '../../res'
 import DropdownListItem from '../dropdown/DropdownListItem'
+import type { IDropdownItem } from '../dropdown/types'
 import Input from '../input/Input'
 import Separator from '../separator/Separator'
 import { DropdownMaterialStyles as s } from './styles'
-import { IDropdownItem, IDropdownMaterialProps } from './types'
+import type { IDropdownMaterialProps } from './types'
 
 const DropdownMaterial = ({
   items,

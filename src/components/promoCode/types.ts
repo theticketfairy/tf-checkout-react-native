@@ -1,12 +1,12 @@
-import {
+import type {
   ImageSourcePropType,
   ImageStyle,
   StyleProp,
   TextStyle,
 } from 'react-native'
-import { TextInputProps, ViewStyle } from 'react-native'
+import type { TextInputProps, ViewStyle } from 'react-native'
 
-import { IButtonStyles } from '../button/types'
+import type { IButtonStyles } from '../button/types'
 
 export interface IPromoCodeStyles {
   rootContainer?: StyleProp<ViewStyle>

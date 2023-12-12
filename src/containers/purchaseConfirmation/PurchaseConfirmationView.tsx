@@ -3,7 +3,7 @@ import { Text, View } from 'react-native'
 
 import { Button, Loading } from '../../components'
 import s from './styles'
-import { IPurchaseConfirmationViewProps } from './types'
+import type { IPurchaseConfirmationViewProps } from './types'
 
 const PurchaseConfirmationView: FC<IPurchaseConfirmationViewProps> = ({
   texts,

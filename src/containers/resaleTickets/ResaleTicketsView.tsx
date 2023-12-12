@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useMemo, useRef } from 'react'
 import { Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { TextField } from 'rn-material-ui-textfield'
+import type { TextField } from 'rn-material-ui-textfield'
 
 import { Button, Checkbox, Input, RadioButton } from '../../components'
 import {
@@ -89,8 +89,12 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
     isTermsAgreed,
   } = resaleToWhomData
 
-  const { firstNameError, lastNameError, emailError, emailConfirmError } =
-    someoneDataErrors
+  const {
+    firstNameError,
+    lastNameError,
+    emailError,
+    emailConfirmError,
+  } = someoneDataErrors
 
   const Terms = useMemo(
     () => (

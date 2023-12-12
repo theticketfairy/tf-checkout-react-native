@@ -1,14 +1,14 @@
 import React, { forwardRef, useImperativeHandle } from 'react'
 
 import { addToWaitingList } from '../../api/ApiClient'
-import {
+import type {
   IAddToWaitingListResponse,
   IFetchAccessTokenResponse,
 } from '../../api/types'
-import { IWaitingListFields } from '../../components/waitingList/types'
+import type { IWaitingListFields } from '../../components/waitingList/types'
 import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
-import { ICoreProps } from '../CoreProps'
-import {
+import type { ICoreProps } from '../CoreProps'
+import type {
   IAddToWaitingListCoreParams,
   WaitingListCoreHandle,
 } from './WaitingListCoreTypes'

@@ -1,8 +1,8 @@
-import { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
-import { IError } from '../../types'
-import { IButtonStyles } from '../button/types'
-import { IInputStyles } from '../input/types'
+import type { IError } from '../../types'
+import type { IButtonStyles } from '../button/types'
+import type { IInputStyles } from '../input/types'
 
 export interface IWaitingListTexts {
   title?: string

@@ -1,4 +1,4 @@
-import {
+import type {
   ColorValue,
   ImageStyle,
   StyleProp,
@@ -6,14 +6,17 @@ import {
   ViewStyle,
 } from 'react-native'
 
-import {
+import type {
   IMyOrderDetailsData,
   IMyOrdersData,
   IMyOrdersOrder,
 } from '../../api/types'
-import { IDropdownItem, IDropdownStyles } from '../../components/dropdown/types'
-import { IError } from '../../types'
-import { IOrderListItemStyles } from './components/types'
+import type {
+  IDropdownItem,
+  IDropdownStyles,
+} from '../../components/dropdown/types'
+import type { IError } from '../../types'
+import type { IOrderListItemStyles } from './components/types'
 
 export interface IMyOrdersConfig {
   isEventsDropdownHidden?: boolean
@@ -39,6 +42,10 @@ export interface IMyOrdersStyles {
     selectionContainer?: StyleProp<ViewStyle>
     clearSelectionIcon?: StyleProp<ImageStyle>
   }
+  emptyOrders?: {
+    container?: StyleProp<ViewStyle>
+    message?: StyleProp<TextStyle>
+  }
 }
 
 export interface IMyOrdersTexts {
@@ -51,6 +58,7 @@ export interface IMyOrdersTexts {
     ongoing?: string
     past?: string
   }
+  emptyOrdersMessage?: string
 }
 
 export interface IMyOrdersProps {

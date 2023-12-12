@@ -1,10 +1,10 @@
-import {
+import type {
   IFreeRegistrationResponse,
   IMyOrderDetailsResponse,
   IOrderReviewResponse,
 } from '../../api/types'
-import { ICoreProps } from '../CoreProps'
-import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
+import type { ICoreProps } from '../CoreProps'
+import type { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
 export type CheckoutCoreHandleType = {
   getEventConditions(): Promise<any>

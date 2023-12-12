@@ -1,4 +1,9 @@
-import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
+//@ts-nocheck
+import Axios, {
+  AxiosError,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+} from 'axios'
 import axiosRetry from 'axios-retry'
 import _filter from 'lodash/filter'
 import _forEach from 'lodash/forEach'
@@ -7,8 +12,8 @@ import _map from 'lodash/map'
 import _mapKeys from 'lodash/mapKeys'
 import _sortBy from 'lodash/sortBy'
 
-import { IOnCheckoutSuccess } from '..'
-import { IWaitingListFields } from '../components/waitingList/types'
+import type { IOnCheckoutSuccess } from '..'
+import type { IWaitingListFields } from '../components/waitingList/types'
 import { Config } from '../helpers/Config'
 import { getDomainByClientAndEnv } from '../helpers/Domains'
 import {
@@ -17,15 +22,20 @@ import {
   LocalStorageKeys,
   storeData,
 } from '../helpers/LocalStorage'
-import { IAccountTicketsResponse, IError, IEvent, IUserProfile } from '../types'
-import {
+import type {
+  IAccountTicketsResponse,
+  IError,
+  IEvent,
+  IUserProfile,
+} from '../types'
+import type {
   IAddToCartResponse,
   ITicket,
   ITicketsResponseData,
 } from '../types/ITicket'
 import Constants from './Constants'
 import { getApiError } from './ErrorHandler'
-import {
+import type {
   IAddToCartParams,
   IAddToWaitingListResponse,
   IAuthorizeResponse,
@@ -119,9 +129,12 @@ Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
 
 Client.interceptors.response.use(
   (response: AxiosResponse) => {
+    console.log(`Response ${response.request._url}`, response.data.data)
     return response
   },
   async (error: AxiosError) => {
+    console.log(`Response ERROR`, error.response)
+
     if (error?.response?.status === 401) {
       error.code = error.code
       error.message = error.response.data.error_description
@@ -130,7 +143,7 @@ Client.interceptors.response.use(
     }
 
     return Promise.reject(error)
-  }
+  },
 )
 
 Client.setGuestToken = (token: string) =>
@@ -156,15 +169,17 @@ Client.setDomain = (domain: string) =>
     origin: domain,
   })
 
-Client.setContentType = (contentType: string) =>
-  (Client.defaults.headers.common['Content-Type'] = contentType)
+Client.setContentType = (contentType: string) => {
+  Client.defaults.headers.common['Content-Type'] = contentType
+  Client.defaults.headers['Content-Type'] = contentType
+}
 
 export const setCustomHeader = (response: any) => {
   const guestHeaderResponseValue = _get(response, 'headers.authorization-guest')
 
   const guestHeaderExistingValue = _get(
     response,
-    'config.headers[Authorization-Guest]'
+    'config.headers[Authorization-Guest]',
   )
 
   const guestHeader = guestHeaderResponseValue || guestHeaderExistingValue
@@ -182,13 +197,20 @@ export const setAccessTokenHandler = async (accessToken: string) => {
 
 // API Authentication
 export const authorize = async (
-  data: FormData
+  data: FormData,
 ): Promise<IAuthorizeResponse> => {
   let responseError: IError | undefined
 
+  //Client.setContentType('multipart/form-data')
+
   const response = await Client.post(
     `/v1/oauth/authorize-rn?client_id=${Config.CLIENT_ID}`,
-    data
+    data,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    },
   ).catch((error: AxiosError) => {
     responseError = {
       message: error?.response?.data.message || 'Authorization failed',
@@ -203,17 +225,19 @@ export const authorize = async (
 }
 
 export const fetchAccessToken = async (
-  data: FormData
+  data: FormData,
 ): Promise<IFetchAccessTokenResponse> => {
   let responseError: IError | undefined
-  const response = await Client.post('/v1/oauth/access_token', data).catch(
-    (error: AxiosError) => {
-      responseError = {
-        message: error.response?.data.message,
-        code: error.response?.status,
-      }
+  const response = await Client.post('/v1/oauth/access_token', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message,
+      code: error.response?.status,
     }
-  )
+  })
 
   const accessToken = _get(response, 'data.access_token')
   if (accessToken) {
@@ -259,7 +283,7 @@ export const fetchUserProfile = async (): Promise<IUserProfileResponse> => {
         ...HEADERS,
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   ).catch((error: AxiosError) => {
     responseError = {
       message: error?.response?.data?.message,
@@ -279,7 +303,7 @@ export const fetchUserProfile = async (): Promise<IUserProfileResponse> => {
 
 //#region Register new user
 export const registerNewUser = async (
-  data: FormData
+  data: FormData,
 ): Promise<IRegisterNewUserResponse> => {
   const resultData: IRegisterNewUserResponse = {
     registerNewUserResponseError: undefined,
@@ -293,7 +317,7 @@ export const registerNewUser = async (
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-    }
+    },
   ).catch((error: AxiosError) => {
     const messageObject = error.response?.data.message
     let errorMessage = ''
@@ -368,7 +392,7 @@ export const registerNewUser = async (
 
 //#region Waiting List
 export const addToWaitingList = async (
-  values: IWaitingListFields
+  values: IWaitingListFields,
 ): Promise<IAddToWaitingListResponse> => {
   if (!Config.EVENT_ID) {
     return {
@@ -387,7 +411,7 @@ export const addToWaitingList = async (
   let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.post(
     `/v1/event/${Config.EVENT_ID}/add_to_waiting_list`,
-    requestData
+    requestData,
   ).catch((error: AxiosError) => {
     responseError = {
       message: error.response?.data.message,
@@ -432,7 +456,7 @@ export const fetchMyOrders = async ({
   const response: AxiosResponse | void = await Client.get(endpoint).catch(
     (error: AxiosError) => {
       responseError = getApiError(error, 'Error fetching My Orders')
-    }
+    },
   )
 
   if (response?.data) {
@@ -458,7 +482,7 @@ export const fetchMyOrders = async ({
 
 //#region OrderDetails
 export const fetchOrderDetails = async (
-  orderId: string
+  orderId: string,
 ): Promise<IMyOrderDetailsResponse> => {
   let responseError: IError | undefined
   let responseData: IMyOrderDetailsData | undefined
@@ -470,7 +494,7 @@ export const fetchOrderDetails = async (
           error.response?.data.message || 'Error while fetching order details',
         code: error.response?.status,
       }
-    }
+    },
   )
 
   if (!responseError && response) {
@@ -514,7 +538,7 @@ export const fetchOrderDetails = async (
           ticketTypeHash: item.ticket_type_hash,
           isTable: item.is_table,
         }
-      }
+      },
     )
     responseData = {
       header: {
@@ -564,7 +588,7 @@ export const fetchOrderDetails = async (
 
 //#region Tickets
 export const fetchTickets = async (
-  promoCode?: string
+  promoCode?: string,
 ): Promise<IFetchTicketsResponse> => {
   if (!Config.EVENT_ID) {
     return {
@@ -614,7 +638,7 @@ export const fetchTickets = async (
   const attributes = _get(response, 'data.data.attributes.tickets')
   const ticketsAttributes = _filter(
     attributes,
-    (item) => typeof item === 'object'
+    (item) => typeof item === 'object',
   )
   const promoCodeResult: IPromoCodeResponse = {
     message: _get(response, 'data.data.attributes.PromoCodeValidationMessage'),
@@ -633,12 +657,16 @@ export const fetchTickets = async (
     promoCodeResult: promoCodeResult,
     isInWaitingList: _get(response, 'data.data.attributes.showWaitingList'),
     isAccessCodeRequired: _get(response, 'data.data.attributes.is_access_code'),
+    arePromoCodesEnabled: _get(
+      response,
+      'data.data.attributes.isPromotionsEnabled',
+    ),
   }
 }
 //#endregion Tickets
 
 export const addToCart = async (
-  data: IAddToCartParams
+  data: IAddToCartParams,
 ): Promise<IAddToCartResponse> => {
   if (!Config.EVENT_ID) {
     return {
@@ -655,7 +683,7 @@ export const addToCart = async (
     `v1/event/${Config.EVENT_ID}/add-to-cart/`,
     {
       data,
-    }
+    },
   ).catch((error: AxiosError) => {
     responseError = {
       code: error.response?.status!,
@@ -703,7 +731,7 @@ export const fetchEvent = async (): Promise<IEventResponse> => {
     `v1/event/${Config.EVENT_ID}`,
     {
       headers: HEADERS,
-    }
+    },
   ).catch((error: AxiosError) => {
     responseError = {
       code: error?.response?.data.status,
@@ -726,7 +754,7 @@ export const fetchEvent = async (): Promise<IEventResponse> => {
 }
 
 export const postReferralVisit = async (
-  referralId: string
+  referralId: string,
 ): Promise<IPostReferralResponse> => {
   if (!Config.EVENT_ID) {
     return {
@@ -745,7 +773,7 @@ export const postReferralVisit = async (
     `v1/event/${eventId}/referrer/`,
     {
       referrer: referralIdNumber,
-    }
+    },
   ).catch((error: AxiosError) => {
     if (error.response?.data.errors && error.response?.data.errors.length > 0) {
       responseError = {
@@ -778,7 +806,7 @@ export const postReferralVisit = async (
 }
 //#region Unlock Password Protected Event
 export const unlockPasswordProtectedEvent = async (
-  password: string
+  password: string,
 ): Promise<IEventResponse> => {
   if (!Config.EVENT_ID) {
     return {
@@ -802,7 +830,7 @@ export const unlockPasswordProtectedEvent = async (
 
   const response: AxiosResponse | void = await Client.post(
     `v1/event/${eventId}/authenticate`,
-    body
+    body,
   ).catch((error: AxiosError) => {
     responseError = {
       message: error.response?.data.message || 'Error while unlocking Event',
@@ -833,7 +861,7 @@ export const unlockPasswordProtectedEvent = async (
 export const fetchCountries = async (): Promise<ICountriesResponse> => {
   let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.get(
-    '/countries/list'
+    '/countries/list',
   ).catch((error: AxiosError) => {
     responseError = {
       message: error.response?.data.message,
@@ -852,11 +880,11 @@ export const fetchCountries = async (): Promise<ICountriesResponse> => {
 }
 
 export const fetchStates = async (
-  countryId: string
+  countryId: string,
 ): Promise<IStatesResponse> => {
   let responseError: IError | undefined
   const response: void | AxiosResponse = await Client.get(
-    `/countries/${countryId}/states/`
+    `/countries/${countryId}/states/`,
   ).catch((ex: AxiosError) => {
     responseError = {
       code: ex.response?.status!,
@@ -883,7 +911,7 @@ export const fetchCart = async (): Promise<ICartResponse> => {
         code: error.response?.status!,
         message: error.response?.data.message,
       }
-    }
+    },
   )
 
   if (res?.data?.data?.attributes) {
@@ -916,7 +944,7 @@ export const fetchCart = async (): Promise<ICartResponse> => {
 }
 
 export const checkoutOrder = async (
-  data: ICheckoutBody
+  data: ICheckoutBody,
 ): Promise<ICheckoutResponse> => {
   const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
 
@@ -936,7 +964,7 @@ export const checkoutOrder = async (
         ...HEADERS,
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   ).catch((error: AxiosError) => {
     responseError = {
       code: error.response?.status!,
@@ -974,7 +1002,7 @@ export const fetchEventConditions = async () => {
 
   let responseError: IError | undefined
   const response: AxiosResponse | void = await Client.get(
-    `v1/event/${Config.EVENT_ID}/conditions`
+    `v1/event/${Config.EVENT_ID}/conditions`,
   ).catch((error: AxiosError) => {
     responseError = {
       message: error.response?.data,
@@ -989,12 +1017,12 @@ export const fetchEventConditions = async () => {
 }
 
 export const fetchOrderReview = async (
-  hash: string
+  hash: string,
 ): Promise<IOrderReviewResponse> => {
   let responseError: IError | undefined
 
   const response: AxiosResponse | void = await Client.get(
-    `v1/order/${hash}/review/`
+    `v1/order/${hash}/review/`,
   ).catch((error: AxiosError) => {
     responseError = {
       message: error.response?.data.message,
@@ -1063,7 +1091,7 @@ export const postOnPaymentSuccess = async (orderHash: string) => {
   let responseError: IError | undefined
 
   const response: AxiosResponse | void = await Client.post(
-    `v1/order/${orderHash}/success`
+    `v1/order/${orderHash}/success`,
   ).catch((error: AxiosError) => {
     responseError = {
       message:
@@ -1079,13 +1107,13 @@ export const postOnPaymentSuccess = async (orderHash: string) => {
 }
 
 export const postOnFreeRegistration = async (
-  orderHash: string
+  orderHash: string,
 ): Promise<IFreeRegistrationResponse> => {
   let responseError: IError | undefined
   let responseData: IFreeRegistrationData | undefined
 
   const res: AxiosResponse | void = await Client.post(
-    `v1/order/${orderHash}/complete_free_registration`
+    `v1/order/${orderHash}/complete_free_registration`,
   ).catch((error: AxiosError) => {
     responseError = {
       message: error.response?.data.message,
@@ -1112,13 +1140,13 @@ export const postOnFreeRegistration = async (
 
 //#region Purchase Confirmation
 export const fetchPurchaseConfirmation = async (
-  orderHash: string
+  orderHash: string,
 ): Promise<IPurchaseConfirmationResponse> => {
   let responseError: IError | undefined
   let data: IPurchaseConfirmationData | undefined
 
   const response: AxiosResponse | void = await Client.get(
-    `/v1/order/${orderHash}/payment/complete`
+    `/v1/order/${orderHash}/payment/complete`,
   ).catch((error: AxiosError) => {
     responseError = {
       message: error.response?.data.message,
@@ -1159,7 +1187,7 @@ export const fetchPurchaseConfirmation = async (
 //#region Resale Tickets
 export const resaleTicket = async (
   data: FormData,
-  orderHash: string
+  orderHash: string,
 ): Promise<IResaleTicketResponse> => {
   let responseError: IError | undefined
   let responseData: IResaleTicketData | undefined
@@ -1169,7 +1197,7 @@ export const resaleTicket = async (
       responseError = {
         message: error.response?.data.message || 'Error while re-sale ticket',
       }
-    }
+    },
   )
 
   if (response?.data && response.data.status) {
@@ -1185,7 +1213,7 @@ export const resaleTicket = async (
 }
 
 export const removeTicketFromResale = async (
-  orderHash: string
+  orderHash: string,
 ): Promise<IRemoveTicketFromResaleResponse> => {
   let responseError: IError | undefined
   let responseData: IRemoveTicketFromResaleData | undefined
@@ -1194,7 +1222,7 @@ export const removeTicketFromResale = async (
     (error: AxiosError) => {
       responseError =
         error.response?.data.message || 'Error removing ticket from resale'
-    }
+    },
   )
 
   if (response?.data.message && response.data.status === 200) {
@@ -1219,7 +1247,7 @@ export const closeSession = async (): Promise<ICloseSessionResponse> => {
     (error: AxiosError) => {
       responseError =
         error.response?.data.message || 'Error while closing session'
-    }
+    },
   )
 
   if (response?.data && response.data.status && response.data.status === 200) {
@@ -1242,16 +1270,16 @@ export const closeSession = async (): Promise<ICloseSessionResponse> => {
 
 //#region Restore Password
 export const requestRestorePassword = async (
-  email: string
+  email: string,
 ): Promise<IRestorePasswordResponse> => {
   let responseError: IError | undefined
   let successData: IRestorePasswordData | undefined
 
   const response: AxiosResponse | void = await Client.post(
-    `v1/oauth/restore-password-rn`,
+    `/auth/restore-password`,
     {
       email: email,
-    }
+    },
   ).catch((error: AxiosError) => {
     responseError = {
       message: error.response?.data.message || 'Error while restoring password',
@@ -1275,14 +1303,14 @@ export const requestRestorePassword = async (
 
 //#region Request Password
 export const requestResetPassword = async (
-  data: IResetPasswordRequestData
+  data: IResetPasswordRequestData,
 ): Promise<IResetPasswordResponse> => {
   let responseError: IError | undefined
   let responseData: any | undefined
 
   const response: AxiosResponse | void = await Client.post(
     `/auth/reset-password`,
-    data
+    data,
   ).catch((error: AxiosError) => {
     responseError = {
       message: error.response?.data.message || 'Reset password error',
@@ -1325,7 +1353,7 @@ export const fetchAccountTickets = async ({
   const response: AxiosResponse | void = await Client.get(endpoint).catch(
     (error: AxiosError) => {
       responseError = getApiError(error)
-    }
+    },
   )
 
   if (responseError) {

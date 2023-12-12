@@ -1,7 +1,7 @@
-import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
-import { IDropdownItem, IDropdownListItemStyles } from '../dropdown/types'
-import { IInputProps, IInputStyles } from '../input/types'
+import type { IDropdownItem, IDropdownListItemStyles } from '../dropdown/types'
+import type { IInputProps, IInputStyles } from '../input/types'
 
 export interface IDropdownMaterialStyles {
   container?: StyleProp<ViewStyle>

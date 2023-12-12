@@ -1,4 +1,4 @@
-import {
+import type {
   ImageSourcePropType,
   ImageStyle,
   StyleProp,
@@ -6,35 +6,38 @@ import {
   ViewStyle,
 } from 'react-native'
 
-import { IEventData } from '../../api/types'
-import { IButtonStyles } from '../../components/button/types'
-import {
+import type { IEventData } from '../../api/types'
+import type { IButtonStyles } from '../../components/button/types'
+import type {
   IEnterPasswordStyles,
   IEnterPasswordTexts,
 } from '../../components/enterPassword/types'
-import { ILoadingStyles } from '../../components/loading/types'
-import {
+import type { ILoadingStyles } from '../../components/loading/types'
+import type {
   ILoggedInStyles,
   ILoggedInTexts,
 } from '../../components/loggedIn/types'
-import {
+import type {
   IPromoCodeStyles,
   IPromoCodeTexts,
 } from '../../components/promoCode/types'
-import {
+import type {
   IWaitingListStyles,
   IWaitingListTexts,
 } from '../../components/waitingList/types'
-import { IGroupedTickets } from '../../core/TicketsCore/TicketsCoreTypes'
-import {
+import type { IGroupedTickets } from '../../core/TicketsCore/TicketsCoreTypes'
+import type {
   IEvent,
   IOnFetchTicketsSuccess,
   ISelectedTicket,
   ITicket,
   ITicketsResponseData,
 } from '../../types'
-import { IError } from '../../types/IError'
-import { ITicketListItemStyles, ITicketListItemTexts } from './components/types'
+import type { IError } from '../../types/IError'
+import type {
+  ITicketListItemStyles,
+  ITicketListItemTexts,
+} from './components/types'
 
 export interface ITicketsViewProps {
   isGettingTickets?: boolean
@@ -73,6 +76,8 @@ export interface ITicketsViewProps {
   // Event password protected
   onPressSubmitEventPassword?: (password: string) => void
   passwordProtectedEventData?: IPasswordProtectedEventData
+
+  arePromoCodesEnabled?: boolean
 }
 
 export interface ITicketListStyles {

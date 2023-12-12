@@ -1,6 +1,6 @@
-import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
-import { IMyOrdersOrder } from '../../../api/types'
+import type { IMyOrdersOrder } from '../../../api/types'
 
 export interface IOrderListItemStyles {
   rootContainer?: StyleProp<ViewStyle>

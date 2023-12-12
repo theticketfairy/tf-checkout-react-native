@@ -4,12 +4,12 @@ import React, {
   useImperativeHandle,
   useRef,
 } from 'react'
+import type { StyleProp } from 'react-native'
 import {
   Animated,
   Dimensions,
   Image,
   Modal as RNModal,
-  StyleProp,
   Text,
   TouchableOpacity,
   View,
@@ -17,7 +17,7 @@ import {
 
 import R from '../../res'
 import s from './BottomSheetModalStyles'
-import { IBottomSheetModalProps } from './BottomSheetModalTypes'
+import type { IBottomSheetModalProps } from './BottomSheetModalTypes'
 
 const animationDuration = 350
 const { height: screenHeight } = Dimensions.get('window')

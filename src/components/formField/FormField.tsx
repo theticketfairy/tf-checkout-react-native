@@ -6,7 +6,7 @@ import DatePicker from '../datePicker/DatePicker'
 import Dropdown from '../dropdown/Dropdown'
 import Input from '../input/Input'
 import styles from './styles'
-import { IFormFieldProps } from './types'
+import type { IFormFieldProps } from './types'
 
 const FormField = ({
   id,

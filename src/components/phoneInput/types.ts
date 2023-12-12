@@ -1,6 +1,6 @@
 import { StyleProp, ViewStyle } from 'react-native'
 
-import { IInputStyles } from '../input/types'
+import type { IInputStyles } from '../input/types'
 
 export interface IOnChangePhoneNumberPayload {
   countryCode: string

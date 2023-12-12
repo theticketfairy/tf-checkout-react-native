@@ -10,10 +10,10 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 
 ### React Native
 
-- Suggested ReactNative version `0.66.3`
-- Suggested Flipper version `0.99.0`
-- React version `0.17.1`
-- Node version `16.10.0`
+- Suggested ReactNative version `0.71.7`
+- Suggested Flipper version `0.125.0`
+- React version `18.2.0`
+- Node version `16.18.0`
 ### Android
 
 - Android 5.0 (API level 21) and above
@@ -22,7 +22,6 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 - Compile Sdk Version and Target Sdk Version `33`
 - Build Tools Version `33.0.0`
 - Java version `1.8`
-- Kotlin version `1.5.31`
 
 Add the following to your Android Manifest as activity property.
 
@@ -161,7 +160,7 @@ const YourComponent: FC () => {
 ### Props
 | Property | Description |
 | -------- | ----------- |
-| EVENT_ID | Specify the event's ID. |
+| EVENT_ID | Specify the event's ID. |
 | CLIENT | Specify your client designated name example `ttf`. |
 | ENV | Sets the environment to any of the following environments: Production, Staging or Development. Receives the following values: `PROD`, `DEV`, `STAG`. Defaults to `PROD`.|
 | CLIENT_ID | Set your CLIENT_ID. |
@@ -991,8 +990,8 @@ interface ILoginSuccessData {
 |----------|-------------|
 | cartProps | Received from the Tickets component |
 | onCheckoutSuccess | Will return Order data from the Checkout action |
-| loginBrandImages | Receives styles and images sources to show in the `Login` component |
-| skipBillingConfig | Configure the skipping component, visible when `isBillingRequired` is set to false |
+| loginBrandImages | Receives styles and images sources to show in the `Login` component |
+| skipBillingConfig | Configure the skipping component, visible when `isBillingRequired` is set to false |
 
 ### texts
 ```js
@@ -1196,7 +1195,7 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 ```
 | Property | Description |
 |----------|-------------|
-| hash | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo`component. |
+| hash | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo`component. |
 | total | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo` component. |
 | onPaymentSuccess | will handle the success in the payment process. Will return the `hash`. |
 | areLoadingIndicatorsEnabled | whether or not show the Loading Indicator, `default: true`. |
@@ -1221,7 +1220,19 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
   payment?: {
     container?: StyleProp<ViewStyle>
     title?: StyleProp<TextStyle>
-    cardBackgroundColor?: string
+    /** Stripe disclaimer: All styles except backgroundColor, cursorColor, borderColor, and borderRadius are Android only */
+    cardStyle?: {
+      backgroundColor?: string
+      borderWidth?: number
+      borderColor?: string
+      borderRadius?: number
+      textColor?: string
+      fontSize?: number
+      placeholderColor?: string
+      cursorColor?: string
+      textErrorColor?: string
+      fontFamily?: string
+    }
     cardContainer?: StyleProp<ViewStyle>
     button?: IButtonStyles
     buttonDisabled?: IButtonStyles
@@ -1239,12 +1250,7 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
 ### Stripe
 
-Currently, Stripe card is not customizable. Please see the open issues in their Github.
-
-- [563](https://github.com/stripe/stripe-react-native/issues/563)
-- [285](https://github.com/stripe/stripe-react-native/issues/285)
-
-Additionally, if you are encountering problems with building your project, please take a look at the [Stripe troubleshooting](https://github.com/stripe/stripe-react-native#troubleshooting).
+If you are encountering problems with building your project, please take a look at the [Stripe troubleshooting](https://github.com/stripe/stripe-react-native#troubleshooting).
 
 ---
 ## Purchase Confirmation UI
@@ -3052,8 +3058,16 @@ Wrap your component with the Core component.
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
 
 # Changelog
+
+## Version 2.0.0
+- Update ReactNative version to 0.71.7.
+- Update Stripe SDK to version 0.26.0.
+  - Enables to better customize the card form.
+- Update dependencies.
+
 ## Version 1.0.31
 - Add missing styles to LoginForm.
+
 ## Version 1.0.30
 - Show errors in Billing UI form fields.
 - Add config prop to Billing UI component, includes 2 configuration flags. 

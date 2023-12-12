@@ -1,14 +1,14 @@
-import { CardFormView } from '@stripe/stripe-react-native'
-import { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { CardFormView } from '@stripe/stripe-react-native'
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
 
-import { IButtonStyles } from '../../components/button/types'
-import {
+import type { IButtonStyles } from '../../components/button/types'
+import type {
   ICartTimerStyles,
   ICartTimerTexts,
 } from '../../components/cartTimer/types'
-import { IFormFieldProps } from '../../components/formField/types'
-import { IError } from '../../types'
-import { IOnCheckoutSuccess } from '../billingInfo/types'
+import type { IFormFieldProps } from '../../components/formField/types'
+import type { IError } from '../../types'
+import type { IOnCheckoutSuccess } from '../billingInfo/types'
 
 export interface ICheckoutStyles {
   rootStyle?: ViewStyle

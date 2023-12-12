@@ -2,9 +2,9 @@ import React, { FC, useRef, useState } from 'react'
 import { Keyboard } from 'react-native'
 
 import { LoginCore, LoginCoreHandle } from '../../core'
-import { IUserProfilePublic } from '../../types'
+import type { IUserProfilePublic } from '../../types'
 import LoginView from './LoginView'
-import { ILoginFields, ILoginProps, LoginContentType } from './types'
+import type { ILoginFields, ILoginProps, LoginContentType } from './types'
 
 const Login: FC<ILoginProps> = ({
   onLoginSuccessful,
@@ -27,13 +27,17 @@ const Login: FC<ILoginProps> = ({
   const [isLoading, setIsLoading] = useState(false)
   const [loginApiError, setLoginApiError] = useState('')
   const [restorePasswordApiError, setRestorePasswordApiError] = useState('')
-  const [restorePasswordSuccessMessage, setRestorePasswordSuccessMessage] =
-    useState('')
+  const [
+    restorePasswordSuccessMessage,
+    setRestorePasswordSuccessMessage,
+  ] = useState('')
   const [userProfileData, setUserProfileData] = useState<IUserProfilePublic>()
-  const [loginContentType, setLoginContentType] =
-    useState<LoginContentType>('login')
-  const [isRestorePasswordLoading, setIsRestorePasswordLoading] =
-    useState(false)
+  const [loginContentType, setLoginContentType] = useState<LoginContentType>(
+    'login'
+  )
+  const [isRestorePasswordLoading, setIsRestorePasswordLoading] = useState(
+    false
+  )
   //#endregion State
 
   const loginCoreRef = useRef<LoginCoreHandle>(null)
@@ -98,8 +102,10 @@ const Login: FC<ILoginProps> = ({
     }
 
     setIsRestorePasswordLoading(true)
-    const { data: restorePasswordSuccessData, error: restorePassError } =
-      await loginCoreRef.current.restorePassword(email)
+    const {
+      data: restorePasswordSuccessData,
+      error: restorePassError,
+    } = await loginCoreRef.current.restorePassword(email)
     setIsRestorePasswordLoading(false)
 
     if (restorePassError || !restorePasswordSuccessData) {

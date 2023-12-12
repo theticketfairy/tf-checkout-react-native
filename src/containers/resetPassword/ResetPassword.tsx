@@ -4,7 +4,7 @@ import { ResetPasswordCore, ResetPasswordCoreHandle } from '../../core'
 import { useDebounced } from '../../helpers/Debounced'
 import { validatePasswords } from '../../helpers/Validators'
 import ResetPasswordView from './ResetPasswordView'
-import { IResetPasswordProps } from './types'
+import type { IResetPasswordProps } from './types'
 
 const ResetPassword: FC<IResetPasswordProps> = ({
   token,

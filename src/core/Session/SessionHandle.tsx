@@ -1,10 +1,10 @@
 import React from 'react'
 import { forwardRef, useImperativeHandle } from 'react'
 
-import { IFetchAccessTokenResponse } from '../../api/types'
+import type { IFetchAccessTokenResponse } from '../../api/types'
 import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
-import { ICoreProps } from '../CoreProps'
-import { SessionHandleType } from './SessionCoreTypes'
+import type { ICoreProps } from '../CoreProps'
+import type { SessionHandleType } from './SessionCoreTypes'
 
 const SessionHandle = forwardRef<SessionHandleType, ICoreProps>(
   (props, ref) => {

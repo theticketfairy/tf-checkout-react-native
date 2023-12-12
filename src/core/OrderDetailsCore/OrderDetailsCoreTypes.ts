@@ -1,8 +1,8 @@
-import {
+import type {
   IRemoveTicketFromResaleResponse,
   IResaleTicketResponse,
 } from '../../api/types'
-import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
+import type { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
 type OrderDetailsCoreHandleType = {
   resaleTicket(

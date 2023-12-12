@@ -1,24 +1,24 @@
 import _ from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Linking, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
 import {
   Checkout,
-  IMyOrderDetailsData,
-  IOnCheckoutSuccess,
+  type IMyOrderDetailsData,
+  type IOnCheckoutSuccess,
   MyOrderDetails,
   MyOrders,
   PurchaseConfirmation,
   Tickets,
   BillingInfo,
   setConfig,
-  ITicketsResponseData,
-  SkippingStatusType,
+  type ITicketsResponseData,
+  type SkippingStatusType,
   ResaleTickets,
   ResetPassword,
-  SessionHandleType
+  type SessionHandleType
 } from 'tf-checkout-react-native'
-import { IMyOrderDetailsTicket } from '../../src/api/types'
-import { IConfig } from '../../src/helpers/Config'
+import type { IMyOrderDetailsTicket } from '../../src/api/types'
+import type { IConfig } from '../../src/helpers/Config'
 import R from '../../src/res'
 import Color from './Colors'
 import { ComponentEnum } from './enums'
@@ -311,7 +311,7 @@ const App = () => {
               cartProps={cartProps!}
               onCheckoutSuccess={handleOnCheckoutSuccess}
               onLoginSuccess={handleOnLoginSuccess}
-              onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}       
+              onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}    
               onLogoutSuccess={() => {
                 setComponentToShow(ComponentEnum.Tickets)
                 setCartProps(undefined)
@@ -370,10 +370,6 @@ const App = () => {
                 },
               },
               payment: {
-                cardStyle: {
-                  backgroundColor: '#FFFFFF',
-                  textColor: '#000000'
-                },
                 title: {
                   color: Color.textMain,
                 },
@@ -382,8 +378,13 @@ const App = () => {
                     backgroundColor: Color.primary,
                   },
                 },
-                
-                
+                cardStyle: {
+                  backgroundColor: R.colors.white,
+                  borderRadius: 10,
+                  cursorColor: R.colors.black,
+                  placeholderColor: R.colors.disabled,
+                  textColor: R.colors.validGreen
+                },
               },
             }}            
             texts={{
@@ -451,7 +452,7 @@ const App = () => {
           <View style={{ flex: 1 }}>
             <MyOrders
               config={{
-                areActivityIndicatorsEnabled: false,
+                areActivityIndicatorsEnabled: true,
                 areAlertsEnabled: true,
               }}
               onFetchMyOrdersSuccess={(data) => {
@@ -460,6 +461,14 @@ const App = () => {
               onLoadingChange={(loading) => setIsLoading(loading)}
               onSelectOrder={handleOnSelectOrder}
               styles={{
+                emptyOrders: {
+                  container: {
+                    alignItems: 'center'
+                  },
+                  message: {
+                    color: R.colors.white
+                  }
+                },
                 timeFilters: { 
                   container: {
                     paddingHorizontal: 16
@@ -520,7 +529,9 @@ const App = () => {
               texts={{
                 title: '_My Orders_',
                 selectEventPlaceholder: '_CUSTOM EVENT_',
-                selectTimeFilterPlaceholder: 'Custom placeholder time filter'
+                selectTimeFilterPlaceholder: 'Custom placeholder time filter',
+                emptyOrdersMessage: '_No orders were found_',
+                
               }}
             />
             <TouchableOpacity

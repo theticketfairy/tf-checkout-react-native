@@ -13,7 +13,7 @@ import React, {
 } from 'react'
 
 import styles from './styles'
-import { IStripePaymentProps, StripePaymentHandle } from './types'
+import type { IStripePaymentProps, StripePaymentHandle } from './types'
 
 const StripePayment = forwardRef<StripePaymentHandle, IStripePaymentProps>(
   (props, ref) => {

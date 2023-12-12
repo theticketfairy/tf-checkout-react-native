@@ -1,17 +1,17 @@
-import {
+import type {
   ICloseSessionResponse,
   IEventResponse,
   IMyOrdersRequestParams,
   IPostReferralResponse,
   IPromoCodeResponse,
 } from '../../api/types'
-import {
+import type {
   IAccountTicketsResponse,
   IAddToCartResponse,
   IError,
   ITicket,
 } from '../../types'
-import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
+import type { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
 export interface IBookTicketsOptions {
   optionName: string
@@ -40,6 +40,7 @@ export interface IGetTicketsPayload {
   promoCodeResult?: IPromoCodeResponse
   isInWaitingList?: boolean
   isAccessCodeRequired?: boolean
+  arePromoCodesEnabled?: boolean
 }
 
 export type TicketsCoreHandleType = {

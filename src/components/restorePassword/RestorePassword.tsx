@@ -6,7 +6,7 @@ import { validateEmail } from '../../helpers/Validators'
 import Button from '../button/Button'
 import Input from '../input/Input'
 import { restorePasswordStyles as s } from './styles'
-import { IRestorePasswordProps } from './types'
+import type { IRestorePasswordProps } from './types'
 
 const RestorePassword: FC<IRestorePasswordProps> = ({
   styles,

@@ -1,4 +1,4 @@
-import { ActivityIndicatorProps, TextStyle, ViewStyle } from 'react-native'
+import type { ActivityIndicatorProps, TextStyle, ViewStyle } from 'react-native'
 
 export interface ILoadingStyles {
   animation?: {

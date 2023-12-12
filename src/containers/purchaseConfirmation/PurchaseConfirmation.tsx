@@ -8,15 +8,15 @@ import React, {
 } from 'react'
 import { Alert } from 'react-native'
 
-import { IFetchAccessTokenResponse } from '../../api/types'
+import type { IFetchAccessTokenResponse } from '../../api/types'
 import {
   PurchaseConfirmationCore,
   PurchaseConfirmationCoreHandle,
   SessionHandle,
 } from '../../core'
-import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
+import type { SessionHandleType } from '../../core/Session/SessionCoreTypes'
 import PurchaseConfirmationView from './PurchaseConfirmationView'
-import { IPurchaseConfirmationProps } from './types'
+import type { IPurchaseConfirmationProps } from './types'
 
 const PurchaseConfirmation = forwardRef<
   SessionHandleType,
@@ -63,10 +63,11 @@ const PurchaseConfirmation = forwardRef<
       }
 
       setIsLoading(true)
-      const { purchaseConfirmationError } =
-        await purchaseConfirmationCoreRef.current!.getPurchaseConfirmation(
-          orderHash
-        )
+      const {
+        purchaseConfirmationError,
+      } = await purchaseConfirmationCoreRef.current!.getPurchaseConfirmation(
+        orderHash
+      )
       setIsLoading(false)
 
       if (purchaseConfirmationError) {
@@ -79,8 +80,9 @@ const PurchaseConfirmation = forwardRef<
     //#endregion Fetch data
 
     //#region Ref
-    const purchaseConfirmationCoreRef =
-      useRef<PurchaseConfirmationCoreHandle>(null)
+    const purchaseConfirmationCoreRef = useRef<PurchaseConfirmationCoreHandle>(
+      null
+    )
     const sessionHandleRef = useRef<SessionHandleType>(null)
     //#endregion Ref
 
@@ -104,8 +106,10 @@ const PurchaseConfirmation = forwardRef<
           }
         }
 
-        const { accessTokenError, accessTokenData } =
-          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+        const {
+          accessTokenError,
+          accessTokenData,
+        } = await sessionHandleRef.current!.refreshAccessToken(refreshToken)
         if (!accessTokenError && accessTokenData?.accessToken) {
           await getInitialData()
         }

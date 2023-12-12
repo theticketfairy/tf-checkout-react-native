@@ -1,5 +1,5 @@
-import { IPurchaseConfirmationResponse } from '../../api/types'
-import { SessionCoreHandleType } from '../Session/SessionCoreTypes'
+import type { IPurchaseConfirmationResponse } from '../../api/types'
+import type { SessionCoreHandleType } from '../Session/SessionCoreTypes'
 
 export type PurchaseConfirmationCoreHandleType = {
   getPurchaseConfirmation(
@@ -7,5 +7,5 @@ export type PurchaseConfirmationCoreHandleType = {
   ): Promise<IPurchaseConfirmationResponse>
 }
 
-export type PurchaseConfirmationCoreHandle =
-  PurchaseConfirmationCoreHandleType & SessionCoreHandleType
+export type PurchaseConfirmationCoreHandle = PurchaseConfirmationCoreHandleType &
+  SessionCoreHandleType

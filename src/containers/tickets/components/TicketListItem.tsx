@@ -3,10 +3,10 @@ import React from 'react'
 import { Text, View } from 'react-native'
 
 import { Dropdown } from '../../../components'
-import { IDropdownItem } from '../../../components/dropdown/types'
+import type { IDropdownItem } from '../../../components/dropdown/types'
 import { priceWithCurrency } from '../../../helpers/StringsHelper'
 import { CartListItemStyles as s } from './styles'
-import { ITicketListItemProps } from './types'
+import type { ITicketListItemProps } from './types'
 
 const TicketListItem = ({
   ticket,
