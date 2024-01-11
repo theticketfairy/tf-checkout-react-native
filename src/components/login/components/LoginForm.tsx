@@ -59,7 +59,9 @@ const LoginForm: FC<ILoginFormProps> = ({
         styles={styles?.dialog?.input}
       />
 
-      {!!loginApiError && <Text style={[s.error]}>{loginApiError}</Text>}
+      {!!loginApiError && (
+        <Text style={[s.error, styles?.dialog?.apiError]}>{loginApiError}</Text>
+      )}
 
       <Text
         onPress={onPressForgotPassword}

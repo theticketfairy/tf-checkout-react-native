@@ -164,6 +164,7 @@ export interface IBillingInfoViewTexts {
   checkoutButton?: string
   skippingMessage?: string
   invalidPhoneNumberError?: string
+  required?: string
   form?: {
     firstName?: string
     lastName?: string

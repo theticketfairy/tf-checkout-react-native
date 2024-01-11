@@ -81,6 +81,7 @@ const TicketsView = ({
         {areTicketsGroupsShown ? (
           <SectionList
             sections={groupedTickets}
+            style={styles?.ticketList?.listContainer}
             renderItem={({ item, index }) => (
               <CartListItem
                 onSelectTicketItem={onSelectTicketOption}

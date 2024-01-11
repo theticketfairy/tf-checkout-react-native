@@ -258,6 +258,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const [confirmPasswordErrorState, setConfirmPasswordErrorState] =
       useState('')
 
+    const requiredText = texts?.required || 'Required'
+
     //#endregion Errors state
     //#endregion
 
@@ -405,8 +407,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         errorsRef.current.privacy = ''
         setTtfPrivacyPolicyError('')
       } else {
-        errorsRef.current.privacy = 'Required'
-        setTtfPrivacyPolicyError('Required')
+        errorsRef.current.privacy = requiredText
+        setTtfPrivacyPolicyError(requiredText)
       }
 
       setIsSubToTicketFairy(newValue)
@@ -640,7 +642,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         setDateOfBirthError(ageError)
       } else {
         if (!newDate) {
-          setDateOfBirthError('Required')
+          setDateOfBirthError(requiredText)
         }
       }
     }
@@ -698,7 +700,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (stateErrorState.length > 0 && itm.value !== '-1') {
         setStateErrorState('')
       } else if (itm.value === '-1') {
-        setStateErrorState('Required')
+        setStateErrorState(requiredText)
       }
       setSelectedState(itm)
     }
@@ -707,7 +709,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (countryErrorState.length > 0 && itm.value !== '-1') {
         setCountryErrorState('')
       } else if (itm.value === '-1') {
-        setCountryErrorState('Required')
+        setCountryErrorState(requiredText)
       }
       setSelectedCountry(itm)
     }
@@ -795,8 +797,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             setDateOfBirthError(birthdayValidation)
             errorsRef.current.dateOfBirth = birthdayValidation
           } else {
-            setDateOfBirthError(data.dateOfBirth ? '' : 'Required')
-            errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : 'Required'
+            setDateOfBirthError(data.dateOfBirth ? '' : requiredText)
+            errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : requiredText
           }
         }
 
@@ -810,7 +812,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           errorsRef.current.phone = validatePhone
         }
 
-        errorsRef.current.privacy = isSubToTicketFairy ? '' : 'Required'
+        errorsRef.current.privacy = isSubToTicketFairy ? '' : requiredText
 
         if (isNameRequired) {
           const ticketHoldersDataCopy = [...data.ticketHolderData]
@@ -881,8 +883,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           setDateOfBirthError(birthdayValidation)
           errorsRef.current.dateOfBirth = birthdayValidation
         } else {
-          setDateOfBirthError(data.dateOfBirth ? '' : 'Required')
-          errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : 'Required'
+          setDateOfBirthError(data.dateOfBirth ? '' : requiredText)
+          errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : requiredText
         }
       }
 
@@ -902,8 +904,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         errorsRef.current.phone = validatePhone
       }
 
-      //setTtfPrivacyPolicyError(isSubToTicketFairy ? '' : 'Required')
-      errorsRef.current.privacy = isSubToTicketFairy ? '' : 'Required'
+      //setTtfPrivacyPolicyError(isSubToTicketFairy ? '' : requiredText)
+      errorsRef.current.privacy = isSubToTicketFairy ? '' : requiredText
 
       if (isNameRequired) {
         const ticketHoldersDataCopy = [...data.ticketHolderData]
@@ -970,14 +972,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const checkExtraDataValid = (): string => {
       if (!isTtfCheckboxHidden && !isSubToTicketFairy) {
         setTtfPrivacyPolicyError(
-          texts?.form?.ttfPrivacyPolicyRequiredError || 'Required'
+          texts?.form?.ttfPrivacyPolicyRequiredError || requiredText
         )
         return 'Please review the errors'
       }
 
       if (isAgeRequired) {
         if (!dateOfBirth) {
-          setDateOfBirthError('Required')
+          setDateOfBirthError(requiredText)
           return 'Please enter your date of birth'
         }
 

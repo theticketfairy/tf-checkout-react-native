@@ -3,11 +3,23 @@ import * as React from 'react' //Needed to render
 import { LogBox, NativeModules } from 'react-native'
 
 import {
+  ICheckoutBody,
+  IEventResponse,
   IMyOrderDetailsData,
   IMyOrdersOrder,
+  IPromoCodeResponse,
+  IRegisterNewUserBody,
   MyOrderRequestFromType,
 } from './api/types'
-import { LoggedIn, Login } from './components'
+import {
+  Dropdown,
+  DropdownMaterial,
+  LoggedIn,
+  Login,
+  PromoCode,
+  WaitingList,
+} from './components'
+import { ILoginSuccessData } from './components/login/types'
 import {
   BillingInfo,
   Checkout,
@@ -28,7 +40,10 @@ import { IMyOrderDetailsProps } from './containers/myOrderDetails/types'
 import { IMyOrdersProps } from './containers/myOrders/types'
 import { IPurchaseConfirmationProps } from './containers/purchaseConfirmation/types'
 import { IResaleTicketsProps } from './containers/resaleTickets/types'
-import { ITicketsProps } from './containers/tickets/types'
+import {
+  IPasswordProtectedEventData,
+  ITicketsProps,
+} from './containers/tickets/types'
 import {
   BillingCore,
   BillingCoreHandle,
@@ -51,8 +66,13 @@ import {
   WaitingListCore,
   WaitingListCoreHandle,
 } from './core'
+import {
+  IBookTicketsOptions,
+  IGetTicketsPayload,
+  IGroupedTickets,
+} from './core/TicketsCore/TicketsCoreTypes'
 import { setConfig } from './helpers/Config'
-import { deleteAllData } from './helpers/LocalStorage'
+import { deleteAllData, deleteUserData } from './helpers/LocalStorage'
 import { refreshAccessToken } from './helpers/RefreshAccessToken'
 import {
   IAccountOrdersPurchasedEvent,
@@ -60,6 +80,11 @@ import {
   IAccountTicketsAttributes,
   IAccountTicketsData,
   IAccountTicketsResponse,
+  IAddToCartResponse,
+  IError,
+  IEvent,
+  ISelectedTicket,
+  ITicket,
   ITicketsResponseData,
   IUserProfile,
 } from './types'
@@ -76,20 +101,37 @@ export {
   CheckoutCore,
   CheckoutCoreHandle,
   deleteAllData,
+  deleteUserData,
+  Dropdown,
+  DropdownMaterial,
   IAccountOrdersPurchasedEvent,
   IAccountOrdersTicket,
   IAccountTicketsAttributes,
   IAccountTicketsData,
   IAccountTicketsResponse,
+  IAddToCartResponse,
   IBillingProps,
+  IBookTicketsOptions,
+  ICheckoutBody,
   ICheckoutProps,
+  IError,
+  IEvent,
+  IEventResponse,
+  IGetTicketsPayload,
+  IGroupedTickets,
+  ILoginSuccessData,
   IMyOrderDetailsData,
   IMyOrderDetailsProps,
   IMyOrdersOrder,
   IMyOrdersProps,
   IOnCheckoutSuccess,
+  IPasswordProtectedEventData,
+  IPromoCodeResponse,
   IPurchaseConfirmationProps,
+  IRegisterNewUserBody,
   IResaleTicketsProps,
+  ISelectedTicket,
+  ITicket,
   ITicketsProps,
   ITicketsResponseData,
   IUserProfile,
@@ -104,6 +146,7 @@ export {
   MyOrdersCoreHandle,
   OrderDetailsCore,
   OrderDetailsCoreHandle,
+  PromoCode,
   PurchaseConfirmation,
   PurchaseConfirmationCore,
   PurchaseConfirmationCoreHandle,
@@ -119,6 +162,7 @@ export {
   Tickets,
   TicketsCore,
   TicketsCoreHandle,
+  WaitingList,
   WaitingListCore,
   WaitingListCoreHandle,
 }
