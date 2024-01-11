@@ -51,6 +51,28 @@ export const deleteData = async (key: string) => {
   }
 }
 
+export const deleteUserData = async () => {
+  try {
+    const value = await AsyncStorage.multiRemove([
+      LocalStorageKeys.ACCESS_TOKEN,
+      LocalStorageKeys.REFRESH_TOKEN,
+      LocalStorageKeys.TOKEN_TYPE,
+      LocalStorageKeys.AUTH_TOKEN_TYPE,
+      LocalStorageKeys.SCOPE,
+      LocalStorageKeys.USER_DATA,
+      LocalStorageKeys.CHECKOUT_DATA,
+      LocalStorageKeys.RESET_PASS_TOKEN,
+      LocalStorageKeys.AUTH_SCOPE,
+    ])
+
+    if (value !== null) {
+      return value
+    }
+  } catch (ex) {
+    return undefined
+  }
+}
+
 export const deleteAllData = async () => {
   try {
     const value = await AsyncStorage.multiRemove([
