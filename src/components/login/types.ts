@@ -92,6 +92,7 @@ export interface ILoginViewStyles {
     message?: StyleProp<TextStyle>
     showPasswordIcon?: StyleProp<ImageStyle>
     forgotPassword?: StyleProp<TextStyle>
+    apiError?: StyleProp<TextStyle>
   }
   loggedIn?: {
     container?: StyleProp<ViewStyle>
