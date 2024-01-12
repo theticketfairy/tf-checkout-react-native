@@ -1,6 +1,6 @@
 {
   "name": "tf-checkout-react-native",
-  "version": "1.0.34",
+  "version": "1.0.35",
   "description": "TheTicketFairy ReactNative Checkout library",
   "homepage": "https://github.com/theticketfairy/tf-checkout-react-native",
   "main": "lib/index.js",
@@ -45,9 +45,9 @@
     "@types/jest": "27.0.3",
     "@types/lodash": "4.14.178",
     "@types/react-native": "0.66.5",
+    "@types/react-native-background-timer": "2.0.0",
     "@types/react-test-renderer": "17.0.1",
     "@types/rn-material-ui-textfield": "1.0.2",
-    "@types/react-native-background-timer":"2.0.0",
     "axios": "0.24.0",
     "axios-retry": "3.2.4",
     "babel-jest": "27.3.1",
@@ -59,14 +59,14 @@
     "metro-react-native-babel-preset": "0.66.2",
     "react": "17.0.2",
     "react-native": "0.66.3",
+    "react-native-background-timer": "2.4.1",
     "react-native-device-country": "1.0.2",
     "react-native-fs": "2.18.0",
     "react-native-keyboard-aware-scroll-view": "0.9.5",
     "react-native-modal-datetime-picker": "13.0.0",
     "react-test-renderer": "17.0.2",
-    "rn-material-ui-textfield": "jorgtz/rn-material-ui-textfield",
-    "typescript": "4.5.2",
-    "react-native-background-timer":"2.4.1"
+    "rn-material-ui-textfield": "https://github.com/jorgtz/rn-material-ui-textfield",
+    "typescript": "4.5.2"
   },
   "peerDependencies": {
     "@react-native-async-storage/async-storage": "1.15.14",
@@ -80,13 +80,12 @@
     "lodash": "4.17.21",
     "react": "17.0.2",
     "react-native": "0.66.3",
+    "react-native-background-timer": "2.4.1",
     "react-native-device-country": "1.0.2",
     "react-native-fs": "2.18.0",
     "react-native-keyboard-aware-scroll-view": "0.9.5",
     "react-native-modal-datetime-picker": "13.0.0",
-    "rn-material-ui-textfield": "jorgtz/rn-material-ui-textfield",
-    "react-native-background-timer":"2.4.1"
-
+    "rn-material-ui-textfield": "https://github.com/jorgtz/rn-material-ui-textfield"
   },
   "jest": {
     "preset": "react-native",

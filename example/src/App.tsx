@@ -949,7 +949,7 @@ const App = () => {
             ref={ticketsRef}
             referrerId={referredId}
             config={{
-              areTicketsGrouped: true,
+              areTicketsGrouped: false,
             }}
               isCheckingCurrentSession={isCheckingCurrentSession}
               onLoadingChange={(loading) => setIsLoading(loading)}

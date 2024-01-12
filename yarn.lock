@@ -5881,9 +5881,9 @@ rimraf@~2.2.6:
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.2.8.tgz#e439be2aaee327321952730f99a8929e4fc50582"
   integrity sha1-5Dm+Kq7jJzIZUnMPmaiSnk/FBYI=
 
-rn-material-ui-textfield@jorgtz/rn-material-ui-textfield:
-  version "1.0.5"
-  resolved "https://codeload.github.com/jorgtz/rn-material-ui-textfield/tar.gz/3747ff2d19a62f837dd06bace276788ede6a2e4c"
+"rn-material-ui-textfield@https://github.com/jorgtz/rn-material-ui-textfield":
+  version "1.0.6"
+  resolved "https://github.com/jorgtz/rn-material-ui-textfield#27c1b24054bbdc2d62ca58272eabe9c071d8abb3"
   dependencies:
     prop-types "^15.5.9"
 
