@@ -200,11 +200,36 @@ export interface IPaymentAddress {
 export interface IOrderReview {
   addressData: IPaymentAddress
   billingData: {
+    // billing_info
     firstName: string
     lastName: string
+    isActAsBillingInfo: boolean
+    city: string
+    company: string
+    country: number
+    email: string
+    isBusiness: boolean
+    phone: string
+    state: number
+    streetAddress: string
+    zipCode: string
   }
+  cart: any
+  cartTotalPrice: number
+  countries: any
+  couponCode?: string
+  discount: number
+  estimatedTax: number
+  estimatedTotal: number
   expiresAt: number
   paymentData: IPaymentConfig
+  isOptedId: boolean
+  isShippingRequired: boolean
+  isTtfOptedIn: boolean
+  isSeatMapAllowed: boolean
+  eventDetails: any
+  orderDetails: any
+  shippingInfo: any
   reviewData: {
     event: string
     price: string
