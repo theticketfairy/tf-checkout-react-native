@@ -15,9 +15,8 @@ import {
   SkippingStatusType,
   ResaleTickets,
   ResetPassword,
-  SessionHandleType
+  SessionHandleType,
 } from 'tf-checkout-react-native'
-import { IMyOrderDetailsTicket } from '../../src/api/types'
 import { IConfig } from '../../src/helpers/Config'
 import R from '../../src/res'
 import Color from './Colors'
