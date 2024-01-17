@@ -328,6 +328,7 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
       hideLoading()
       await handleFetchOrderDetails()
 
+      checkoutCoreRef.current?.stopCartTimer()
       onPaymentSuccess?.()
     }
 
@@ -389,6 +390,7 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
       hideLoading()
       await handleFetchOrderDetails()
 
+      checkoutCoreRef.current?.stopCartTimer()
       onPaymentSuccess?.()
     }
     //#endregion

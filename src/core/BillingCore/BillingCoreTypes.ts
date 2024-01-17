@@ -23,6 +23,7 @@ export type BillingCoreHandleType = {
   getStates(countryId: string): Promise<IStatesResponse>
   getUserProfile(): Promise<IUserProfileResponse>
   registerNewUser(data: FormData): Promise<IRegisterNewUserResponse>
+  stopCartTimer(): void
 }
 
 export type BillingCoreHandle = BillingCoreHandleType & SessionCoreHandleType

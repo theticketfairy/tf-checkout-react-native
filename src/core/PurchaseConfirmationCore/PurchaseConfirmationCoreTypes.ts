@@ -5,6 +5,7 @@ export type PurchaseConfirmationCoreHandleType = {
   getPurchaseConfirmation(
     orderHash: string
   ): Promise<IPurchaseConfirmationResponse>
+  stopCartTimer(): void
 }
 
 export type PurchaseConfirmationCoreHandle =

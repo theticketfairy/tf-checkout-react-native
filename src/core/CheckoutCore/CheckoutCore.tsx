@@ -23,6 +23,11 @@ const CheckoutCore = forwardRef<CheckoutCoreHandle, ICheckoutCoreProps>(
     const [secondsLeft, setSecondsLeft] = useState(420)
     const [timerOn, setTimerOn] = useState(false)
 
+    const handleStopTimer = useCallback(() => {
+      BackgroundTimer.stop()
+      BackgroundTimer.stopBackgroundTimer()
+    }, [])
+
     const handleStartTimer = useCallback(() => {
       BackgroundTimer.runBackgroundTimer(() => {
         setSecondsLeft((secs) => {
@@ -93,6 +98,10 @@ const CheckoutCore = forwardRef<CheckoutCoreHandle, ICheckoutCoreProps>(
         refreshToken?: string
       ): Promise<IFetchAccessTokenResponse> {
         return await refreshAccessTokenAsync(refreshToken)
+      },
+
+      stopCartTimer() {
+        return handleStopTimer()
       },
     }))
 

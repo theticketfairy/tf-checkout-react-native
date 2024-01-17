@@ -12,6 +12,7 @@ export type CheckoutCoreHandleType = {
   getOrderReview(orderHash: string): Promise<IOrderReviewResponse>
   freeRegistration(orderHash: string): Promise<IFreeRegistrationResponse>
   paymentSuccess(orderHash: string): Promise<any>
+  stopCartTimer(): void
 }
 
 export interface ICheckoutCoreProps extends ICoreProps {

@@ -62,6 +62,7 @@ const PurchaseConfirmation = forwardRef<
         return
       }
 
+      purchaseConfirmationCoreRef.current?.stopCartTimer()
       setIsLoading(true)
       const { purchaseConfirmationError } =
         await purchaseConfirmationCoreRef.current!.getPurchaseConfirmation(

@@ -31,6 +31,11 @@ const BillingCore = forwardRef<BillingCoreHandle, IBillingCoreProps>(
     const [secondsLeft, setSecondsLeft] = useState(420)
     const [timerOn, setTimerOn] = useState(false)
 
+    const handleStopTimer = useCallback(() => {
+      BackgroundTimer.stop()
+      BackgroundTimer.stopBackgroundTimer()
+    }, [])
+
     const handleStartTimer = useCallback(() => {
       BackgroundTimer.runBackgroundTimer(() => {
         setSecondsLeft((secs) => {
@@ -107,6 +112,10 @@ const BillingCore = forwardRef<BillingCoreHandle, IBillingCoreProps>(
         refreshToken?: string
       ): Promise<IFetchAccessTokenResponse> {
         return await refreshAccessTokenAsync(refreshToken)
+      },
+
+      stopCartTimer() {
+        return handleStopTimer()
       },
     }))
 

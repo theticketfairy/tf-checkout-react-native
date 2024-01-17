@@ -1048,6 +1048,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       }
 
       setSkippingStatus('success')
+      billingCoreRef.current.stopCartTimer()
       onCheckoutSuccess(checkoutData)
     }
 
