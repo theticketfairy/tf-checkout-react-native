@@ -8,17 +8,21 @@ import {
   IMyOrderDetailsData,
   IMyOrdersOrder,
   IPromoCodeResponse,
+  IPurchaseConfirmationData,
   IRegisterNewUserBody,
   MyOrderRequestFromType,
 } from './api/types'
 import {
   Dropdown,
   DropdownMaterial,
+  Loading,
   LoggedIn,
   Login,
   PromoCode,
   WaitingList,
 } from './components'
+import { IDropdownStyles } from './components/dropdown/types'
+import { ILoadingStyles } from './components/loading/types'
 import { ILoginSuccessData } from './components/login/types'
 import {
   BillingInfo,
@@ -114,11 +118,13 @@ export {
   IBookTicketsOptions,
   ICheckoutBody,
   ICheckoutProps,
+  IDropdownStyles,
   IError,
   IEvent,
   IEventResponse,
   IGetTicketsPayload,
   IGroupedTickets,
+  ILoadingStyles,
   ILoginSuccessData,
   IMyOrderDetailsData,
   IMyOrderDetailsProps,
@@ -127,6 +133,7 @@ export {
   IOnCheckoutSuccess,
   IPasswordProtectedEventData,
   IPromoCodeResponse,
+  IPurchaseConfirmationData,
   IPurchaseConfirmationProps,
   IRegisterNewUserBody,
   IResaleTicketsProps,
@@ -135,6 +142,7 @@ export {
   ITicketsProps,
   ITicketsResponseData,
   IUserProfile,
+  Loading,
   LoggedIn,
   Login,
   LoginCore,
