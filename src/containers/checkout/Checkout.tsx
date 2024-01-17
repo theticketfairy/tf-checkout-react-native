@@ -116,10 +116,8 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
           }
         }
 
-        const {
-          accessTokenError,
-          accessTokenData,
-        } = await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+        const { accessTokenError, accessTokenData } =
+          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
         if (!accessTokenError && accessTokenData?.accessToken) {
           await fetchInitialData()
         }
@@ -141,10 +139,8 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
         return
       }
 
-      const {
-        error: conditionsError,
-        data: conditionsData,
-      } = await checkoutCoreRef.current!.getEventConditions()
+      const { error: conditionsError, data: conditionsData } =
+        await checkoutCoreRef.current!.getEventConditions()
 
       if (conditionsError) {
         hideLoading()
@@ -162,10 +158,8 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
     }
 
     const fetchOrderReviewAsync = async () => {
-      const {
-        orderReviewData,
-        orderReviewError,
-      } = await checkoutCoreRef.current!.getOrderReview(checkoutData.hash)
+      const { orderReviewData, orderReviewError } =
+        await checkoutCoreRef.current!.getOrderReview(checkoutData.hash)
       hideLoading()
 
       if (orderReviewError) {
@@ -259,12 +253,8 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
 
     const handleFetchOrderDetails = async () => {
       showLoading()
-      const {
-        orderDetailsData,
-        orderDetailsError,
-      } = await checkoutCoreRef.current!.getPurchaseOrderDetails(
-        checkoutData.id
-      )
+      const { orderDetailsData, orderDetailsError } =
+        await checkoutCoreRef.current!.getPurchaseOrderDetails(checkoutData.id)
       hideLoading()
 
       if (orderDetailsError) {
@@ -323,9 +313,8 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
 
     const handleOnPressFreeRegistration = async () => {
       showLoading()
-      const {
-        freeRegistrationError,
-      } = await checkoutCoreRef.current!.freeRegistration(checkoutData.hash)
+      const { freeRegistrationError } =
+        await checkoutCoreRef.current!.freeRegistration(checkoutData.hash)
 
       if (freeRegistrationError) {
         hideLoading()
@@ -337,9 +326,9 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
       }
 
       hideLoading()
-      onPaymentSuccess?.()
-
       await handleFetchOrderDetails()
+
+      onPaymentSuccess?.()
     }
 
     const handleOnPressPay = async () => {
@@ -365,13 +354,11 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
         },
       }
 
-      const {
-        error: confirmPaymentError,
-        paymentIntent,
-      } = await confirmPayment(orderReview.paymentData!.stripeClientSecret!, {
-        paymentMethodType: 'Card',
-        paymentMethodData: { billingDetails },
-      })
+      const { error: confirmPaymentError, paymentIntent } =
+        await confirmPayment(orderReview.paymentData!.stripeClientSecret!, {
+          paymentMethodType: 'Card',
+          paymentMethodData: { billingDetails },
+        })
 
       if (confirmPaymentError || paymentIntent?.status !== 'Succeeded') {
         hideLoading()
@@ -387,9 +374,8 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
 
       onCheckoutCompletedSuccess?.(checkoutData)
 
-      const {
-        error: onPaymentSuccessError,
-      } = await checkoutCoreRef.current!.paymentSuccess(checkoutData.hash)
+      const { error: onPaymentSuccessError } =
+        await checkoutCoreRef.current!.paymentSuccess(checkoutData.hash)
 
       if (onPaymentSuccessError) {
         hideLoading()
@@ -401,8 +387,9 @@ const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
       }
 
       hideLoading()
-      onPaymentSuccess?.()
       await handleFetchOrderDetails()
+
+      onPaymentSuccess?.()
     }
     //#endregion
 
