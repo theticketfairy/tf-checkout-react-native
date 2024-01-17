@@ -1032,6 +1032,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       setIsSubmittingData(true)
       const { error: checkoutError, data: checkoutData } =
         await billingCoreRef.current.checkoutOrder(checkoutBody)
+      setIsLoading(false)
       setIsSubmittingData(false)
 
       if (checkoutError) {
@@ -1470,7 +1471,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             setSkippingStatus('fail')
             setIsLoading(false)
           } else {
-            // We can perfom Checkout process since phone is valid
+            // We can perform Checkout process since phone is valid
             if (!isBillingRequired && usrTkn && cartData) {
               const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
                 userProfile: usrPrfl,
@@ -1484,7 +1485,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             }
           }
         } else {
-          // We can perfom Checkout process since phone is valid
+          // We can perform Checkout process since phone is valid
           if (!isBillingRequired && usrTkn && cartData) {
             const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
               userProfile: usrPrfl,
@@ -1517,6 +1518,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
       setCountries(parsedCountries)
       setTicketHoldersData(tHolders)
+      setIsSubmittingData(false)
       setIsLoading(false)
     }
     //#endregion Fetch Initial Data
