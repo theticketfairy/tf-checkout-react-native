@@ -14,6 +14,7 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 - Suggested Flipper version `0.99.0`
 - React version `0.17.1`
 - Node version `16.10.0`
+
 ### Android
 
 - Android 5.0 (API level 21) and above
@@ -40,7 +41,7 @@ To download the PDFs, add the `WRITE_EXTERNAL_STORAGE` permission to the Android
 
 To download the PDFs, add the following flags to `Info.plist` file:
 
-```
+```yml
 - UIFileSharingEnabled: Application supports iTunes file sharing
 - LSSupportsOpeningDocumentsInPlace: Supports opening documents in place
 ```
@@ -60,12 +61,14 @@ npm install tf-checkout-react-native
 Make sure to install all the required dependencies in your project.
 
 ### Metro
+
 Add the following to your `metro.config.js` in the resolver property:
 
 `sourceExts: ['jsx', 'js', 'ts', 'tsx']`
 
-Result: 
-````js
+Result:
+
+```js
 module.exports = {
   watchFolders: [moduleRoot],
   resolver: {
@@ -73,9 +76,8 @@ module.exports = {
     extraNodeModules: {
       react: path.resolve(__dirname,
     }
-    .... 
-````
-
+    ....
+```
 
 ### Required for Android
 
@@ -132,15 +134,15 @@ const YourComponent: FC () => {
     initConfig()
   }, [])
 
-  return <Tickets 
-    isCheckingCurrentSession 
+  return <Tickets
+    isCheckingCurrentSession
   />
 }
 ```
 
 `setConfig` set your event's configuration, with the following options:
 
-````ts
+```ts
 {
   EVENT_ID?: string | number,
   CLIENT?: string,
@@ -157,19 +159,21 @@ const YourComponent: FC () => {
     SCOPE: string
   }
 }
-````
+```
+
 ### Props
-| Property | Description |
-| -------- | ----------- |
-| EVENT_ID | Specify the event's ID. |
-| CLIENT | Specify your client designated name example `ttf`. |
-| ENV | Sets the environment to any of the following environments: Production, Staging or Development. Receives the following values: `PROD`, `DEV`, `STAG`. Defaults to `PROD`.|
-| CLIENT_ID | Set your CLIENT_ID. |
-| CLIENT_SECRET | Set your CLIENT_SECRET. |
-| BRAND | Set your BRAND so users can only see this brand in their orders. |
-| TIMEOUT | Set custom timeout for the APIs requests. |
-| ARE_SUB_BRANDS_INCLUDED | If true will include orders from the `BRAND` sub-brands. Default `false`. |
-| AUTH | Object that receives data for Single Sign On (SSO).|
+
+| Property                | Description                                                                                                                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| EVENT_ID                |  Specify the event's ID.                                                                                                                                                 |
+| CLIENT                  | Specify your client designated name example `ttf`.                                                                                                                       |
+| ENV                     | Sets the environment to any of the following environments: Production, Staging or Development. Receives the following values: `PROD`, `DEV`, `STAG`. Defaults to `PROD`. |
+| CLIENT_ID               | Set your CLIENT_ID.                                                                                                                                                      |
+| CLIENT_SECRET           | Set your CLIENT_SECRET.                                                                                                                                                  |
+| BRAND                   | Set your BRAND so users can only see this brand in their orders.                                                                                                         |
+| TIMEOUT                 | Set custom timeout for the APIs requests.                                                                                                                                |
+| ARE_SUB_BRANDS_INCLUDED | If true will include orders from the `BRAND` sub-brands. Default `false`.                                                                                                |
+| AUTH                    | Object that receives data for Single Sign On (SSO).                                                                                                                      |
 
 # Run the example app
 
@@ -232,7 +236,9 @@ After opening and URL with the corresponding schema, use this component to let t
 - refreshAccessToken: Let refresh the expired access token.
 
 # Component styling
+
 ### Button
+
 ```ts
 interface IButtonStyles {
   container?: StyleProp<ViewStyle>
@@ -240,7 +246,9 @@ interface IButtonStyles {
   text?: StyleProp<TextStyle>
 }
 ```
+
 ### Input
+
 ```ts
 interface IInputStyles {
   color?: ColorValue
@@ -268,7 +276,9 @@ interface ICheckboxStyles {
 ```
 
 # Exported functions
+
 ## setConfig
+
 Set the configuration for the library.
 
 ```ts
@@ -291,6 +301,7 @@ export interface IConfig {
   }
 }
 ```
+
 ## refreshAccessToken
 
 Let refresh the expired access token, it can use the internal stored refresh token, passing nothing to it, or you can pass a `string` refresh token.
@@ -315,16 +326,20 @@ accessTokenData?: {
 ```
 
 # Exported handlers
+
 ## SessionCoreHandle
+
 Exports function to refresh access token.
 
 ### refreshAccessToken
+
 Allows to refresh access token inside the component. It will automatically re-fetch the component's data from the server. You will need to create a `ref` object with the corresponding type.
 
-Example: 
+Example:
 
 In your parent component
-```ts 
+
+```ts
 const sessionHandleRef = useRef<SessionHandleType>(null)
 
 // Call the refreshAccessToken function by using
@@ -332,6 +347,7 @@ await sessionHandleRef.current?.refreshAccessToken()
 ```
 
 # Exported components
+
 Depending on your needs, you can use the UI Components or the Core Components.
 
 [UI Components](#ui-components) use the Core Components at their core but also exposes an UI that you can configure with your own styles. There is no need to create any kind of logic with them, only setConfig and implement the callbacks to get their data.
@@ -359,6 +375,7 @@ Depending on your needs, you can use the UI Components or the Core Components.
 [Reset Password](#reset-password-ui)
 
 ---
+
 ## Session handle
 
 In all components with the exception of Login and Reset Password, you can pass a `ref` with type `SessionHandleType` to access two functions:
@@ -367,6 +384,7 @@ In all components with the exception of Login and Reset Password, you can pass a
 `reloadData` It will re-fetch component's data from server.
 
 ---
+
 ## Login UI
 
 Import the component from the library
@@ -378,9 +396,9 @@ import { Login } from 'tf-checkout-react-native'
 Then add it to the render function.
 
 ```tsx
-<Login
+interface LoginProps {
   onLoginSuccessful: (
-    userProfile: IUserProfile, 
+    userProfile: IUserProfile,
     accessTokenData?: IFetchAccessTokenData
   ) => void
   onLoginError?: (error: IError) => void
@@ -390,7 +408,7 @@ Then add it to the render function.
 
   onFetchAccessTokenError?: (error: IError) => void
   onFetchAccessTokenSuccess?: () => void
-  
+
   isLoginDialogVisible: boolean
   showLoginDialog: () => void
   hideLoginDialog: () => void
@@ -399,8 +417,8 @@ Then add it to the render function.
   onLogoutSuccess?: () => void
   onLogoutError?: () => void
 
-  userFirstName={loggedUserName}
-  refs={{
+  userFirstName: string
+  refs: {
     inputs?: {
       email?: any
       password?: any
@@ -411,8 +429,9 @@ Then add it to the render function.
       loadingView?: any
       activityIndicator?: any
       loadingText?: any
-  }}
-  brandImages={
+    }
+  }
+  brandImages: {
     containerStyle?: StyleProp<ViewStyle>
     image1?: ImageSourcePropType
     image1Style?: StyleProp<ImageStyle>
@@ -427,13 +446,15 @@ Then add it to the render function.
   //Restore password
   onRestorePasswordError?: (error: IError) => void
   onRestorePasswordSuccess?: () => void
-/>
+}
 ```
 
 ### Data Types
+
 #### IUserProfile
+
 ```ts
-{
+interface IUserProfile {
   customerId: string
   firstName: string
   lastName: string
@@ -450,6 +471,7 @@ Then add it to the render function.
 ```
 
 #### IFetchAccessTokenData
+
 ```ts
 {
   accessToken: string
@@ -458,24 +480,26 @@ Then add it to the render function.
   scope: string
 }
 ```
+
 ### Props
-| Property | Description |
-|----------|-------------|
-| onLoginSuccessful: (userProfile: IUserProfile, accessToken: string)` |When login was successful, return userProfile data and the access token to use if for future API requests.
-| onLoginFailure?: (error: string) | When login fails will return the error received. |
-| onFetchUserProfileFailure?: (error: string) | This is used if the authentication worked but the fetch of the userProfile failed. |
-| onFetchAccessTokenFailure?: (error: string) | When the fetch of the access token failed. |
-| isLoginDialogVisible: boolean | Flag to show or hide the login dialog. |
-| showLoginDialog: () => void | Callback to show the Login dialog. |
-| hideLoginDialog: () => void | Callback to hide the Login dialog. |
-| onLogoutSuccess?: () => void | Use it to logout the authenticated user. It will delete all the stored data, including access token. Please make sure to update the `userFirstName` prop so the component will show the logged out view. |
-|onLogoutFail?: () => void | Will be called if something went wrong while deleting the local data. |
-|styles?: ILoginViewStyles | Use this to style your components. |
-|texts?: ILoginViewTexts | Use this to change some texts that appear in this component. |
-|userFirstName?: string | Once authenticated send the received firstName data to this prop, so the component can render the Logged in view. |
-|brandImages?: ILoginBrandImages | Receives up to 2 images with their styles and the container style for the images. |
-| onRestorePasswordError?: (error: string) | When restore password fails will return the error received. |
-| onRestorePasswordSuccess? | Called when restore password request was successful |
+
+| Property                                                             | Description                                                                                                                                                                                              |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| onLoginSuccessful: (userProfile: IUserProfile, accessToken: string)` | When login was successful, return userProfile data and the access token to use if for future API requests.                                                                                               |
+| onLoginFailure?: (error: string)                                     | When login fails will return the error received.                                                                                                                                                         |
+| onFetchUserProfileFailure?: (error: string)                          | This is used if the authentication worked but the fetch of the userProfile failed.                                                                                                                       |
+| onFetchAccessTokenFailure?: (error: string)                          | When the fetch of the access token failed.                                                                                                                                                               |
+| isLoginDialogVisible: boolean                                        | Flag to show or hide the login dialog.                                                                                                                                                                   |
+| showLoginDialog: () => void                                          | Callback to show the Login dialog.                                                                                                                                                                       |
+| hideLoginDialog: () => void                                          | Callback to hide the Login dialog.                                                                                                                                                                       |
+| onLogoutSuccess?: () => void                                         | Use it to logout the authenticated user. It will delete all the stored data, including access token. Please make sure to update the `userFirstName` prop so the component will show the logged out view. |
+| onLogoutFail?: () => void                                            | Will be called if something went wrong while deleting the local data.                                                                                                                                    |
+| styles?: ILoginViewStyles                                            | Use this to style your components.                                                                                                                                                                       |
+| texts?: ILoginViewTexts                                              | Use this to change some texts that appear in this component.                                                                                                                                             |
+| userFirstName?: string                                               | Once authenticated send the received firstName data to this prop, so the component can render the Logged in view.                                                                                        |
+| brandImages?: ILoginBrandImages                                      | Receives up to 2 images with their styles and the container style for the images.                                                                                                                        |
+| onRestorePasswordError?: (error: string)                             | When restore password fails will return the error received.                                                                                                                                              |
+| onRestorePasswordSuccess?                                            | Called when restore password request was successful                                                                                                                                                      |
 
 ### styles
 
@@ -536,6 +560,7 @@ interface ILoginViewStyles {
 \*Note: Logos images styles are passed from the `brandImages` prop.
 
 ### texts
+
 ```js
 {
   loginButton?: string
@@ -572,10 +597,12 @@ interface ILoginViewStyles {
   }
 }
 ```
----
-## Tickets UI 
 
-This component will first fetch for the Event's data, if data is ok, then will fetch the tickets for this event. 
+---
+
+## Tickets UI
+
+This component will first fetch for the Event's data, if data is ok, then will fetch the tickets for this event.
 
 ### Password protected event
 
@@ -592,7 +619,7 @@ Then add it to the render function.
 ```js
 const sessionHandleRef = useRef<SessionHandleType>(null)
 
-<Tickets 
+<Tickets
   ref={sessionHandleRef}
   onAddToCartSuccess={handleOnAddToCartSuccess} />
 ```
@@ -617,14 +644,14 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
     message: string
     extraData?: any
   }) => void
-  
+
   // Callbacks for fetching the tickets
   onFetchTicketsError?: (error: {
     code: number
     message: string
     extraData?: any
   }) => void
-  
+
   // Callbacks for fetching the Event base on the eventId prop
   onFetchTicketsSuccess?: (data: {
     tickets: ITicket[]
@@ -658,7 +685,7 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
   onPressMyOrders: () => void
   onPressLogout?: () => void
 
-  onLoadingChange?: (isLoading: boolean) => void 
+  onLoadingChange?: (isLoading: boolean) => void
   promoCodeCloseIcon?: ImageSourcePropType
 
   // Event password protected
@@ -700,7 +727,9 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 ```
 
 ### config prop
-Configure the component's behavior 
+
+Configure the component's behavior
+
 ```ts
 config: {
   // Whether or not show the loading indicators.
@@ -719,6 +748,7 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 `onFetchTicketsSuccess` When tickets fetching was successful, will return fetched data, including `promoCodeResponse`.
 
 ### styles
+
 ```js
 {
   rootContainer?: ViewStyle
@@ -798,6 +828,7 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 ```
 
 ### texts
+
 ```js
 {
   promoCode?: {
@@ -845,7 +876,9 @@ You can then call the `BillingInfo` component and pass them as props in the `car
   }
 }
 ```
+
 ---
+
 ## BillingInfo UI
 
 Import the component from the library
@@ -862,7 +895,7 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
 <BillingInfo
   ref={sessionHandleRef}
-  cartProps: { 
+  cartProps: {
     isBillingRequired: boolean
     isNameRequired: boolean
     isAgeRequired: boolean
@@ -883,13 +916,13 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
         email: string
       }
     }) => void
-  onRegisterError?: (error: { 
+  onRegisterError?: (error: {
     isAlreadyRegistered?: boolean
     message?: string
     raw?: any
   }) => void
 
-  onCheckoutSuccess: (data: {   
+  onCheckoutSuccess: (data: {
     id: string
     hash: string
     total: string
@@ -956,12 +989,13 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 
   config?: {
     isCheckoutAlwaysButtonEnabled?: boolean
-    shouldHideTicketHolderSectionOnSingleTicket?: boolean 
+    shouldHideTicketHolderSectionOnSingleTicket?: boolean
   }
 />
 ```
 
 ### DataTypes
+
 ILoginSuccessData
 
 ```ts
@@ -990,14 +1024,16 @@ interface ILoginSuccessData {
 ```
 
 ### Props
-| Property | Description |
-|----------|-------------|
-| cartProps | Received from the Tickets component |
-| onCheckoutSuccess | Will return Order data from the Checkout action |
-| loginBrandImages | Receives styles and images sources to show in the `Login` component |
-| skipBillingConfig | Configure the skipping component, visible when `isBillingRequired` is set to false |
+
+| Property          | Description                                                                         |
+| ----------------- | ----------------------------------------------------------------------------------- |
+| cartProps         | Received from the Tickets component                                                 |
+| onCheckoutSuccess | Will return Order data from the Checkout action                                     |
+| loginBrandImages  |  Receives styles and images sources to show in the `Login` component                |
+| skipBillingConfig | Configure the skipping component, visible when `isBillingRequired` is set to false  |
 
 ### texts
+
 ```js
 interface IBillingInfoViewTexts {
   loginTexts?: ILoginViewTexts
@@ -1069,7 +1105,7 @@ interface IBillingInfoViewStyles {
     }
     input?: IInputStyles
   }
-  
+
   checkboxStyles?: {
     container?: StyleProp<ViewStyle>
     content?: StyleProp<ViewStyle>
@@ -1089,7 +1125,7 @@ interface IBillingInfoViewStyles {
   customCheckbox?: ICheckboxStyles
 
   datePicker?: IDatePickerStyles
-  
+
   privacyPolicyLinkStyle?: StyleProp<TextStyle>
 
   phoneInput?: {
@@ -1114,6 +1150,7 @@ interface IBillingInfoViewStyles {
   privacyPolicyLinkStyle?: StyleProp<TextStyle>
 }
 ```
+
 ---
 
 ## Checkout UI
@@ -1197,15 +1234,16 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
   areLoadingIndicatorsEnabled?: boolean
 }
 ```
-| Property | Description |
-|----------|-------------|
-| hash | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo`component. |
-| total | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo` component. |
-| onPaymentSuccess | will handle the success in the payment process. Will return the `hash`. |
-| areLoadingIndicatorsEnabled | whether or not show the Loading Indicator, `default: true`. |
-| areAlertsEnabled | whether or not show the Error Alerts, `default: true`. |
 
-*Note: If the you need to modify the card container, use the `styles.payment.cardContainer` prop. Useful if the card is to short and the zip code is not visible.*
+| Property                    | Description                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------- |
+| hash                        | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo`component.  |
+| total                       | retrieved from the `onCheckoutSuccess` callback in the `BillingInfo` component. |
+| onPaymentSuccess            | will handle the success in the payment process. Will return the `hash`.         |
+| areLoadingIndicatorsEnabled | whether or not show the Loading Indicator, `default: true`.                     |
+| areAlertsEnabled            | whether or not show the Error Alerts, `default: true`.                          |
+
+_Note: If the you need to modify the card container, use the `styles.payment.cardContainer` prop. Useful if the card is to short and the zip code is not visible._
 
 ### styles
 
@@ -1250,12 +1288,16 @@ Currently, Stripe card is not customizable. Please see the open issues in their 
 Additionally, if you are encountering problems with building your project, please take a look at the [Stripe troubleshooting](https://github.com/stripe/stripe-react-native#troubleshooting).
 
 ---
+
 ## Purchase Confirmation UI
 
 Import the component from the library
 
 ```js
-import { PurchaseConfirmation, SessionHandleType } from 'tf-checkout-react-native'
+import {
+  PurchaseConfirmation,
+  SessionHandleType
+} from 'tf-checkout-react-native'
 ```
 
 Add it to the render function.
@@ -1294,17 +1336,20 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
   }
 />
 ```
-### Props
-| Property | Description |
-|----------|-------------|
-| orderHash | The `hash` returned in the `BillingInfo` component |
-| onComplete | To handle the completion of the flow. Here you can handle the unmount of the component or navigate to another screen |
-| styles | Styles for the component |
-| texts | Texts for the component  |
 
+### Props
+
+| Property   | Description                                                                                                          |
+| ---------- | -------------------------------------------------------------------------------------------------------------------- |
+| orderHash  | The `hash` returned in the `BillingInfo` component                                                                   |
+| onComplete | To handle the completion of the flow. Here you can handle the unmount of the component or navigate to another screen |
+| styles     | Styles for the component                                                                                             |
+| texts      | Texts for the component                                                                                              |
 
 ---
+
 ## My Orders UI
+
 If there is a valid session, there will appear a button to access `MyOrders` in the `Tickets` component.
 
 Import the component from the library.
@@ -1312,7 +1357,6 @@ Import the component from the library.
 ```js
 import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
 ```
-
 
 ### Props
 
@@ -1428,7 +1472,9 @@ import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
   }
 }
 ```
+
 IMyOrdersData
+
 ```ts
 {
   events: {
@@ -1474,7 +1520,9 @@ IMyOrdersData
   }
 }
 ```
+
 IMyOrderDetailsData
+
 ```ts
 {
   header: {
@@ -1543,6 +1591,7 @@ IMyOrderDetailsData
 ```
 
 ### styles
+
 ```js
 {
   orderListItem?: {
@@ -1624,9 +1673,9 @@ import { MyOrderDetails, SessionHandleType } from 'tf-checkout-react-native'
     areActivityIndicatorsEnabled?: boolean
     areAlertsEnabled?: boolean
   }
-  onDownloadStatusChange?: (status?: 
-    'downloading' | 
-    'downloaded' | 
+  onDownloadStatusChange?: (status?:
+    'downloading' |
+    'downloaded' |
     'failed'
   ) => void
   downloadStatusIcons?: {
@@ -1764,7 +1813,6 @@ import { MyOrderDetails, SessionHandleType } from 'tf-checkout-react-native'
 
 Allows the user to resale the tickets they bought. They can decide wether sell it to a friend or to any other user.
 
-
 Import the component from the library.
 
 ```js
@@ -1873,7 +1921,9 @@ import { ResaleTickets, SessionHandleType } from 'tf-checkout-react-native'
 After opening and URL with the corresponding schema and token, use this component to let the user reset its password.
 
 ### Usage
+
 Import the component from the library.
+
 ```ts
 import { ResetPassword } from 'tf-checkout-react-native'
 ```
@@ -1913,7 +1963,7 @@ Then add it to the render function.
     newPasswordLabel?: string
     confirmNewPasswordLabel?: string
   }
-  onResetPasswordSuccess?: (data: { 
+  onResetPasswordSuccess?: (data: {
     message: string
     status?: number
     }) => void
@@ -1927,12 +1977,12 @@ Then add it to the render function.
 }
 ```
 
-
 # Core Components
-**⚠️ Remember that you first need to set your configuration using the [setConfig](#set-your-configuration)
- function. ⚠️**
 
- ### Index
+**⚠️ Remember that you first need to set your configuration using the [setConfig](#set-your-configuration)
+function. ⚠️**
+
+### Index
 
 [TicketsCore](#ticketscore)
 
@@ -1951,16 +2001,17 @@ Then add it to the render function.
 [LoginCore](#logincore)
 
 [ResetPasswordCore](#resetpasswordcore)
- 
+
 ---
+
 ## SessionCoreHandle
 
 All Core components with the exception of Login and ResetPassword exposes the `refreshAccessToken` function to re-authenticate the user after the access token is expired. This is through the corresponding `CoreHandle` ref.
 
-It returns the `IFetchAccessTokenResponse` object: 
+It returns the `IFetchAccessTokenResponse` object:
 
 ```ts
-IFetchAccessTokenResponse {
+interface IFetchAccessTokenResponse {
   accessTokenError?: {
     code?: number
     message: string
@@ -1975,14 +2026,13 @@ IFetchAccessTokenResponse {
 }
 ```
 
-
-### Example:
+### Example
 
 Import the component from the library
 
 ```js
-import { 
-  TicketsCore 
+import {
+  TicketsCore
   TicketsCoreHandle // You can import the Handle to use it as type in the useRef hook
 } from 'tf-checkout-react-native'
 ```
@@ -1990,7 +2040,7 @@ import {
 Declare a reference to pass it to the component.
 
 ```js
-const ticketsCoreRef = useRef<TicketsCoreHandle>(null)
+const ticketsCoreRef = useRef < TicketsCoreHandle > null
 ```
 
 Then add it to the render function and assign the reference to the corresponding component.
@@ -2012,9 +2062,10 @@ const handleGetTickets = async () => {
 ---
 
 ## TicketsCore
+
 This is the initial component to show. It will retrieve the tickets, event, present My Orders and Logout buttons if the user is logged in, and will add the selected tickets to the cart.
 
-Exposes the following functions: 
+Exposes the following functions:
 
 `getTickets` Fetches the tickets from the event set in the config function. It receives a promoCode and referrerId parameters to apply to the tickets. PromoCode is higher priority than referrerId
 
@@ -2176,7 +2227,7 @@ Exposes the following functions:
 
   // Adds selected tickets to the cart.
   addToCart(
-    options: {  
+    options: {
       optionName: string
       ticketId: string
       quantity: number
@@ -2277,15 +2328,16 @@ Exposes the following functions:
         }
         relationships: any[]
         type: string
-      },  
+      },
       error?: IError>
   }>
 }
 ```
 
 ## MyOrderRequestFromType
-```
-MyOrderRequestFromType =
+
+```ts
+type MyOrderRequestFromType =
   | 'upcoming_events'
   | 'ongoing_and_upcoming_events'
   | 'ongoing_events'
@@ -2296,8 +2348,8 @@ MyOrderRequestFromType =
 Import the component from the library
 
 ```js
-import { 
-  TicketsCore 
+import {
+  TicketsCore
   TicketsCoreHandle // You can import the Handle to use it as type in the useRef hook
 } from 'tf-checkout-react-native'
 ```
@@ -2305,7 +2357,7 @@ import {
 Declare a reference to pass it to the component.
 
 ```js
-const ticketsCoreRef = useRef<TicketsCoreHandle>(null)
+const ticketsCoreRef = useRef < TicketsCoreHandle > null
 ```
 
 Then add it to the render function and assign the reference to the corresponding component.
@@ -2323,13 +2375,15 @@ const handleGetTickets = async () => {
   const res = await ticketsCoreRef.current.getTickets()
 }
 ```
+
 ---
 
 ## WaitingListCore
-This component *must* appear after getting the response from **getTickets()** and the property `isInWaitingList` is set to true.
 
+This component _must_ appear after getting the response from **getTickets()** and the property `isInWaitingList` is set to true.
 
-Exposes the following functions: 
+Exposes the following functions:
+
 ```tsx
 {
   addToWaitingList(
@@ -2354,17 +2408,19 @@ Exposes the following functions:
   refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
 }
 ```
+
 **addToWaitingList** Receives params with the following properties:
+
 ```js
 firstName: string
-lastName: string 
+lastName: string
 email: string
 ```
 
-And returns a Promise with the following object: 
+And returns a Promise with the following object:
 
-```js
-{
+```ts
+interface IAddToWaitingListResponse {
   addToWaitingListError?: {
     code?: number // If it was a server error, this will be the error code
     message: string //Error message that you could use it in your UI
@@ -2382,8 +2438,8 @@ And returns a Promise with the following object:
 Import the component from the library
 
 ```js
-import { 
-  WaitingListCore 
+import {
+  WaitingListCore
   WaitingListCoreHandle // You can import the Handle to use as type it in the useRef hook
 } from 'tf-checkout-react-native'
 ```
@@ -2391,7 +2447,7 @@ import {
 Declare a reference to pass it to the component.
 
 ```js
-const waitingListCoreRef = useRef<WaitingListCoreHandle>(null)
+const waitingListCoreRef = useRef < WaitingListCoreHandle > null
 ```
 
 Then add it to the render function and assign the reference to the corresponding component.
@@ -2404,17 +2460,19 @@ Then add it to the render function and assign the reference to the corresponding
 
 Use the reference to access the component methods.
 
-```js
+```tsx
 const handleAddToWaitingList = async (params: IAddToWaitingListCoreParams) => {
   const res = await waitingListCoreRef.current.addToWaitingList(params)
 }
 ```
+
 ---
 
 ## BillingCore
+
 This component collects user's billing information and checks the order out. If the entered user data is already in the system it will perform checkout, other wise it will perform a registration and then the checkout.
 
-Exposes the following functions: 
+Exposes the following functions:
 
 `getCart` Fetches the current cart information, needed to know how many ticket holders data is needed.
 
@@ -2428,9 +2486,8 @@ Exposes the following functions:
 
 `checkoutOrder` Performs the checkout.
 
-
-```ts
-{
+```tsx
+interface IBillingCore {
   // Fetches the current cart information, needed to know how many ticket holders data is needed.
   getCart(): Promise<{
     cartError?: {
@@ -2536,17 +2593,18 @@ Exposes the following functions:
 }
 
 ```
+
 ---
 
 ## CheckoutCore
+
 Shows the event conditions, purchase details and process the payment and free registration to an event.
 
-You will need to install and use the [ReactNative Stripe SDK](https://github.com/stripe/stripe-react-native) (we recommend version 0.2.3). Follow their documentation to implement it. Our backend is already prepared to process the payments. 
+You will need to install and use the [ReactNative Stripe SDK](https://github.com/stripe/stripe-react-native) (we recommend version 0.2.3). Follow their documentation to implement it. Our backend is already prepared to process the payments.
 
-Remember that you will need the `publishableKey`. 
+Remember that you will need the `publishableKey`.
 
 After you collect the card information and call the `confirmPayment` function, you will need to call the `paymentSuccess` function to complete the payment.
-
 
 Exposes the following functions:
 
@@ -2554,14 +2612,13 @@ Exposes the following functions:
 
 `getPurchaseOrderDetails` Get purchase order details for the current event.
 
-`getOrderReview`  Get order review for the current event.
+`getOrderReview` Get order review for the current event.
 
 `freeRegistration` Free registration to an event.
 
 `paymentSuccess` Payment success.
 
 `refreshAccessToken` Refreshes access token.
-
 
 ```ts
 // Get event conditions for the Event Id set on the setConfig.
@@ -2668,8 +2725,11 @@ paymentSuccess(orderHash: string): Promise<any>
 // Refresh access token.
 refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
 ```
+
 ---
+
 ## PurchaseConfirmationCore
+
 Shows the purchase confirmation information.
 
 It exposes the following functions:
@@ -2689,10 +2749,10 @@ getPurchaseConfirmation(
     }
     purchaseConfirmationData?: {
       conversionPixels?: any
-      currency: { 
-        currency: string; 
-        decimalPlaces: number; 
-        symbol: string 
+      currency: {
+        currency: string;
+        decimalPlaces: number;
+        symbol: string
       }
       customConfirmationPageText?: string
       customerId: string
@@ -2717,9 +2777,12 @@ getPurchaseConfirmation(
   }>
   refreshAccessToken(refreshToken?: string): Promise<IFetchAccessTokenResponse>
 ```
+
 ---
+
 ## MyOrdersCore
-Shows the purchased orders from the user. It can also show the sub-brands if the `ARE_SUB_BRANDS_INCLUDED` was set to true and the `BRAND` was set to an existing brand. 
+
+Shows the purchased orders from the user. It can also show the sub-brands if the `ARE_SUB_BRANDS_INCLUDED` was set to true and the `BRAND` was set to an existing brand.
 
 Exposes the following functions:
 
@@ -2834,7 +2897,7 @@ getMyOrders(page: number, filter: string): Promise<{
         }
         relationships: any[]
         type: string
-      },  
+      },
       error?: IError>
 }>
 
@@ -2883,8 +2946,9 @@ getOrderDetails(orderId: string): Promise<{
 ```
 
 ## MyOrderRequestFromType
-```
-MyOrderRequestFromType =
+
+```ts
+type MyOrderRequestFromType =
   | 'upcoming_events'
   | 'ongoing_and_upcoming_events'
   | 'ongoing_events'
@@ -2893,12 +2957,18 @@ MyOrderRequestFromType =
 ```
 
 ---
+
 ## OrderDetailsCore
+
 Allows to re-sale the tickets or to remove them from the re-sale system.
 
 Import it from the library.
+
 ```ts
-import { OrderDetailsCore, OrderDetailsCoreHandle } from 'tf-checkout-react-native';
+import {
+  OrderDetailsCore,
+  OrderDetailsCoreHandle
+} from 'tf-checkout-react-native'
 ```
 
 Create a ref
@@ -2914,20 +2984,20 @@ Assign the ref to the wrapper component.
 ```
 
 Access the exposed function through the current value.
+
 ```ts
 await myOrderDetailsCoreRef.current.removeTicketFromResale(ticket.hash)
 ```
 
-
 ```ts
 resaleTicket(
-/*  
+/*
     formData.append('to', toWhom)
     formData.append('first_name', firstName)
     formData.append('last_name', lastName)
     formData.append('email', email)
     formData.append('confirm_email', emailConfirm)
-    formData.append('confirm', String(isTermsAgreed)) 
+    formData.append('confirm', String(isTermsAgreed))
 */
 
     data: FormData,
@@ -2960,8 +3030,11 @@ resaleTicket(
       }
   }>
 ```
+
 ---
+
 ## LoginCore
+
 Handles the login and logout process.
 
 Exposes the following functions:
@@ -3006,20 +3079,25 @@ login(fields?: {
 
 logout(): Promise<void>
 ```
+
 ---
+
 ## ResetPasswordCore
+
 Will allow the user to reset its password.
 
-Exposes the following function: 
+Exposes the following function:
 
 `postResetPassword` Sends the reset token and the new password values.
 
-postResetPassword parameters: 
+postResetPassword parameters:
+
 ```
   token: string,
   password: string,
   password_confirmation: string,
 ```
+
 postResetPassword returning data:
 
 ```ts
@@ -3028,7 +3106,7 @@ postResetPassword returning data:
     message: string
     status?: number
   }
-  error?: {  
+  error?: {
     code?: number
     message: string
     extraData?: any
@@ -3037,11 +3115,16 @@ postResetPassword returning data:
 ```
 
 ### Usage
+
 Import it from the library.
 
 ```ts
-import { ResetPasswordCore, ResetPasswordCoreHandle } from 'tf-checkout-react-native'
+import {
+  ResetPasswordCore,
+  ResetPasswordCoreHandle
+} from 'tf-checkout-react-native'
 ```
+
 Wrap your component with the Core component.
 
 ```xml
@@ -3052,44 +3135,39 @@ Wrap your component with the Core component.
 
 # Utils
 
-`deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case. 
-
-
+`deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case.
 
 # Changelog
+
 ## Version 1.0.32
 
 - Add `referredId` property to Tickets component and getTickets method. This will apply special prices fo the passed `refferentId` property.
-
-
 
 ## Version 1.0.31
 
 - Add missing styles to LoginForm.
 
-
-
 ## Version 1.0.30
 
 - Show errors in Billing UI form fields.
-- Add config prop to Billing UI component, includes 2 configuration flags. 
+- Add config prop to Billing UI component, includes 2 configuration flags.
+
 ```
   config?: {
     isCheckoutAlwaysButtonEnabled?: boolean
-    shouldHideTicketHolderSectionOnSingleTicket?: boolean 
+    shouldHideTicketHolderSectionOnSingleTicket?: boolean
   }
 ```
 
 - Replacing `"rn-material-ui-textfield": "1.0.5"` library with `"rn-material-ui-textfield": "jorgtz/rn-material-ui-textfield"`, make sure to replace it in all the package.json files.
 
-
-
 ## Version 1.0.29
 
 - Update Stripe SDK to version 0.26.0.
-  - Minimum iOS Deployment version  = `13`.
-- Expose styles to customize Stripe Card Form: 
+  - Minimum iOS Deployment version = `13`.
+- Expose styles to customize Stripe Card Form:
   - cardStyle?: CardFormView.Styles
+
 ```
 {
     backgroundColor?: string;
@@ -3104,10 +3182,8 @@ Wrap your component with the Core component.
     fontFamily?: string;
 }
 ```
-  - cardContainer?: StyleProp<ViewStyle>
 
-
-
+- cardContainer?: StyleProp<ViewStyle>
 
 ## Version 1.0.28
 
@@ -3115,14 +3191,15 @@ Wrap your component with the Core component.
 - Add filter to `getMyOrders` request in `MyOrdersCore` component, to filter by time frame by passing the following string:
 
 ```ts
-'upcoming_events' | 'ongoing_and_upcoming_events' | 'ongoing_events' | 'past_events'
+;'upcoming_events' |
+  'ongoing_and_upcoming_events' |
+  'ongoing_events' |
+  'past_events'
 ```
 
 - Add more data to the `getMyOrders` success response.
 - Add more data to the `getOrderDetails` success response.
 - Add `ticketsSold` prop to Event's object in fetchEvent success data.
-
-
 
 ## Version 1.0.27
 
@@ -3134,24 +3211,22 @@ Wrap your component with the Core component.
 
 - Add missing success data in `onFetchOrderDetailsSuccess` response.
 
-
-
 ## Version 1.0.26
 
 - Add the possibility to remove all of the following Billing/Street Address fields from free tickets:
+
   - Billing Street Address
   - City
   - State/County
   - Post Code/Zip
   - Country
 
-- Update `addToCart` success response to include: 
-```  
+- Update `addToCart` success response to include:
+
+```
 isTicketFree?: boolean
 isPhoneHidden?: boolean
-  ```
-
-
+```
 
 ## Version 1.0.25
 
@@ -3169,8 +3244,6 @@ isPhoneHidden?: boolean
   - Export function `refreshAccessToken`
 - Add `reloadData` to re-fetch servers data in UI components.
 
-
-
 ## Version 1.0.24
 
 - Add **SingleSignOn** feature.
@@ -3186,28 +3259,19 @@ isPhoneHidden?: boolean
       areTicketsGrouped?: boolean
     }
 ```
+
 - Updated Tickets styles prop to include Ticket Section Header.
 - Moved `areActivityIndicatorsEnabled` and `areAlertsEnabled` to the `config` prop.
 - Made TTF Privacy Policy mandatory.
 - Added `styles` and `texts` props for TTF Privacy Policy checkbox.
 - Added **Password Protected** event feature.
 
-
-
 ## Version 1.0.23
 
 - Fix Checkout not allowing free registrations
 
-
-
 ## Version 1.0.22
 
 - Added cartTimer component, that will show the cart's remaining expiration time in the Billing screen.
-- setConfig not longer receives the `DOMAIN` prop, instead it receives the `CLIENT` 
+- setConfig not longer receives the `DOMAIN` prop, instead it receives the `CLIENT`
 - Added a three dot button to my orders to show the possible actions.
-
-
-
-
-
-

@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useMemo, useRef } from 'react'
 import {
   ActivityIndicator,
+  DimensionValue,
   FlatList,
   Image,
   RefreshControl,
@@ -82,7 +83,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
       container: s.eventsDropdownContainer,
       button: s.eventsDropdownButton,
       label: {
-        maxWidth: '75%',
+        maxWidth: '75%' as DimensionValue,
       },
       ...styles?.eventsDropdown,
     }
