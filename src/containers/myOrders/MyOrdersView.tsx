@@ -12,6 +12,7 @@ import {
 
 import { IMyOrdersOrder } from '../../api/types'
 import { Dropdown, Loading } from '../../components'
+import { IDropdownStyles } from '../../components/dropdown/types'
 import R from '../../res'
 import OrderListItem from './components/OrderListItem'
 import { MyOrdersViewStyles as s } from './styles'
@@ -77,7 +78,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
     />
   )
 
-  const dropdownStyles = useMemo(() => {
+  const dropdownStyles: IDropdownStyles = useMemo(() => {
     return {
       container: s.eventsDropdownContainer,
       button: s.eventsDropdownButton,

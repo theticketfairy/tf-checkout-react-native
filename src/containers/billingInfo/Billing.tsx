@@ -48,6 +48,10 @@ import { IDropdownItem } from '../../components/dropdown/types'
 import { ILoginSuccessData } from '../../components/login/types'
 import { PaymentContainer } from '../../components/paymentContainer'
 import { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
+import {
+  useStripeConfig,
+  useStripePayment,
+} from '../../components/stripePayment/hooks'
 import { BillingCore, BillingCoreHandle, SessionHandle } from '../../core'
 import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
 import { Config } from '../../helpers/Config'
@@ -185,6 +189,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const [checkoutUpdateData, setCheckoutUpdateData] = useState<any>({})
     const [orderIsFree, setOrderIsFree] = useState(false)
     const [paymentError, setPaymentError] = useState<string>('')
+    const [stripeReady, setStripeReady] = useState(false)
+    const [paymentProcessing, setPaymentProcessing] = useState(false)
     //#endregion State
 
     //#region Labels
@@ -239,6 +245,27 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         : `Street ${optionalAddress}`
     }, [texts])
     //#endregion Labels
+
+    // Initialize Stripe for single page checkout
+    const stripePublishableKey =
+      checkoutUpdateData?.additional_payment_information?.basic_config?.apiKey
+    const stripeAccountId =
+      checkoutUpdateData?.additional_payment_information?.basic_config
+        ?.accountId
+    const elementsConfig =
+      checkoutUpdateData?.additional_payment_information?.elements_config
+
+    const { isStripeInitialized, stripeError } = useStripeConfig({
+      stripePublishableKey,
+      stripeAccountId,
+      elementsConfig,
+    })
+
+    const { processPayment: processStripePayment } = useStripePayment({
+      onError: (error: string) => {
+        setPaymentError(error)
+      },
+    })
 
     // Cart expiration timer
     const [secondsLeft, setSecondsLeft] = React.useState(420)
@@ -1431,13 +1458,59 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         }
 
         // 5. Process payment if not free
-        if (!orderIsFree && stripePaymentMethod) {
-          const paymentResult = await processPayment(
-            stripePaymentMethod,
-            checkoutData
-          )
-          if (!paymentResult.success) {
+        if (!orderIsFree && stripeReady) {
+          try {
+            const paymentDataResponse = {
+              data: {
+                attributes: {
+                  payment_method: {
+                    stripe_client_secret: checkoutData?.stripe_client_secret,
+                    stripe_setup_intent_client_secret:
+                      checkoutData?.stripe_setup_intent_client_secret,
+                  },
+                },
+              },
+            }
+
+            const paymentResult = await processStripePayment({
+              paymentDataResponse,
+              values: {
+                firstName,
+                lastName,
+                email,
+                street,
+                city,
+                postalCode,
+                selectedCountry,
+                selectedState,
+              },
+              formikHelpers: null,
+              checkoutResponse: { data: { attributes: checkoutData } },
+              checkoutUpdateResponse: {
+                data: { attributes: checkoutUpdateData },
+              },
+              additionalData: {
+                attributes: checkoutData,
+                isFreeTickets: orderIsFree,
+                updatedOrderData: checkoutData,
+                eventId: checkoutData?.event_id || '',
+              },
+            })
+
+            if (!paymentResult?.success && !orderIsFree) {
+              if (paymentResult?.canceled) {
+                setIsLoading(false)
+                return
+              }
+              setIsLoading(false)
+              setPaymentError(paymentResult?.error || 'Payment failed')
+              return
+            }
+          } catch (error) {
             setIsLoading(false)
+            const errorMessage =
+              error instanceof Error ? error.message : 'Payment failed'
+            setPaymentError(errorMessage)
             return
           }
         }
@@ -2110,17 +2183,42 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             )}
 
             {/* Payment section for single page checkout */}
-            {isSinglePageCheckout && !orderIsFree && paymentProps && (
+            {isSinglePageCheckout && !orderIsFree && stripePublishableKey && (
               <PaymentContainer
-                paymentFields={paymentProps.paymentFields || []}
-                handlePayment={paymentProps.handlePayment}
-                checkoutData={paymentProps.checkoutData}
+                stripePublishableKey={stripePublishableKey}
+                stripeAccountId={stripeAccountId}
+                paymentFields={paymentProps?.paymentFields || []}
+                handlePayment={paymentProps?.handlePayment || (() => {})}
+                checkoutData={checkoutUpdateData}
+                elementsOptions={elementsConfig}
+                stripePaymentProps={{
+                  onChangePaymentInfo: (paymentInfo: any) => {
+                    setStripeReady(paymentInfo.complete)
+                  },
+                  onChangeConfirmPaymentLoading: (loading: boolean) => {
+                    setPaymentProcessing(loading)
+                  },
+                  onError: (error: string) => {
+                    setPaymentError(error)
+                  },
+                  onPaymentSuccess: (result: any) => {
+                    console.log('Payment successful:', result)
+                  },
+                  onPaymentCancel: () => {
+                    console.log('Payment cancelled')
+                  },
+                }}
                 onGetPaymentDataSuccess={() => {}}
                 onGetPaymentDataError={() => {}}
-                onPaymentError={() => {}}
-                // onPaymentMethodReady={setStripePaymentMethod}
-                // onPaymentError={setPaymentError}
-                // orderData={checkoutUpdateData}
+                onPaymentError={(error: any) => {
+                  setPaymentError(error.message || 'Payment error')
+                }}
+                displayPaymentButton={false}
+                hideFieldsBlock={true}
+                isSinglePageCheckout={true}
+                formTitle='Payment Information'
+                orderInfoLabel=''
+                paymentInfoLabel=''
               />
             )}
 

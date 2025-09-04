@@ -45,6 +45,11 @@ export interface IOnCheckoutSuccess {
   hash: string
   total: string
   status: string
+  stripe_client_secret?: string
+  stripe_setup_intent_client_secret?: string
+  event_id?: string
+  // Allow additional properties from the API response
+  [key: string]: any
 }
 
 export interface IBillingProps {

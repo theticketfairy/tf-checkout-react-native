@@ -15,20 +15,16 @@ import {
   View,
 } from 'react-native'
 
-import {
-  // fetchEventConditions,
-  fetchOrderReview,
-} from '../../api/ApiClient'
+import { fetchOrderReview } from '../../api/ApiClient'
 import { IOrderReview } from '../../api/types'
+// import { FEES_STYLES } from '../../constants'
 import {
   createFixedFloatNormalizer,
   currencyNormalizerCreator,
 } from '../../utils/normalizers'
+import { useStripeConfig, useStripePayment } from '../stripePayment/hooks'
 import StripePayment from '../stripePayment/StripePayment'
 import { IStripePaymentProps } from '../stripePayment/types'
-// import { FEES_STYLES } from '../../constants'
-// import { usePixel } from '../../hooks/usePixel'
-// import { IAddOn, IOrderData, IPaymentField } from '../../types'
 // import TimerWidget from '../timerWidget'
 import { handlePaymentMiddleWare } from './handlePayment'
 import { OrderDetails } from './OrderDetails'
@@ -50,11 +46,8 @@ export interface IPaymentPage {
   onGetPaymentDataSuccess: (value: any) => void
   onGetPaymentDataError: (value: AxiosError) => void
   onPaymentError: (value: AxiosError, slug?: string) => void
-  themeOptions?: any
   elementsOptions?: any
   onCountdownFinish?: () => void
-  enableTimer?: boolean
-  enablePaymentPlan?: boolean
   paymentInfoLabel?: string
   orderInfoLabel?: string
   displayPaymentButton?: boolean
@@ -103,16 +96,12 @@ export const PaymentContainer = ({
   handlePayment,
   formTitle = 'Get Your Tickets',
   errorText,
-  checkoutData,
   onErrorClose = _identity,
   onGetPaymentDataSuccess = _identity,
   onGetPaymentDataError = _identity,
   onPaymentError = _identity,
-  // themeOptions,
-  // elementsOptions,
+  elementsOptions,
   onCountdownFinish = _identity,
-  // enableTimer = false,
-  // enablePaymentPlan = true,
   orderInfoLabel = 'Order Review',
   paymentInfoLabel = 'Order Confirmation',
   displayPaymentButton = true,
@@ -125,29 +114,25 @@ export const PaymentContainer = ({
 IPaymentPage) => {
   const [reviewData, setReviewData] = useState({} as IOrderReview)
   const [orderData, setOrderData] = useState(initialOrderValues)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
   const showPaymentPlanSection = false
   const [paymentIsLoading, setPaymentIsLoading] = useState(false)
-  // const [, setPaymentDataIsLoading] = useState(true)
-  // const [, setConditions] = useState<{ id: string; text: string }[]>([])
+  const [, setPaymentDataIsLoading] = useState(true)
   const [paymentPlanConfig] = useState(initialPaymentPlanConfiguration)
   const paymentPlanUseSavedCard = false
-  // const [, setCurrency] = useState('')
 
   const showFormTitle = Boolean(formTitle)
   const showErrorText = Boolean(errorText)
 
   const eventId = _get(reviewData, 'cart[0].product_id') || ''
-  const { hash, total } = checkoutData
+  const hash = _get(reviewData, 'hash') || ''
+  const total = _get(reviewData, 'total') || ''
   const isFreeTickets = useMemo(
     () =>
       (!Number(total) && !Number(orderData.total)) ||
       !Number(orderData.pay_now),
     [total, orderData]
   )
-
-  // const pageUrl = ''
-  // usePixel(eventId, { page: 'review', pageUrl })
 
   useEffect(() => {
     const fetchPaymentData = async () => {
@@ -203,39 +188,14 @@ IPaymentPage) => {
     if (isSinglePageCheckout) {
       if (!orderData?.total) {
         console.log('🚀 ~ PaymentContainer ~ orderData:', orderData)
-        // setOrderData((current: any) => ({ ...current, pay_now: 1, total: 1 }))
-        // setPaymentDataIsLoading(false)
+        setOrderData((current: any) => ({ ...current, pay_now: 1, total: 1 }))
+        setPaymentDataIsLoading(false)
       }
     } else {
       fetchPaymentData()
     }
     console.log('🚀 ~ PaymentContainer ~ orderData:', orderData)
   }, [])
-
-  //just once
-  // useEffect(() => {
-  //   // fetch conditions data
-  //   const fetchConditions = async () => {
-  //     if (eventId) {
-  //       const conditionsResponse = await fetchEventConditions()
-  //       console.log(
-  //         '🚀 ~ fetchConditions ~ conditionsResponse:',
-  //         conditionsResponse
-  //       )
-  //       // const conditionsInfo = conditionsResponse.data.attributes
-  //       // setConditions(
-  //       //   conditionsInfo
-  //       //     ? conditionsInfo.map((item: { id: any; text: any }) => ({
-  //       //         id: item.id,
-  //       //         text: item.text,
-  //       //         checked: false,
-  //       //       }))
-  //       //     : []
-  //       // )
-  //     }
-  //   }
-  //   fetchConditions()
-  // }, [])
 
   const showPaymentForm = () => {
     if (hidePaymentForm) {
@@ -257,6 +217,29 @@ IPaymentPage) => {
   const getPublishableKey = () =>
     stripePublishableKey ||
     _get(reviewData, 'payment_method.stripe_publishable_key')
+
+  const getStripeAccountId = () =>
+    _get(reviewData, 'payment_method.stripe_connected_account')
+
+  const getClientSecret = () =>
+    _get(reviewData, 'payment_method.stripe_client_secret')
+
+  const getSetupIntentSecret = () =>
+    _get(reviewData, 'payment_method.stripe_setup_intent_client_secret')
+
+  // Initialize Stripe hooks
+  useStripeConfig({
+    stripePublishableKey: getPublishableKey(),
+    stripeAccountId: getStripeAccountId(),
+    elementsConfig: elementsOptions,
+  })
+
+  useStripePayment({
+    onError: (error: string) => {
+      setError(error)
+      onPaymentError(new Error(error) as any)
+    },
+  })
 
   const hasTableTypes = Boolean(Number(orderData.guest_count))
   const paymentFieldsData = hasTableTypes
@@ -344,16 +327,21 @@ IPaymentPage) => {
               <Text style={styles.paymentError}>{errorText}</Text>
             )}
             <StripePayment
-              // stripe_client_secret={_get(
-              //   reviewData,
-              //   'payment_method.stripe_client_secret'
-              // )}
-              // hasSeatMapActions={reviewData.eventDetails.flagSeatMapAllowed}
-              // total={
-              //   orderData.guest_count ? orderData.pay_now : orderData.total
-              // }
-              onChangePaymentInfo={(data: any) =>
-                handlePaymentMiddleWare(error, data || {}, {
+              stripePublishableKey={getPublishableKey()}
+              stripeAccountId={getStripeAccountId()}
+              clientSecret={getClientSecret()}
+              setupIntentClientSecret={getSetupIntentSecret()}
+              elementsConfig={elementsOptions}
+              displayPaymentButton={
+                displayPaymentButton && !isSinglePageCheckout
+              }
+              onChangePaymentInfo={(paymentInfo) => {
+                if (paymentInfo.complete && isSinglePageCheckout) {
+                  // For single page checkout, we handle payment differently
+                  return
+                }
+                // Legacy handling for non-single page checkout
+                handlePaymentMiddleWare(error, paymentInfo || {}, {
                   reviewData,
                   isFreeTickets,
                   paymentPlanIsAvailable: false,
@@ -366,19 +354,21 @@ IPaymentPage) => {
                   isBrowser: false,
                   onPaymentError,
                 })
-              }
-              // error={error}
-              // orderId={orderData.id}
-              // currency={orderData.currency}
-              // billing_info={reviewData.billingData}
-              // isLoading={paymentIsLoading}
-              // handleSetLoading={(value: boolean) => setPaymentIsLoading(value)}
-              // conditions={conditions}
-              // forPaymentPlan={false}
-              // collectPaymentMethodOnly={
-              //   !_get(reviewData, 'payment_method.stripe_client_secret')
-              // }
-              // displayPaymentButton={displayPaymentButton}
+              }}
+              onChangeConfirmPaymentLoading={(loading) => {
+                setPaymentIsLoading(loading)
+              }}
+              onError={(error) => {
+                setError(error)
+                onPaymentError(new Error(error) as any)
+              }}
+              onPaymentSuccess={(result) => {
+                // Handle successful payment
+                console.log('Payment successful:', result)
+              }}
+              onPaymentCancel={() => {
+                console.log('Payment cancelled')
+              }}
               {...stripePaymentProps}
             />
           </View>
