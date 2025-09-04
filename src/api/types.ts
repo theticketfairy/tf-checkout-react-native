@@ -113,6 +113,7 @@ export interface ICheckoutBody {
     dob_day?: number
     dob_month?: number
     dob_year?: number
+    add_ons?: { [key: string]: number }
   }
 }
 

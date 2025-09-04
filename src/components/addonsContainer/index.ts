@@ -1,0 +1,1 @@
+export { SimpleAddonsContainer } from './SimpleAddonsContainer'

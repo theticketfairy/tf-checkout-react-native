@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useMemo, useRef } from 'react'
 import {
   ActivityIndicator,
-  DimensionValue,
   FlatList,
   Image,
   RefreshControl,
@@ -58,7 +57,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
 
   //#region Renders
   const renderOrderListItem = useCallback(
-    ({ item }) => (
+    ({ item }: { item: IMyOrdersOrder }) => (
       <OrderListItem
         order={item}
         onSelectOrder={handleOnSelectOrder}
@@ -83,7 +82,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
       container: s.eventsDropdownContainer,
       button: s.eventsDropdownButton,
       label: {
-        maxWidth: '75%' as DimensionValue,
+        maxWidth: '75%',
       },
       ...styles?.eventsDropdown,
     }

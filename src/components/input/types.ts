@@ -31,6 +31,7 @@ export interface IInputProps extends TextFieldProps {
   title?: string
   id?: string
   onTextChanged?: (key: string, value: string) => void
+  required?: boolean
 
   styles?: IInputStyles
   isShowPasswordButtonVisible?: boolean

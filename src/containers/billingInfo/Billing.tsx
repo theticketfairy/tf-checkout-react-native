@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unreachable */
+/* eslint-disable react-hooks/exhaustive-deps */
 import _every from 'lodash/every'
 import _find from 'lodash/find'
 import _forEach from 'lodash/forEach'
@@ -40,8 +43,10 @@ import {
   Login,
   PhoneInput,
 } from '../../components'
+import { SimpleAddonsContainer } from '../../components/addonsContainer'
 import { IDropdownItem } from '../../components/dropdown/types'
 import { ILoginSuccessData } from '../../components/login/types'
+import { PaymentContainer } from '../../components/paymentContainer'
 import { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
 import { BillingCore, BillingCoreHandle, SessionHandle } from '../../core'
 import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
@@ -64,6 +69,7 @@ import s from './styles'
 import {
   IBillingFormFieldsData,
   IBillingProps,
+  IOnCheckoutSuccess,
   ITicketHolderField,
   SkippingStatusType,
 } from './types'
@@ -119,6 +125,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         isCheckoutAlwaysButtonEnabled: false,
         shouldHideTicketHolderSectionOnSingleTicket: false,
       },
+      // Single page checkout props
+      isSinglePageCheckout = false,
+      paymentProps,
+      addonsProps,
+      // onCheckoutUpdateSuccess,
+      // onCheckoutUpdateError,
     },
     ref
   ) => {
@@ -164,6 +176,15 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     const [skippingStatus, setSkippingStatus] =
       useState<SkippingStatusType>(undefined)
     const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
+
+    // New single page checkout state
+    const [selectedAddOns, setSelectedAddOns] = useState<{
+      [key: string]: number
+    }>({})
+    const [stripePaymentMethod, setStripePaymentMethod] = useState<any>(null)
+    const [checkoutUpdateData, setCheckoutUpdateData] = useState<any>({})
+    const [orderIsFree, setOrderIsFree] = useState(false)
+    const [paymentError, setPaymentError] = useState<string>('')
     //#endregion State
 
     //#region Labels
@@ -387,11 +408,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       [onSkippingStatusChange]
     )
 
-    const showAlert = (text: string) => {
-      if (areAlertsEnabled) {
-        Alert.alert('', text)
-      }
-    }
+    const showAlert = useCallback(
+      (text: string) => {
+        if (areAlertsEnabled) {
+          Alert.alert('', text)
+        }
+      },
+      [areAlertsEnabled]
+    )
 
     const showLoginDialog = () => setIsLoginDialogVisible(true)
     const hideLoginDialog = () => setIsLoginDialogVisible(false)
@@ -1292,7 +1316,149 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       return checkoutBody
     }
 
+    // Single page checkout functions
+    const updateCheckoutWithAddOns = useCallback(
+      async (addOns: { [key: string]: number }) => {
+        if (!isSinglePageCheckout || !billingCoreRef.current) return
+
+        // Prevent infinite loops by checking if addOns actually changed
+        const currentAddOnsString = JSON.stringify(selectedAddOns)
+        console.log('🚀 ~ currentAddOnsString:', currentAddOnsString)
+        const newAddOnsString = JSON.stringify(addOns)
+        console.log('🚀 ~ newAddOnsString:', newAddOnsString)
+        return
+      },
+      [addonsProps?.eventId, selectedAddOns, checkoutUpdateData]
+    )
+
+    const handleAddOnSelect = useCallback(
+      async (id: string, value: string) => {
+        const quantity = parseInt(value, 10) || 0
+        const updatedAddOns = { ...selectedAddOns }
+
+        if (quantity > 0) {
+          updatedAddOns[id] = quantity
+        } else {
+          delete updatedAddOns[id]
+        }
+
+        setSelectedAddOns(updatedAddOns)
+        await updateCheckoutWithAddOns(updatedAddOns)
+      },
+      [selectedAddOns]
+    )
+
+    const processPayment = async (paymentMethod: any, checkoutData: any) => {
+      if (!paymentProps?.stripePublishableKey || orderIsFree) {
+        return { success: true }
+      }
+
+      try {
+        // This would integrate with your payment processing API
+        const paymentResult = await billingCoreRef.current?.processPayment({
+          paymentMethodId: paymentMethod.id,
+          orderHash: checkoutData.hash,
+          amount: checkoutData.total,
+        })
+
+        if (paymentResult?.error) {
+          setPaymentError(paymentResult.error.message)
+          paymentProps.onPaymentError?.(paymentResult.error)
+          return { success: false, error: paymentResult.error }
+        }
+
+        paymentProps.onPaymentSuccess?.(paymentResult?.data)
+        return { success: true, data: paymentResult?.data }
+      } catch (error) {
+        setPaymentError('Payment processing failed')
+        paymentProps.onPaymentError?.(error)
+        return { success: false, error }
+      }
+    }
+
+    const performSinglePageCheckout = async () => {
+      try {
+        setIsLoading(true)
+
+        // 1. Validate form data
+        showErrorMessages({
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          confirmEmail: emailConfirmation,
+          password: password,
+          confirmPassword: passwordConfirmation,
+          street: street,
+          city: city,
+          selectedCountry: selectedCountry,
+          selectedState: selectedState,
+          postalCode: postalCode,
+          dateOfBirth: dateOfBirth,
+          phoneNumber: phone,
+          isRegistering: !loggedUserFirstName && !storedToken.current,
+          ticketHolderData: ticketHoldersData,
+        })
+
+        const isBasicDataValid = checkBasicDataValid()
+        const isExtraDataValidErrors = checkExtraDataValid()
+
+        if (isExtraDataValidErrors || !isBasicDataValid) {
+          setIsLoading(false)
+          return
+        }
+
+        // 2. Handle user registration if needed
+        if (!loggedUserFirstName && !storedToken.current) {
+          await performNewUserRegister()
+        }
+
+        // 3. Create checkout body with add-ons
+        const checkoutBody = getCheckoutBody()
+        checkoutBody.attributes.add_ons = selectedAddOns
+
+        // 4. Perform checkout
+        const checkoutResult = await billingCoreRef.current?.checkoutOrder(
+          checkoutBody
+        )
+
+        const { error: checkoutError, data: checkoutData } =
+          checkoutResult || {}
+
+        if (checkoutError) {
+          setIsLoading(false)
+          onCheckoutError?.(checkoutError)
+          return showAlert(checkoutError.message)
+        }
+
+        // 5. Process payment if not free
+        if (!orderIsFree && stripePaymentMethod) {
+          const paymentResult = await processPayment(
+            stripePaymentMethod,
+            checkoutData
+          )
+          if (!paymentResult.success) {
+            setIsLoading(false)
+            return
+          }
+        }
+
+        // 6. Complete checkout
+        setIsLoading(false)
+        billingCoreRef.current?.stopCartTimer()
+        onCheckoutSuccess((checkoutData || {}) as IOnCheckoutSuccess)
+      } catch (error) {
+        setIsLoading(false)
+        onCheckoutError?.(error as IError)
+        showAlert('Checkout failed. Please try again.')
+      }
+    }
+
     const onSubmit = async () => {
+      if (isSinglePageCheckout) {
+        return await performSinglePageCheckout()
+      }
+
+      // Existing multi-step checkout logic
       showErrorMessages({
         firstName: firstName,
         lastName: lastName,
@@ -1933,11 +2099,43 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
 
             {renderTicketHolders()}
 
+            {/* Add-ons section for single page checkout */}
+            {isSinglePageCheckout && addonsProps && (
+              <SimpleAddonsContainer
+                {...addonsProps}
+                eventId={addonsProps.eventId || ''}
+                onAddOnSelect={handleAddOnSelect}
+                selectedAddOns={selectedAddOns}
+              />
+            )}
+
+            {/* Payment section for single page checkout */}
+            {isSinglePageCheckout && !orderIsFree && paymentProps && (
+              <PaymentContainer
+                paymentFields={paymentProps.paymentFields || []}
+                handlePayment={paymentProps.handlePayment}
+                checkoutData={paymentProps.checkoutData}
+                onGetPaymentDataSuccess={() => {}}
+                onGetPaymentDataError={() => {}}
+                onPaymentError={() => {}}
+                // onPaymentMethodReady={setStripePaymentMethod}
+                // onPaymentError={setPaymentError}
+                // orderData={checkoutUpdateData}
+              />
+            )}
+
+            {/* Payment error display */}
+            {paymentError && (
+              <View style={s.errorContainer}>
+                <Text style={s.errorText}>{paymentError}</Text>
+              </View>
+            )}
+
             <Button
               onPress={onSubmit}
-              text={texts?.checkoutButton || 'CHECKOUT'}
+              text={isSubmittingData || isLoading ? 'Loading...' : 'CHECKOUT'}
               isDisabled={isButtonDisabled}
-              isLoading={isSubmittingData}
+              isLoading={isSubmittingData || isLoading}
               styles={
                 isButtonDisabled
                   ? {

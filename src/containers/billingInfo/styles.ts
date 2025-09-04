@@ -61,4 +61,17 @@ export default StyleSheet.create({
     color: R.colors.danger,
     marginTop: 8,
   },
+  errorContainer: {
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: '#ffebee',
+    borderRadius: 5,
+    borderLeftWidth: 4,
+    borderLeftColor: R.colors.danger,
+  },
+  errorText: {
+    color: R.colors.danger,
+    fontSize: 14,
+    fontWeight: '500',
+  },
 })

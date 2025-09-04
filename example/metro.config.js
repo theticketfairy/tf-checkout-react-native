@@ -13,7 +13,7 @@ const moduleRoot = path.resolve(__dirname, '..')
 module.exports = {
   watchFolders: [moduleRoot],
   resolver: {
-    sourceExts: ['jsx', 'js', 'ts', 'tsx'],
+    sourceExts: ['jsx', 'js', 'ts', 'tsx', 'json'],
     extraNodeModules: {
       react: path.resolve(__dirname, 'node_modules/react'),
       'react-native': path.resolve(__dirname, 'node_modules/react-native'),
@@ -27,7 +27,7 @@ module.exports = {
     getTransformOptions: async () => ({
       transform: {
         experimentalImportSupport: false,
-        inlineRequires: true,
+        inlineRequires: false, // Disable for better debugging
       },
     }),
   },

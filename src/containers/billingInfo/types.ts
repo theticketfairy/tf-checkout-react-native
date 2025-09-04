@@ -27,6 +27,7 @@ import {
   ILoginViewStyles,
   ILoginViewTexts,
 } from '../../components/login/types'
+import { IPaymentField } from '../../components/paymentContainer/types'
 import {
   IPhoneInputStyles,
   IPhoneInputTexts,
@@ -115,6 +116,27 @@ export interface IBillingProps {
   shouldCartTimerNotMinimizeOnTap?: boolean
 
   config?: IBillingConfig
+
+  // Single page checkout props
+  isSinglePageCheckout?: boolean
+  paymentProps?: {
+    stripePublishableKey?: string
+    stripeAccountId?: string
+    onPaymentSuccess?: (data: any) => void
+    onPaymentError?: (error: any) => void
+    enableAddressElement?: boolean
+    paymentButtonText?: string
+    paymentFields?: IPaymentField[]
+    checkoutData?: any
+    handlePayment?: (paymentMethod: any, checkoutData: any) => void
+  }
+  addonsProps?: {
+    eventId?: string
+    addOnDataWithCustomFields?: any
+    onAddOnSelect?: (id: string, value: string, addon: any) => void
+  }
+  onCheckoutUpdateSuccess?: (data: any) => void
+  onCheckoutUpdateError?: (error: any) => void
 }
 
 export interface ITicketHolderField {

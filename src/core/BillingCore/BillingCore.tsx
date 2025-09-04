@@ -10,6 +10,7 @@ import {
   fetchUserProfile,
   registerNewUser,
 } from '../../api/ApiClient'
+import { updateCheckout } from '../../api/adapters'
 import {
   ICartResponse,
   ICheckoutBody,
@@ -116,6 +117,34 @@ const BillingCore = forwardRef<BillingCoreHandle, IBillingCoreProps>(
 
       stopCartTimer() {
         return handleStopTimer()
+      },
+
+      // New methods for single page checkout
+      async updateCheckout(data: any) {
+        try {
+          const response = await updateCheckout(data)
+          return response
+        } catch (error) {
+          return { error }
+        }
+      },
+
+      async processPayment(paymentData: any) {
+        try {
+          // This would integrate with your payment processing API
+          // For now, we'll create a placeholder implementation
+          const response = await fetch('/api/payment/process', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(paymentData),
+          })
+          const data = await response.json()
+          return { data }
+        } catch (error) {
+          return { error }
+        }
       },
     }))
 

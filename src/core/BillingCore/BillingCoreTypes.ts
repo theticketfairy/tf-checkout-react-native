@@ -24,6 +24,10 @@ export type BillingCoreHandleType = {
   getUserProfile(): Promise<IUserProfileResponse>
   registerNewUser(data: FormData): Promise<IRegisterNewUserResponse>
   stopCartTimer(): void
+  
+  // New methods for single page checkout
+  updateCheckout: (data: any) => Promise<{ error?: any; data?: any }>
+  processPayment: (paymentData: any) => Promise<{ error?: any; data?: any }>
 }
 
 export type BillingCoreHandle = BillingCoreHandleType & SessionCoreHandleType

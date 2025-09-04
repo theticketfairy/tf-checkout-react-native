@@ -10,10 +10,9 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 
 ### React Native
 
-- Suggested ReactNative version `0.66.3`
-- Suggested Flipper version `0.99.0`
-- React version `0.17.1`
-- Node version `16.10.0`
+- Suggested ReactNative version `0.79.0`
+- React version `19.1.0`
+- Node version `20.18.3` or later
 
 ### Android
 
@@ -177,13 +176,51 @@ const YourComponent: FC () => {
 
 # Run the example app
 
+## New React Native Demo (TFCheckoutDemo)
+
+The main example is now a modern React Native 0.79.0 project located in the `TFCheckoutDemo/` directory.
+
+### Setup Instructions
+
 1. Clone this repo.
-2. In the App.tsx file, update the `EVENT_ID` const with the assigned ID to be able to retrieve data from the server.
-3. cd into the _root project_ folder and `yarn` or `npm install`.
-4. cd into the _example_ folder and `yarn` or `npm install`.
-   - If running on iOS, cd into ios folder and `pod install && cd ..`.
-5. Run `yarn ios` or `npm run ios` to initialize and run in the iPhone simulator.
-6. If running on Android, run `yarn android` or `npm run android` to run it in the Android emulator or connected physical device.
+2. Navigate to the TFCheckoutDemo directory:
+
+   ```bash
+   cd TFCheckoutDemo
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+4. For iOS, install pods:
+
+   ```bash
+   cd ios && pod install && cd ..
+   ```
+
+5. Run the app:
+   - **iOS**: `npm run ios`
+   - **Android**: `npm run android`
+
+### Demo Configuration
+
+The demo is pre-configured with:
+
+- **Event ID**: 13369
+- **Client**: "mana"
+- **Brand**: "mana-common"
+- **Environment**: "STAG" (staging)
+
+### Known Issues
+
+- **Tickets Component Rendering**: The Tickets container component may not render correctly. This is a known issue being investigated.
+
+## Legacy iOS Example
+
+The original iOS example in the `example/` folder has been simplified to a basic native iOS app without React Native dependencies due to build compatibility issues with older React Native versions.
 
 # Features
 

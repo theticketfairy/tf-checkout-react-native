@@ -684,7 +684,7 @@ export const addToCart = async (
     const { attributes } = response?.data?.data
 
     responseData = {
-      isBillingRequired: !attributes?.skip_billing_page ?? true,
+      isBillingRequired: !attributes?.skip_billing_page,
       isNameRequired: attributes?.names_required ?? false,
       isAgeRequired: attributes?.age_required ?? false,
       isPhoneRequired: attributes?.phone_required ?? false,
@@ -1387,3 +1387,67 @@ export const fetchAccountTickets = async ({
   }
 }
 //#endregion Account Tickets
+
+//#region Addons and Single Page Checkout
+export const fetchAddons = async (eventId: string) => {
+  let responseError: IError | undefined
+
+  const response: AxiosResponse | void = await Client.get(
+    `/events/${eventId}/addons`
+  ).catch((error: AxiosError) => {
+    responseError = getApiError(error)
+  })
+
+  if (response && !responseError) {
+    return {
+      addonsData: response.data,
+    }
+  } else {
+    return {
+      addonsError: responseError,
+    }
+  }
+}
+
+export const updateCheckoutWithAddons = async (updateData: any) => {
+  let responseError: IError | undefined
+
+  const response: AxiosResponse | void = await Client.patch(
+    '/checkout',
+    updateData
+  ).catch((error: AxiosError) => {
+    responseError = getApiError(error)
+  })
+
+  if (response && !responseError) {
+    return {
+      data: response.data,
+    }
+  } else {
+    return {
+      error: responseError,
+    }
+  }
+}
+
+export const processPayment = async (paymentData: any) => {
+  let responseError: IError | undefined
+
+  const response: AxiosResponse | void = await Client.post(
+    '/payment/process',
+    paymentData
+  ).catch((error: AxiosError) => {
+    responseError = getApiError(error)
+  })
+
+  if (response && !responseError) {
+    return {
+      data: response.data,
+    }
+  } else {
+    return {
+      error: responseError,
+    }
+  }
+}
+//#endregion Addons and Single Page Checkout
