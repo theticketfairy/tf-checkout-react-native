@@ -1451,3 +1451,66 @@ export const processPayment = async (paymentData: any) => {
   }
 }
 //#endregion Addons and Single Page Checkout
+
+interface IAxiosResponseData {
+  error: boolean
+  message: string
+  status: number
+  success: boolean
+}
+
+interface IPaymentSuccessData {
+  clientSecret: string
+  paymentIntentId: string
+  status: string
+}
+interface IPaymentSuccessDataResponse extends IAxiosResponseData {
+  data: {
+    attributes: IPaymentSuccessData
+    relationships: Array<unknown>
+    type: string
+  }
+}
+interface IFreeRegistrationDataResponse extends IAxiosResponseData {
+  data: {
+    attributes: IFreeRegistrationData
+    relationships: Array<unknown>
+    type: string
+  }
+}
+
+export const createPaymentPlan = (
+  orderHash: string,
+  stripePaymentMethodId: string
+) => {
+  const res = Client.post(
+    `v1/order/${orderHash}/payment_plan/create`,
+    { stripe_payment_method_id: stripePaymentMethodId },
+    { headers: { 'Referer-Url': '' } }
+  ).catch((error: AxiosError) => {
+    throw error
+  })
+  return res
+}
+
+export const handleFreeSuccess = async (
+  orderHash: string
+): Promise<IFreeRegistrationDataResponse> => {
+  const response = await Client.post(
+    `v1/order/${orderHash}/complete_free_registration`,
+    undefined,
+    { headers: { 'Referer-Url': '' } }
+  )
+  return response.data
+}
+
+export const handlePaymentSuccess = async (
+  orderHash: string
+): Promise<IPaymentSuccessDataResponse> => {
+  const response = await Client.post(
+    `v1/order/${orderHash}/success`,
+    undefined,
+    { headers: { 'Referer-Url': '' } }
+  )
+  return response.data
+}

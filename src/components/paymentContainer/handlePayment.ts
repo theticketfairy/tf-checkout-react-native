@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosError } from 'axios'
 import _get from 'lodash/get'
 
@@ -6,7 +5,7 @@ import {
   createPaymentPlan,
   handleFreeSuccess,
   handlePaymentSuccess,
-} from '../../api'
+} from '../../api/ApiClient'
 
 interface Options {
   reviewData: any
