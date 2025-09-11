@@ -82,7 +82,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
       container: s.eventsDropdownContainer,
       button: s.eventsDropdownButton,
       label: {
-        maxWidth: '75%',
+        maxWidth: '75%' as any,
       },
       ...styles?.eventsDropdown,
     }

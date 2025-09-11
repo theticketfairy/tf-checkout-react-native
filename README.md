@@ -4,14 +4,14 @@ React Native library for Ticket Fairy checkout.
 
 For Single Sign-On (SSO) Please be aware that this is the first version of the implementation, we are working to release a V2, that will cover other use cases, in the near future.
 
-# Requirements
+## Requirements
 
 Configure [ReactNative environment](https://reactnative.dev/docs/environment-setup) for desired platforms (iOS, Android or both).
 
 ### React Native
 
-- Suggested ReactNative version `0.79.0`
-- React version `19.1.0`
+- Suggested ReactNative version `0.72.9`
+- React version `18.1.0`
 - Node version `20.18.3` or later
 
 ### Android
@@ -35,8 +35,8 @@ To download the PDFs, add the `WRITE_EXTERNAL_STORAGE` permission to the Android
 ### iOS
 
 - Compatible with apps targeting iOS `13.0` or above.
-- Pods version `1.10.1`
-- Command Line Tools version `13.0`
+- Pods version `1.15.0` or later
+- Command Line Tools version `15.0` or later
 
 To download the PDFs, add the following flags to `Info.plist` file:
 
@@ -45,7 +45,7 @@ To download the PDFs, add the following flags to `Info.plist` file:
 - LSSupportsOpeningDocumentsInPlace: Supports opening documents in place
 ```
 
-# Installation
+## Installation
 
 ```sh
 yarn add tf-checkout-react-native
@@ -94,7 +94,7 @@ Set appropriate style in your styles.xml file.
 </style>
 ```
 
-# Set your configuration
+## Set your configuration
 
 Import the function from the library.
 
@@ -174,19 +174,19 @@ const YourComponent: FC () => {
 | ARE_SUB_BRANDS_INCLUDED | If true will include orders from the `BRAND` sub-brands. Default `false`.                                                                                                |
 | AUTH                    | Object that receives data for Single Sign On (SSO).                                                                                                                      |
 
-# Run the example app
+## Run the example app
 
-## New React Native Demo (TFCheckoutDemo)
+## React Native Example
 
-The main example is now a modern React Native 0.79.0 project located in the `TFCheckoutDemo/` directory.
+The main example is a React Native 0.72.9 project located in the `example/` directory.
 
 ### Setup Instructions
 
 1. Clone this repo.
-2. Navigate to the TFCheckoutDemo directory:
+2. Navigate to the example directory:
 
    ```bash
-   cd TFCheckoutDemo
+   cd example
    ```
 
 3. Install dependencies:
@@ -207,20 +207,22 @@ The main example is now a modern React Native 0.79.0 project located in the `TFC
 
 ### Demo Configuration
 
-The demo is pre-configured with:
+The demo can be configured with your event details in the `App.tsx` file:
 
-- **Event ID**: 13369
-- **Client**: "mana"
-- **Brand**: "mana-common"
-- **Environment**: "STAG" (staging)
+- **Event ID**: Set your event ID
+- **Client**: Set your client name
+- **Brand**: Set your brand name
+- **Environment**: "STAG" (staging) or "PROD" (production)
 
-### Known Issues
+### Features
 
-- **Tickets Component Rendering**: The Tickets container component may not render correctly. This is a known issue being investigated.
+The example app demonstrates:
 
-## Legacy iOS Example
-
-The original iOS example in the `example/` folder has been simplified to a basic native iOS app without React Native dependencies due to build compatibility issues with older React Native versions.
+- Complete checkout flow with single page checkout support
+- Payment processing with Stripe integration
+- Add-ons selection and management
+- Order details and confirmation
+- User authentication and profile management
 
 # Features
 
@@ -272,7 +274,7 @@ After opening and URL with the corresponding schema, use this component to let t
 
 - refreshAccessToken: Let refresh the expired access token.
 
-# Component styling
+## Component styling
 
 ### Button
 
@@ -383,7 +385,7 @@ const sessionHandleRef = useRef<SessionHandleType>(null)
 await sessionHandleRef.current?.refreshAccessToken()
 ```
 
-# Exported components
+## Exported components
 
 Depending on your needs, you can use the UI Components or the Core Components.
 
@@ -391,7 +393,7 @@ Depending on your needs, you can use the UI Components or the Core Components.
 
 [Core Components](#core-components) are wrappers that don't include any UI neither validation logics, they only act as a Middleware to retrieve and send data from the server and return it to your implementation components. They are useful when your design cannot be achieved by the UI components. You will need to use references to access their exposed functions.
 
-# UI Components
+## UI Components
 
 [Login](#login-ui)
 
@@ -926,7 +928,7 @@ import { BillingInfo } from 'tf-checkout-react-native'
 
 Add it to the render function.
 
-```js
+```tsx
 const sessionHandleRef = useRef<SessionHandleType>(null)
 
 
@@ -2014,7 +2016,7 @@ Then add it to the render function.
 }
 ```
 
-# Core Components
+## Core Components
 
 **⚠️ Remember that you first need to set your configuration using the [setConfig](#set-your-configuration)
 function. ⚠️**
@@ -3129,7 +3131,7 @@ Exposes the following function:
 
 postResetPassword parameters:
 
-```
+```ts
   token: string,
   password: string,
   password_confirmation: string,
@@ -3170,11 +3172,11 @@ Wrap your component with the Core component.
 </ResetPasswordCore>
 ```
 
-# Utils
+## Utils
 
 `deleteAllData` asynchronously deletes all the data stored in the local storage. Use this with caution, only in an edge case.
 
-# Changelog
+## Changelog
 
 ## Version 1.0.32
 
@@ -3189,7 +3191,7 @@ Wrap your component with the Core component.
 - Show errors in Billing UI form fields.
 - Add config prop to Billing UI component, includes 2 configuration flags.
 
-```
+```ts
   config?: {
     isCheckoutAlwaysButtonEnabled?: boolean
     shouldHideTicketHolderSectionOnSingleTicket?: boolean
@@ -3205,7 +3207,7 @@ Wrap your component with the Core component.
 - Expose styles to customize Stripe Card Form:
   - cardStyle?: CardFormView.Styles
 
-```
+```ts
 {
     backgroundColor?: string;
     borderWidth?: number;
@@ -3260,7 +3262,7 @@ Wrap your component with the Core component.
 
 - Update `addToCart` success response to include:
 
-```
+```ts
 isTicketFree?: boolean
 isPhoneHidden?: boolean
 ```
