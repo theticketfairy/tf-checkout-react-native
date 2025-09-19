@@ -1841,7 +1841,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               <PhoneInput
                 phoneNumber={phone}
                 onChangePhoneNumber={handleOnChangePhoneNumber}
-                styles={styles?.phoneInput}
+                styles={styles?.phoneInputStyles}
                 error={phoneError}
                 texts={{
                   label: phoneLabel,

@@ -9,13 +9,14 @@ import Foundation
 
 @objc(TFCheckoutRNModule)
 class TFCheckoutRNModule: NSObject {
+  
   @objc
-  func constantsToExport() -> [AnyHashable : Any]! {
-    return ["count": 1]
+  static func moduleName() -> String {
+    return "TFCheckoutRNModule"
   }
-
+  
   @objc
-  static func requiresMainQueueSetup() -> Bool {
-    return true
+  func constantsToExport() -> [AnyHashable : Any] {
+    return ["count": 1]
   }
 }

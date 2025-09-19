@@ -67,6 +67,7 @@ import {
   IRestorePasswordData,
   IRestorePasswordResponse,
   IStatesResponse,
+  IUpdateCheckoutResponse,
   IUserProfileResponse,
 } from './types'
 
@@ -681,10 +682,10 @@ export const addToCart = async (
 
   if (!responseError) {
     setCustomHeader(response)
-    const { attributes } = response?.data?.data
+    const { attributes } = response?.data
 
     responseData = {
-      isBillingRequired: !attributes?.skip_billing_page ?? true,
+      isBillingRequired: !attributes?.skip_billing_page,
       isNameRequired: attributes?.names_required ?? false,
       isAgeRequired: attributes?.age_required ?? false,
       isPhoneRequired: attributes?.phone_required ?? false,
@@ -901,13 +902,14 @@ export const fetchCart = async (): Promise<ICartResponse> => {
       }
     }
   )
-
-  if (res?.data?.data?.attributes) {
-    const attr = res?.data?.data?.attributes
+  const data = res?.data.data
+  if (data?.attributes) {
+    const attr = data?.attributes
     const quantityString = _get(attr, 'cart[0].quantity', '1')
     const tfOptIn = _get(attr, 'ttfOptIn', false)
     const isMarketingOptedIn = _get(attr, 'optedIn', false)
     const expiresAt = _get(attr, 'expiresAt', 420)
+    const eventId = _get(attr, 'eventId', null)
 
     cartData = {
       quantity: parseInt(quantityString, 10),
@@ -918,6 +920,13 @@ export const fetchCart = async (): Promise<ICartResponse> => {
       isTfOptInHidden: _get(attr, 'hide_ttf_opt_in', false),
       isTfOptIn: typeof tfOptIn === 'number' ? tfOptIn > 0 : tfOptIn,
       expiresAt: expiresAt,
+    }
+
+    return {
+      success: true,
+      cartError: responseError,
+      cartData,
+      eventId: eventId,
     }
   } else {
     responseError = {
@@ -1096,6 +1105,83 @@ export const fetchOrderReview = async (
   return {
     orderReviewError: responseError,
     orderReviewData: resData,
+  }
+}
+
+// Update checkout with add-ons and pricing
+export const updateCheckout = async (
+  data: any
+): Promise<IUpdateCheckoutResponse> => {
+  let responseError: IError | undefined
+  let responseData: any | undefined
+
+  const response: AxiosResponse | void = await Client.post('v1/checkout', {
+    data,
+  }).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message || 'Error updating checkout',
+      code: error.response?.status,
+    }
+  })
+
+  if (response?.data) {
+    responseData = response.data
+  }
+
+  return {
+    success: !responseError,
+    error: responseError,
+    data: responseData,
+  }
+}
+
+// Get add-ons for event
+export const getAddons = async (eventId: string): Promise<any> => {
+  let responseError: IError | undefined
+  let addonsData: any = {}
+
+  const response: AxiosResponse | void = await Client.get(
+    `v1/event/${eventId}/add-ons`
+  ).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message || 'Error fetching add-ons',
+      code: error.response?.status,
+    }
+  })
+
+  if (response?.data?.data?.attributes) {
+    addonsData = response.data.data.attributes
+  }
+
+  return {
+    data: addonsData,
+    error: responseError,
+    success: !responseError,
+  }
+}
+
+// Get payment data and order review
+export const getPaymentData = async (hash: string): Promise<any> => {
+  let responseError: IError | undefined
+  let responseData: any | undefined
+
+  const response: AxiosResponse | void = await Client.get(
+    `v1/order/${hash}/review`
+  ).catch((error: AxiosError) => {
+    responseError = {
+      message: error.response?.data.message || 'Error fetching payment data',
+      code: error.response?.status,
+    }
+  })
+
+  if (response?.data) {
+    responseData = response.data
+  }
+
+  return {
+    success: !responseError,
+    error: responseError,
+    data: responseData,
   }
 }
 

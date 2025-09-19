@@ -223,7 +223,7 @@ export const billingInfoStyles: IBillingInfoViewStyles = {
       },
     },
   },
-  phoneInput: {
+  phoneInputStyles: {
     input: {
       baseColor: Color.textMain,
       color: Color.textMain,

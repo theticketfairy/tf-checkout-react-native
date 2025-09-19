@@ -166,7 +166,7 @@ const LoginView: FC<ILoginViewProps> = ({
     setData({ ...data, loginPassword: text })
   //#endregion Text Changed
 
-  const renderContent = () => {
+  const renderContent = (): React.ReactElement => {
     switch (content) {
       case 'login':
         return (
@@ -215,7 +215,27 @@ const LoginView: FC<ILoginViewProps> = ({
         )
 
       default:
-        return LoginForm
+        return (
+          <LoginForm
+            email={loginEmail}
+            emailError={loginEmailError}
+            onEmailChanged={handleOnLoginEmailChanged}
+            password={loginPassword}
+            passwordError={loginPasswordError}
+            onPasswordChanged={handleOnLoginPasswordChanged}
+            onPressLoginButton={handleOnPressLogin}
+            onPressForgotPassword={onPressForgotPassword}
+            viewProps={{
+              styles: styles,
+              texts: texts,
+            }}
+            loginApiError={loginApiError}
+            isLoginButtonDisabled={!checkIsLoginDataValid()}
+            isLoading={isLoading}
+            brandImages={BrandImages}
+            isShowPasswordButtonVisible={isShowPasswordButtonVisible}
+          />
+        )
     }
   }
 

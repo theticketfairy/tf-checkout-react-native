@@ -5,13 +5,16 @@ import {
   Image,
   RefreshControl,
   SafeAreaView,
+  StyleProp,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
 } from 'react-native'
 
 import { IMyOrdersOrder } from '../../api/types'
 import { Dropdown, Loading } from '../../components'
+import { IDropdownStyles } from '../../components/dropdown/types'
 import R from '../../res'
 import OrderListItem from './components/OrderListItem'
 import { MyOrdersViewStyles as s } from './styles'
@@ -57,7 +60,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
 
   //#region Renders
   const renderOrderListItem = useCallback(
-    ({ item }) => (
+    ({ item }: { item: any }) => (
       <OrderListItem
         order={item}
         onSelectOrder={handleOnSelectOrder}
@@ -77,16 +80,19 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
     />
   )
 
-  const dropdownStyles = useMemo(() => {
-    return {
+  const dropdownStyles = useMemo<IDropdownStyles>(
+    () => ({
       container: s.eventsDropdownContainer,
       button: s.eventsDropdownButton,
       label: {
-        maxWidth: '75%',
-      },
-      ...styles?.eventsDropdown,
-    }
-  }, [styles?.eventsDropdown])
+        maxWidth: '100%',
+      } as StyleProp<TextStyle>,
+      icon: {},
+      dialog: {},
+      flatListContainer: {},
+    }),
+    []
+  )
 
   const onClearSelectedEvent = () =>
     onChangeEvent({

@@ -400,6 +400,43 @@ export interface ICartData {
 export interface ICartResponse {
   cartData?: ICartData
   cartError?: IError
+  eventId?: string
+  success?: boolean
+}
+
+export interface IUpdateCheckoutResponse {
+  success: boolean
+  error?: IError
+  data?: {
+    data: {
+      attributes: {
+        additional_payment_information: {
+          additional_config: any
+          basic_config: any
+          elements_config: any
+          payment_plan_available: boolean
+          stripe_wallets: any
+        }
+        cart_price_breakdown: {
+          add_ons_price_breakdown: any[]
+          currency: any
+          debt: number
+          event_name: string
+          goods_tax: number
+          goods_tax_name: string
+          guest_count: number
+          guest_revenue: number
+          insurance_amount: number
+          insurance_items_breakdown: any[]
+          payment_option_additional_fees: number
+          tickets_price_breakdown: any[]
+          total: number
+          total_add_ons: number
+        }
+        add_ons?: any[]
+      }
+    }
+  }
 }
 
 export interface ICountriesResponse {

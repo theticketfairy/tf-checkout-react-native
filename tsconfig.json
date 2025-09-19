@@ -6,13 +6,15 @@
     "lib": ["ESNext"],
     "module": "ESNext",
     "moduleResolution": "Node",
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "outDir": "./lib",
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
     "target": "ES2018",
+    "typeRoots": ["./node_modules/@types"],
+    "types": []
   },
-  "exclude": ["**/__tests__/*"],
-  "include": ["src"]
+  "exclude": ["**/__tests__/*", "node_modules/**/*", "lib/**/*", "example/**/*", "android/**/*", "ios/**/*"],
+  "include": ["src/**/*"]
 }

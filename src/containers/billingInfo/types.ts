@@ -154,7 +154,7 @@ export interface IBillingInfoViewStyles {
 
   privacyPolicyLinkStyle?: StyleProp<TextStyle>
 
-  phoneInput?: IPhoneInputStyles
+  phoneInputStyles?: IPhoneInputStyles
 
   cartTimer?: ICartTimerStyles
 }

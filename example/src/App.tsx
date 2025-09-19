@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View, Switch } from 'react-native'
 import {
   Checkout,
   IMyOrderDetailsData,
@@ -16,12 +16,14 @@ import {
   ResaleTickets,
   ResetPassword,
   SessionHandleType,
+  CheckoutSP,
 } from 'tf-checkout-react-native'
 import { IConfig } from '../../src/helpers/Config'
 import R from '../../src/res'
 import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles, { billingInfoStyles } from './styles'
+import { IMyOrderDetailsTicket } from '../../src/api/types'
 
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
@@ -31,12 +33,12 @@ interface IDeepLinkUrl {
   url: string
 }
 
-const EVENT_ID = 13369
+const EVENT_ID = 14065
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
-  CLIENT: 'mana',
-  BRAND: 'mana-common',
+  CLIENT: 'ttf',
+  BRAND: 'time-slot',
   ARE_SUB_BRANDS_INCLUDED: true,
   ENV: 'STAG',
 }
@@ -46,6 +48,9 @@ const config: IConfig = {
 // the-ticket-fairy
 
 const App = () => {
+  // Toggle for checkout mode
+  const [isSinglePageCheckout, setIsSinglePageCheckout] = useState(false)
+  
   const resetPasswordTokenRef = useRef('')
   const isAppLoaded = useRef<null | boolean>(null)
 
@@ -70,7 +75,6 @@ const App = () => {
     IOnCheckoutSuccess | undefined
   >(undefined)
 
-  const [isPaymentSuccess, setIsPaymentSuccess] = useState<boolean | undefined>(undefined)
   const [selectedOrderDetails, setSelectedOrderDetails] =
     useState<IMyOrderDetailsData>()
 
@@ -81,15 +85,22 @@ const App = () => {
   const [isTicketToSellActive, setIsTicketToSellActive] = useState<
     boolean | undefined
   >(undefined)
+
+  // User login state
+  const [userFirstName, setUserFirstName] = useState<string>('')
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false)
+
+  // Order hash for purchase confirmation (used by single page checkout)
+  const [orderHash, setOrderHash] = useState<string>('')
   
   const resetData = () => {
-    console.log('%cApp.tsx line:85 Reseting data', 'color: white; background-color: #FF0000;');
     setCartProps(undefined)
     setIsLoading(false)
     setSkippingStatus(undefined)
     setCheckOutProps(undefined)
-    setIsPaymentSuccess(undefined)
+    setOrderHash('')
     setComponentToShow(ComponentEnum.Tickets)
+    // Keep user login state intact during reset - don't clear userFirstName/isUserLoggedIn
   }
   
   //#region Handlers
@@ -101,19 +112,45 @@ const App = () => {
 
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
     setCartProps(data)
+    setComponentToShow(isSinglePageCheckout ? ComponentEnum.CheckoutSP : ComponentEnum.BillingInfo)
   }
 
   const handleOnLoginSuccess = (data: any) => {
+    // Extract user info from login response - handle both formats
+    let firstName = ''
+    
+    if (data?.userProfile) {
+      // Single page checkout format: { userProfile: { firstName: ... }, accessTokenData: ... }
+      firstName = data.userProfile.firstName || data.userProfile.first_name || ''
+    } else if (data && (data.firstName || data.first_name || data.user?.firstName)) {
+      // Two-step checkout format: { firstName: ... } or { user: { firstName: ... } }
+      firstName = data.firstName || data.first_name || data.user?.firstName || ''
+    }
+    
+    if (firstName) {
+      setUserFirstName(firstName)
+      setIsUserLoggedIn(true)
+    }
   }
 
-  const handleOnFetchUserProfileSuccess = () => {}
+  const handleOnFetchUserProfileSuccess = (userProfile?: any) => {
+    // If user profile is fetched successfully, user is logged in
+    if (userProfile && (userProfile.firstName || userProfile.first_name)) {
+      const firstName = userProfile.firstName || userProfile.first_name || ''
+      setUserFirstName(firstName)
+      setIsUserLoggedIn(true)
+    }
+  }
 
   const handleOnCheckoutSuccess = (data: IOnCheckoutSuccess) => {
     setCheckOutProps(data)
+    if(!isSinglePageCheckout) {
+      setComponentToShow(ComponentEnum.Checkout)
+    }
   }
 
   const handleOnPaymentSuccess = () => {
-    setIsPaymentSuccess(true)
+    setComponentToShow(ComponentEnum.PurchaseConfirmation)
   }
 
   const handleOnComplete = () => {
@@ -122,6 +159,7 @@ const App = () => {
 
   const handleOnSelectOrder = (order: IMyOrderDetailsData) => {
     setSelectedOrderDetails(order)
+    setComponentToShow(ComponentEnum.MyOrderDetails)
   }
 
   const handleOnPressMyOrders = () => {
@@ -129,6 +167,8 @@ const App = () => {
   }
 
   const handleOnPressLogout = () => {
+    setUserFirstName('')
+    setIsUserLoggedIn(false)
   }
 
   const handleOnDismissMyOrders = () => {
@@ -191,7 +231,6 @@ const App = () => {
 
   //#region effects
   useEffect(() => {
-    console.log('initial useEffect')
     setTimeout(() => { ticketsRef.current?.refreshAccessToken() }, 2000)
     const setConfigAsync = async () => {
       setIsCheckingCurrentSession(true)
@@ -204,30 +243,10 @@ const App = () => {
     isAppLoaded.current = true
 
     return () => {
-      console.log('Removing all event listeners')
       Linking.removeAllListeners('url')
     }
   }, [])
 
-  useEffect(() => {
-    if (cartProps) {
-      setComponentToShow(ComponentEnum.BillingInfo)
-    }
-  }, [cartProps])
-
-  useEffect(() => {
-    if (checkoutProps) {
-      setComponentToShow(ComponentEnum.Checkout)
-    }
-  }, [checkoutProps])
-
-  useEffect(() => {
-    if (isPaymentSuccess !== undefined && isPaymentSuccess === true) {
-      setTimeout(() => {
-        setComponentToShow(ComponentEnum.PurchaseConfirmation)
-      }, 250)
-    }
-  }, [isPaymentSuccess])
 
   useEffect(() => {
     if (selectedOrderDetails) {
@@ -240,16 +259,224 @@ const App = () => {
     getInitialURL()
   }
 
+  // Toggle UI Component
+  const RenderToggle = () => (
+    <View style={{ backgroundColor: Color.backgroundMain }}>
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: Color.textMainOff
+      }}>
+        <Text style={{ color: Color.textMain, marginRight: 10, fontWeight: '600' }}>
+          Two-Step Checkout
+        </Text>
+        <Switch
+          value={isSinglePageCheckout}
+          onValueChange={setIsSinglePageCheckout}
+          trackColor={{ false: Color.textMainOff, true: Color.primary }}
+          thumbColor={isSinglePageCheckout ? Color.white : Color.white}
+        />
+        <Text style={{ color: Color.textMain, marginLeft: 10, fontWeight: '600' }}>
+          Single Page Checkout
+        </Text>
+      </View>
+    </View>
+  )
   const RenderComponent = () => {
+    // Two-Step Checkout Mode (existing logic)
     switch (componentToShow) {
+      case ComponentEnum.CheckoutSP:
+        return (
+          <CheckoutSP
+            onPaymentSuccess={(orderData) => {
+              // For single page checkout, store the hash separately
+              if (orderData) {
+                setOrderHash(orderData.orderHash)
+                setOrderHash(orderData.orderHash)
+              }
+              handleOnPaymentSuccess()
+            }}
+            isAgeRequired={cartProps?.isAgeRequired}
+            minimumAge={cartProps?.minimumAge}
+            loginBrandImages={{
+              image1: GOOGLE_IMAGE,
+              image1Style: {
+                height: 50,
+                width: 100,
+                resizeMode: 'contain',
+                tintColor: undefined
+              },
+              image2: AMAZON_IMAGE,
+              image2Style: {
+                height: 50,
+                width: 100,
+                resizeMode: 'contain',
+                tintColor: undefined,
+                marginBottom: 16
+              },
+            }}
+            areAlertsEnabled={true}
+            areLoadingIndicatorsEnabled={true}
+            shouldCartTimerNotMinimizeOnTap={false}
+            userFirstName={userFirstName}
+            onLoginSuccess={(data) => {
+              handleOnLoginSuccess(data)
+            }}
+            onLogoutSuccess={() => {
+              setUserFirstName('')
+              setIsUserLoggedIn(false)
+              setComponentToShow(ComponentEnum.Tickets)
+              setCartProps(undefined)
+              setCheckOutProps(undefined)
+            }}
+            onCartExpired={handleOnCartExpired}
+            texts={{
+                form: {
+                  getYourTicketsTitle: '_Get your tickets_',
+                  firstName: '_First name_',
+                  lastName: '_Last name_',
+                  email: '_Email_',
+                  phone: '_Phone_',
+                  confirmEmail: '_Confirm email_',
+                  street: '_Street_',
+                  city: '_City_',
+                  country: '_Country_',
+                  zipCode: '_Zip code_',
+                  state: '_State_',
+                  dateOfBirth: '_Date of birth_',
+                  isSubToBrand: '_Is sub to Brand_',
+                  isSubToTicketFairy: '_Is sub to ticket fairy_',
+                  password: '_Password_',
+                  confirmPassword: '_Confirm password_',
+                  emailsAdvice: '_Emails advice_',
+                  choosePassword: '_Choose password_',
+                },
+                checkoutButton: '_Checkout_',
+                screenTitle: '_Get your tickets_',
+                providePaymentInfo: '_Provide Payment Info_',
+                paymentTitle: '_Payment_',
+                addonMainTitle: '_UPGRADES & ADD-ONS_',
+                addonSubTitle: '_PLEASE SELECT FROM THE OPTIONAL ADD-ONS BELOW_',
+                loginTexts: {
+                  loginButton: '_Login_',
+                  logoutButton: '_Logout_',
+                  line1: '_Line 1_',
+                  line2: '_Line 2_',
+                  message: '_Message_',
+                  logoutDialog: {
+                    title: '_Logout?_',
+                    message: '_sure to logout?_',
+                    confirm: '_yes_',
+                    cancel: '_cancel_',
+                  },
+                  dialog: {
+                    loginButton: '_Dialog_login_',
+                    message: '_Dialog message_',
+                    emailLabel: '_Dialog email label_',
+                    passwordLabel: '_Dialog password label_',
+                    title: '_Login title_',
+                  },
+                  loggedIn: {
+                    loggedAs: '_Logged in:_',
+                    notYou: '_Not you?_',
+                  }
+                }
+            }}
+            styles={{
+              ...billingInfoStyles,
+              // Fix addon styles to prevent black on black
+              addonSection: {
+                marginBottom: 24,
+                paddingHorizontal: 20,
+                paddingVertical: 20,
+                backgroundColor: '#ffffff', // Light background
+                borderRadius: 16,
+              },
+              addonMainTitle: {
+                fontSize: 20,
+                fontWeight: '700',
+                color: '#1f2937',  // Dark color for contrast
+                textAlign: 'center',
+                marginBottom: 8,
+              },
+              addonSubtitle: {
+                fontSize: 14,
+                fontWeight: '500',
+                color: '#6b7280',  // Medium gray
+                textAlign: 'center',
+                marginBottom: 20,
+              },
+              addonItem: {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                paddingVertical: 16,
+                paddingHorizontal: 16,
+                marginBottom: 12,
+                backgroundColor: '#f9fafb', // Very light gray
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: '#e5e7eb',
+              },
+              addonName: {
+                fontSize: 16,
+                fontWeight: '600',
+                color: '#1f2937',  // Dark text
+                marginBottom: 6,
+              },
+              // Card style fix (match Checkout)
+              payment: {
+                container: {
+                  marginTop: 16,
+                  marginBottom: 16,
+                },
+                title: {
+                  fontSize: 16, 
+                  fontWeight: '600',
+                  marginBottom: 16,
+                  color: '#374151'
+                },
+                cardContainer: {
+                  marginTop: 24,
+                  minHeight: Platform.OS === 'ios' ? 180 : 270,
+                  maxHeight: Platform.OS === 'ios' ? 300 : 350,
+                  borderRadius: 10,
+                  // padding: 8,
+                  alignSelf: 'center',
+                },
+                cardStyle: {
+                  backgroundColor: '#FFFFFF',
+                  textColor: '#000000',
+                }
+              },
+              // Order review style fix
+              orderReview: {
+                item: {
+                  title: { 
+                    color: '#6b7280', 
+                    fontSize: 14,
+                    fontWeight: '500'
+                  },
+                  value: { 
+                    color: '#1f2937',
+                    fontSize: 14,
+                    fontWeight: '600'
+                  },
+                }
+              },
+            }}
+          />
+        )
       case ComponentEnum.BillingInfo:
         return (
-          <>
           <BillingInfo
-          config={{
+            config={{
             isCheckoutAlwaysButtonEnabled: true,
             shouldHideTicketHolderSectionOnSingleTicket: true,
-          }}
+            }}
             ref={billingRef}
             onCartExpired={handleOnCartExpired}
             onSkippingStatusChange={setSkippingStatus}
@@ -269,9 +496,9 @@ const App = () => {
                   tintColor: undefined,
                   marginBottom: 16
                 },
-              }}
-              onLoadingChange={setIsLoading}
-              texts={{
+            }}
+            onLoadingChange={setIsLoading}
+            texts={{
                 form: {
                   getYourTicketsTitle: '_Get your tickets_',
                   firstName: '_First name_',
@@ -327,23 +554,23 @@ const App = () => {
                     notYou: '_Not you?_',
                   }
                 }
-              }}
-              styles={billingInfoStyles}
-              cartProps={cartProps!}
-              onCheckoutSuccess={handleOnCheckoutSuccess}
-              onLoginSuccess={handleOnLoginSuccess}
-              onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}       
-              onLogoutSuccess={() => {
-                setComponentToShow(ComponentEnum.Tickets)
-                setCartProps(undefined)
-                setCheckOutProps(undefined)
-              }}    
-              />
-          </>
+            }}
+            styles={billingInfoStyles}
+            cartProps={cartProps!}
+            onCheckoutSuccess={handleOnCheckoutSuccess}
+            onLoginSuccess={handleOnLoginSuccess}
+            onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}       
+            onLogoutSuccess={() => {
+              setUserFirstName('')
+              setIsUserLoggedIn(false)
+              setComponentToShow(ComponentEnum.Tickets)
+              setCartProps(undefined)
+              setCheckOutProps(undefined)
+            }}    
+            />
         )
       case ComponentEnum.Checkout:
         return (
-          <>
           <Checkout
             checkoutData={checkoutProps!}
             onPaymentSuccess={handleOnPaymentSuccess}
@@ -408,8 +635,9 @@ const App = () => {
               },
             }}            
             texts={{
-              title: '_Get your tickets_',
-              subTitle: '_subtitle_',
+              screenTitle: '_Get your tickets_',
+              title: '_GET YOUR TICKETS_',
+              subTitle: '_Order review_',
               orderReviewItems: {
                 event: '_EVENTO_',
                 ticketType: '_TICKET_TYPE_',
@@ -421,12 +649,11 @@ const App = () => {
               payButton: '_PAY_'
             }}
             />
-          </>
         )
       case ComponentEnum.PurchaseConfirmation:
         return (
           <PurchaseConfirmation
-            orderHash={checkoutProps!.hash}
+            orderHash={orderHash || checkoutProps?.hash || ''}
             onComplete={handleOnComplete}
             texts={{
               title: '_Purchase Confirmation_',
@@ -740,7 +967,8 @@ const App = () => {
                   sell: '_Sell_Ticket_',
                 }
               }}
-              onPressResaleTicket={handleOnPressSellTicket} onRemoveTicketFromResaleSuccess={(message) => {
+              onPressResaleTicket={handleOnPressSellTicket} 
+              onRemoveTicketFromResaleSuccess={(message) => {
                 console.log('onRemoveTicketFromResaleSuccess', message)
               }} 
                          
@@ -794,139 +1022,139 @@ const App = () => {
         case ComponentEnum.ResaleTickets:
         return (
           <View style={{flex: 1}}>
-          <ResaleTickets
-              texts={{
-                title: '_Resale Tickets_',
-              }}
-              ticket={ticketToSell!}
-              styles={{
-                title: {
-                  color: Color.textMain,
-                  fontSize: 20,
-                  fontWeight: '700',
-                  marginLeft: 16,
-                },
-                ticketOrderDetails: {
-                  rootContainer: {
-                    marginVertical: 16,
-                    paddingHorizontal: 16,
-                  },
+            <ResaleTickets
+                texts={{
+                  title: '_Resale Tickets_',
+                }}
+                ticket={ticketToSell!}
+                styles={{
                   title: {
                     color: Color.textMain,
-                    fontSize: 18,
+                    fontSize: 20,
+                    fontWeight: '700',
+                    marginLeft: 16,
                   },
-                  label: {
-                    color: Color.textMainOff,
-                  },
-                  value: {
-                    color: Color.textMain,
-                  },
-                },
-                termsCheckbox: {
-                  container: {
-                    marginTop: 16
-                  },
-                  text: {
-                    color: Color.textMain,
-                  },
-                  indicator: {
-                    backgroundColor: Color.validationGreen,
-                  },
-                  indicatorDisabled: {
-                    borderColor: Color.white
-                  }
-                },
-                ticketBuyerForm: {
-                  rootContainer: {
-                    paddingHorizontal: 16,
-                    marginBottom: 16,
-                  },
-                  inputs: {
-                    baseColor: Color.textMain,
-                    input: {
+                  ticketOrderDetails: {
+                    rootContainer: {
+                      marginVertical: 16,
+                      paddingHorizontal: 16,
+                    },
+                    title: {
+                      color: Color.textMain,
+                      fontSize: 18,
+                    },
+                    label: {
+                      color: Color.textMainOff,
+                    },
+                    value: {
                       color: Color.textMain,
                     },
-                    errorColor: Color.danger,
                   },
-                  radioButtons: {
-                    rootContainer: {
-                      marginVertical: 8,
-                    },
-                    indicator: {
-                      backgroundColor: Color.textMain,
-                    },
-                    radio: {
-                      borderColor: Color.textMainOff,
+                  termsCheckbox: {
+                    container: {
+                      marginTop: 16
                     },
                     text: {
                       color: Color.textMain,
                     },
+                    indicator: {
+                      backgroundColor: Color.validationGreen,
+                    },
+                    indicatorDisabled: {
+                      borderColor: Color.white
+                    }
                   },
-                  title: {
-                    fontSize: 20,
-                    fontWeight: '700',
-                    marginBottom: 16,
-                    color: Color.textMain,
+                  ticketBuyerForm: {
+                    rootContainer: {
+                      paddingHorizontal: 16,
+                      marginBottom: 16,
+                    },
+                    inputs: {
+                      baseColor: Color.textMain,
+                      input: {
+                        color: Color.textMain,
+                      },
+                      errorColor: Color.danger,
+                    },
+                    radioButtons: {
+                      rootContainer: {
+                        marginVertical: 8,
+                      },
+                      indicator: {
+                        backgroundColor: Color.textMain,
+                      },
+                      radio: {
+                        borderColor: Color.textMainOff,
+                      },
+                      text: {
+                        color: Color.textMain,
+                      },
+                    },
+                    title: {
+                      fontSize: 20,
+                      fontWeight: '700',
+                      marginBottom: 16,
+                      color: Color.textMain,
+                    },
+                    formContainer: {
+                      marginVertical: 16,
+                    },
                   },
-                  formContainer: {
-                    marginVertical: 16,
+                  resaleTicketsButton: {
+                    button: {
+                      backgroundColor: Color.primary,
+                      width: '70%',
+                      borderRadius: 2,
+                    },
+                    container: {
+                      marginBottom: 32
+                    },
                   },
-                },
-                resaleTicketsButton: {
-                  button: {
-                    backgroundColor: Color.primary,
-                    width: '70%',
-                    borderRadius: 2,
+                  resaleTicketsButtonDisabled: {
+                    container: {
+                      marginBottom: 32
+                    },
+                    button: {
+                      backgroundColor: Color.gray20,
+                      width: '70%',
+                      borderRadius: 2,
+                    },
                   },
-                  container: {
-                    marginBottom: 32
+                  terms: {
+                    rootContainer: {
+                      marginTop: 16,
+                      paddingHorizontal: 16,
+                    },
+                    title: {
+                      color: Color.textMain,
+                      fontSize: 20,
+                      fontWeight: '700',
+                      marginBottom: 16,
+                    },
+                    item: {
+                      color: Color.textMain,
+                    },
+                    itemBold: {
+                      fontWeight: '900',
+                    },
                   },
-                },
-                resaleTicketsButtonDisabled: {
-                  container: {
-                    marginBottom: 32
-                  },
-                  button: {
-                    backgroundColor: Color.gray20,
-                    width: '70%',
-                    borderRadius: 2,
-                  },
-                },
-                terms: {
-                  rootContainer: {
-                    marginTop: 16,
-                    paddingHorizontal: 16,
-                  },
-                  title: {
-                    color: Color.textMain,
-                    fontSize: 20,
-                    fontWeight: '700',
-                    marginBottom: 16,
-                  },
-                  item: {
-                    color: Color.textMain,
-                  },
-                  itemBold: {
-                    fontWeight: '900',
-                  },
-                },
-               
                 
-              }}
-              onResaleTicketsSuccess={(resaleTicketData, ticket) => {
-                const newOrderDetails: IMyOrderDetailsData = { ...selectedOrderDetails! }
-                _.forEach(newOrderDetails.tickets, (itm) => {
-                  if (itm.hash === ticket.hash) {
-                    itm.isOnSale = true
-                    itm.isSellable = false
-                  }
-                })
+                  
+                }}
+                onResaleTicketsSuccess={(resaleTicketData, ticket) => {
+                  const newOrderDetails: IMyOrderDetailsData = { ...selectedOrderDetails! }
+                  _.forEach(newOrderDetails.tickets, (itm) => {
+                    if (itm.hash === ticket.hash) {
+                      itm.isOnSale = true
+                      itm.isSellable = false
+                    }
+                  })
 
-                setSelectedOrderDetails(newOrderDetails)
-                setComponentToShow(ComponentEnum.MyOrderDetails)
-              } } 
-              isTicketTypeActive={isTicketToSellActive}            
-          />
+                  setSelectedOrderDetails(newOrderDetails)
+                  setComponentToShow(ComponentEnum.MyOrderDetails)
+                } } 
+                isTicketTypeActive={isTicketToSellActive}            
+            />
             <TouchableOpacity
               onPress={handleOnDismissResaleTickets}
               style={{
@@ -945,11 +1173,11 @@ const App = () => {
         return (
           <View style={{ flex: 1 }}>
             <Tickets
-            ref={ticketsRef}
-            referrerId={referredId}
-            config={{
-              areTicketsGrouped: false,
-            }}
+              ref={ticketsRef}
+              referrerId={referredId}
+              config={{
+                areTicketsGrouped: false,
+              }}
               isCheckingCurrentSession={isCheckingCurrentSession}
               onLoadingChange={(loading) => setIsLoading(loading)}
               onFetchTicketsError={(error) => {
@@ -1118,7 +1346,6 @@ const App = () => {
                   },
                 },
               }}
-
               texts={{
                 promoCode: {
                   promoCodeButton: '_PROMO_CODE_',
@@ -1143,7 +1370,10 @@ const App = () => {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>{RenderComponent()}</SafeAreaView>
+    <SafeAreaView style={styles.safeArea}>
+      {componentToShow === ComponentEnum.Tickets && <RenderToggle />}
+      {RenderComponent()}
+    </SafeAreaView>
   )
 }
 
