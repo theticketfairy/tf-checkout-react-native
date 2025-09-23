@@ -124,6 +124,7 @@ Client.interceptors.response.use(
     return response
   },
   async (error: AxiosError) => {
+    console.log('API ERROR:', JSON.stringify(error))
     if (error?.response?.status === 401) {
       error.code = error.code
       error.message = error.response.data.error_description

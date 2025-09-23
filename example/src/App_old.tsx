@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View, Switch } from 'react-native'
 import {
   Checkout,
-  CheckoutV2,
   IMyOrderDetailsData,
   IOnCheckoutSuccess,
   MyOrderDetails,
@@ -113,7 +112,7 @@ const App = () => {
 
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
     setCartProps(data)
-    setComponentToShow(ComponentEnum.CheckoutV2)
+    setComponentToShow(isSinglePageCheckout ? ComponentEnum.CheckoutSP : ComponentEnum.BillingInfo)
   }
 
   const handleOnLoginSuccess = (data: any) => {
@@ -159,7 +158,6 @@ const App = () => {
   }
 
   const handleOnSelectOrder = (order: IMyOrderDetailsData) => {
-    console.log('handleOnSelectOrder', order)
     setSelectedOrderDetails(order)
     setComponentToShow(ComponentEnum.MyOrderDetails)
   }
@@ -288,50 +286,8 @@ const App = () => {
     </View>
   )
   const RenderComponent = () => {
-    // Checkout flow using components
+    // Two-Step Checkout Mode (existing logic)
     switch (componentToShow) {
-      case ComponentEnum.CheckoutV2:
-        return (
-          <CheckoutV2
-            isSinglePageCheckout={isSinglePageCheckout}
-            isAgeRequired={cartProps?.isAgeRequired}
-            minimumAge={cartProps?.minimumAge}
-            onCartExpired={handleOnCartExpired}
-            onLoginSuccess={handleOnLoginSuccess}
-            onLogoutSuccess={() => {
-              setUserFirstName('')
-              setIsUserLoggedIn(false)
-              setComponentToShow(ComponentEnum.Tickets)
-              setCartProps(undefined)
-              setCheckOutProps(undefined)
-            }}
-            onPaymentSuccess={(orderData) => {
-              if (orderData) {
-                setOrderHash(orderData.orderHash)
-              }
-              handleOnPaymentSuccess()
-            }}
-            onCheckoutSuccess={handleOnCheckoutSuccess}
-            loginBrandImages={{
-              image1: GOOGLE_IMAGE,
-              image1Style: {
-                height: 50,
-                width: 100,
-                resizeMode: 'contain',
-                tintColor: undefined
-              },
-              image2: AMAZON_IMAGE,
-              image2Style: {
-                height: 50,
-                width: 100,
-                resizeMode: 'contain',
-                tintColor: undefined,
-                marginBottom: 16
-              },
-            }}
-          />
-        )
-      
       case ComponentEnum.CheckoutSP:
         return (
           <CheckoutSP

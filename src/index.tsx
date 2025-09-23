@@ -22,6 +22,7 @@ import {
   PromoCode,
   WaitingList,
 } from './components'
+import { CheckoutControllerWrapper as CheckoutV2 } from './components/checkout-v2'
 import { IDropdownStyles } from './components/dropdown/types'
 import { ILoadingStyles } from './components/loading/types'
 import { ILoginSuccessData } from './components/login/types'
@@ -106,6 +107,7 @@ export {
   CheckoutCore,
   CheckoutCoreHandle,
   CheckoutSP,
+  CheckoutV2,
   deleteAllData,
   deleteUserData,
   Dropdown,

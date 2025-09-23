@@ -678,7 +678,7 @@ export const useCheckout = ({
         logger.info('Fetching payment data', { orderHash: hash })
         const { success: paymentSuccess, data: paymentDataResponse } =
           await getPaymentData(String(hash))
-
+        console.log('paymentDataResponse', paymentDataResponse)
         if (!paymentSuccess || !paymentDataResponse) {
           logger.error('Failed to fetch payment data', { orderHash: hash })
           throw new Error('Unable to fetch payment data')

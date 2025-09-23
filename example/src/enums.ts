@@ -8,4 +8,5 @@ export enum ComponentEnum {
   MyOrderDetails,
   ResaleTickets,
   ResetPassword,
+  CheckoutV2,
 }

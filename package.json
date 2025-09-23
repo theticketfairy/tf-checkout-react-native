@@ -35,6 +35,9 @@
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-transform-private-methods": "^7.27.1",
+    "@babel/plugin-transform-private-property-in-object": "^7.27.1",
     "@babel/runtime": "7.16.3",
     "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-clipboard/clipboard": "^1.14.0",
@@ -57,7 +60,6 @@
     "jest": "27.3.1",
     "jwt-decode": "3.1.2",
     "lodash": "4.17.21",
-    "yup": "^1.4.0",
     "metro-react-native-babel-preset": "^0.70.3",
     "react": "18.1.0",
     "react-native": "0.72.9",
@@ -68,7 +70,8 @@
     "react-native-modal-datetime-picker": "13.0.0",
     "react-test-renderer": "18.1.0",
     "rn-material-ui-textfield": "https://github.com/jorgtz/rn-material-ui-textfield",
-    "typescript": "4.5.2"
+    "typescript": "4.5.2",
+    "yup": "^1.4.0"
   },
   "peerDependencies": {
     "@react-native-async-storage/async-storage": "^2.0.0",
@@ -81,7 +84,6 @@
     "formik": "^2.4.5",
     "jwt-decode": "3.1.2",
     "lodash": "4.17.21",
-    "yup": "^1.4.0",
     "react": "18.1.0",
     "react-native": "0.72.9",
     "react-native-background-timer": "2.4.1",
@@ -89,7 +91,8 @@
     "react-native-fs": "2.18.0",
     "react-native-keyboard-aware-scroll-view": "0.9.5",
     "react-native-modal-datetime-picker": "13.0.0",
-    "rn-material-ui-textfield": "https://github.com/jorgtz/rn-material-ui-textfield"
+    "rn-material-ui-textfield": "https://github.com/jorgtz/rn-material-ui-textfield",
+    "yup": "^1.4.0"
   },
   "jest": {
     "preset": "react-native",
@@ -101,5 +104,8 @@
       "json",
       "node"
     ]
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.89.0"
   }
 }
