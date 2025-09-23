@@ -2,7 +2,7 @@ export const emailRegex =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
 //https://www.twilio.com/docs/glossary/what-e164
-const phoneRegex = /^\+[1-9]\d{1,14}$/
+export const phoneRegex = /^\+[1-9]\d{1,14}$/
 
 const emptyRegex = /^\s+$/
 

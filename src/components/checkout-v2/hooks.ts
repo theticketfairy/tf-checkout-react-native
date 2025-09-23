@@ -1,0 +1,568 @@
+/*
+ * COMPOSITE HOOK FOR CHECKOUT FLOW
+ *
+ * This hook is used to initialize the checkout flow
+ * and provide all the necessary data and functions
+ * to the checkout component.
+ *
+ */
+
+import {
+  BillingDetails,
+  initStripe,
+  useConfirmPayment,
+} from '@stripe/stripe-react-native'
+import { UseQueryOptions } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import BackgroundTimer from 'react-native-background-timer'
+
+import { ApiResponse } from '../../api/api.types'
+import { useCheckToken } from '../../features/auth/hooks'
+import {
+  useAddons,
+  useCart,
+  useCheckout,
+  useCountries,
+  useEventConditions,
+  useEventInfo,
+  usePaymentData,
+  usePaymentSuccess,
+  useStates,
+  useTickets,
+  useUpdateCheckout,
+  useUserProfile,
+} from './api.hooks'
+import { CheckoutFormProps, CheckoutFormValues } from './form/types'
+import { CustomerProfileResponse, IOrderItem, OrderResult } from './types'
+import { createCheckoutBody, priceWithCurrency } from './utils'
+
+interface UseCheckoutFlowProps {
+  onCartExpired?: () => void
+  isSinglePageCheckout?: boolean
+  isAgeRequired?: boolean
+  isPhoneRequired?: boolean
+  isPhoneHidden?: boolean
+  minimumAge?: number
+  onCheckoutSuccess?: (data: any) => void
+  onCheckoutError?: (error: any) => void
+  onPaymentSuccess?: (data: OrderResult) => void
+  onPaymentError?: (error: any) => void
+  //   Return true if the form should be submitted
+  onBeforeSubmit?: (values: CheckoutFormValues) => boolean | Promise<boolean>
+}
+
+interface UseCheckoutFlowReturn extends Omit<CheckoutFormProps, 'scrollRef'> {
+  secondsLeft: number | undefined
+  eventId: string | undefined
+  isInitialLoading: boolean
+  isSubmitting: boolean
+  isLoggedIn: boolean
+  setSecondsLeft: React.Dispatch<React.SetStateAction<number | undefined>>
+  setSelectedCountry: React.Dispatch<React.SetStateAction<string>>
+}
+
+export const useCheckoutFlow = ({
+  onCartExpired,
+  onCheckoutSuccess,
+  onCheckoutError,
+  onPaymentSuccess,
+  onPaymentError,
+  isAgeRequired,
+  isPhoneRequired,
+  isPhoneHidden,
+  minimumAge,
+  onBeforeSubmit,
+  isSinglePageCheckout,
+}: UseCheckoutFlowProps): UseCheckoutFlowReturn => {
+  const cartQuery = useCart()
+  const eventId = cartQuery.data?.data?.attributes?.eventId
+
+  const hasToken = useCheckToken()
+  const [orderItems, setOrderItems] = useState<IOrderItem[]>([])
+  const [secondsLeft, setSecondsLeft] = useState<number | undefined>(undefined)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const [selectedCountry, setSelectedCountry] = useState<string>('')
+  const [addons, setAddons] = useState<Record<string, number>>({})
+
+  const ticketsQuery = useTickets(eventId)
+  const eventInfoQuery = useEventInfo(eventId)
+
+  const userProfileQuery = useUserProfile({
+    enabled: !!hasToken,
+  } as UseQueryOptions<ApiResponse<CustomerProfileResponse>, AxiosError>)
+
+  const countriesQuery = useCountries()
+
+  const checkoutMutation = useCheckout()
+  const paymentDataMutation = usePaymentData()
+  const updateCheckoutMutation = useUpdateCheckout()
+  const paymentSuccessMutation = usePaymentSuccess()
+
+  const addonsQuery = useAddons(eventId)
+  const statesQuery = useStates(selectedCountry)
+  const conditionsQuery = useEventConditions(eventId)
+
+  const { confirmPayment } = useConfirmPayment()
+
+  const isInitialLoading = useMemo(() => {
+    if (cartQuery.isPending) return true
+    if (eventInfoQuery.isPending) return true
+    if (ticketsQuery.isPending) return true
+    if (countriesQuery.isPending) return true
+
+    return false
+  }, [
+    cartQuery.isPending,
+    eventInfoQuery.isPending,
+    ticketsQuery.isPending,
+    countriesQuery.isPending,
+  ])
+
+  // Prefill form with user profile data when available
+  const initialValues = useMemo(() => {
+    const base: CheckoutFormValues = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      emailConfirmation: '',
+      phone: '',
+      dateOfBirth: undefined,
+      street: '',
+      city: '',
+      postalCode: '',
+      password: '',
+      passwordConfirmation: '',
+      isSubToTicketFairy: false,
+      isSubToBrand: false,
+      isCardFormComplete: false,
+      country: '',
+      state: '',
+      addons: {},
+      acceptedConditions: {},
+    }
+
+    if (userProfileQuery.data?.data) {
+      const profile = userProfileQuery.data.data
+
+      base.firstName = profile.firstName || ''
+      base.lastName = profile.lastName || ''
+      base.email = profile.email || ''
+      base.emailConfirmation = profile.email || ''
+      base.phone = profile.phone || ''
+      base.street = profile.streetAddress || ''
+      base.city = profile.city || ''
+      base.postalCode = profile.zipCode || ''
+      base.country = profile.countryId || '-1'
+      base.state = profile.stateId || '-1'
+    }
+
+    return base
+  }, [userProfileQuery.data?.data])
+
+  const countries = useMemo(() => {
+    return countriesQuery.data?.data || []
+  }, [countriesQuery.data?.data])
+
+  const states = useMemo(() => {
+    return statesQuery?.data?.data || []
+  }, [statesQuery?.data?.data])
+
+  const availableAddons = useMemo(() => {
+    return addonsQuery.data?.data?.attributes?.add_ons || []
+  }, [addonsQuery.data?.data?.attributes?.add_ons])
+
+  const conditions = useMemo(() => {
+    return conditionsQuery.data?.data?.attributes?.conditions || []
+  }, [conditionsQuery.data?.data?.attributes?.conditions])
+
+  const eventCurrency = useMemo(() => {
+    return eventInfoQuery.data?.data.attributes.currency.currency
+  }, [eventInfoQuery.data?.data.attributes.currency.currency])
+
+  const isLoggedIn = useMemo(() => {
+    return !!userProfileQuery.data?.data
+  }, [userProfileQuery.data?.data])
+
+  // Handle payment processing
+  const handlePayment = useCallback(
+    async (
+      hash: string,
+      total: string | number,
+      values: CheckoutFormValues
+    ) => {
+      try {
+        setIsSubmitting(true)
+
+        // Get payment data
+        const paymentResponse = await paymentDataMutation.mutateAsync(
+          String(hash)
+        )
+        const { order_details, payment_method } =
+          paymentResponse.data.attributes
+        console.log('Order details', order_details)
+        console.log('Payment method', payment_method)
+        // Check if this is a free ticket
+        const isFreeTicket =
+          Number(total) === 0 || Number(order_details.pay_now) === 0
+
+        if (isFreeTicket) {
+          // For free tickets, just confirm the order
+          await paymentSuccessMutation.mutateAsync(String(hash))
+
+          const result: OrderResult = {
+            orderHash: String(hash),
+            total: Number(total),
+            currency: order_details.currency,
+            email: values.email,
+          }
+
+          setIsSubmitting(false)
+          onPaymentSuccess?.(result)
+        } else {
+          // For paid tickets, handle Stripe payment
+          // Initialize Stripe with payment method details
+          const stripeConfig = {
+            publishableKey: payment_method.stripe_publishable_key!,
+            ...(payment_method.stripe_connected_account &&
+            payment_method.stripe_connected_account !== ''
+              ? { stripeAccountId: payment_method.stripe_connected_account }
+              : {}),
+          }
+
+          await initStripe(stripeConfig)
+
+          // Create comprehensive billing details for payment
+          const billingDetails: BillingDetails = {
+            email: values.email,
+            name: `${values.firstName} ${values.lastName}`,
+            phone: values.phone || undefined,
+            address: {
+              city: values.city || undefined,
+              country: values.country || undefined,
+              line1: values.street || undefined,
+              postalCode: values.postalCode || undefined,
+              state: values.state || undefined,
+            },
+          }
+
+          // Confirm payment with Stripe
+          const { error: confirmError, paymentIntent } = await confirmPayment(
+            payment_method.stripe_client_secret!,
+            { paymentMethodType: 'Card', paymentMethodData: { billingDetails } }
+          )
+
+          if (confirmError || paymentIntent?.status !== 'Succeeded') {
+            throw new Error(confirmError?.message || 'Payment failed')
+          }
+
+          // Notify backend of successful payment
+          await paymentSuccessMutation.mutateAsync(String(hash))
+
+          // Notify about successful payment
+          const result: OrderResult = {
+            orderHash: String(hash),
+            total: Number(total),
+            currency: order_details.currency,
+            email: values.email,
+            paymentIntentId: paymentIntent.id,
+          }
+
+          setIsSubmitting(false)
+          onPaymentSuccess?.(result)
+        }
+      } catch (error) {
+        console.error('Payment process failed:', error)
+        onPaymentError?.(error)
+        setIsSubmitting(false)
+      }
+    },
+    [
+      paymentDataMutation,
+      paymentSuccessMutation,
+      onPaymentSuccess,
+      onPaymentError,
+      confirmPayment,
+    ]
+  )
+
+  const onSubmit = useCallback(
+    async (values: CheckoutFormValues) => {
+      try {
+        setIsSubmitting(true)
+
+        // Step 1: Check if the form should be submitted
+        const shouldContinue = await onBeforeSubmit?.(values)
+        if (!shouldContinue) return
+
+        const ticketQuantity =
+          (cartQuery.data?.data?.attributes?.cart?.[0] as any)?.quantity || 1
+
+        // Step 2: Create and submit checkout
+        const checkoutBody = createCheckoutBody(
+          values,
+          ticketQuantity,
+          isAgeRequired
+        )
+        const checkoutResponse = await checkoutMutation.mutateAsync(
+          checkoutBody
+        )
+
+        const hash = checkoutResponse.data.attributes.hash
+        const total = checkoutResponse.data.attributes.total
+
+        // Step 3: Handle payment if needed
+        if (isSinglePageCheckout) {
+          await handlePayment(hash, total, values)
+        } else {
+          setIsSubmitting(false)
+          if (onCheckoutSuccess) onCheckoutSuccess(checkoutResponse.data)
+        }
+      } catch (error) {
+        setIsSubmitting(false)
+        if (onCheckoutError) onCheckoutError(error)
+      }
+    },
+    [
+      cartQuery.data?.data?.attributes?.cart,
+      checkoutMutation,
+      handlePayment,
+      isAgeRequired,
+      isSinglePageCheckout,
+      onCheckoutError,
+      onCheckoutSuccess,
+      onBeforeSubmit,
+    ]
+  )
+
+  const updateOrderItemsFromCheckoutData = useCallback(
+    (cartPriceBreakdown: any) => {
+      if (!cartPriceBreakdown) return
+
+      // Update order items with the latest pricing information
+      const updatedOrderItems: IOrderItem[] = []
+      const currency = cartPriceBreakdown.currency?.currency || 'USD'
+
+      // Add ticket items
+      if (cartPriceBreakdown.tickets_price_breakdown) {
+        cartPriceBreakdown.tickets_price_breakdown.forEach((ticket: any) => {
+          updatedOrderItems.push({
+            id: ticket.ticket_type_id,
+            title: ticket.ticket_type_name,
+            subtitle: `${ticket.quantity} x ${priceWithCurrency(
+              ticket.price_per_ticket,
+              currency
+            )}`,
+            value: priceWithCurrency(ticket.total_price.toString(), currency),
+          })
+        })
+      }
+
+      // Add add-ons
+      if (
+        cartPriceBreakdown.total_add_ons > 0 &&
+        cartPriceBreakdown.add_ons_price_breakdown &&
+        Array.isArray(cartPriceBreakdown.add_ons_price_breakdown)
+      ) {
+        cartPriceBreakdown.add_ons_price_breakdown.forEach((addon: any) => {
+          updatedOrderItems.push({
+            id: `addon_${addon.add_on_name}`,
+            title: `${addon.add_on_name} (Add-on)`,
+            subtitle: `${addon.quantity} x ${priceWithCurrency(
+              addon.price_per_add_on,
+              currency
+            )}`,
+            value: priceWithCurrency(addon.total_price.toString(), currency),
+          })
+        })
+      }
+
+      // Add tax if available
+      if (cartPriceBreakdown.goods_tax > 0) {
+        updatedOrderItems.push({
+          id: 'tax',
+          title: cartPriceBreakdown.goods_tax_name || 'Tax',
+          value: priceWithCurrency(
+            cartPriceBreakdown.goods_tax.toString(),
+            currency
+          ),
+        })
+      }
+
+      // Add total
+      updatedOrderItems.push({
+        id: 'total',
+        title: 'Total',
+        value: priceWithCurrency(cartPriceBreakdown.total.toString(), currency),
+      })
+
+      // Update the order items state
+      setOrderItems(updatedOrderItems)
+    },
+    [setOrderItems]
+  )
+
+  // Function to update checkout with add-ons
+  const updateCheckoutWithAddOns = useCallback(
+    async (newAddons: { [key: string]: number } = {}) => {
+      if (!eventId) {
+        console.warn('Cannot update addons - no event ID')
+        return
+      }
+
+      const mergedAddons = { ...addons, ...newAddons }
+      console.log('Updating checkout with addons', {
+        eventId,
+        newAddons,
+        mergedAddons,
+      })
+
+      // Remove zero quantities
+      Object.entries(mergedAddons).forEach(([key, value]) => {
+        if (!Number(value)) {
+          delete mergedAddons[key]
+        }
+      })
+
+      try {
+        console.log('Updating checkout with addons', {
+          event_id: eventId,
+          add_ons: mergedAddons,
+          is_from_resale: false,
+        })
+        // Call the API
+        const response = await updateCheckoutMutation.mutateAsync({
+          attributes: {
+            event_id: eventId,
+            add_ons: mergedAddons,
+            is_from_resale: false,
+          },
+        })
+
+        console.log('Update checkout response', JSON.stringify(response))
+
+        if (response.data?.attributes) {
+          const cartPriceBreakdown =
+            response.data.attributes.cart_price_breakdown || {}
+
+          setAddons(mergedAddons)
+          updateOrderItemsFromCheckoutData(cartPriceBreakdown)
+        }
+      } catch (error) {
+        console.error('Failed to update addons', { error, eventId })
+      }
+    },
+    [
+      eventId,
+      addons,
+      updateCheckoutMutation,
+      setAddons,
+      updateOrderItemsFromCheckoutData,
+    ]
+  )
+
+  // Function to handle addon changes from the form
+  const onAddonChange = useCallback(
+    (addonId: string, quantity: number) => {
+      console.log('Addon quantity changed', { addonId, quantity })
+      const updatedAddons = { [addonId]: quantity }
+      updateCheckoutWithAddOns(updatedAddons)
+    },
+    [updateCheckoutWithAddOns]
+  )
+
+  const onCountryChange = useCallback(
+    (countryId: string) => {
+      setSelectedCountry(countryId)
+    },
+    [setSelectedCountry]
+  )
+
+  useEffect(() => {
+    if (cartQuery.data?.data?.attributes?.expiresAt) {
+      const expiresAt = cartQuery.data.data.attributes.expiresAt
+      setSecondsLeft(expiresAt)
+
+      BackgroundTimer.runBackgroundTimer(() => {
+        setSecondsLeft((prev: number | undefined) => {
+          if (!prev || prev <= 1) {
+            BackgroundTimer.stopBackgroundTimer()
+            onCartExpired?.()
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+
+      return () => BackgroundTimer.stopBackgroundTimer()
+    }
+  }, [cartQuery.data, setSecondsLeft, onCartExpired])
+
+  useEffect(() => {
+    if (cartQuery.data?.data?.attributes) {
+      const cartData = cartQuery.data.data.attributes
+      const currency = (cartData.cart?.[0] as any)?.currency || 'USD'
+      const eventName = eventInfoQuery.data?.data.attributes.name ?? 'Event'
+
+      const items: IOrderItem[] = [
+        {
+          id: 'event',
+          title: 'Event',
+          value: eventName,
+        },
+        {
+          id: 'tickets',
+          title: 'Number of Tickets',
+          value: (cartData.cart?.[0] as any)?.quantity?.toString() || '1',
+        },
+      ]
+
+      if ((cartData.cart?.[0] as any)?.price) {
+        items.push({
+          id: 'price',
+          title: 'Ticket Price',
+          value: priceWithCurrency((cartData.cart[0] as any).price, currency),
+        })
+      }
+
+      const total = (cartData.cart?.[0] as any)?.price || 0
+      items.push({
+        id: 'total',
+        title: 'Total',
+        value: priceWithCurrency(total, currency),
+      })
+
+      setOrderItems(items)
+    }
+  }, [cartQuery.data, eventInfoQuery.data])
+
+  return {
+    // Handlers
+    onAddonChange,
+    onCountryChange,
+    onSubmit,
+
+    setSecondsLeft,
+    setSelectedCountry,
+
+    // States
+    states,
+    eventId,
+    countries,
+    orderItems,
+    conditions,
+    secondsLeft,
+    availableAddons,
+    initialValues,
+    eventCurrency,
+    isSubmitting,
+    isInitialLoading,
+    isLoggedIn,
+    isPhoneRequired,
+    isAgeRequired,
+    isPhoneHidden,
+    minimumAge,
+    isSinglePageCheckout,
+  }
+}

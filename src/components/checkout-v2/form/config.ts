@@ -1,12 +1,14 @@
 import * as Yup from 'yup'
 
+// import { phoneRegex } from '../../../helpers/Validators'
+
 export const createCheckoutFormConfig = ({
   minimumAge,
   isAgeRequired,
   requirePassword,
   isTicketFree = false,
-  isPhoneRequired = false,
-  isPhoneHidden = false,
+  // isPhoneRequired = false,
+  // isPhoneHidden = false,
   isSinglePageCheckout = true,
   requiredConditions = [],
 }: {
@@ -29,10 +31,15 @@ export const createCheckoutFormConfig = ({
     emailConfirmation: Yup.string()
       .oneOf([Yup.ref('email')], 'Emails must match')
       .required('Email confirmation is required'),
-    phone:
-      isPhoneRequired && !isPhoneHidden
-        ? Yup.string().required('Phone number is required')
-        : Yup.string(),
+    // phone:
+    //   isPhoneRequired && !isPhoneHidden
+    //     ? Yup.string()
+    //         .required('Phone number is required')
+    //         .test('is-phone', 'Invalid phone number', (value) => {
+    //           console.log('value', value)
+    //           return phoneRegex.test(value || '')
+    //         })
+    //     : Yup.string(),
     dateOfBirth: isAgeRequired
       ? Yup.date()
           .required('Date of birth is required')

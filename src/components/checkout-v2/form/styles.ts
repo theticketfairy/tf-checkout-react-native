@@ -15,8 +15,16 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     width: '100%',
   },
+  paymentContainer: {
+    padding: 10,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    marginVertical: 10,
+    minHeight: 180,
+  },
   cardContainer: {
     height: 200,
+    width: '100%',
   },
   orderReviewContainer: {
     marginVertical: 16,
@@ -106,6 +114,15 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#d32f2f',
     marginBottom: 10,
+  },
+
+  cardStyle: {
+    backgroundColor: '#FFFFFF',
+    textColor: '#000000',
+    placeholderColor: '#999999',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
   },
 })
 

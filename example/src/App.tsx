@@ -297,7 +297,7 @@ const App = () => {
       case ComponentEnum.CheckoutV2:
         return (
           <CheckoutV2
-            cartProps={cartProps}
+            isPhoneRequired={true}
             isSinglePageCheckout={isSinglePageCheckout}
             onCartExpired={handleOnCartExpired}
             onCheckoutSuccess={handleOnCheckoutSuccess}
@@ -311,11 +311,6 @@ const App = () => {
               Alert.alert('Payment Error', error?.message || 'Unknown error')
             }}
             onLoginSuccess={handleOnLoginSuccess}
-            onBack={() => {
-              // Return to tickets screen
-              resetData()
-              setComponentToShow(ComponentEnum.Tickets)
-            }}
             loginBrandImages={{
               image1: GOOGLE_IMAGE,
               image1Style: {

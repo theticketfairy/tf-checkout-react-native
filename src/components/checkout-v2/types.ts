@@ -2,26 +2,6 @@
  * Type definitions for checkout API interactions
  */
 
-// API response wrapper type
-export interface ApiResponse<T> {
-  data: T
-  success: boolean
-  error: boolean
-  message: string
-  status: number
-}
-
-// Error response format
-export interface ErrorResponse {
-  error: {
-    code: number
-    message: string
-    extraData?: any
-  }
-  success: false
-  status: number
-}
-
 /**
  * Event-related types
  */
@@ -338,25 +318,6 @@ export interface PaymentSuccessResponse {
   success: boolean
 }
 
-/**
- * User registration related types
- */
-export interface RegisterUserResponse {
-  attributes: {
-    access_token: string
-    refresh_token: string
-    token_type: string
-    scope: string
-    user_profile: {
-      first_name: string
-      last_name: string
-      email: string
-      // date_of_birth: string | null
-      phone: string | null
-    }
-  }
-}
-
 export interface UserRegistrationData {
   email: string
   first_name: string
@@ -423,25 +384,6 @@ export interface AddonsResponse {
 }
 
 /**
- * Form data types for API requests
- */
-export interface CheckoutFormValues {
-  firstName: string
-  lastName: string
-  email: string
-  emailConfirmation?: string
-  phone?: string
-  street: string
-  city: string
-  postalCode: string
-  dateOfBirth?: Date
-  password?: string
-  passwordConfirmation?: string
-  isSubToTicketFairy?: boolean
-  isSubToBrand?: boolean
-}
-
-/**
  * API helper types
  */
 export interface DropdownItem {
@@ -500,5 +442,18 @@ export interface ICheckoutBody {
     dob_month?: number
     dob_year?: number
     add_ons?: Record<string, number>
+  }
+}
+
+export interface IOrderItem {
+  id: string
+  title: string
+  subtitle?: string
+  value: string
+  styles?: {
+    title?: any
+    value?: any
+    container?: any
+    subtitle?: any
   }
 }

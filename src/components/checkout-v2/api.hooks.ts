@@ -5,15 +5,16 @@ import {
   UseQueryOptions,
 } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
-import React, { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
+import { ApiResponse } from '../../api/api.types'
 import { Client } from '../../api/ApiClient'
 import { ICheckoutBody } from '../../api/types'
+import { QueryOpts } from '../../common/query.types'
 import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
 import {
   AddonsResponse,
   AddToCartResponse,
-  ApiResponse,
   CartResponse,
   CheckoutResponse,
   CountriesResponse,
@@ -22,12 +23,10 @@ import {
   IAddToCartParams,
   PaymentDataResponse,
   PaymentSuccessResponse,
-  RegisterUserResponse,
   StatesResponse,
   TicketsResponse,
   UpdateCheckoutParams,
   UpdateCheckoutResponse,
-  UserRegistrationData,
 } from './types'
 
 /**
@@ -87,17 +86,35 @@ export const useAddToCart = () => {
  * Hook to fetch user profile
  */
 export const useUserProfile = (
-  options?: UseQueryOptions<ApiResponse<CustomerProfileResponse>, AxiosError>
+  options?: QueryOpts<ApiResponse<CustomerProfileResponse>, AxiosError>
 ) => {
-  return useQuery<ApiResponse<CustomerProfileResponse>, AxiosError>({
+  const queryClient = useQueryClient()
+  const [hasToken, setHasToken] = useState(false)
+
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = await getData(LocalStorageKeys.ACCESS_TOKEN)
+      setHasToken(!!token)
+    }
+    checkToken()
+  }, [])
+
+  const invalidate = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['userProfile'] })
+  }, [queryClient])
+
+  const query = useQuery<ApiResponse<CustomerProfileResponse>, AxiosError>({
     queryKey: ['userProfile'],
     queryFn: () =>
       Client.get<ApiResponse<CustomerProfileResponse>>(
         `customer/profile/`
       ).then((response) => response.data),
     retry: false,
+    enabled: hasToken,
     ...options,
   })
+
+  return { ...query, invalidate }
 }
 
 /**
@@ -189,23 +206,6 @@ export const usePaymentSuccess = () => {
 }
 
 /**
- * Hook to register new user
- */
-export const useRegisterUser = () => {
-  return useMutation<
-    ApiResponse<RegisterUserResponse>,
-    AxiosError,
-    UserRegistrationData | FormData
-  >({
-    mutationFn: (userData) =>
-      Client.post<ApiResponse<RegisterUserResponse>>(
-        'v1/oauth/register-rn',
-        userData
-      ).then((response) => response.data),
-  })
-}
-
-/**
  * Hook to fetch cart data
  */
 export const useCart = (
@@ -266,113 +266,4 @@ export const useEventConditions = (eventId?: string | number) => {
       ).then((response) => response.data),
     enabled: !!eventId,
   })
-}
-
-// COMPOSITE HOOK FOR CHECKOUT FLOW
-
-/**
- * Main hook that consolidates all checkout functionality
- */
-export interface CheckoutFlowResult {
-  // Queries
-  cartQuery: ReturnType<typeof useCart>
-  eventInfoQuery: ReturnType<typeof useEventInfo>
-  ticketsQuery: ReturnType<typeof useTickets>
-  userProfileQuery: ReturnType<typeof useUserProfile>
-  countriesQuery: ReturnType<typeof useCountries>
-
-  // Mutations
-  checkoutMutation: ReturnType<typeof useCheckout>
-  updateCheckoutMutation: ReturnType<typeof useUpdateCheckout>
-  paymentDataMutation: ReturnType<typeof usePaymentData>
-  paymentSuccessMutation: ReturnType<typeof usePaymentSuccess>
-  registerUserMutation: ReturnType<typeof useRegisterUser>
-  addToCartMutation: ReturnType<typeof useAddToCart>
-
-  // Additional hooks
-  useStates: typeof useStates
-  useAddons: typeof useAddons
-  useEventConditions: typeof useEventConditions
-
-  // Helper state
-  isInitialLoading: boolean
-  eventId: string | undefined
-  secondsLeft?: number
-  setSecondsLeft: React.Dispatch<React.SetStateAction<number | undefined>>
-}
-
-export const useCheckoutFlow = (): CheckoutFlowResult => {
-  // Get cart data to initialize the flow
-  const cartQuery = useCart()
-
-  // Add cart timer state
-  const [secondsLeft, setSecondsLeft] = React.useState<number | undefined>(
-    undefined
-  )
-
-  // Use the event ID from cart to fetch event info and tickets
-  const eventId = cartQuery.data?.data?.attributes?.eventId
-  const eventInfoQuery = useEventInfo(eventId)
-
-  const ticketsQuery = useTickets(eventId)
-
-  // Fetch user profile if logged in
-  // First check for token existence
-  const [hasToken, setHasToken] = React.useState(false)
-  React.useEffect(() => {
-    const checkToken = async () => {
-      const token = await getData(LocalStorageKeys.ACCESS_TOKEN)
-      setHasToken(!!token)
-    }
-    checkToken()
-  }, [])
-
-  const userProfileQuery = useUserProfile({
-    enabled: hasToken,
-  } as UseQueryOptions<ApiResponse<CustomerProfileResponse>, AxiosError>)
-
-  // Load countries for the form
-  const countriesQuery = useCountries()
-
-  // Mutations for checkout flow
-  const checkoutMutation = useCheckout()
-  const updateCheckoutMutation = useUpdateCheckout()
-  const paymentDataMutation = usePaymentData()
-  const paymentSuccessMutation = usePaymentSuccess()
-  const registerUserMutation = useRegisterUser()
-  const addToCartMutation = useAddToCart()
-
-  // Initial loading state
-  const isInitialLoading =
-    cartQuery.isLoading ||
-    (!!eventId && (eventInfoQuery.isLoading || ticketsQuery.isLoading)) ||
-    countriesQuery.isLoading
-
-  return {
-    // Queries
-    cartQuery,
-    eventInfoQuery,
-    ticketsQuery,
-    userProfileQuery,
-    countriesQuery,
-
-    // Mutations
-    checkoutMutation,
-    updateCheckoutMutation,
-    paymentDataMutation,
-    paymentSuccessMutation,
-    registerUserMutation,
-    addToCartMutation,
-
-    // Additional hooks
-    useStates,
-    useAddons,
-    useEventConditions,
-
-    // Helper state
-    isInitialLoading,
-    eventId,
-    secondsLeft,
-    setSecondsLeft,
-  }
 }
