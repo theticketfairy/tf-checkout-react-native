@@ -10,6 +10,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native'
 import BackgroundTimer from 'react-native-background-timer'
@@ -32,14 +33,21 @@ import {
 import { priceWithCurrency } from './utils'
 
 export interface CheckoutV2Props {
-  isSinglePageCheckout?: boolean
+  cartProps: any // Cart data from add-to-cart response
+  isSinglePageCheckout?: boolean // Whether to use single page checkout or two-step
+  onCartExpired?: () => void
+  onCheckoutSuccess?: (data: any) => void
+  onCheckoutError?: (error: any) => void
+  onPaymentSuccess?: (data: OrderResult) => void
+  onPaymentError?: (error: any) => void
+  onLoginSuccess?: (data: any) => void
+  onLoginError?: () => void
+  onLogoutSuccess?: () => void
+  onBack?: () => void // Optional back navigation function
   isAgeRequired?: boolean
   minimumAge?: number
-  onCartExpired?: () => void
-  onLoginSuccess?: (data: any) => void
-  onLogoutSuccess?: () => void
-  onPaymentSuccess: (orderData: OrderResult) => void
-  onCheckoutSuccess?: (data: any) => void
+  isPhoneRequired?: boolean
+  isPhoneHidden?: boolean
   loginBrandImages?: any
 }
 
@@ -59,17 +67,24 @@ const styles = StyleSheet.create({
   },
 })
 
-const CheckoutControllerRaw: React.FC<CheckoutV2Props> = ({
-  isSinglePageCheckout = false,
+export const CheckoutControllerRaw = ({
+  cartProps,
+  isSinglePageCheckout = true,
+  onCartExpired,
+  onCheckoutSuccess,
+  onCheckoutError,
+  onPaymentSuccess,
+  onPaymentError,
+  onLoginSuccess,
+  onLoginError,
+  onLogoutSuccess,
+  onBack,
   isAgeRequired = false,
   minimumAge = 18,
-  onLoginSuccess,
-  onLogoutSuccess,
-  onPaymentSuccess,
-  onCheckoutSuccess,
-  onCartExpired,
+  isPhoneRequired = false,
+  isPhoneHidden = false,
   loginBrandImages,
-}) => {
+}: CheckoutV2Props) => {
   // Get checkout API hooks
   const {
     cartQuery,
@@ -422,7 +437,7 @@ const CheckoutControllerRaw: React.FC<CheckoutV2Props> = ({
           }
 
           setStatus('success')
-          onPaymentSuccess(result)
+          onPaymentSuccess?.(result)
         } else {
           // For paid tickets, handle Stripe payment
           // Initialize Stripe with payment method details
@@ -473,7 +488,7 @@ const CheckoutControllerRaw: React.FC<CheckoutV2Props> = ({
           }
 
           setStatus('success')
-          onPaymentSuccess(result)
+          onPaymentSuccess?.(result)
         }
       } catch (error) {
         console.error('Payment process failed:', error)
@@ -780,13 +795,15 @@ const CheckoutControllerRaw: React.FC<CheckoutV2Props> = ({
           // Single-page: continue to payment
           await handlePayment(hash, total, values)
         } else {
-          // Two-step: notify about checkout success
+          // Two-step: notify about checkout success and don't process payment
           setStatus('success')
           if (onCheckoutSuccess) {
             onCheckoutSuccess({
               hash,
               total,
               email: values.email,
+              firstName: values.firstName,
+              lastName: values.lastName,
             })
           }
         }
@@ -834,9 +851,29 @@ const CheckoutControllerRaw: React.FC<CheckoutV2Props> = ({
       <ScrollView
         ref={scrollRef}
         style={styles.container}
-        keyboardShouldPersistTaps='handled'
         contentContainerStyle={styles.contentContainerStyle}
+        keyboardShouldPersistTaps='handled'
       >
+        {/* Back button - only show if onBack is provided */}
+        {onBack && (
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: 16,
+            }}
+            onPress={onBack}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                color: '#007AFF',
+              }}
+            >
+              ← Back
+            </Text>
+          </TouchableOpacity>
+        )}
         {/* Login Component */}
         <Login
           onLoginSuccessful={handleLoginSuccess}
@@ -863,6 +900,7 @@ const CheckoutControllerRaw: React.FC<CheckoutV2Props> = ({
           isSubmitting={status === 'loading' || checkoutMutation.isPending}
           formStatus={status}
           eventCurrency={eventInfoQuery.data?.data.attributes.currency.currency}
+          isSinglePageCheckout={isSinglePageCheckout}
           // User state
           isLoggedIn={!!loggedUserFirstName}
           // Validation props

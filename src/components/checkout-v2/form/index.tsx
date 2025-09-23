@@ -14,6 +14,7 @@ import DatePicker from '../../datePicker/DatePicker'
 import { IDropdownItem } from '../../dropdown/types'
 import DropdownMaterial from '../../dropdownMaterial/DropdownMaterial'
 import Input from '../../input/Input'
+import PhoneInput from '../../phoneInput/PhoneInput'
 import AddonsContainer from '../components/AddonsContainer'
 import Conditions from '../components/Conditions'
 import OrderReview, { IOrderItem } from '../components/OrderReview'
@@ -59,6 +60,7 @@ export interface CheckoutFormProps {
   eventCurrency?: string
   isSubmitting: boolean
   formStatus: 'idle' | 'loading' | 'success' | 'error'
+  isSinglePageCheckout?: boolean // Whether to show payment form
   // User state
   isLoggedIn: boolean
 
@@ -116,6 +118,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
     scrollRef,
     eventCurrency,
     conditions,
+    isSinglePageCheckout = true,
   } = props
   const fieldTopRef = useRef<Record<string, number>>({})
 
@@ -167,6 +170,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
         requirePassword: !isLoggedIn,
         isTicketFree,
         isPhoneRequired,
+        isSinglePageCheckout,
         requiredConditions,
       }),
     [
@@ -175,6 +179,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
       isLoggedIn,
       isTicketFree,
       isPhoneRequired,
+      isSinglePageCheckout,
       requiredConditions,
     ]
   )
@@ -200,6 +205,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
         setFieldValue,
         validateForm,
         setTouched,
+        setFieldError,
       }) => {
         // Let parent component manage country/state values
         // Form will update via enableReinitialize when props change
@@ -359,14 +365,19 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
                   (fieldTopRef.current.phone = e.nativeEvent.layout.y)
                 }
               >
-                <Input
-                  label='Phone Number'
-                  value={values.phone}
-                  onChangeText={handleChange('phone')}
-                  onBlur={handleBlur('phone')}
+                <PhoneInput
+                  phoneNumber={values.phone}
+                  onChangePhoneNumber={(payload) => {
+                    handleChange('phone')(payload.input)
+                    setFieldError(
+                      'phone',
+                      payload.isValid ? undefined : 'Invalid phone number'
+                    )
+                  }}
                   error={touched.phone ? errors.phone : undefined}
-                  placeholder='Enter your phone number'
-                  keyboardType='phone-pad'
+                  texts={{
+                    label: 'Phone Number',
+                  }}
                 />
               </View>
             )}
@@ -378,19 +389,23 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
                 }
               >
                 <DatePicker
-                  text='Date of Birth'
-                  onSelectDate={(date) =>
+                  onSelectDate={(date) => {
+                    console.log('date', date)
+                    // Store as ISO string for consistent parsing
                     handleChange('dateOfBirth')(date.toISOString())
+                  }}
+                  text='Date of Birth'
+                  selectedDate={
+                    values.dateOfBirth
+                      ? new Date(values.dateOfBirth)
+                      : undefined
                   }
-                  selectedDate={values.dateOfBirth}
                   error={touched.dateOfBirth ? errors.dateOfBirth : undefined}
                 />
               </View>
             )}
 
             {/* Address Information */}
-            <Text style={styles.sectionTitle}>Address Information</Text>
-
             <View
               onLayout={(e) =>
                 (fieldTopRef.current.street = e.nativeEvent.layout.y)
@@ -420,22 +435,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
                 placeholder='Enter your city'
               />
             </View>
-
-            <View
-              onLayout={(e) =>
-                (fieldTopRef.current.postalCode = e.nativeEvent.layout.y)
-              }
-            >
-              <Input
-                label='Postal Code'
-                value={values.postalCode}
-                onChangeText={handleChange('postalCode')}
-                onBlur={handleBlur('postalCode')}
-                error={touched.postalCode ? errors.postalCode : undefined}
-                placeholder='Enter your postal code'
-              />
-            </View>
-
             {/* Country */}
             {!!countries.length && (
               <View
@@ -477,6 +476,21 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
               </View>
             )}
 
+            <View
+              onLayout={(e) =>
+                (fieldTopRef.current.postalCode = e.nativeEvent.layout.y)
+              }
+            >
+              <Input
+                label='Postal Code'
+                value={values.postalCode}
+                onChangeText={handleChange('postalCode')}
+                onBlur={handleBlur('postalCode')}
+                error={touched.postalCode ? errors.postalCode : undefined}
+                placeholder='Enter your postal code'
+              />
+            </View>
+
             {/* State */}
             {!!states.length && (
               <View
@@ -513,44 +527,41 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
             )}
 
             {/* Marketing Opt-ins */}
-            <View>
-              <Text style={styles.sectionTitle}>Marketing Preferences</Text>
-              <Field name='isSubToTicketFairy'>
-                {({
-                  field,
-                  form,
-                }: FieldProps<
-                  CheckoutFormValues['isSubToTicketFairy'],
-                  CheckoutFormValues
-                >) => (
-                  <Checkbox
-                    isActive={field.value || false}
-                    onPress={() =>
-                      form.setFieldValue('isSubToTicketFairy', !field.value)
-                    }
-                    text='Subscribe to The Ticket Fairy newsletters'
-                  />
-                )}
-              </Field>
+            <Field name='isSubToTicketFairy'>
+              {({
+                field,
+                form,
+              }: FieldProps<
+                CheckoutFormValues['isSubToTicketFairy'],
+                CheckoutFormValues
+              >) => (
+                <Checkbox
+                  isActive={field.value || false}
+                  onPress={() =>
+                    form.setFieldValue('isSubToTicketFairy', !field.value)
+                  }
+                  text='Subscribe to The Ticket Fairy newsletters'
+                />
+              )}
+            </Field>
 
-              <Field name='isSubToBrand'>
-                {({
-                  field,
-                  form,
-                }: FieldProps<
-                  CheckoutFormValues['isSubToBrand'],
-                  CheckoutFormValues
-                >) => (
-                  <Checkbox
-                    isActive={field.value || false}
-                    onPress={() =>
-                      form.setFieldValue('isSubToBrand', !field.value)
-                    }
-                    text='Subscribe to event organizer newsletters'
-                  />
-                )}
-              </Field>
-            </View>
+            <Field name='isSubToBrand'>
+              {({
+                field,
+                form,
+              }: FieldProps<
+                CheckoutFormValues['isSubToBrand'],
+                CheckoutFormValues
+              >) => (
+                <Checkbox
+                  isActive={field.value || false}
+                  onPress={() =>
+                    form.setFieldValue('isSubToBrand', !field.value)
+                  }
+                  text='Subscribe to event organizer newsletters'
+                />
+              )}
+            </Field>
 
             {/* Add-ons section */}
             {availableAddons && availableAddons.length > 0 && (
@@ -619,8 +630,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
               <OrderReview orderItems={orderItems} />
             </View>
 
-            {/* Payment */}
-            {!isTicketFree && (
+            {/* Payment - only show in single-page mode and if ticket is not free */}
+            {!isTicketFree && isSinglePageCheckout && (
               <View
                 style={styles.sectionContainer}
                 onLayout={(e) =>
@@ -628,27 +639,48 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
                     e.nativeEvent.layout.y)
                 }
               >
-                <Text style={styles.sectionTitle}>Payment Information</Text>
-                <CardForm
-                  onFormComplete={(details) =>
-                    setFieldValue('isCardFormComplete', details.complete)
-                  }
-                  style={styles.cardContainer}
-                  autofocus={false}
-                />
-                {touched.isCardFormComplete && errors.isCardFormComplete && (
-                  <Text style={styles.errorText}>
-                    {errors.isCardFormComplete}
-                  </Text>
-                )}
-              </View>
-            )}
+                <Text style={styles.sectionTitle}>Payment Details</Text>
+                <View
+                  style={{
+                    padding: 10,
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: 8,
+                    marginVertical: 10,
+                    minHeight: 180,
+                  }}
+                >
+                  <CardForm
+                    onFormComplete={(details) => {
+                      setFieldValue('isCardFormComplete', true)
+                      setFieldValue('cardFormDetails', details)
+                    }}
+                    style={{
+                      height: 200,
+                      width: '100%',
+                    }}
+                    cardStyle={{
+                      backgroundColor: '#FFFFFF',
+                      textColor: '#000000',
+                      placeholderColor: '#999999',
+                      borderWidth: 1,
+                      borderColor: '#E0E0E0',
+                      borderRadius: 8,
+                    }}
+                  />
 
-            {formStatus === 'error' && (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>
-                  There was an error processing your payment. Please try again.
-                </Text>
+                  {/* Display error if card form is not complete */}
+                  {touched.isCardFormComplete && errors.isCardFormComplete ? (
+                    <Text
+                      style={{
+                        color: 'red',
+                        marginTop: 5,
+                        fontSize: 12,
+                      }}
+                    >
+                      {errors.isCardFormComplete}
+                    </Text>
+                  ) : null}
+                </View>
               </View>
             )}
 
@@ -666,7 +698,11 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = (props) => {
               {formStatus === 'loading' || isSubmitting ? (
                 <ActivityIndicator size='small' color='#ffffff' />
               ) : (
-                <Text style={styles.buttonText}>Complete Checkout</Text>
+                <Text style={styles.buttonText}>
+                  {isSinglePageCheckout
+                    ? 'Complete Checkout'
+                    : 'Proceed to Payment'}
+                </Text>
               )}
             </TouchableOpacity>
           </View>

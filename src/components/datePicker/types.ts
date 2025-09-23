@@ -2,10 +2,12 @@ import { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
 
 export interface IDatePickerStyles {
   container?: StyleProp<ViewStyle>
-  button?: StyleProp<ViewStyle>
-  text?: StyleProp<TextStyle>
+  inputContainer?: StyleProp<ViewStyle>
+  fieldWrapper?: StyleProp<ViewStyle>
+  input?: StyleProp<TextStyle>
   error?: StyleProp<TextStyle>
   errorColor?: ColorValue
+  baseColor?: string
 }
 
 export interface IDatePickerProps {

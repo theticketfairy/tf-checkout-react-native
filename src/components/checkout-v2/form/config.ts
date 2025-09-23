@@ -7,6 +7,7 @@ export const createCheckoutFormConfig = ({
   isTicketFree = false,
   isPhoneRequired = false,
   isPhoneHidden = false,
+  isSinglePageCheckout = true,
   requiredConditions = [],
 }: {
   minimumAge?: number
@@ -15,6 +16,7 @@ export const createCheckoutFormConfig = ({
   isTicketFree?: boolean
   isPhoneRequired?: boolean
   isPhoneHidden?: boolean
+  isSinglePageCheckout?: boolean
   requiredConditions?: Array<{ id: string }>
 }) =>
   // Use strict validation mode
@@ -77,11 +79,12 @@ export const createCheckoutFormConfig = ({
       : Yup.string().oneOf([Yup.ref('password')], 'Passwords must match'),
     isSubToTicketFairy: Yup.boolean(),
     isSubToBrand: Yup.boolean(),
-    isCardFormComplete: isTicketFree
-      ? Yup.boolean()
-      : Yup.boolean()
-          .oneOf([true], 'Please complete your card information')
-          .required('Please complete your card information'),
+    isCardFormComplete:
+      isTicketFree || !isSinglePageCheckout
+        ? Yup.boolean() // Not required for free tickets or two-step checkout
+        : Yup.boolean()
+            .oneOf([true], 'Please complete your card information')
+            .required('Please complete your card information'),
     country: isTicketFree
       ? Yup.string()
       : Yup.string().test(

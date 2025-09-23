@@ -5752,13 +5752,6 @@ react-native-fs@2.18.0:
     base-64 "^0.1.0"
     utf8 "^3.0.0"
 
-react-native-modal-datetime-picker@13.0.0:
-  version "13.0.0"
-  resolved "https://registry.yarnpkg.com/react-native-modal-datetime-picker/-/react-native-modal-datetime-picker-13.0.0.tgz#d41db2bb9dd2b487c10477fce94f027af56dfaf2"
-  integrity sha512-Ltxr5bUXiaRTfDmRQkc3gIVKmRmPo6lW8rQYw+lyMhgveNIeTdGMkC8SY2vI5SLw+tT/3An2W7+6hta61LTb5A==
-  dependencies:
-    prop-types "^15.7.2"
-
 react-native@0.72.9:
   version "0.72.9"
   resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.72.9.tgz#82f2dd360109785580845fa9930f17763eb2eed4"

@@ -113,7 +113,11 @@ const App = () => {
 
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
     setCartProps(data)
-    setComponentToShow(ComponentEnum.CheckoutV2)
+    if(isSinglePageCheckout) {
+      setComponentToShow(ComponentEnum.CheckoutV2)
+    } else {
+      setComponentToShow(ComponentEnum.BillingInfo)
+    }
   }
 
   const handleOnLoginSuccess = (data: any) => {
@@ -293,225 +297,44 @@ const App = () => {
       case ComponentEnum.CheckoutV2:
         return (
           <CheckoutV2
+            cartProps={cartProps}
             isSinglePageCheckout={isSinglePageCheckout}
-            isAgeRequired={cartProps?.isAgeRequired}
-            minimumAge={cartProps?.minimumAge}
             onCartExpired={handleOnCartExpired}
-            onLoginSuccess={handleOnLoginSuccess}
-            onLogoutSuccess={() => {
-              setUserFirstName('')
-              setIsUserLoggedIn(false)
-              setComponentToShow(ComponentEnum.Tickets)
-              setCartProps(undefined)
-              setCheckOutProps(undefined)
-            }}
-            onPaymentSuccess={(orderData) => {
-              if (orderData) {
-                setOrderHash(orderData.orderHash)
-              }
-              handleOnPaymentSuccess()
-            }}
             onCheckoutSuccess={handleOnCheckoutSuccess}
-            loginBrandImages={{
-              image1: GOOGLE_IMAGE,
-              image1Style: {
-                height: 50,
-                width: 100,
-                resizeMode: 'contain',
-                tintColor: undefined
-              },
-              image2: AMAZON_IMAGE,
-              image2Style: {
-                height: 50,
-                width: 100,
-                resizeMode: 'contain',
-                tintColor: undefined,
-                marginBottom: 16
-              },
+            onCheckoutError={(error) => {
+              console.log('checkout error', error)
+              Alert.alert('Checkout Error', error?.message || 'Unknown error')
             }}
-          />
-        )
-      
-      case ComponentEnum.CheckoutSP:
-        return (
-          <CheckoutSP
-            onPaymentSuccess={(orderData) => {
-              // For single page checkout, store the hash separately
-              if (orderData) {
-                setOrderHash(orderData.orderHash)
-                setOrderHash(orderData.orderHash)
-              }
-              handleOnPaymentSuccess()
+            onPaymentSuccess={handleOnPaymentSuccess}
+            onPaymentError={(error) => {
+              console.log('payment error', error)
+              Alert.alert('Payment Error', error?.message || 'Unknown error')
             }}
-            isAgeRequired={cartProps?.isAgeRequired}
-            minimumAge={cartProps?.minimumAge}
-            loginBrandImages={{
-              image1: GOOGLE_IMAGE,
-              image1Style: {
-                height: 50,
-                width: 100,
-                resizeMode: 'contain',
-                tintColor: undefined
-              },
-              image2: AMAZON_IMAGE,
-              image2Style: {
-                height: 50,
-                width: 100,
-                resizeMode: 'contain',
-                tintColor: undefined,
-                marginBottom: 16
-              },
-            }}
-            areAlertsEnabled={true}
-            areLoadingIndicatorsEnabled={true}
-            shouldCartTimerNotMinimizeOnTap={false}
-            userFirstName={userFirstName}
-            onLoginSuccess={(data) => {
-              handleOnLoginSuccess(data)
-            }}
-            onLogoutSuccess={() => {
-              setUserFirstName('')
-              setIsUserLoggedIn(false)
+            onLoginSuccess={handleOnLoginSuccess}
+            onBack={() => {
+              // Return to tickets screen
+              resetData()
               setComponentToShow(ComponentEnum.Tickets)
-              setCartProps(undefined)
-              setCheckOutProps(undefined)
             }}
-            onCartExpired={handleOnCartExpired}
-            texts={{
-                form: {
-                  getYourTicketsTitle: '_Get your tickets_',
-                  firstName: '_First name_',
-                  lastName: '_Last name_',
-                  email: '_Email_',
-                  phone: '_Phone_',
-                  confirmEmail: '_Confirm email_',
-                  street: '_Street_',
-                  city: '_City_',
-                  country: '_Country_',
-                  zipCode: '_Zip code_',
-                  state: '_State_',
-                  dateOfBirth: '_Date of birth_',
-                  isSubToBrand: '_Is sub to Brand_',
-                  isSubToTicketFairy: '_Is sub to ticket fairy_',
-                  password: '_Password_',
-                  confirmPassword: '_Confirm password_',
-                  emailsAdvice: '_Emails advice_',
-                  choosePassword: '_Choose password_',
-                },
-                checkoutButton: '_Checkout_',
-                screenTitle: '_Get your tickets_',
-                providePaymentInfo: '_Provide Payment Info_',
-                paymentTitle: '_Payment_',
-                addonMainTitle: '_UPGRADES & ADD-ONS_',
-                addonSubTitle: '_PLEASE SELECT FROM THE OPTIONAL ADD-ONS BELOW_',
-                loginTexts: {
-                  loginButton: '_Login_',
-                  logoutButton: '_Logout_',
-                  line1: '_Line 1_',
-                  line2: '_Line 2_',
-                  message: '_Message_',
-                  logoutDialog: {
-                    title: '_Logout?_',
-                    message: '_sure to logout?_',
-                    confirm: '_yes_',
-                    cancel: '_cancel_',
-                  },
-                  dialog: {
-                    loginButton: '_Dialog_login_',
-                    message: '_Dialog message_',
-                    emailLabel: '_Dialog email label_',
-                    passwordLabel: '_Dialog password label_',
-                    title: '_Login title_',
-                  },
-                  loggedIn: {
-                    loggedAs: '_Logged in:_',
-                    notYou: '_Not you?_',
-                  }
-                }
-            }}
-            styles={{
-              ...billingInfoStyles,
-              // Fix addon styles to prevent black on black
-              addonSection: {
-                marginBottom: 24,
-                paddingHorizontal: 20,
-                paddingVertical: 20,
-                backgroundColor: '#ffffff', // Light background
-                borderRadius: 16,
+            loginBrandImages={{
+              image1: GOOGLE_IMAGE,
+              image1Style: {
+                height: 50,
+                width: 100,
+                resizeMode: 'contain',
+                tintColor: undefined,
               },
-              addonMainTitle: {
-                fontSize: 20,
-                fontWeight: '700',
-                color: '#1f2937',  // Dark color for contrast
-                textAlign: 'center',
-                marginBottom: 8,
-              },
-              addonSubtitle: {
-                fontSize: 14,
-                fontWeight: '500',
-                color: '#6b7280',  // Medium gray
-                textAlign: 'center',
-                marginBottom: 20,
-              },
-              addonItem: {
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                paddingVertical: 16,
-                paddingHorizontal: 16,
-                marginBottom: 12,
-                backgroundColor: '#f9fafb', // Very light gray
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: '#e5e7eb',
-              },
-              addonName: {
-                fontSize: 16,
-                fontWeight: '600',
-                color: '#1f2937',  // Dark text
-                marginBottom: 6,
-              },
-              // Card style fix (match Checkout)
-              payment: {
-                container: {
-                  marginTop: 16,
-                  marginBottom: 16,
-                },
-                title: {
-                  fontSize: 16, 
-                  fontWeight: '600',
-                  marginBottom: 16,
-                  color: '#374151'
-                },
-                cardContainer: {
-                  marginTop: 24,
-                  minHeight: Platform.OS === 'ios' ? 180 : 270,
-                  maxHeight: Platform.OS === 'ios' ? 300 : 350,
-                  borderRadius: 10,
-                  // padding: 8,
-                  alignSelf: 'center',
-                },
-                cardStyle: {
-                  backgroundColor: '#FFFFFF',
-                  textColor: '#000000',
-                }
-              },
-              // Order review style fix
-              orderReview: {
-                item: {
-                  title: { 
-                    color: '#6b7280', 
-                    fontSize: 14,
-                    fontWeight: '500'
-                  },
-                  value: { 
-                    color: '#1f2937',
-                    fontSize: 14,
-                    fontWeight: '600'
-                  },
-                }
+              image2: AMAZON_IMAGE,
+              image2Style: {
+                height: 50,
+                width: 100,
+                resizeMode: 'contain',
+                tintColor: undefined,
+                marginBottom: 16,
               },
             }}
+            isAgeRequired
+            minimumAge={18}
           />
         )
       case ComponentEnum.BillingInfo:
@@ -679,7 +502,6 @@ const App = () => {
               },
             }}            
             texts={{
-              screenTitle: '_Get your tickets_',
               title: '_GET YOUR TICKETS_',
               subTitle: '_Order review_',
               orderReviewItems: {

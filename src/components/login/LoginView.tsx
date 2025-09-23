@@ -86,8 +86,6 @@ const LoginView: FC<ILoginViewProps> = ({
     return true
   }
 
-  console.log(texts, 'texts')
-
   const LoggedComponent = () => (
     <View style={styles?.loggedIn?.container}>
       <Text style={styles?.loggedIn?.placeholder}>
