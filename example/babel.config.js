@@ -1,8 +1,9 @@
 module.exports = {
   presets: ['module:metro-react-native-babel-preset'],
   plugins: [
-    '@babel/plugin-transform-private-methods',
-    '@babel/plugin-transform-private-property-in-object',
-    '@babel/plugin-proposal-class-properties'
+    '@babel/plugin-transform-flow-strip-types',
+    ['@babel/plugin-transform-private-methods', { loose: true }],
+    ['@babel/plugin-transform-private-property-in-object', {loose: true}],
+    ['@babel/plugin-proposal-class-properties', { loose: true }],
   ]
 }
