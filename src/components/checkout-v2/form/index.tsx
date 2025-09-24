@@ -1,14 +1,15 @@
 import { CardForm, CardFormView } from '@stripe/stripe-react-native'
 import { FormikProvider, useFormik } from 'formik'
-import React, { useMemo, useRef } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
-  LayoutChangeEvent,
   Text,
   TouchableOpacity,
   View,
+  ViewProps,
 } from 'react-native'
 
+import { readableError } from '../../../utils/handlers'
 import Checkbox from '../../checkbox/Checkbox'
 import DatePicker from '../../datePicker/DatePicker'
 import DropdownMaterial from '../../dropdownMaterial/DropdownMaterial'
@@ -20,7 +21,7 @@ import Conditions from '../components/Conditions'
 import OrderReview, { IOrderItem } from '../components/OrderReview'
 import { createCheckoutFormConfig } from './config'
 import styles from './styles'
-import { CheckoutFormProps } from './types'
+import { CheckoutFormProps, PaymentFormProps } from './types'
 
 export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   initialValues,
@@ -44,6 +45,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   conditions,
   isSinglePageCheckout = true,
 }) => {
+  const [isCardFormComplete, setIsCardFormComplete] = useState(false)
+  const [cardFormError, setCardFormError] = useState<string>()
   const modifiedInitialValues = {
     ...initialValues,
     isCardFormComplete: isTicketFree ? true : initialValues.isCardFormComplete,
@@ -61,7 +64,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
       isAgeRequired,
       requirePassword: !isLoggedIn,
       isTicketFree,
-      isPhoneRequired,
       isSinglePageCheckout,
       requiredConditions,
     }),
@@ -98,7 +100,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   // 2) helper: scroll to a field by key
   const scrollToField = (key: string) => {
     const y = fieldTopRef.current[key]
-    console.log('scrollToField', key, y, scrollRef.current)
     if (y != null && scrollRef.current) {
       // small offset so the label is visible
       scrollRef.current.scrollTo({ y: Math.max(0, y - 16), animated: true })
@@ -115,8 +116,14 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
     const result = await formik.setTouched(touchedFields, true)
     const formErrors = result ?? {}
+    const paymentValid =
+      isCardFormComplete || isTicketFree || !isSinglePageCheckout
 
-    if (Object.keys(formErrors).length === 0) {
+    if (!paymentValid) {
+      setCardFormError('Please fill your payment information')
+    }
+
+    if (Object.keys(formErrors).length === 0 && paymentValid) {
       formik.handleSubmit()
       return
     }
@@ -128,6 +135,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
     if (firstErroredKey) {
       scrollToField(firstErroredKey)
+    } else if (!paymentValid) {
+      scrollToField('isCardFormComplete')
     }
   }
 
@@ -494,15 +503,17 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
         {/* Payment - only show in single-page mode and if ticket is not free */}
         {!isTicketFree && isSinglePageCheckout && (
-          <PaymentSection
+          <Payment
             orderItems={orderItems}
-            onLayout={(e) =>
-              (fieldTopRef.current.isCardFormComplete = e.nativeEvent.layout.y)
-            }
-            onFormComplete={(details) => {
-              formik.setFieldValue('isCardFormComplete', details.complete)
+            paymentViewProps={{
+              onLayout: (e) =>
+                (fieldTopRef.current.isCardFormComplete =
+                  e.nativeEvent.layout.y),
             }}
-            error={formik.errors.isCardFormComplete}
+            onFormComplete={(details) => {
+              setIsCardFormComplete(details.complete)
+            }}
+            error={cardFormError}
           />
         )}
 
@@ -527,19 +538,19 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   )
 }
 
-interface PaymentSectionProps {
-  onLayout: (e: LayoutChangeEvent) => void
+interface PaymentProps {
   onFormComplete: (details: CardFormView.Details) => void
   error?: string
   orderItems: IOrderItem[]
+  paymentViewProps?: ViewProps
 }
 
-export const PaymentSection = ({
-  onLayout,
+export const Payment = ({
   onFormComplete,
   error,
   orderItems,
-}: PaymentSectionProps) => {
+  paymentViewProps,
+}: PaymentProps) => {
   return (
     <View>
       <View style={styles.sectionContainer}>
@@ -547,7 +558,7 @@ export const PaymentSection = ({
         <OrderReview orderItems={orderItems} />
       </View>
 
-      <View style={styles.sectionContainer} onLayout={onLayout}>
+      <View style={styles.sectionContainer} {...paymentViewProps}>
         <Text style={styles.sectionTitle}>Payment Details</Text>
         <View style={styles.paymentContainer}>
           <CardForm
@@ -559,6 +570,58 @@ export const PaymentSection = ({
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
         </View>
       </View>
+    </View>
+  )
+}
+
+export const PaymentForm = ({ orderItems, onSubmit }: PaymentFormProps) => {
+  const [error, setError] = useState<string>()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isCardFormComplete, setIsCardFormComplete] = useState(false)
+
+  const onFormComplete = (details: CardFormView.Details) => {
+    setIsCardFormComplete(details.complete)
+
+    if (details.complete) {
+      setError(undefined)
+    }
+  }
+
+  const onPressSubmit = async () => {
+    try {
+      setIsSubmitting(true)
+      if (!isCardFormComplete) {
+        throw new Error('Please fill your payment information')
+      }
+
+      await onSubmit()
+    } catch (e) {
+      setError(readableError(e))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <View>
+      <Payment
+        orderItems={orderItems}
+        onFormComplete={onFormComplete}
+        error={error}
+        paymentViewProps={{}}
+      />
+      {/* Submit Button */}
+      <TouchableOpacity
+        style={[styles.button, isSubmitting ? styles.buttonDisabled : {}]}
+        onPress={onPressSubmit}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? (
+          <ActivityIndicator size='small' color='#ffffff' />
+        ) : (
+          <Text style={styles.buttonText}>Complete Payment</Text>
+        )}
+      </TouchableOpacity>
     </View>
   )
 }

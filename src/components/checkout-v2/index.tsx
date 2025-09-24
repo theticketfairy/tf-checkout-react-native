@@ -8,16 +8,16 @@ import { IError } from '../../types'
 import CartTimer from '../cartTimer/CartTimer'
 import Login from '../login/Login'
 import { ILoginBrandImages, ILoginSuccessData } from '../login/types'
-import { CheckoutForm } from './form'
+import { CheckoutForm, PaymentForm } from './form'
 import { CheckoutFormValues } from './form/types'
-import { useCheckoutFlow } from './hooks/use-checkout'
+import { CheckoutData, useCheckoutFlow } from './hooks/use-checkout'
 import { OrderResult } from './types'
 import { createRegistrationData } from './utils'
 
 export interface CheckoutV2Props {
   isSinglePageCheckout?: boolean
   onCartExpired?: () => void
-  onCheckoutSuccess?: (data: any) => void
+  onCheckoutSuccess?: (data: CheckoutData) => void
   onCheckoutError?: (error: any) => void
   onPaymentSuccess?: (data: OrderResult) => void
   onPaymentError?: (error: any) => void
@@ -49,14 +49,14 @@ const styles = StyleSheet.create({
 
 export const CheckoutControllerRaw = ({
   isSinglePageCheckout = true,
-  onCartExpired,
-  onCheckoutSuccess,
-  onCheckoutError,
-  onPaymentSuccess,
-  onPaymentError,
-  onLoginSuccess,
-  onLoginError,
-  onLogoutSuccess,
+  onCartExpired: _onCartExpired,
+  onCheckoutSuccess: _onCheckoutSuccess,
+  onCheckoutError: _onCheckoutError,
+  onPaymentSuccess: _onPaymentSuccess,
+  onPaymentError: _onPaymentError,
+  onLoginSuccess: _onLoginSuccess,
+  onLoginError: _onLoginError,
+  onLogoutSuccess: _onLogoutSuccess,
   isAgeRequired = false,
   minimumAge = 18,
   isPhoneRequired = false,
@@ -64,6 +64,7 @@ export const CheckoutControllerRaw = ({
   loginBrandImages,
 }: CheckoutV2Props) => {
   const scrollRef = useRef<ScrollView>(null)
+  const [checkoutData, setCheckoutData] = useState<CheckoutData>()
   const [loginMessage, setLoginMessage] = useState('')
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
 
@@ -155,13 +156,21 @@ export const CheckoutControllerRaw = ({
     ]
   )
 
+  const onCheckoutSuccess = useCallback(
+    (data: CheckoutData) => {
+      setCheckoutData(data)
+      _onCheckoutSuccess?.(data)
+    },
+    [_onCheckoutSuccess]
+  )
+
   const checkoutFlow = useCheckoutFlow({
-    onCartExpired,
-    onBeforeSubmit: registerUser,
-    onCheckoutError,
     onCheckoutSuccess,
-    onPaymentError,
-    onPaymentSuccess,
+    onCartExpired: _onCartExpired,
+    onBeforeSubmit: registerUser,
+    onCheckoutError: _onCheckoutError,
+    onPaymentError: _onPaymentError,
+    onPaymentSuccess: _onPaymentSuccess,
     isPhoneRequired,
     isAgeRequired,
     isPhoneHidden,
@@ -172,6 +181,25 @@ export const CheckoutControllerRaw = ({
 
   const { setSelectedCountry, secondsLeft } = checkoutFlow
 
+  const handleLoginError = (error: IError) => {
+    _onLoginError?.(error)
+  }
+
+  const handleLogout = () => {
+    invalidate()
+    _onLogoutSuccess?.()
+  }
+
+  const handleLoginSuccess = useCallback(
+    (data: ILoginSuccessData) => {
+      console.log('Login success', data)
+      invalidate()
+      _onLoginSuccess?.(data)
+      setIsLoginDialogVisible(false)
+    },
+    [_onLoginSuccess, invalidate]
+  )
+
   useEffect(() => {
     if (userProfile?.data) {
       const profile = userProfile.data
@@ -180,29 +208,6 @@ export const CheckoutControllerRaw = ({
       }
     }
   }, [setSelectedCountry, userProfile])
-
-  const handleLoginError = (error: IError) => {
-    onLoginError?.(error)
-  }
-
-  const handleLogout = () => {
-    invalidate()
-    if (onLogoutSuccess) {
-      onLogoutSuccess()
-    }
-  }
-
-  const handleLoginSuccess = useCallback(
-    (data: ILoginSuccessData) => {
-      console.log('Login success', data)
-      invalidate()
-      if (onLoginSuccess) {
-        onLoginSuccess(data)
-      }
-      setIsLoginDialogVisible(false)
-    },
-    [onLoginSuccess, invalidate]
-  )
 
   return (
     <>
@@ -231,7 +236,17 @@ export const CheckoutControllerRaw = ({
         <Text style={styles.title}>Personal Information</Text>
 
         {/* Use our new CheckoutForm component */}
-        <CheckoutForm scrollRef={scrollRef} {...checkoutFlow} />
+        {isSinglePageCheckout || !checkoutData ? (
+          <CheckoutForm scrollRef={scrollRef} {...checkoutFlow} />
+        ) : (
+          <PaymentForm
+            scrollRef={scrollRef}
+            onSubmit={async () =>
+              await checkoutFlow.handlePayment(checkoutData)
+            }
+            orderItems={checkoutFlow.orderItems}
+          />
+        )}
       </ScrollView>
 
       {/* Cart Timer */}

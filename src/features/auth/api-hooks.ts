@@ -37,15 +37,12 @@ export const useUserProfile = (
   const invalidate = useCallback(async () => {
     const isValid = await isStoredTokenValid()
     setEnabled(isValid)
-    console.log('Token:', isValid, 'invalidate')
     queryClient.invalidateQueries({ queryKey: ['userProfile'] })
 
     if (!isValid) {
-      console.log('Before:', queryClient.getQueryData(['userProfile']))
       queryClient.cancelQueries({ queryKey: ['userProfile'] })
       queryClient.removeQueries({ queryKey: ['userProfile'] })
       queryClient.setQueryData(['userProfile'], undefined)
-      console.log('After:', queryClient.getQueryData(['userProfile']))
     }
   }, [queryClient])
 
@@ -59,17 +56,6 @@ export const useUserProfile = (
     enabled,
     ...options,
   })
-
-  useEffect(() => {
-    console.log('Query:', JSON.stringify(query))
-  }, [query])
-
-  console.log(
-    queryClient
-      .getQueryCache()
-      .getAll()
-      .map((q) => q.queryKey)
-  )
 
   return { ...query, invalidate }
 }

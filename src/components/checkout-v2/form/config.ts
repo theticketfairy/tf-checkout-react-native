@@ -7,17 +7,13 @@ export const createCheckoutFormConfig = ({
   isAgeRequired,
   requirePassword,
   isTicketFree = false,
-  // isPhoneRequired = false,
-  // isPhoneHidden = false,
-  isSinglePageCheckout = true,
+  // isSinglePageCheckout = true,
   requiredConditions = [],
 }: {
   minimumAge?: number
   isAgeRequired: boolean
   requirePassword: boolean
   isTicketFree?: boolean
-  isPhoneRequired?: boolean
-  isPhoneHidden?: boolean
   isSinglePageCheckout?: boolean
   requiredConditions?: Array<{ id: string }>
 }) =>
@@ -31,15 +27,6 @@ export const createCheckoutFormConfig = ({
     emailConfirmation: Yup.string()
       .oneOf([Yup.ref('email')], 'Emails must match')
       .required('Email confirmation is required'),
-    // phone:
-    //   isPhoneRequired && !isPhoneHidden
-    //     ? Yup.string()
-    //         .required('Phone number is required')
-    //         .test('is-phone', 'Invalid phone number', (value) => {
-    //           console.log('value', value)
-    //           return phoneRegex.test(value || '')
-    //         })
-    //     : Yup.string(),
     dateOfBirth: isAgeRequired
       ? Yup.date()
           .required('Date of birth is required')
@@ -86,12 +73,12 @@ export const createCheckoutFormConfig = ({
       : Yup.string().oneOf([Yup.ref('password')], 'Passwords must match'),
     isSubToTicketFairy: Yup.boolean(),
     isSubToBrand: Yup.boolean(),
-    isCardFormComplete:
-      isTicketFree || !isSinglePageCheckout
-        ? Yup.boolean() // Not required for free tickets or two-step checkout
-        : Yup.boolean()
-            .oneOf([true], 'Please complete your card information')
-            .required('Please complete your card information'),
+    // isCardFormComplete:
+    //   isTicketFree || !isSinglePageCheckout
+    //     ? Yup.boolean() // Not required for free tickets or two-step checkout
+    //     : Yup.boolean()
+    //         .oneOf([true], 'Please complete your card information')
+    //         .required('Please complete your card information'),
     country: isTicketFree
       ? Yup.string()
       : Yup.string().test(

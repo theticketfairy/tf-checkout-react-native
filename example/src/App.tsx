@@ -2,7 +2,6 @@ import _ from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View, Switch } from 'react-native'
 import {
-  Checkout,
   CheckoutV2,
   IMyOrderDetailsData,
   IOnCheckoutSuccess,
@@ -10,21 +9,20 @@ import {
   MyOrders,
   PurchaseConfirmation,
   Tickets,
-  BillingInfo,
   setConfig,
   ITicketsResponseData,
   SkippingStatusType,
   ResaleTickets,
   ResetPassword,
   SessionHandleType,
-  CheckoutSP,
 } from 'tf-checkout-react-native'
 import { IConfig } from '../../src/helpers/Config'
 import R from '../../src/res'
 import Color from './Colors'
 import { ComponentEnum } from './enums'
-import styles, { billingInfoStyles } from './styles'
+import styles from './styles'
 import { IMyOrderDetailsTicket } from '../../src/api/types'
+import { CheckoutData } from '../../src/components/checkout-v2/hooks/use-checkout'
 
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
@@ -72,10 +70,6 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [skippingStatus, setSkippingStatus] = useState<SkippingStatusType>(undefined)
 
-  const [checkoutProps, setCheckOutProps] = useState<
-    IOnCheckoutSuccess | undefined
-  >(undefined)
-
   const [selectedOrderDetails, setSelectedOrderDetails] =
     useState<IMyOrderDetailsData>()
 
@@ -98,7 +92,6 @@ const App = () => {
     setCartProps(undefined)
     setIsLoading(false)
     setSkippingStatus(undefined)
-    setCheckOutProps(undefined)
     setOrderHash('')
     setComponentToShow(ComponentEnum.Tickets)
     // Keep user login state intact during reset - don't clear userFirstName/isUserLoggedIn
@@ -113,11 +106,7 @@ const App = () => {
 
   const handleOnAddToCartSuccess = (data: ITicketsResponseData) => {
     setCartProps(data)
-    if(isSinglePageCheckout) {
-      setComponentToShow(ComponentEnum.CheckoutV2)
-    } else {
-      setComponentToShow(ComponentEnum.BillingInfo)
-    }
+    setComponentToShow(ComponentEnum.CheckoutV2)
   }
 
   const handleOnLoginSuccess = (data: any) => {
@@ -147,11 +136,8 @@ const App = () => {
     }
   }
 
-  const handleOnCheckoutSuccess = (data: IOnCheckoutSuccess) => {
-    setCheckOutProps(data)
-    if(!isSinglePageCheckout) {
-      setComponentToShow(ComponentEnum.Checkout)
-    }
+  const handleOnCheckoutSuccess = (data: CheckoutData) => {
+    setOrderHash(data.hash)
   }
 
   const handleOnPaymentSuccess = () => {
@@ -332,189 +318,10 @@ const App = () => {
             minimumAge={18}
           />
         )
-      case ComponentEnum.BillingInfo:
-        return (
-          <BillingInfo
-            config={{
-            isCheckoutAlwaysButtonEnabled: true,
-            shouldHideTicketHolderSectionOnSingleTicket: true,
-            }}
-            ref={billingRef}
-            onCartExpired={handleOnCartExpired}
-            onSkippingStatusChange={setSkippingStatus}
-            loginBrandImages={{
-              image1: GOOGLE_IMAGE,
-              image1Style: {
-                  height: 50,
-                  width: 100,
-                  resizeMode: 'contain',
-                  tintColor: undefined
-                },
-                image2: AMAZON_IMAGE,
-                image2Style: {
-                  height: 50,
-                  width: 100,
-                  resizeMode: 'contain',
-                  tintColor: undefined,
-                  marginBottom: 16
-                },
-            }}
-            onLoadingChange={setIsLoading}
-            texts={{
-                form: {
-                  getYourTicketsTitle: '_Get your tickets_',
-                  firstName: '_First name_',
-                  lastName: '_Last name_',
-                  email: '_Email_',
-                  phone: '_Phone_',
-                  confirmEmail: '_Confirm email_',
-                  street: '_Street_',
-                  city: '_City_',
-                  country: '_Country_',
-                  zipCode: '_Zip code_',
-                  state: '_State_',
-                  ticketHoldersTitle: '_Ticket holders_',
-                  ticketHolderItem: '_Ticket holder item_',
-                  isSubToTicketFairy: '_Is sub to ticket fairy_',
-                  holderEmail: '_Holder email_',
-                  holderFirstName: '_Holder first name_',
-                  holderLastName: '_Holder last name_',
-                  holderPhone: '_Holder phone_',
-                  isSubToBrand: '_Is sub to Brand_',
-                  password: '_Password_',
-                  confirmPassword: '_Confirm password_',
-                  dateOfBirth: '_Date of birth_',
-                  emailsAdvice: '_Emails advice_',
-                  choosePassword: '_Choose password_',
-                  fillAllRequiredFieldsAlert: '_Fill all required fields_',
-                  optional: '(_Optional_)',
-                  ttfPrivacyPolicyRequiredError: '* Required'
-                },
-                checkoutButton: '_Checkout_',
-                loginTexts: {
-                  loginButton: '_Login_',
-                  logoutButton: '_Logout_',
-                  line1: '_Line 1_',
-                  line2: '_Line 2_',
-                  message: '_Message_',
-
-                  logoutDialog: {
-                    title: '_Logout?_',
-                    message: '_sure to logout?_',
-                    confirm: '_yes_',
-                    cancel: '_cancel_',
-                  },
-                  dialog: {
-                    loginButton: '_Dialog_login_',
-                    message: '_Dialog message_',
-                    emailLabel: '_Dialog email label_',
-                    passwordLabel: '_Dialog password label_',
-                    title: '_Login title_',
-                  },
-                  loggedIn: {
-                    loggedAs: '_Logged in:_',
-                    notYou: '_Not you?_',
-                  }
-                }
-            }}
-            styles={billingInfoStyles}
-            cartProps={cartProps!}
-            onCheckoutSuccess={handleOnCheckoutSuccess}
-            onLoginSuccess={handleOnLoginSuccess}
-            onFetchUserProfileSuccess={handleOnFetchUserProfileSuccess}       
-            onLogoutSuccess={() => {
-              setUserFirstName('')
-              setIsUserLoggedIn(false)
-              setComponentToShow(ComponentEnum.Tickets)
-              setCartProps(undefined)
-              setCheckOutProps(undefined)
-            }}    
-            />
-        )
-      case ComponentEnum.Checkout:
-        return (
-          <Checkout
-            checkoutData={checkoutProps!}
-            onPaymentSuccess={handleOnPaymentSuccess}
-            onPressExit={handleStripeError}
-            onLoadingChange={(loading) => {setIsLoading(loading)}}
-            onCartExpired={handleOnCartExpired}
-            styles={{
-              rootStyle: {
-                paddingHorizontal: 16,
-              },
-              missingStripeConfig: {
-                exitButton: {
-                  container: {
-                    width: '100%',
-                  },
-                  button: {
-                    backgroundColor: Color.primary,
-                    borderRadius: 2,
-                  },
-                },
-              },
-              title: {
-                color: Color.textMain,
-              },
-              subTitle: {
-                color: Color.textMain,
-              },
-              freeRegistrationButton: {
-                button: {
-                  backgroundColor: Color.primary,
-                  borderRadius: 2,
-                },
-              },
-              orderReview: {
-                item: {
-                  title: {
-                    color: Color.textMainOff,
-                  },
-                  value: {
-                    color: Color.textMain,
-                  },
-                  container: {
-                    marginBottom: 4,
-                  },
-                },
-              },
-              payment: {
-                cardStyle: {
-                  backgroundColor: '#FFFFFF',
-                  textColor: '#000000'
-                },
-                title: {
-                  color: Color.textMain,
-                },
-                button: {
-                  button: {
-                    backgroundColor: Color.primary,
-                  },
-                },
-                
-                
-              },
-            }}            
-            texts={{
-              title: '_GET YOUR TICKETS_',
-              subTitle: '_Order review_',
-              orderReviewItems: {
-                event: '_EVENTO_',
-                ticketType: '_TICKET_TYPE_',
-                numberOfTickets: '_NUMBER_OF_TICKETS_',
-                price: '_PRICE_',
-                total: '_TOTAL_',
-              },
-              providePaymentInfo: '_Provide Payment Info_',
-              payButton: '_PAY_'
-            }}
-            />
-        )
       case ComponentEnum.PurchaseConfirmation:
         return (
           <PurchaseConfirmation
-            orderHash={orderHash || checkoutProps?.hash || ''}
+            orderHash={orderHash}
             onComplete={handleOnComplete}
             texts={{
               title: '_Purchase Confirmation_',
@@ -562,9 +369,6 @@ const App = () => {
               config={{
                 areActivityIndicatorsEnabled: false,
                 areAlertsEnabled: true,
-              }}
-              onFetchMyOrdersSuccess={(data) => {
-                console.log('onFetchMyOrdersSuccess', data)
               }}
               onLoadingChange={(loading) => setIsLoading(loading)}
               onSelectOrder={handleOnSelectOrder}

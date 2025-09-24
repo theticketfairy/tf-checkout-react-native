@@ -17,6 +17,7 @@ import BackgroundTimer from 'react-native-background-timer'
 
 import { CustomerProfileResponse } from '../../../features/auth/types'
 import { useCountries, useStates } from '../../../features/geo/api-hooks'
+import { logError } from '../../../utils/handlers'
 import { CheckoutFormProps, CheckoutFormValues } from '../form/types'
 import { IOrderItem, OrderResult } from '../types'
 import { createCheckoutBody, priceWithCurrency } from '../utils'
@@ -40,7 +41,7 @@ export interface UseCheckoutFlowProps {
   isPhoneHidden?: boolean
   minimumAge?: number
   customerProfile?: CustomerProfileResponse
-  onCheckoutSuccess?: (data: any) => void
+  onCheckoutSuccess?: (data: CheckoutData) => void
   onCheckoutError?: (error: any) => void
   onPaymentSuccess?: (data: OrderResult) => void
   onPaymentError?: (error: any) => void
@@ -57,9 +58,10 @@ export interface UseCheckoutFlowReturn
   isLoggedIn: boolean
   setSecondsLeft: React.Dispatch<React.SetStateAction<number | undefined>>
   setSelectedCountry: React.Dispatch<React.SetStateAction<string>>
+  handlePayment: (input: CheckoutData) => Promise<void>
 }
 
-export interface HandlePaymentInput {
+export interface CheckoutData {
   hash: string
   total: string | number
   values: CheckoutFormValues
@@ -75,7 +77,7 @@ export const useCheckoutFlow = ({
   isPhoneRequired,
   isPhoneHidden,
   minimumAge,
-  onBeforeSubmit,
+  onBeforeSubmit = () => true,
   isSinglePageCheckout,
   customerProfile,
 }: UseCheckoutFlowProps): UseCheckoutFlowReturn => {
@@ -186,7 +188,7 @@ export const useCheckoutFlow = ({
 
   // Handle payment processing
   const handlePayment = useCallback(
-    async (input: HandlePaymentInput) => {
+    async (input: CheckoutData) => {
       try {
         setIsSubmitting(true)
 
@@ -211,7 +213,6 @@ export const useCheckoutFlow = ({
             email: input.values.email,
           }
 
-          setIsSubmitting(false)
           onPaymentSuccess?.(result)
         } else {
           // For paid tickets, handle Stripe payment
@@ -266,9 +267,9 @@ export const useCheckoutFlow = ({
           onPaymentSuccess?.(result)
         }
       } catch (error) {
-        console.error('Payment process failed:', error)
+        logError(error, 'Checkout: handlePayment')
         onPaymentError?.(error)
-        setIsSubmitting(false)
+        throw error
       }
     },
     [
@@ -280,22 +281,12 @@ export const useCheckoutFlow = ({
     ]
   )
 
-  const onSubmit = useCallback(
+  const handleCheckout = useCallback(
     async (values: CheckoutFormValues) => {
       try {
-        setIsSubmitting(true)
-
-        // Step 1: Check if the form should be submitted
-        const shouldContinue = onBeforeSubmit
-          ? await onBeforeSubmit?.(values)
-          : true
-
-        if (!shouldContinue) return
-
         const ticketQuantity =
           (cartQuery.data?.data?.attributes?.cart?.[0] as any)?.quantity || 1
 
-        // Step 2: Create and submit checkout
         const checkoutBody = createCheckoutBody(
           values,
           ticketQuantity,
@@ -307,33 +298,46 @@ export const useCheckoutFlow = ({
 
         const hash = checkoutResponse.data.attributes.hash
         const total = checkoutResponse.data.attributes.total
+        onCheckoutSuccess?.({ hash, total, values })
 
-        // Step 3: Handle payment if needed
+        return { hash, total }
+      } catch (error) {
+        logError(error, 'Checkout: handleCheckout')
+        onCheckoutError?.(error)
+        throw error
+      }
+    },
+    [
+      cartQuery.data?.data?.attributes?.cart,
+      checkoutMutation,
+      isAgeRequired,
+      onCheckoutSuccess,
+      onCheckoutError,
+    ]
+  )
+
+  const onSubmit = useCallback(
+    async (values: CheckoutFormValues) => {
+      try {
+        setIsSubmitting(true)
+        if (!(await onBeforeSubmit(values))) return
+
+        const { hash, total } = await handleCheckout(values)
+
         if (isSinglePageCheckout) {
           await handlePayment({
             hash,
             total,
             values,
           })
-        } else {
-          setIsSubmitting(false)
-          if (onCheckoutSuccess) onCheckoutSuccess(checkoutResponse.data)
         }
       } catch (error) {
+        logError(error, 'Checkout: onSubmit')
+      } finally {
         setIsSubmitting(false)
-        if (onCheckoutError) onCheckoutError(error)
       }
     },
-    [
-      cartQuery.data?.data?.attributes?.cart,
-      checkoutMutation,
-      handlePayment,
-      isAgeRequired,
-      isSinglePageCheckout,
-      onCheckoutError,
-      onCheckoutSuccess,
-      onBeforeSubmit,
-    ]
+    [onBeforeSubmit, handleCheckout, isSinglePageCheckout, handlePayment]
   )
 
   const updateOrderItemsFromCheckoutData = useCallback(
@@ -545,6 +549,8 @@ export const useCheckoutFlow = ({
 
     setSecondsLeft,
     setSelectedCountry,
+
+    handlePayment,
 
     // States
     states,

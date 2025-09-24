@@ -78,3 +78,11 @@ export interface CheckoutFormProps {
 
   scrollRef: React.RefObject<ScrollView | null>
 }
+
+export interface PaymentFormProps {
+  // Order data
+  orderItems: IOrderItem[]
+  // Form handlers
+  onSubmit: () => void | Promise<void>
+  scrollRef: React.RefObject<ScrollView | null>
+}
