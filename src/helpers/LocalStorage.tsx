@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import jwtDecode from 'jwt-decode'
 
 export const LocalStorageKeys = {
   AUTH_GUEST_TOKEN: 'AUTH_GUEST_TOKEN',
@@ -116,4 +117,19 @@ export const checkStoredData = async () => {
   } catch (ex) {
     console.log('Local Storage GetData Error - checkStoredData')
   }
+}
+
+export const isStoredTokenValid = async () => {
+  const token = await getData(LocalStorageKeys.ACCESS_TOKEN)
+  if (!token) {
+    return false
+  }
+
+  const decodedToken = jwtDecode<{ exp: number }>(token)
+  if (decodedToken && decodedToken.exp < Date.now() / 1000) {
+    await deleteData(LocalStorageKeys.ACCESS_TOKEN)
+    await deleteData(LocalStorageKeys.USER_DATA)
+    return false
+  }
+  return true
 }

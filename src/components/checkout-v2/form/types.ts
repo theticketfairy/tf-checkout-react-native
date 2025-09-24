@@ -45,7 +45,7 @@ export interface CheckoutFormProps {
   isSinglePageCheckout?: boolean // Whether to show payment form
   // User state
   isLoggedIn: boolean
-
+  isInitialLoading: boolean
   // Validation props
   isAgeRequired?: boolean
   minimumAge?: number

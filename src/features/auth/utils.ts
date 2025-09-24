@@ -1,6 +1,6 @@
 import { setAccessTokenHandler } from '../../api/ApiClient'
 import { LocalStorageKeys, storeData } from '../../helpers/LocalStorage'
-import { IAuthAttributes } from './auth.types'
+import { IAuthAttributes } from './types'
 
 // Helper to store authentication tokens
 export const storeAuthTokens = async (

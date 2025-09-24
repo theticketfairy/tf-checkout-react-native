@@ -5,29 +5,24 @@ import {
   UseQueryOptions,
 } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 
-import { ApiResponse } from '../../api/api.types'
-import { Client } from '../../api/ApiClient'
-import { ICheckoutBody } from '../../api/types'
-import { QueryOpts } from '../../common/query.types'
-import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
+import { ApiResponse } from '../../../api/api.types'
+import { Client } from '../../../api/ApiClient'
+import { ICheckoutBody } from '../../../api/types'
 import {
   AddonsResponse,
   AddToCartResponse,
   CartResponse,
   CheckoutResponse,
-  CountriesResponse,
-  CustomerProfileResponse,
   EventResponse,
   IAddToCartParams,
   PaymentDataResponse,
   PaymentSuccessResponse,
-  StatesResponse,
   TicketsResponse,
   UpdateCheckoutParams,
   UpdateCheckoutResponse,
-} from './types'
+} from '../types'
 
 /**
  * Hook to fetch event information
@@ -79,77 +74,6 @@ export const useAddToCart = () => {
         `v1/event/${eventId}/add-to-cart/`,
         ticketData
       ).then((response) => response.data),
-  })
-}
-
-/**
- * Hook to fetch user profile
- */
-export const useUserProfile = (
-  options?: QueryOpts<ApiResponse<CustomerProfileResponse>, AxiosError>
-) => {
-  const queryClient = useQueryClient()
-  const [hasToken, setHasToken] = useState(false)
-
-  useEffect(() => {
-    const checkToken = async () => {
-      const token = await getData(LocalStorageKeys.ACCESS_TOKEN)
-      setHasToken(!!token)
-    }
-    checkToken()
-  }, [])
-
-  const invalidate = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['userProfile'] })
-  }, [queryClient])
-
-  const query = useQuery<ApiResponse<CustomerProfileResponse>, AxiosError>({
-    queryKey: ['userProfile'],
-    queryFn: () =>
-      Client.get<ApiResponse<CustomerProfileResponse>>(
-        `customer/profile/`
-      ).then((response) => response.data),
-    retry: false,
-    enabled: hasToken,
-    ...options,
-  })
-
-  return { ...query, invalidate }
-}
-
-/**
- * Hook to fetch countries list
- */
-export const useCountries = () => {
-  return useQuery<ApiResponse<CountriesResponse>, AxiosError>({
-    queryKey: ['countries'],
-    queryFn: () =>
-      Client.get<ApiResponse<CountriesResponse>>(`countries/list`).then(
-        (response) => response.data
-      ),
-    staleTime: 1000 * 60 * 60 * 24, // 24 hours - countries rarely change
-  })
-}
-
-/**
- * Hook to fetch states for a country
- */
-export const useStates = (countryId?: string) => {
-  return useQuery<ApiResponse<StatesResponse>, AxiosError>({
-    queryKey: ['states', countryId],
-    queryFn: () =>
-      Client.get<ApiResponse<Record<string, string>>>(
-        `countries/${countryId}/states/`
-      ).then((response) => {
-        return {
-          ...response.data,
-          data: Object.entries(response.data.data || {}).map(([id, name]) => ({
-            label: String(name),
-            value: parseInt(String(id), 10),
-          })),
-        }
-      }),
-    enabled: !!countryId && countryId !== '-1',
   })
 }
 

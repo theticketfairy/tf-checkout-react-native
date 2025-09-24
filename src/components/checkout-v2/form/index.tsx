@@ -1,16 +1,23 @@
-import { CardForm } from '@stripe/stripe-react-native'
+import { CardForm, CardFormView } from '@stripe/stripe-react-native'
 import { FormikProvider, useFormik } from 'formik'
 import React, { useMemo, useRef } from 'react'
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native'
+import {
+  ActivityIndicator,
+  LayoutChangeEvent,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 
 import Checkbox from '../../checkbox/Checkbox'
 import DatePicker from '../../datePicker/DatePicker'
 import DropdownMaterial from '../../dropdownMaterial/DropdownMaterial'
 import Input from '../../input/Input'
+import Loading from '../../loading/Loading'
 import PhoneInput from '../../phoneInput/PhoneInput'
 import AddonsContainer from '../components/AddonsContainer'
 import Conditions from '../components/Conditions'
-import OrderReview from '../components/OrderReview'
+import OrderReview, { IOrderItem } from '../components/OrderReview'
 import { createCheckoutFormConfig } from './config'
 import styles from './styles'
 import { CheckoutFormProps } from './types'
@@ -32,6 +39,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   onAddonChange,
   onSubmit: onSubmitCallback,
   scrollRef,
+  isInitialLoading,
   eventCurrency,
   conditions,
   isSinglePageCheckout = true,
@@ -125,6 +133,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
   return (
     <FormikProvider value={formik}>
+      {isInitialLoading && <Loading />}
       <View style={styles.form}>
         {/* Personal Information */}
         <View
@@ -483,40 +492,18 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </View>
         )}
 
-        {/* Order Review */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Order Summary</Text>
-          <OrderReview orderItems={orderItems} />
-        </View>
-
         {/* Payment - only show in single-page mode and if ticket is not free */}
         {!isTicketFree && isSinglePageCheckout && (
-          <View
-            style={styles.sectionContainer}
+          <PaymentSection
+            orderItems={orderItems}
             onLayout={(e) =>
               (fieldTopRef.current.isCardFormComplete = e.nativeEvent.layout.y)
             }
-          >
-            <Text style={styles.sectionTitle}>Payment Details</Text>
-            <View style={styles.paymentContainer}>
-              <CardForm
-                onFormComplete={(details) => {
-                  formik.setFieldValue('isCardFormComplete', true)
-                  formik.setFieldValue('cardFormDetails', details)
-                }}
-                style={styles.cardContainer}
-                cardStyle={styles.cardStyle}
-              />
-
-              {/* Display error if card form is not complete */}
-              {formik.touched.isCardFormComplete &&
-              formik.errors.isCardFormComplete ? (
-                <Text style={styles.errorText}>
-                  {formik.errors.isCardFormComplete}
-                </Text>
-              ) : null}
-            </View>
-          </View>
+            onFormComplete={(details) => {
+              formik.setFieldValue('isCardFormComplete', details.complete)
+            }}
+            error={formik.errors.isCardFormComplete}
+          />
         )}
 
         {/* Submit Button */}
@@ -539,4 +526,39 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     </FormikProvider>
   )
 }
-export default CheckoutForm
+
+interface PaymentSectionProps {
+  onLayout: (e: LayoutChangeEvent) => void
+  onFormComplete: (details: CardFormView.Details) => void
+  error?: string
+  orderItems: IOrderItem[]
+}
+
+export const PaymentSection = ({
+  onLayout,
+  onFormComplete,
+  error,
+  orderItems,
+}: PaymentSectionProps) => {
+  return (
+    <View>
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>Order Summary</Text>
+        <OrderReview orderItems={orderItems} />
+      </View>
+
+      <View style={styles.sectionContainer} onLayout={onLayout}>
+        <Text style={styles.sectionTitle}>Payment Details</Text>
+        <View style={styles.paymentContainer}>
+          <CardForm
+            onFormComplete={onFormComplete}
+            style={styles.cardContainer}
+            cardStyle={styles.cardStyle}
+          />
+
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        </View>
+      </View>
+    </View>
+  )
+}

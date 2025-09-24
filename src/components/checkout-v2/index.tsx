@@ -2,17 +2,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 
-import { IAuthAttributes } from '../../features/auth/auth.types'
-import { storeAuthTokens } from '../../features/auth/auth.utils'
-import { useRegisterUser } from '../../features/auth/hooks'
+import { useRegisterUser, useUserProfile } from '../../features/auth/api-hooks'
+import { storeAuthTokens } from '../../features/auth/utils'
 import { IError } from '../../types'
 import CartTimer from '../cartTimer/CartTimer'
 import Login from '../login/Login'
-import { ILoginBrandImages } from '../login/types'
-import { useUserProfile } from './api.hooks'
+import { ILoginBrandImages, ILoginSuccessData } from '../login/types'
 import { CheckoutForm } from './form'
 import { CheckoutFormValues } from './form/types'
-import { useCheckoutFlow } from './hooks'
+import { useCheckoutFlow } from './hooks/use-checkout'
 import { OrderResult } from './types'
 import { createRegistrationData } from './utils'
 
@@ -23,7 +21,7 @@ export interface CheckoutV2Props {
   onCheckoutError?: (error: any) => void
   onPaymentSuccess?: (data: OrderResult) => void
   onPaymentError?: (error: any) => void
-  onLoginSuccess?: (data: IAuthAttributes) => void
+  onLoginSuccess?: (data: ILoginSuccessData) => void
   onLoginError?: (error: any) => void
   onLogoutSuccess?: () => void
   isAgeRequired?: boolean
@@ -127,6 +125,7 @@ export const CheckoutControllerRaw = ({
   const registerUser = useCallback(
     async (values: CheckoutFormValues): Promise<boolean> => {
       try {
+        // User is already registered or logged in, skip registration
         if (userProfile?.data) {
           return true
         }
@@ -168,6 +167,7 @@ export const CheckoutControllerRaw = ({
     isPhoneHidden,
     minimumAge,
     isSinglePageCheckout,
+    customerProfile: userProfile?.data,
   })
 
   const { setSelectedCountry, secondsLeft } = checkoutFlow
@@ -193,7 +193,7 @@ export const CheckoutControllerRaw = ({
   }
 
   const handleLoginSuccess = useCallback(
-    (data: IAuthAttributes | any) => {
+    (data: ILoginSuccessData) => {
       console.log('Login success', data)
       invalidate()
       if (onLoginSuccess) {
@@ -242,8 +242,9 @@ export const CheckoutControllerRaw = ({
   )
 }
 
+const queryClient = new QueryClient()
+
 export const CheckoutControllerWrapper = (props: CheckoutV2Props) => {
-  const queryClient = new QueryClient()
   return (
     <QueryClientProvider client={queryClient}>
       <CheckoutControllerRaw {...props} />

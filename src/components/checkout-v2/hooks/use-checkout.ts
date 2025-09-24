@@ -12,38 +12,34 @@ import {
   initStripe,
   useConfirmPayment,
 } from '@stripe/stripe-react-native'
-import { UseQueryOptions } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import BackgroundTimer from 'react-native-background-timer'
 
-import { ApiResponse } from '../../api/api.types'
-import { useCheckToken } from '../../features/auth/hooks'
+import { CustomerProfileResponse } from '../../../features/auth/types'
+import { useCountries, useStates } from '../../../features/geo/api-hooks'
+import { CheckoutFormProps, CheckoutFormValues } from '../form/types'
+import { IOrderItem, OrderResult } from '../types'
+import { createCheckoutBody, priceWithCurrency } from '../utils'
 import {
   useAddons,
   useCart,
   useCheckout,
-  useCountries,
   useEventConditions,
   useEventInfo,
   usePaymentData,
   usePaymentSuccess,
-  useStates,
   useTickets,
   useUpdateCheckout,
-  useUserProfile,
-} from './api.hooks'
-import { CheckoutFormProps, CheckoutFormValues } from './form/types'
-import { CustomerProfileResponse, IOrderItem, OrderResult } from './types'
-import { createCheckoutBody, priceWithCurrency } from './utils'
+} from './api-hooks'
 
-interface UseCheckoutFlowProps {
+export interface UseCheckoutFlowProps {
   onCartExpired?: () => void
   isSinglePageCheckout?: boolean
   isAgeRequired?: boolean
   isPhoneRequired?: boolean
   isPhoneHidden?: boolean
   minimumAge?: number
+  customerProfile?: CustomerProfileResponse
   onCheckoutSuccess?: (data: any) => void
   onCheckoutError?: (error: any) => void
   onPaymentSuccess?: (data: OrderResult) => void
@@ -52,7 +48,8 @@ interface UseCheckoutFlowProps {
   onBeforeSubmit?: (values: CheckoutFormValues) => boolean | Promise<boolean>
 }
 
-interface UseCheckoutFlowReturn extends Omit<CheckoutFormProps, 'scrollRef'> {
+export interface UseCheckoutFlowReturn
+  extends Omit<CheckoutFormProps, 'scrollRef'> {
   secondsLeft: number | undefined
   eventId: string | undefined
   isInitialLoading: boolean
@@ -60,6 +57,12 @@ interface UseCheckoutFlowReturn extends Omit<CheckoutFormProps, 'scrollRef'> {
   isLoggedIn: boolean
   setSecondsLeft: React.Dispatch<React.SetStateAction<number | undefined>>
   setSelectedCountry: React.Dispatch<React.SetStateAction<string>>
+}
+
+export interface HandlePaymentInput {
+  hash: string
+  total: string | number
+  values: CheckoutFormValues
 }
 
 export const useCheckoutFlow = ({
@@ -74,11 +77,11 @@ export const useCheckoutFlow = ({
   minimumAge,
   onBeforeSubmit,
   isSinglePageCheckout,
+  customerProfile,
 }: UseCheckoutFlowProps): UseCheckoutFlowReturn => {
   const cartQuery = useCart()
   const eventId = cartQuery.data?.data?.attributes?.eventId
 
-  const hasToken = useCheckToken()
   const [orderItems, setOrderItems] = useState<IOrderItem[]>([])
   const [secondsLeft, setSecondsLeft] = useState<number | undefined>(undefined)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -88,10 +91,6 @@ export const useCheckoutFlow = ({
 
   const ticketsQuery = useTickets(eventId)
   const eventInfoQuery = useEventInfo(eventId)
-
-  const userProfileQuery = useUserProfile({
-    enabled: !!hasToken,
-  } as UseQueryOptions<ApiResponse<CustomerProfileResponse>, AxiosError>)
 
   const countriesQuery = useCountries()
 
@@ -143,8 +142,8 @@ export const useCheckoutFlow = ({
       acceptedConditions: {},
     }
 
-    if (userProfileQuery.data?.data) {
-      const profile = userProfileQuery.data.data
+    if (customerProfile) {
+      const profile = customerProfile
 
       base.firstName = profile.firstName || ''
       base.lastName = profile.lastName || ''
@@ -159,7 +158,7 @@ export const useCheckoutFlow = ({
     }
 
     return base
-  }, [userProfileQuery.data?.data])
+  }, [customerProfile])
 
   const countries = useMemo(() => {
     return countriesQuery.data?.data || []
@@ -182,40 +181,34 @@ export const useCheckoutFlow = ({
   }, [eventInfoQuery.data?.data.attributes.currency.currency])
 
   const isLoggedIn = useMemo(() => {
-    return !!userProfileQuery.data?.data
-  }, [userProfileQuery.data?.data])
+    return !!customerProfile
+  }, [customerProfile])
 
   // Handle payment processing
   const handlePayment = useCallback(
-    async (
-      hash: string,
-      total: string | number,
-      values: CheckoutFormValues
-    ) => {
+    async (input: HandlePaymentInput) => {
       try {
         setIsSubmitting(true)
 
         // Get payment data
         const paymentResponse = await paymentDataMutation.mutateAsync(
-          String(hash)
+          String(input.hash)
         )
         const { order_details, payment_method } =
           paymentResponse.data.attributes
-        console.log('Order details', order_details)
-        console.log('Payment method', payment_method)
         // Check if this is a free ticket
         const isFreeTicket =
-          Number(total) === 0 || Number(order_details.pay_now) === 0
+          Number(input.total) === 0 || Number(order_details.pay_now) === 0
 
         if (isFreeTicket) {
           // For free tickets, just confirm the order
-          await paymentSuccessMutation.mutateAsync(String(hash))
+          await paymentSuccessMutation.mutateAsync(String(input.hash))
 
           const result: OrderResult = {
-            orderHash: String(hash),
-            total: Number(total),
+            orderHash: String(input.hash),
+            total: Number(input.total),
             currency: order_details.currency,
-            email: values.email,
+            email: input.values.email,
           }
 
           setIsSubmitting(false)
@@ -235,15 +228,15 @@ export const useCheckoutFlow = ({
 
           // Create comprehensive billing details for payment
           const billingDetails: BillingDetails = {
-            email: values.email,
-            name: `${values.firstName} ${values.lastName}`,
-            phone: values.phone || undefined,
+            email: input.values.email,
+            name: `${input.values.firstName} ${input.values.lastName}`,
+            phone: input.values.phone || undefined,
             address: {
-              city: values.city || undefined,
-              country: values.country || undefined,
-              line1: values.street || undefined,
-              postalCode: values.postalCode || undefined,
-              state: values.state || undefined,
+              city: input.values.city || undefined,
+              country: input.values.country || undefined,
+              line1: input.values.street || undefined,
+              postalCode: input.values.postalCode || undefined,
+              state: input.values.state || undefined,
             },
           }
 
@@ -258,14 +251,14 @@ export const useCheckoutFlow = ({
           }
 
           // Notify backend of successful payment
-          await paymentSuccessMutation.mutateAsync(String(hash))
+          await paymentSuccessMutation.mutateAsync(String(input.hash))
 
           // Notify about successful payment
           const result: OrderResult = {
-            orderHash: String(hash),
-            total: Number(total),
+            orderHash: String(input.hash),
+            total: Number(input.total),
             currency: order_details.currency,
-            email: values.email,
+            email: input.values.email,
             paymentIntentId: paymentIntent.id,
           }
 
@@ -293,7 +286,10 @@ export const useCheckoutFlow = ({
         setIsSubmitting(true)
 
         // Step 1: Check if the form should be submitted
-        const shouldContinue = await onBeforeSubmit?.(values)
+        const shouldContinue = onBeforeSubmit
+          ? await onBeforeSubmit?.(values)
+          : true
+
         if (!shouldContinue) return
 
         const ticketQuantity =
@@ -314,7 +310,11 @@ export const useCheckoutFlow = ({
 
         // Step 3: Handle payment if needed
         if (isSinglePageCheckout) {
-          await handlePayment(hash, total, values)
+          await handlePayment({
+            hash,
+            total,
+            values,
+          })
         } else {
           setIsSubmitting(false)
           if (onCheckoutSuccess) onCheckoutSuccess(checkoutResponse.data)

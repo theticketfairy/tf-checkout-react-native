@@ -162,59 +162,6 @@ export interface AddToCartResponse {
 }
 
 /**
- * Customer profile related types
- */
-export interface TicketHolder {
-  firstName: string
-  lastName: string
-  phone: string | null
-  email: string
-}
-
-export interface CustomerProfileResponse {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
-  phone: string | null
-  streetAddress: string
-  zipCode: string
-  countryId: string
-  company: string | null
-  stateId: string
-  city: string
-  username: string
-  screenName: string | null
-  bio: string | null
-  shortBio: string | null
-  region: string | null
-  image: string | null
-  recommendedEvents: any[]
-  rnRoles: any[]
-  hasDashboardAccess: boolean
-  ticketHolders: TicketHolder[]
-  dateOfBirth: string | null
-}
-
-/**
- * Countries and states related types
- */
-export interface CountryInfo {
-  id: string
-  code: string
-  name: string
-}
-
-export interface StateInfo {
-  label: string
-  value: number
-}
-
-export type CountriesResponse = CountryInfo[]
-
-export type StatesResponse = StateInfo[]
-
-/**
  * Checkout related types
  */
 export interface CheckoutResponse {
