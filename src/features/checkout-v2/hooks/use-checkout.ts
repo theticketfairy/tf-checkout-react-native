@@ -125,6 +125,20 @@ export const useCheckoutFlow = ({
 
   // Prefill form with user profile data when available
   const initialValues = useMemo(() => {
+    // Get ticket quantity from cart
+    const ticketQuantity =
+      (cartQuery.data?.data?.attributes?.cart?.[0] as any)?.quantity || 1
+
+    // Create empty ticket holders array based on ticket quantity
+    const ticketHolders = Array(ticketQuantity)
+      .fill(null)
+      .map(() => ({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+      }))
+
     const base: CheckoutFormValues = {
       firstName: '',
       lastName: '',
@@ -144,11 +158,13 @@ export const useCheckoutFlow = ({
       state: '',
       addons: {},
       acceptedConditions: {},
+      ticketHolders,
     }
 
     if (customerProfile) {
       const profile = customerProfile
 
+      // Fill main user info
       base.firstName = profile.firstName || ''
       base.lastName = profile.lastName || ''
       base.email = profile.email || ''
@@ -159,10 +175,20 @@ export const useCheckoutFlow = ({
       base.postalCode = profile.zipCode || ''
       base.country = profile.countryId || '-1'
       base.state = profile.stateId || '-1'
+
+      // Fill first ticket holder info from the user's profile data
+      if (base.ticketHolders.length > 0) {
+        base.ticketHolders[0] = {
+          firstName: profile.firstName || '',
+          lastName: profile.lastName || '',
+          email: profile.email || '',
+          phone: profile.phone || '',
+        }
+      }
     }
 
     return base
-  }, [customerProfile])
+  }, [cartQuery.data?.data?.attributes?.cart, customerProfile])
 
   const countries = useMemo(() => {
     return countriesQuery.data?.data || []

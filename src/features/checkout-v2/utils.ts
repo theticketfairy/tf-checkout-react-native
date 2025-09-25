@@ -4,7 +4,7 @@
 
 import { Config } from '../../helpers/Config'
 import { CheckoutFormValues } from './form/types'
-import { ICheckoutBody } from './types'
+import { CartPriceBreakdown, ICheckoutBody } from './types'
 
 /**
  * Format a price with its currency symbol
@@ -78,21 +78,13 @@ export const createCheckoutBody = (
   ticketQuantity: number,
   isAgeRequired?: boolean
 ): ICheckoutBody => {
-  // Create ticket holders array
-  const ticketHolders = []
-  for (let i = 0; i < ticketQuantity; i++) {
-    const holder =
-      i === 0
-        ? {
-            email: values.email,
-            first_name: values.firstName,
-            last_name: values.lastName,
-            phone: values.phone || '',
-          }
-        : { email: '', first_name: '', last_name: '', phone: '' }
-
-    ticketHolders.push(holder)
-  }
+  // Use the ticket holders from the form values - no fallbacks
+  const ticketHolders = values.ticketHolders.map((holder) => ({
+    email: holder.email,
+    first_name: holder.firstName,
+    last_name: holder.lastName,
+    phone: holder.phone,
+  }))
   const body: ICheckoutBody = {
     attributes: {
       city: values.city,

@@ -6,6 +6,7 @@ export const createCheckoutFormConfig = ({
   requirePassword,
   isTicketFree = false,
   requiredConditions = [],
+  isPhoneRequired = false,
 }: {
   minimumAge?: number
   isAgeRequired: boolean
@@ -13,6 +14,7 @@ export const createCheckoutFormConfig = ({
   isTicketFree?: boolean
   isSinglePageCheckout?: boolean
   requiredConditions?: Array<{ id: string }>
+  isPhoneRequired?: boolean
 }) =>
   Yup.object().shape({
     firstName: Yup.string().required('First name is required'),
@@ -92,5 +94,17 @@ export const createCheckoutFormConfig = ({
             value && value[condition.id as keyof typeof value] === true
         )
       }
+    ),
+
+    // Ticket holders validation
+    ticketHolders: Yup.array().of(
+      Yup.object().shape({
+        firstName: Yup.string().required('First name is required'),
+        lastName: Yup.string().required('Last name is required'),
+        email: Yup.string().email('Invalid email format'), // Email not required
+        phone: isPhoneRequired
+          ? Yup.string().required('Phone number is required')
+          : Yup.string(),
+      })
     ),
   })

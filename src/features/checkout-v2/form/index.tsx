@@ -21,9 +21,14 @@ import { readableError } from '../../../utils/handlers'
 import AddonsContainer from '../components/AddonsContainer'
 import Conditions from '../components/Conditions'
 import OrderReview, { IOrderItem } from '../components/OrderReview'
+import TicketHoldersSection from '../components/TicketHoldersSection'
 import { createCheckoutFormConfig } from './config'
 import styles from './styles'
-import { CheckoutFormProps, PaymentFormProps } from './types'
+import {
+  CheckoutFormProps,
+  PaymentFormProps,
+  TicketHolderFormValues,
+} from './types'
 
 export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   initialValues,
@@ -93,6 +98,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
       'country',
       'postalCode',
       'state',
+      'ticketHolders', // Add ticket holders field for validation
       // Include card validation as the last field to check
       ...(isTicketFree ? [] : ['isCardFormComplete']),
     ],
@@ -487,6 +493,52 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
             />
           </View>
         )}
+
+        {/* Ticket Holders section */}
+        <View
+          onLayout={(e) => {
+            fieldTopRef.current.ticketHolders = e.nativeEvent.layout.y
+          }}
+        >
+          <TicketHoldersSection
+            ticketHolders={formik.values.ticketHolders}
+            onChange={(index, field, value) => {
+              const updatedTicketHolders = [...formik.values.ticketHolders]
+              updatedTicketHolders[index] = {
+                ...updatedTicketHolders[index],
+                [field]: value,
+              }
+              formik.setFieldValue('ticketHolders', updatedTicketHolders)
+            }}
+            errors={
+              formik.errors.ticketHolders as Array<
+                Partial<Record<keyof TicketHolderFormValues, string>>
+              >
+            }
+            touched={
+              formik.touched.ticketHolders as Array<
+                Partial<Record<keyof TicketHolderFormValues, boolean>>
+              >
+            }
+            onFieldBlur={(index, field) => {
+              const updatedTouched = [...(formik.touched.ticketHolders || [])]
+              if (!updatedTouched[index]) {
+                updatedTouched[index] = {}
+              }
+              updatedTouched[index] = {
+                ...updatedTouched[index],
+                [field]: true,
+              }
+              formik.setFieldTouched(
+                `ticketHolders[${index}].${field}`,
+                true,
+                false
+              )
+            }}
+            isPhoneRequired={isPhoneRequired}
+            isPhoneHidden={isPhoneHidden}
+          />
+        </View>
 
         {/* Event Conditions */}
         {conditions && conditions.length > 0 && (

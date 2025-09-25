@@ -5,6 +5,13 @@ import { IDropdownItem } from '../../../components/dropdown/types'
 import { IOrderItem } from '../components/OrderReview'
 import { AddonItem } from '../types'
 
+export interface TicketHolderFormValues {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+}
+
 export interface CheckoutFormValues {
   // Personal information
   firstName: string
@@ -35,6 +42,9 @@ export interface CheckoutFormValues {
   // Add-ons
   addons: Record<string, number>
   acceptedConditions: Record<string, boolean>
+  
+  // Ticket holders information
+  ticketHolders: TicketHolderFormValues[]
 }
 
 export interface CheckoutFormProps {
