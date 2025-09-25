@@ -42,7 +42,7 @@ export interface CheckoutFormValues {
   // Add-ons
   addons: Record<string, number>
   acceptedConditions: Record<string, boolean>
-  
+
   // Ticket holders information
   ticketHolders: TicketHolderFormValues[]
 }

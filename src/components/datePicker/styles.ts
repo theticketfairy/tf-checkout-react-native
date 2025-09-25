@@ -7,7 +7,6 @@ const FONT_SIZE = 16
 export default StyleSheet.create({
   container: {
     width: '100%',
-    marginBottom: 16,
     position: 'relative',
   },
   label: {

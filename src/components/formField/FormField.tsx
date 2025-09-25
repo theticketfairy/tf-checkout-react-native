@@ -3,7 +3,7 @@ import { Text } from 'react-native'
 
 import Checkbox from '../checkbox/Checkbox'
 import DatePicker from '../datePicker/DatePicker'
-import Dropdown from '../dropdown/Dropdown'
+import DropdownMaterial from '../dropdownMaterial/DropdownMaterial'
 import Input from '../input/Input'
 import styles from './styles'
 import { IFormFieldProps } from './types'
@@ -36,18 +36,13 @@ const FormField = ({
 
     case 'dropdown':
       return (
-        <Dropdown
+        <DropdownMaterial
           items={dropdownProps!.options}
           selectedOption={dropdownProps?.selectedOption}
           onSelectItem={(item) => dropdownProps!.onSelectOption(id!, item)}
-          styles={{
-            container: [
-              styles.dropdownContainer,
-              dropdownProps?.style?.container,
-            ],
-            button: [styles.dropdownButton, dropdownProps?.style?.button],
-            label: [styles.dropdownLabel, dropdownProps?.style?.label],
-            icon: dropdownProps?.style?.icon,
+          materialInputProps={{
+            label: dropdownProps?.style?.label?.text || 'Select',
+            error: error,
           }}
         />
       )

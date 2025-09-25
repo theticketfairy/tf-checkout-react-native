@@ -30,7 +30,14 @@ export interface IFormFieldProps {
     selectedOption?: IDropdownItem
     options: IDropdownItem[]
     onSelectOption: (id: string, item: IDropdownItem) => void
-    style?: IDropdownStyles
+    style?: {
+      label?: {
+        text?: string
+      }
+      container?: any
+      button?: any
+      icon?: any
+    }
   }
   checkboxProps?: {
     isActive: boolean

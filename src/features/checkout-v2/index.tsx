@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { ScrollView, StyleSheet, Text } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
 
-import { CartTimer, Login } from '../../components'
+import { CartTimer, FormField, Login } from '../../components'
 import {
   ILoginBrandImages,
   ILoginSuccessData,
@@ -235,7 +235,11 @@ export const CheckoutControllerRaw = ({
           texts={{ dialog: { message: loginMessage } }}
         />
 
-        <Text style={styles.title}>Personal Information</Text>
+        <FormField
+          fieldType='title'
+          title='Personal Information'
+          titleStyle={styles.title}
+        />
 
         {/* Use our new CheckoutForm component */}
         {isSinglePageCheckout || !checkoutData ? (

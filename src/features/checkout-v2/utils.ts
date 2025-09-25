@@ -4,7 +4,7 @@
 
 import { Config } from '../../helpers/Config'
 import { CheckoutFormValues } from './form/types'
-import { CartPriceBreakdown, ICheckoutBody } from './types'
+import { ICheckoutBody } from './types'
 
 /**
  * Format a price with its currency symbol
