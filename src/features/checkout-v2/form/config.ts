@@ -1,13 +1,10 @@
 import * as Yup from 'yup'
 
-// import { phoneRegex } from '../../../helpers/Validators'
-
 export const createCheckoutFormConfig = ({
   minimumAge,
   isAgeRequired,
   requirePassword,
   isTicketFree = false,
-  // isSinglePageCheckout = true,
   requiredConditions = [],
 }: {
   minimumAge?: number
@@ -17,7 +14,6 @@ export const createCheckoutFormConfig = ({
   isSinglePageCheckout?: boolean
   requiredConditions?: Array<{ id: string }>
 }) =>
-  // Use strict validation mode
   Yup.object().shape({
     firstName: Yup.string().required('First name is required'),
     lastName: Yup.string().required('Last name is required'),
@@ -73,12 +69,6 @@ export const createCheckoutFormConfig = ({
       : Yup.string().oneOf([Yup.ref('password')], 'Passwords must match'),
     isSubToTicketFairy: Yup.boolean(),
     isSubToBrand: Yup.boolean(),
-    // isCardFormComplete:
-    //   isTicketFree || !isSinglePageCheckout
-    //     ? Yup.boolean() // Not required for free tickets or two-step checkout
-    //     : Yup.boolean()
-    //         .oneOf([true], 'Please complete your card information')
-    //         .required('Please complete your card information'),
     country: isTicketFree
       ? Yup.string()
       : Yup.string().test(

@@ -1,7 +1,7 @@
 import React from 'react'
 import { ScrollView } from 'react-native'
 
-import { IDropdownItem } from '../../dropdown/types'
+import { IDropdownItem } from '../../../components/dropdown/types'
 import { IOrderItem } from '../components/OrderReview'
 import { AddonItem } from '../types'
 

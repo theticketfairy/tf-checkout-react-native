@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native'
 
-import Checkbox from '../../checkbox/Checkbox'
+import { Checkbox } from '../../../components'
 
 export interface Condition {
   id: string

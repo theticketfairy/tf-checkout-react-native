@@ -32,12 +32,12 @@ interface IDeepLinkUrl {
   url: string
 }
 
-const EVENT_ID = 14065
+const EVENT_ID = 1227
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
   CLIENT: 'ttf',
-  BRAND: 'time-slot',
+  BRAND: 'rymmar',
   ARE_SUB_BRANDS_INCLUDED: true,
   ENV: 'STAG',
 }

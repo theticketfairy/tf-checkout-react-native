@@ -18,6 +18,7 @@ import BackgroundTimer from 'react-native-background-timer'
 import { CustomerProfileResponse } from '../../../features/auth/types'
 import { useCountries, useStates } from '../../../features/geo/api-hooks'
 import { logError } from '../../../utils/handlers'
+// import { useEventCustomFields } from '../../event/api-hooks'
 import { CheckoutFormProps, CheckoutFormValues } from '../form/types'
 import { IOrderItem, OrderResult } from '../types'
 import { createCheckoutBody, priceWithCurrency } from '../utils'
@@ -100,6 +101,7 @@ export const useCheckoutFlow = ({
   const paymentDataMutation = usePaymentData()
   const updateCheckoutMutation = useUpdateCheckout()
   const paymentSuccessMutation = usePaymentSuccess()
+  // const customFieldsQuery = useEventCustomFields(eventId)
 
   const addonsQuery = useAddons(eventId)
   const statesQuery = useStates(selectedCountry)

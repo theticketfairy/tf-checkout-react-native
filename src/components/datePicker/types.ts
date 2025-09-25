@@ -17,4 +17,5 @@ export interface IDatePickerProps {
   selectedDate?: Date
   styles?: IDatePickerStyles
   error?: string
+  placeholder?: string
 }

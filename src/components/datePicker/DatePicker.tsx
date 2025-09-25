@@ -1,14 +1,7 @@
 import React, { useState } from 'react'
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 
-import R from '../../res'
 import Input from '../input/Input'
 import s from './styles'
 import { IDatePickerProps } from './types'
@@ -19,6 +12,7 @@ const DatePicker = ({
   styles,
   text = 'Select date',
   selectedDate,
+  placeholder = 'Select date',
   error,
 }: IDatePickerProps) => {
   const [isVisible, setIsVisible] = useState(false)
@@ -56,7 +50,7 @@ const DatePicker = ({
       <Input
         label={text}
         value={selectedDate ? formatDate(selectedDate) : ''}
-        placeholder='Dateeeee 1'
+        placeholder={placeholder}
         pointerEvents='none'
         editable={false} // Prevent keyboard from showing
         error={error}

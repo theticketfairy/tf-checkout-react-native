@@ -9,13 +9,15 @@ import {
   ViewProps,
 } from 'react-native'
 
+import {
+  Checkbox,
+  DatePicker,
+  DropdownMaterial,
+  Input,
+  Loading,
+  PhoneInput,
+} from '../../../components'
 import { readableError } from '../../../utils/handlers'
-import Checkbox from '../../checkbox/Checkbox'
-import DatePicker from '../../datePicker/DatePicker'
-import DropdownMaterial from '../../dropdownMaterial/DropdownMaterial'
-import Input from '../../input/Input'
-import Loading from '../../loading/Loading'
-import PhoneInput from '../../phoneInput/PhoneInput'
 import AddonsContainer from '../components/AddonsContainer'
 import Conditions from '../components/Conditions'
 import OrderReview, { IOrderItem } from '../components/OrderReview'
@@ -303,6 +305,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 formik.handleChange('dateOfBirth')(date.toISOString())
               }}
               text='Date of Birth'
+              placeholder='Date of Birth'
               selectedDate={
                 formik.values.dateOfBirth
                   ? new Date(formik.values.dateOfBirth)

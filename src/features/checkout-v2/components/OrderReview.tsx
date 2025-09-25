@@ -2,7 +2,6 @@ import _map from 'lodash/map'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
-// Define types similar to the checkout-sp implementation
 export interface IOrderItem {
   id: string
   title: string

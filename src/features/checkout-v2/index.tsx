@@ -2,12 +2,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 
+import { CartTimer, Login } from '../../components'
+import {
+  ILoginBrandImages,
+  ILoginSuccessData,
+} from '../../components/login/types'
 import { useRegisterUser, useUserProfile } from '../../features/auth/api-hooks'
 import { storeAuthTokens } from '../../features/auth/utils'
 import { IError } from '../../types'
-import CartTimer from '../cartTimer/CartTimer'
-import Login from '../login/Login'
-import { ILoginBrandImages, ILoginSuccessData } from '../login/types'
 import { CheckoutForm, PaymentForm } from './form'
 import { CheckoutFormValues } from './form/types'
 import { CheckoutData, useCheckoutFlow } from './hooks/use-checkout'

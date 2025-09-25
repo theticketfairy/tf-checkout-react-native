@@ -22,7 +22,6 @@ import {
   PromoCode,
   WaitingList,
 } from './components'
-import { CheckoutControllerWrapper as CheckoutV2 } from './components/checkout-v2'
 import { IDropdownStyles } from './components/dropdown/types'
 import { ILoadingStyles } from './components/loading/types'
 import { ILoginSuccessData } from './components/login/types'
@@ -77,6 +76,7 @@ import {
   IGetTicketsPayload,
   IGroupedTickets,
 } from './core/TicketsCore/TicketsCoreTypes'
+import { CheckoutControllerWrapper as CheckoutV2 } from './features/checkout-v2'
 import { setConfig } from './helpers/Config'
 import { deleteAllData, deleteUserData } from './helpers/LocalStorage'
 import { refreshAccessToken } from './helpers/RefreshAccessToken'
