@@ -18,7 +18,8 @@ import BackgroundTimer from 'react-native-background-timer'
 import { CustomerProfileResponse } from '../../../features/auth/types'
 import { useCountries, useStates } from '../../../features/geo/api-hooks'
 import { logError } from '../../../utils/handlers'
-// import { useEventCustomFields } from '../../event/api-hooks'
+import { useEventCustomFields } from '../../event/api-hooks'
+import { OrderAttribute } from '../../event/types'
 import { CheckoutFormProps, CheckoutFormValues } from '../form/types'
 import { IOrderItem, OrderResult } from '../types'
 import { createCheckoutBody, priceWithCurrency } from '../utils'
@@ -101,11 +102,36 @@ export const useCheckoutFlow = ({
   const paymentDataMutation = usePaymentData()
   const updateCheckoutMutation = useUpdateCheckout()
   const paymentSuccessMutation = usePaymentSuccess()
-  // const customFieldsQuery = useEventCustomFields(eventId)
+  const customFieldsQuery = useEventCustomFields(eventId)
 
   const addonsQuery = useAddons(eventId)
   const statesQuery = useStates(selectedCountry)
   const conditionsQuery = useEventConditions(eventId)
+
+  // Extract and sort order custom fields
+  const orderCustomFields = useMemo(() => {
+    if (!customFieldsQuery.data?.data?.attributes) {
+      return []
+    }
+
+    // Filter for order attributes only
+    const orderAttributes = customFieldsQuery.data.data.attributes.filter(
+      (attr): attr is OrderAttribute => 'order' in attr
+    )
+
+    // Extract fields from order attributes and sort by order property
+    const fields = orderAttributes
+      .map((attr) => attr.order.group.fields)
+      .flat()
+      .sort((a, b) => {
+        // Convert order strings to numbers for comparison
+        const orderA = parseInt(a.order, 10) || 0
+        const orderB = parseInt(b.order, 10) || 0
+        return orderA - orderB
+      })
+
+    return fields
+  }, [customFieldsQuery.data])
 
   const { confirmPayment } = useConfirmPayment()
 
@@ -114,6 +140,7 @@ export const useCheckoutFlow = ({
     if (eventInfoQuery.isPending) return true
     if (ticketsQuery.isPending) return true
     if (countriesQuery.isPending) return true
+    if (customFieldsQuery.isPending) return true
 
     return false
   }, [
@@ -121,7 +148,34 @@ export const useCheckoutFlow = ({
     eventInfoQuery.isPending,
     ticketsQuery.isPending,
     countriesQuery.isPending,
+    customFieldsQuery.isPending,
   ])
+
+  const defaultCustomFieldValues = useMemo(() => {
+    const defaults: Record<string, string | string[]> = {}
+
+    // Get the custom fields from the query response
+    if (customFieldsQuery.data?.data?.attributes) {
+      // Filter to only include OrderAttribute types and cast accordingly
+      const orderAttributes = customFieldsQuery.data.data.attributes.filter(
+        (attr): attr is OrderAttribute => 'order' in attr
+      )
+
+      // Extract fields from order attributes - now TypeScript knows these are OrderAttribute
+      const fields = orderAttributes
+        .map((attr) => attr.order.group.fields)
+        .flat()
+
+      // Set default values for fields that have them
+      fields.forEach((field) => {
+        if (field.defaultValue !== undefined && field.defaultValue !== null) {
+          defaults[field.id] = field.defaultValue
+        }
+      })
+    }
+
+    return defaults
+  }, [customFieldsQuery.data])
 
   // Prefill form with user profile data when available
   const initialValues = useMemo(() => {
@@ -158,6 +212,7 @@ export const useCheckoutFlow = ({
       state: '',
       addons: {},
       acceptedConditions: {},
+      customFields: { ...defaultCustomFieldValues },
       ticketHolders,
     }
 
@@ -188,7 +243,11 @@ export const useCheckoutFlow = ({
     }
 
     return base
-  }, [cartQuery.data?.data?.attributes?.cart, customerProfile])
+  }, [
+    cartQuery.data?.data?.attributes?.cart,
+    customerProfile,
+    defaultCustomFieldValues,
+  ])
 
   const countries = useMemo(() => {
     return countriesQuery.data?.data || []
@@ -573,6 +632,7 @@ export const useCheckoutFlow = ({
     // Handlers
     onAddonChange,
     onCountryChange,
+    orderCustomFields,
     onSubmit,
 
     setSecondsLeft,

@@ -5,6 +5,7 @@ import { ICheckboxStyles } from '../checkbox/types'
 import { IDatePickerProps } from '../datePicker/types'
 import { IDropdownItem, IDropdownStyles } from '../dropdown/types'
 import { IInputProps } from '../input/types'
+import { IRadioGroupProps } from '../radioGroup/types'
 
 export type FieldType =
   | 'input'
@@ -14,6 +15,7 @@ export type FieldType =
   | 'text'
   | 'header'
   | 'datePicker'
+  | 'radio'
 
 export interface IFormField {
   value: string | number
@@ -28,8 +30,10 @@ export interface IFormFieldProps {
   inputProps?: IInputProps
   dropdownProps?: {
     selectedOption?: IDropdownItem
+    selectedOptions?: IDropdownItem[] // For multi-select support
     options: IDropdownItem[]
     onSelectOption: (id: string, item: IDropdownItem) => void
+    isMultiSelect?: boolean // Flag to indicate multi-select mode
     style?: {
       label?: {
         text?: string
@@ -48,6 +52,7 @@ export interface IFormFieldProps {
   }
   title?: string
   datePickerProps?: IDatePickerProps
+  radioProps?: Omit<IRadioGroupProps, 'error'>
 
   titleStyle?: StyleProp<TextStyle>
   headerStyle?: StyleProp<TextStyle>

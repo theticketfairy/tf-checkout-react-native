@@ -119,5 +119,17 @@ export const createCheckoutBody = (
     body.attributes.dob_year = dob.getFullYear()
   }
 
+  // Add custom fields if present
+  if (values.customFields && Object.keys(values.customFields).length > 0) {
+    body.attributes.custom_fields = {}
+
+    // Format custom fields for API
+    Object.entries(values.customFields).forEach(([key, value]) => {
+      if (value !== undefined && value !== '') {
+        body.attributes.custom_fields![key] = value
+      }
+    })
+  }
+
   return body
 }

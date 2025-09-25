@@ -1,5 +1,7 @@
 import * as Yup from 'yup'
 
+import { Field } from '../../event/types'
+
 export const createCheckoutFormConfig = ({
   minimumAge,
   isAgeRequired,
@@ -7,6 +9,7 @@ export const createCheckoutFormConfig = ({
   isTicketFree = false,
   requiredConditions = [],
   isPhoneRequired = false,
+  orderCustomFields = [],
 }: {
   minimumAge?: number
   isAgeRequired: boolean
@@ -15,6 +18,7 @@ export const createCheckoutFormConfig = ({
   isSinglePageCheckout?: boolean
   requiredConditions?: Array<{ id: string }>
   isPhoneRequired?: boolean
+  orderCustomFields?: Field[]
 }) =>
   Yup.object().shape({
     firstName: Yup.string().required('First name is required'),
@@ -106,5 +110,40 @@ export const createCheckoutFormConfig = ({
           ? Yup.string().required('Phone number is required')
           : Yup.string(),
       })
+    ),
+
+    // Custom fields validation
+    customFields: Yup.object().test(
+      'validate-custom-fields',
+      'Please fill out all required custom fields',
+      (value: Record<string, string | string[]> | undefined) => {
+        // If no custom fields, validation passes
+        if (!orderCustomFields || orderCustomFields.length === 0) {
+          return true
+        }
+
+        // Find required fields
+        const requiredFields = orderCustomFields.filter(
+          (field) => field.required
+        )
+
+        // If no required fields, validation passes
+        if (requiredFields.length === 0) {
+          return true
+        }
+
+        // Check that all required fields have values
+        return requiredFields.every((field) => {
+          const fieldValue = value?.[field.id]
+
+          // For arrays (multi-select), check that there's at least one item
+          if (Array.isArray(fieldValue)) {
+            return fieldValue.length > 0
+          }
+
+          // For strings, check that it's not empty
+          return fieldValue !== undefined && fieldValue !== ''
+        })
+      }
     ),
   })

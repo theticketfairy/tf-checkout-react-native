@@ -11,6 +11,7 @@ import {
 
 import { FormField, Loading, PhoneInput } from '../../../components'
 import { readableError } from '../../../utils/handlers'
+import { Field } from '../../event/types'
 import AddonsContainer from '../components/AddonsContainer'
 import Conditions from '../components/Conditions'
 import OrderReview, { IOrderItem } from '../components/OrderReview'
@@ -44,10 +45,13 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   eventCurrency,
   conditions,
   isSinglePageCheckout = true,
+  orderCustomFields = [],
 }) => {
-  console.log(states.length, 'states')
+  // Handle card form state for payment
   const [isCardFormComplete, setIsCardFormComplete] = useState(false)
   const [cardFormError, setCardFormError] = useState<string>()
+
+  // Initial values already include default custom field values from the hook
   const modifiedInitialValues = {
     ...initialValues,
     isCardFormComplete: isTicketFree ? true : initialValues.isCardFormComplete,
@@ -67,6 +71,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
       isTicketFree,
       isSinglePageCheckout,
       requiredConditions,
+      isPhoneRequired,
+      orderCustomFields,
     }),
     validateOnChange: true,
     validateOnBlur: true,
@@ -75,7 +81,211 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     enableReinitialize: true,
   })
 
+  // Custom field values are initialized with defaults and any existing user values
+
   const fieldTopRef = useRef<Record<string, number>>({})
+
+  /**
+   * Helper function to render custom fields based on field type
+   * Supports text, textarea, select, select_multi, phone, and radio field types
+   * Automatically handles the appropriate FormField configuration for each type
+   */
+  const renderField = (field: Field) => {
+    const fieldId = `customFields.${field.id}`
+    const fieldValue = formik.values.customFields?.[field.id]
+
+    const commonInputProps = {
+      onBlur: () => formik.setFieldTouched(`customFields.${field.id}`, true),
+    }
+
+    switch (field.type) {
+      case 'text':
+        return (
+          <FormField
+            fieldType='input'
+            id={fieldId}
+            inputProps={{
+              label: field.label,
+              value: (fieldValue as string) || '',
+              onTextChanged: (_, value) => {
+                formik.setFieldValue(`customFields.${field.id}`, value)
+              },
+              placeholder:
+                (field.defaultValue as string) || `Enter ${field.label}`,
+              ...commonInputProps,
+            }}
+          />
+        )
+
+      case 'textarea':
+        return (
+          <FormField
+            fieldType='input'
+            id={fieldId}
+            inputProps={{
+              label: field.label,
+              value: (fieldValue as string) || '',
+              onTextChanged: (_, value) => {
+                formik.setFieldValue(`customFields.${field.id}`, value)
+              },
+              placeholder:
+                (field.defaultValue as string) || `Enter ${field.label}`,
+              multiline: true,
+              numberOfLines: 4,
+              ...commonInputProps,
+            }}
+          />
+        )
+
+      case 'select':
+        return (
+          <FormField
+            fieldType='dropdown'
+            id={fieldId}
+            dropdownProps={{
+              options: [
+                { value: '', label: `Select ${field.label}` },
+                ...(field.options?.map((option) => ({
+                  value: option.value,
+                  label: option.name,
+                })) || []),
+              ],
+              onSelectOption: (_, item) => {
+                formik.setFieldValue(`customFields.${field.id}`, item.value)
+              },
+              selectedOption: {
+                value: (fieldValue as string) || '',
+                label:
+                  field.options?.find((o) => o.value === fieldValue)?.name ||
+                  `Select ${field.label}`,
+              },
+              style: {
+                label: { text: field.label },
+              },
+            }}
+          />
+        )
+
+      case 'phone':
+        return (
+          <PhoneInput
+            phoneNumber={(fieldValue as string) || ''}
+            onChangePhoneNumber={(payload) => {
+              formik.setFieldValue(`customFields.${field.id}`, payload.input)
+              requestAnimationFrame(() => {
+                if (!payload.isValid) {
+                  formik.setFieldError(
+                    `customFields.${field.id}`,
+                    'Invalid phone number'
+                  )
+                }
+              })
+            }}
+            error={
+              field.required && !fieldValue
+                ? `${field.label} is required`
+                : undefined
+            }
+            texts={{
+              label: field.label,
+            }}
+          />
+        )
+
+      case 'select_multi': {
+        // Extract the selected values as an array of strings
+        const selectedValues = Array.isArray(fieldValue)
+          ? fieldValue.map((value) => String(value))
+          : [String(fieldValue)]
+
+        // Convert field options to IDropdownItem format
+        const dropdownOptions =
+          field.options?.map((option) => ({
+            value: String(option.value),
+            label: option.name,
+          })) || []
+
+        // Get selected options based on values
+        const selectedOptions = dropdownOptions.filter((option) =>
+          selectedValues.includes(option.value)
+        )
+
+        return (
+          <View style={{ marginBottom: 16 }}>
+            <FormField
+              fieldType='dropdown'
+              id={fieldId}
+              error={
+                field.required && selectedValues.length === 0
+                  ? `${field.label} is required`
+                  : undefined
+              }
+              dropdownProps={{
+                options: dropdownOptions,
+                selectedOptions: selectedOptions,
+                isMultiSelect: true,
+                onSelectOption: (_, item) => {
+                  // Toggle selection
+                  let newValues = [...selectedValues]
+
+                  if (selectedValues.includes(String(item.value))) {
+                    // Remove if already selected
+                    newValues = newValues.filter((val) => val !== item.value)
+                  } else {
+                    // Add if not selected
+                    newValues.push(String(item.value))
+                  }
+
+                  formik.setFieldValue(`customFields.${field.id}`, newValues)
+                },
+                style: {
+                  label: { text: field.label },
+                  button: {
+                    backgroundColor:
+                      selectedValues.length > 0 ? '#E6F0FF' : undefined,
+                  },
+                },
+              }}
+            />
+          </View>
+        )
+      }
+
+      case 'radio':
+        return (
+          <FormField
+            fieldType='radio'
+            id={fieldId}
+            radioProps={{
+              options:
+                field.options?.map((option) => ({
+                  value: option.value,
+                  label: option.name,
+                })) || [],
+              selectedValue: fieldValue as string,
+              onValueChange: (value) => {
+                formik.setFieldValue(`customFields.${field.id}`, value)
+              },
+              label: field.label,
+            }}
+            error={
+              field.required && !fieldValue
+                ? `${field.label} is required`
+                : undefined
+            }
+          />
+        )
+
+      // Fallback for unsupported types
+      default:
+        return (
+          <FormField
+            fieldType='title'
+            title={`Unsupported field type: ${field.type} (${field.label})`}
+          />
+        )
+    }
+  }
 
   // Order of fields as they appear visually. Include only the keys present in your validation schema.
   const fieldOrder = useMemo(
@@ -425,28 +635,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </View>
         )}
 
-        <View
-          onLayout={(e) =>
-            (fieldTopRef.current.postalCode = e.nativeEvent.layout.y)
-          }
-        >
-          <FormField
-            fieldType='input'
-            id='postalCode'
-            inputProps={{
-              label: 'Postal Code',
-              value: formik.values.postalCode,
-              onTextChanged: (_, value) =>
-                formik.handleChange('postalCode')(value),
-              onBlur: (e) => formik.handleBlur('postalCode')(e),
-              error: formik.touched.postalCode
-                ? formik.errors.postalCode
-                : undefined,
-              placeholder: 'Enter your postal code',
-            }}
-          />
-        </View>
-
         {/* State */}
         {!!states.length && (
           <View
@@ -493,17 +681,55 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </View>
         )}
 
+        {/* Postal Code */}
+        <View
+          onLayout={(e) =>
+            (fieldTopRef.current.postalCode = e.nativeEvent.layout.y)
+          }
+        >
+          <FormField
+            fieldType='input'
+            id='postalCode'
+            inputProps={{
+              label: 'Postal Code',
+              value: formik.values.postalCode,
+              onTextChanged: (_, value) =>
+                formik.handleChange('postalCode')(value),
+              onBlur: (e) => formik.handleBlur('postalCode')(e),
+              error: formik.touched.postalCode
+                ? formik.errors.postalCode
+                : undefined,
+              placeholder: 'Enter your postal code',
+            }}
+          />
+        </View>
+
+        {/* Custom Order Fields */}
+        {orderCustomFields.length > 0 && (
+          <>
+            <FormField
+              fieldType='title'
+              title='Additional Information'
+              titleStyle={styles.sectionTitle}
+            />
+            {orderCustomFields.map((field) => (
+              <View key={field.id}>{renderField(field)}</View>
+            ))}
+          </>
+        )}
+
         {/* Marketing Opt-ins */}
         <FormField
           fieldType='checkbox'
           id='isSubToTicketFairy'
           checkboxProps={{
             isActive: formik.values.isSubToTicketFairy || false,
-            onPress: () =>
+            onPress: () => {
               formik.setFieldValue(
                 'isSubToTicketFairy',
                 !formik.values.isSubToTicketFairy
-              ),
+              )
+            },
             text: 'Subscribe to The Ticket Fairy newsletters',
           }}
         />
@@ -513,8 +739,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           id='isSubToBrand'
           checkboxProps={{
             isActive: formik.values.isSubToBrand || false,
-            onPress: () =>
-              formik.setFieldValue('isSubToBrand', !formik.values.isSubToBrand),
+            onPress: () => {
+              formik.setFieldValue('isSubToBrand', !formik.values.isSubToBrand)
+            },
             text: 'Subscribe to event organizer newsletters',
           }}
         />

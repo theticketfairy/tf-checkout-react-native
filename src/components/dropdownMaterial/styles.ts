@@ -47,7 +47,6 @@ export const DropdownMaterialStyles = StyleSheet.create({
     justifyContent: 'center',
     width: DIALOG.width,
     maxHeight: DIALOG.maxHeight,
-    minHeight: DIALOG.minHeight,
     shadowColor: R.colors.black,
     shadowOffset: {
       width: 3,

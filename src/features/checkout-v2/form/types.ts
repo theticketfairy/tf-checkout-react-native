@@ -2,6 +2,7 @@ import React from 'react'
 import { ScrollView } from 'react-native'
 
 import { IDropdownItem } from '../../../components/dropdown/types'
+import { Field } from '../../event/types'
 import { IOrderItem } from '../components/OrderReview'
 import { AddonItem } from '../types'
 
@@ -43,6 +44,9 @@ export interface CheckoutFormValues {
   addons: Record<string, number>
   acceptedConditions: Record<string, boolean>
 
+  // Custom fields
+  customFields: Record<string, string | string[]>
+
   // Ticket holders information
   ticketHolders: TicketHolderFormValues[]
 }
@@ -70,6 +74,7 @@ export interface CheckoutFormProps {
 
   // Order data
   orderItems: IOrderItem[]
+  orderCustomFields?: Field[]
 
   // Add-ons data
   availableAddons?: AddonItem[]
