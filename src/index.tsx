@@ -13,7 +13,6 @@ import {
   MyOrderRequestFromType,
 } from './api/types'
 import {
-  CheckoutSP,
   Dropdown,
   DropdownMaterial,
   Loading,
@@ -106,7 +105,6 @@ export {
   Checkout,
   CheckoutCore,
   CheckoutCoreHandle,
-  CheckoutSP,
   CheckoutV2,
   deleteAllData,
   deleteUserData,

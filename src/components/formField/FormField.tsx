@@ -36,37 +36,47 @@ const FormField = ({
         />
       )
 
-    case 'dropdown': {
-      // Unified dropdown handling for both single and multi-select
-      // Determine the selected option to display
-      let displayOption = dropdownProps?.selectedOption
-
-      // For multi-select mode, create a combined display option
-      if (dropdownProps?.isMultiSelect && dropdownProps?.selectedOptions) {
+    case 'dropdown':
+      // Special handling for multi-select dropdown
+      if (dropdownProps?.isMultiSelect && dropdownProps.selectedOptions) {
+        // For multi-select, we create a display string from selected options
         const selectedText =
           dropdownProps.selectedOptions.length > 0
             ? dropdownProps.selectedOptions.map((item) => item.label).join(', ')
             : `Select ${dropdownProps?.style?.label?.text || 'items'}`
 
-        displayOption = {
+        // Use a fake selectedOption for the display
+        const displayOption = {
           value: '',
           label: selectedText,
         }
-      }
 
-      // Single component path for both single and multi-select
-      return (
-        <DropdownMaterial
-          items={dropdownProps!.options}
-          selectedOption={displayOption}
-          onSelectItem={(item) => dropdownProps!.onSelectOption(id!, item)}
-          materialInputProps={{
-            label: dropdownProps?.style?.label?.text || 'Select',
-            error: error,
-          }}
-        />
-      )
-    }
+        // Return with special multi-select handling
+        return (
+          <DropdownMaterial
+            items={dropdownProps.options}
+            selectedOption={displayOption}
+            onSelectItem={(item) => dropdownProps.onSelectOption(id!, item)}
+            materialInputProps={{
+              label: dropdownProps?.style?.label?.text || 'Select Multiple',
+              error: error,
+            }}
+          />
+        )
+      } else {
+        // Standard single-select dropdown
+        return (
+          <DropdownMaterial
+            items={dropdownProps!.options}
+            selectedOption={dropdownProps?.selectedOption}
+            onSelectItem={(item) => dropdownProps!.onSelectOption(id!, item)}
+            materialInputProps={{
+              label: dropdownProps?.style?.label?.text || 'Select',
+              error: error,
+            }}
+          />
+        )
+      }
 
     case 'title':
       return <Text style={[styles.title, titleStyle]}>{title}</Text>
@@ -93,6 +103,7 @@ const FormField = ({
     case 'datePicker':
       return (
         <DatePicker
+          error={error}
           onSelectDate={datePickerProps!.onSelectDate}
           text={datePickerProps?.text || 'Select date'}
           onCancel={datePickerProps?.onCancel}

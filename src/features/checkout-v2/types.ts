@@ -389,7 +389,7 @@ export interface ICheckoutBody {
     dob_month?: number
     dob_year?: number
     add_ons?: Record<string, number>
-    custom_fields?: Record<string, string | string[]>
+    data_capture?: Record<string, string | string[]>
   }
 }
 

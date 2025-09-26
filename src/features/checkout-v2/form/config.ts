@@ -73,6 +73,9 @@ export const createCheckoutFormConfig = ({
           .oneOf([Yup.ref('password')], 'Passwords must match')
           .required('Password confirmation is required')
       : Yup.string().oneOf([Yup.ref('password')], 'Passwords must match'),
+    phone: isPhoneRequired
+      ? Yup.string().required('Phone number is required')
+      : Yup.string().optional(),
     isSubToTicketFairy: Yup.boolean(),
     isSubToBrand: Yup.boolean(),
     country: isTicketFree
@@ -106,9 +109,7 @@ export const createCheckoutFormConfig = ({
         firstName: Yup.string().required('First name is required'),
         lastName: Yup.string().required('Last name is required'),
         email: Yup.string().email('Invalid email format'), // Email not required
-        phone: isPhoneRequired
-          ? Yup.string().required('Phone number is required')
-          : Yup.string(),
+        phone: Yup.string().optional(),
       })
     ),
 
@@ -134,7 +135,7 @@ export const createCheckoutFormConfig = ({
 
         // Check that all required fields have values
         return requiredFields.every((field) => {
-          const fieldValue = value?.[field.id]
+          const fieldValue = value?.[field.name]
 
           // For arrays (multi-select), check that there's at least one item
           if (Array.isArray(fieldValue)) {

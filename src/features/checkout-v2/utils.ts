@@ -64,7 +64,7 @@ export const createRegistrationData = (
 // Helper to add date of birth fields to form data
 const addDateOfBirthToFormData = (
   formData: FormData,
-  dateOfBirth: Date
+  dateOfBirth: string
 ): void => {
   const dob = new Date(dateOfBirth)
   formData.append('dob_day', dob.getDate().toString())
@@ -75,7 +75,6 @@ const addDateOfBirthToFormData = (
 // Helper to create checkout request body
 export const createCheckoutBody = (
   values: CheckoutFormValues,
-  ticketQuantity: number,
   isAgeRequired?: boolean
 ): ICheckoutBody => {
   // Use the ticket holders from the form values - no fallbacks
@@ -119,14 +118,16 @@ export const createCheckoutBody = (
     body.attributes.dob_year = dob.getFullYear()
   }
 
+  console.log('VALUES CUSTOM FIELDS:', values.customFields)
+
   // Add custom fields if present
   if (values.customFields && Object.keys(values.customFields).length > 0) {
-    body.attributes.custom_fields = {}
-
+    body.attributes.data_capture = {}
+    console.log('values.customFields', values.customFields)
     // Format custom fields for API
     Object.entries(values.customFields).forEach(([key, value]) => {
       if (value !== undefined && value !== '') {
-        body.attributes.custom_fields![key] = value
+        body.attributes.data_capture![key] = value
       }
     })
   }

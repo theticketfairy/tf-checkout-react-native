@@ -139,6 +139,7 @@ Client.interceptors.response.use(
       '[API ERROR]',
       JSON.stringify(
         {
+          baseURL: Client.defaults.baseURL,
           url,
           method,
           status,

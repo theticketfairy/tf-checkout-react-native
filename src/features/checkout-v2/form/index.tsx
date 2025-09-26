@@ -1,6 +1,6 @@
 import { CardForm, CardFormView } from '@stripe/stripe-react-native'
 import { FormikProvider, useFormik } from 'formik'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   Text,
@@ -50,7 +50,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   // Handle card form state for payment
   const [isCardFormComplete, setIsCardFormComplete] = useState(false)
   const [cardFormError, setCardFormError] = useState<string>()
-
+  useEffect(() => {
+    console.log('ORDER CUSTOM FIELDS', orderCustomFields)
+  }, [orderCustomFields])
   // Initial values already include default custom field values from the hook
   const modifiedInitialValues = {
     ...initialValues,
@@ -92,10 +94,10 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
    */
   const renderField = (field: Field) => {
     const fieldId = `customFields.${field.id}`
-    const fieldValue = formik.values.customFields?.[field.id]
+    const fieldValue = formik.values.customFields?.[field.name]
 
     const commonInputProps = {
-      onBlur: () => formik.setFieldTouched(`customFields.${field.id}`, true),
+      onBlur: () => formik.setFieldTouched(`customFields.${field.name}`, true),
     }
 
     switch (field.type) {
@@ -108,7 +110,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
               label: field.label,
               value: (fieldValue as string) || '',
               onTextChanged: (_, value) => {
-                formik.setFieldValue(`customFields.${field.id}`, value)
+                console.log('TEXT CHANGED', `customFields.${field.name}`, value)
+                formik.setFieldValue(`customFields.${field.name}`, value)
               },
               placeholder:
                 (field.defaultValue as string) || `Enter ${field.label}`,
@@ -126,7 +129,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
               label: field.label,
               value: (fieldValue as string) || '',
               onTextChanged: (_, value) => {
-                formik.setFieldValue(`customFields.${field.id}`, value)
+                formik.setFieldValue(`customFields.${field.name}`, value)
               },
               placeholder:
                 (field.defaultValue as string) || `Enter ${field.label}`,
@@ -151,7 +154,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 })) || []),
               ],
               onSelectOption: (_, item) => {
-                formik.setFieldValue(`customFields.${field.id}`, item.value)
+                formik.setFieldValue(`customFields.${field.name}`, item.value)
               },
               selectedOption: {
                 value: (fieldValue as string) || '',
@@ -171,11 +174,11 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           <PhoneInput
             phoneNumber={(fieldValue as string) || ''}
             onChangePhoneNumber={(payload) => {
-              formik.setFieldValue(`customFields.${field.id}`, payload.input)
+              formik.setFieldValue(`customFields.${field.name}`, payload.input)
               requestAnimationFrame(() => {
                 if (!payload.isValid) {
                   formik.setFieldError(
-                    `customFields.${field.id}`,
+                    `customFields.${field.name}`,
                     'Invalid phone number'
                   )
                 }
@@ -236,7 +239,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     newValues.push(String(item.value))
                   }
 
-                  formik.setFieldValue(`customFields.${field.id}`, newValues)
+                  formik.setFieldValue(`customFields.${field.name}`, newValues)
                 },
                 style: {
                   label: { text: field.label },
@@ -264,7 +267,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 })) || [],
               selectedValue: fieldValue as string,
               onValueChange: (value) => {
-                formik.setFieldValue(`customFields.${field.id}`, value)
+                formik.setFieldValue(`customFields.${field.name}`, value)
               },
               label: field.label,
             }}
@@ -311,39 +314,61 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
   // 2) helper: scroll to a field by key
   const scrollToField = (key: string) => {
+    console.log('SCROLL TO:', key)
+    if (key === 'isCardFormComplete') {
+      return
+    }
     const y = fieldTopRef.current[key]
     if (y != null && scrollRef.current) {
-      // small offset so the label is visible
       scrollRef.current.scrollTo({ y: Math.max(0, y - 16), animated: true })
     }
   }
 
   const onPressSubmit = async () => {
+    console.log('ON PRESS SUBMIT')
     const allFields = Object.keys(initialValues)
 
+    // Create touched fields with special handling for nested ticket holders
     const touchedFields = allFields.reduce((acc, field) => {
-      acc[field] = true as const
+      // Handle ticketHolders specially as a nested structure
+      if (field === 'ticketHolders') {
+        // Create a properly structured touched fields object for ticket holders
+        acc[field] = formik.values.ticketHolders.map(() => ({
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+        }))
+      } else {
+        // Mark all other fields as touched
+        acc[field] = true
+      }
       return acc
-    }, {} as Record<string, true>)
+    }, {} as Record<string, boolean | Record<string, boolean>[]>)
 
     const result = await formik.setTouched(touchedFields, true)
     const formErrors = result ?? {}
     const paymentValid =
       isCardFormComplete || isTicketFree || !isSinglePageCheckout
-
+    console.log('PAYMENT VALID', paymentValid)
     if (!paymentValid) {
       setCardFormError('Please fill your payment information')
     }
 
     if (Object.keys(formErrors).length === 0 && paymentValid) {
+      console.log('PRESS SUBMIT')
       formik.handleSubmit()
       return
     }
+
+    console.log('FORM ERRORS', formErrors)
 
     // find first error by visual order
     const firstErroredKey = fieldOrder.find(
       (k) => formErrors[k as keyof typeof formErrors] != null
     )
+
+    console.log('FIRST ERRORED KEY', firstErroredKey)
 
     if (firstErroredKey) {
       scrollToField(firstErroredKey)
@@ -365,15 +390,15 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           <FormField
             fieldType='input'
             id='firstName'
+            error={
+              formik.touched.firstName ? formik.errors.firstName : undefined
+            }
             inputProps={{
               label: 'First Name',
               value: formik.values.firstName,
               onTextChanged: (_, value) =>
                 formik.handleChange('firstName')(value),
               onBlur: (e) => formik.handleBlur('firstName')(e),
-              error: formik.touched.firstName
-                ? formik.errors.firstName
-                : undefined,
               placeholder: 'Enter your first name',
             }}
           />
@@ -387,15 +412,13 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           <FormField
             fieldType='input'
             id='lastName'
+            error={formik.touched.lastName ? formik.errors.lastName : undefined}
             inputProps={{
               label: 'Last Name',
               value: formik.values.lastName,
               onTextChanged: (_, value) =>
                 formik.handleChange('lastName')(value),
               onBlur: (e) => formik.handleBlur('lastName')(e),
-              error: formik.touched.lastName
-                ? formik.errors.lastName
-                : undefined,
               placeholder: 'Enter your last name',
             }}
           />
@@ -407,12 +430,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           <FormField
             fieldType='input'
             id='email'
+            error={formik.touched.email ? formik.errors.email : undefined}
             inputProps={{
               label: 'Email',
               value: formik.values.email,
               onTextChanged: (_, value) => formik.handleChange('email')(value),
               onBlur: (e) => formik.handleBlur('email')(e),
-              error: formik.touched.email ? formik.errors.email : undefined,
               placeholder: 'Enter your email',
               keyboardType: 'email-address',
             }}
@@ -427,15 +450,17 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           <FormField
             fieldType='input'
             id='emailConfirmation'
+            error={
+              formik.touched.emailConfirmation
+                ? formik.errors.emailConfirmation
+                : undefined
+            }
             inputProps={{
               label: 'Confirm Email',
               value: formik.values.emailConfirmation,
               onTextChanged: (_, value) =>
                 formik.handleChange('emailConfirmation')(value),
               onBlur: (e) => formik.handleBlur('emailConfirmation')(e),
-              error: formik.touched.emailConfirmation
-                ? formik.errors.emailConfirmation
-                : undefined,
               placeholder: 'Confirm your email',
               keyboardType: 'email-address',
             }}
@@ -459,15 +484,15 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
               <FormField
                 fieldType='input'
                 id='password'
+                error={
+                  formik.touched.password ? formik.errors.password : undefined
+                }
                 inputProps={{
                   label: 'Password',
                   value: formik.values.password,
                   onTextChanged: (_, value) =>
                     formik.handleChange('password')(value),
                   onBlur: (e) => formik.handleBlur('password')(e),
-                  error: formik.touched.password
-                    ? formik.errors.password
-                    : undefined,
                   placeholder: 'Enter a password',
                   secureTextEntry: true,
                   textContentType: 'oneTimeCode',
@@ -484,15 +509,17 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
               <FormField
                 fieldType='input'
                 id='passwordConfirmation'
+                error={
+                  formik.touched.passwordConfirmation
+                    ? formik.errors.passwordConfirmation
+                    : undefined
+                }
                 inputProps={{
                   label: 'Confirm Password',
                   value: formik.values.passwordConfirmation,
                   onTextChanged: (_, value) =>
                     formik.handleChange('passwordConfirmation')(value),
                   onBlur: (e) => formik.handleBlur('passwordConfirmation')(e),
-                  error: formik.touched.passwordConfirmation
-                    ? formik.errors.passwordConfirmation
-                    : undefined,
                   placeholder: 'Confirm your password',
                   secureTextEntry: true,
                   textContentType: 'oneTimeCode',
@@ -519,7 +546,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   )
                 })
               }}
-              error={formik.errors.phone}
+              error={formik.touched.phone ? formik.errors.phone : undefined}
               texts={{
                 label: 'Phone Number',
               }}
@@ -536,6 +563,11 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
             <FormField
               fieldType='datePicker'
               id='dateOfBirth'
+              error={
+                formik.touched.dateOfBirth
+                  ? formik.errors.dateOfBirth
+                  : undefined
+              }
               datePickerProps={{
                 onSelectDate: (date) => {
                   formik.handleChange('dateOfBirth')(date.toISOString())
@@ -544,9 +576,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 placeholder: 'Date of Birth',
                 selectedDate: formik.values.dateOfBirth
                   ? new Date(formik.values.dateOfBirth)
-                  : undefined,
-                error: formik.touched.dateOfBirth
-                  ? formik.errors.dateOfBirth
                   : undefined,
               }}
             />
@@ -562,12 +591,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           <FormField
             fieldType='input'
             id='street'
+            error={formik.touched.street ? formik.errors.street : undefined}
             inputProps={{
               label: 'Street Address',
               value: formik.values.street,
               onTextChanged: (_, value) => formik.handleChange('street')(value),
               onBlur: (e) => formik.handleBlur('street')(e),
-              error: formik.touched.street ? formik.errors.street : undefined,
               placeholder: 'Enter your street address',
             }}
           />
@@ -579,12 +608,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           <FormField
             fieldType='input'
             id='city'
+            error={formik.touched.city ? formik.errors.city : undefined}
             inputProps={{
               label: 'City',
               value: formik.values.city,
               onTextChanged: (_, value) => formik.handleChange('city')(value),
               onBlur: (e) => formik.handleBlur('city')(e),
-              error: formik.touched.city ? formik.errors.city : undefined,
               placeholder: 'Enter your city',
             }}
           />
@@ -599,6 +628,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
             <FormField
               fieldType='dropdown'
               id='country'
+              error={formik.touched.country ? formik.errors.country : undefined}
               dropdownProps={{
                 options: [
                   { value: '-1', label: 'Select Country' },
@@ -626,11 +656,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   label: { text: 'Country' },
                 },
               }}
-              error={
-                formik.touched.country && formik.errors.country
-                  ? String(formik.errors.country)
-                  : undefined
-              }
             />
           </View>
         )}
@@ -690,15 +715,15 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           <FormField
             fieldType='input'
             id='postalCode'
+            error={
+              formik.touched.postalCode ? formik.errors.postalCode : undefined
+            }
             inputProps={{
               label: 'Postal Code',
               value: formik.values.postalCode,
               onTextChanged: (_, value) =>
                 formik.handleChange('postalCode')(value),
               onBlur: (e) => formik.handleBlur('postalCode')(e),
-              error: formik.touched.postalCode
-                ? formik.errors.postalCode
-                : undefined,
               placeholder: 'Enter your postal code',
             }}
           />
@@ -707,13 +732,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         {/* Custom Order Fields */}
         {orderCustomFields.length > 0 && (
           <>
-            <FormField
-              fieldType='title'
-              title='Additional Information'
-              titleStyle={styles.sectionTitle}
-            />
             {orderCustomFields.map((field) => (
-              <View key={field.id}>{renderField(field)}</View>
+              <View key={field.name}>{renderField(field)}</View>
             ))}
           </>
         )}
@@ -834,18 +854,20 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
         {/* Payment - only show in single-page mode and if ticket is not free */}
         {!isTicketFree && isSinglePageCheckout && (
-          <Payment
-            orderItems={orderItems}
-            paymentViewProps={{
-              onLayout: (e) =>
-                (fieldTopRef.current.isCardFormComplete =
-                  e.nativeEvent.layout.y),
-            }}
-            onFormComplete={(details) => {
-              setIsCardFormComplete(details.complete)
-            }}
-            error={cardFormError}
-          />
+          <View
+            style={styles.sectionContainer}
+            onLayout={(e) =>
+              (fieldTopRef.current.isCardFormComplete = e.nativeEvent.layout.y)
+            }
+          >
+            <Payment
+              orderItems={orderItems}
+              onFormComplete={(details) => {
+                setIsCardFormComplete(details.complete)
+              }}
+              error={cardFormError}
+            />
+          </View>
         )}
 
         {/* Submit Button */}

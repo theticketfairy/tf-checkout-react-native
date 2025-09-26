@@ -22,7 +22,7 @@ import Color from './Colors'
 import { ComponentEnum } from './enums'
 import styles from './styles'
 import { IMyOrderDetailsTicket } from '../../src/api/types'
-import { CheckoutData } from '../../src/components/checkout-v2/hooks/use-checkout'
+import { CheckoutData } from '../../src/features/checkout-v2/hooks/use-checkout'
 
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
@@ -314,8 +314,8 @@ const App = () => {
                 marginBottom: 16,
               },
             }}
-            isAgeRequired
-            minimumAge={18}
+            isAgeRequired={false}
+            // minimumAge={18}
           />
         )
       case ComponentEnum.PurchaseConfirmation:

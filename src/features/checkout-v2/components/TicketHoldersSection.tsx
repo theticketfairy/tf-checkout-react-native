@@ -1,3 +1,4 @@
+import { FormikErrors } from 'formik'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
@@ -11,7 +12,7 @@ interface TicketHoldersSectionProps {
     field: keyof TicketHolderFormValues,
     value: string
   ) => void
-  errors?: Array<Partial<Record<keyof TicketHolderFormValues, string>>>
+  errors?: FormikErrors<TicketHolderFormValues>[]
   touched?: Array<Partial<Record<keyof TicketHolderFormValues, boolean>>>
   onFieldBlur?: (index: number, field: keyof TicketHolderFormValues) => void
   isPhoneHidden?: boolean
@@ -34,8 +35,8 @@ export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
       />
 
       {ticketHolders.map((holder, index) => {
-        const touchedFields = touched ? touched[index] : {}
         const errorFields = errors ? errors[index] : {}
+        const touchedFields = touched ? touched[index] : {}
 
         return (
           <View
@@ -48,15 +49,15 @@ export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
               <FormField
                 fieldType='input'
                 id={`firstName-${index}`}
+                error={
+                  touchedFields?.firstName ? errorFields?.firstName : undefined
+                }
                 inputProps={{
                   label: 'First Name *',
                   value: holder.firstName,
-                  onTextChanged: (value: string) =>
+                  onTextChanged: (key, value) =>
                     onChange(index, 'firstName', value),
                   onBlur: () => onFieldBlur?.(index, 'firstName'),
-                  error: touchedFields?.firstName
-                    ? errorFields?.firstName
-                    : undefined,
                   placeholder: 'Enter first name',
                 }}
               />
@@ -66,15 +67,15 @@ export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
               <FormField
                 fieldType='input'
                 id={`lastName-${index}`}
+                error={
+                  touchedFields?.lastName ? errorFields?.lastName : undefined
+                }
                 inputProps={{
                   label: 'Last Name *',
                   value: holder.lastName,
-                  onTextChanged: (value: string) =>
+                  onTextChanged: (key, value) =>
                     onChange(index, 'lastName', value),
                   onBlur: () => onFieldBlur?.(index, 'lastName'),
-                  error: touchedFields?.lastName
-                    ? errorFields?.lastName
-                    : undefined,
                   placeholder: 'Enter last name',
                 }}
               />
@@ -84,13 +85,13 @@ export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
               <FormField
                 fieldType='input'
                 id={`email-${index}`}
+                error={touchedFields?.email ? errorFields?.email : undefined}
                 inputProps={{
                   label: 'Email',
                   value: holder.email,
-                  onTextChanged: (value: string) =>
+                  onTextChanged: (key, value) =>
                     onChange(index, 'email', value),
                   onBlur: () => onFieldBlur?.(index, 'email'),
-                  error: touchedFields?.email ? errorFields?.email : undefined,
                   placeholder: 'Enter email address',
                   keyboardType: 'email-address',
                 }}
@@ -104,7 +105,7 @@ export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
                   onChangePhoneNumber={(payload) => {
                     onChange(index, 'phone', payload.input)
                   }}
-                  error={errorFields?.phone}
+                  error={touchedFields?.phone ? errorFields?.phone : undefined}
                   texts={{
                     label: 'Phone Number',
                   }}

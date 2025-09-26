@@ -169,7 +169,7 @@ export const useCheckoutFlow = ({
       // Set default values for fields that have them
       fields.forEach((field) => {
         if (field.defaultValue !== undefined && field.defaultValue !== null) {
-          defaults[field.id] = field.defaultValue
+          defaults[field.name] = field.defaultValue
         }
       })
     }
@@ -187,29 +187,29 @@ export const useCheckoutFlow = ({
     const ticketHolders = Array(ticketQuantity)
       .fill(null)
       .map(() => ({
-        firstName: '',
-        lastName: '',
+        firstName: 'G',
+        lastName: 'B',
         email: '',
         phone: '',
       }))
 
     const base: CheckoutFormValues = {
-      firstName: '',
-      lastName: '',
-      email: '',
-      emailConfirmation: '',
+      firstName: 'G',
+      lastName: 'B',
+      email: 'garik+10@theticketfairy.com',
+      emailConfirmation: 'garik+10@theticketfairy.com',
       phone: '',
       dateOfBirth: undefined,
-      street: '',
-      city: '',
-      postalCode: '',
-      password: '',
-      passwordConfirmation: '',
+      street: 'Test',
+      city: 'Test',
+      postalCode: '123',
+      password: '12345678?',
+      passwordConfirmation: '12345678?',
       isSubToTicketFairy: false,
       isSubToBrand: false,
       isCardFormComplete: false,
-      country: '',
-      state: '',
+      country: '1',
+      state: '1',
       addons: {},
       acceptedConditions: {},
       customFields: { ...defaultCustomFieldValues },
@@ -230,13 +230,14 @@ export const useCheckoutFlow = ({
       base.postalCode = profile.zipCode || ''
       base.country = profile.countryId || '-1'
       base.state = profile.stateId || '-1'
+      base.dateOfBirth = profile.dateOfBirth || undefined
 
       // Fill first ticket holder info from the user's profile data
       if (base.ticketHolders.length > 0) {
         base.ticketHolders[0] = {
-          firstName: profile.firstName || '',
-          lastName: profile.lastName || '',
-          email: profile.email || '',
+          firstName: profile.firstName || 'G',
+          lastName: profile.lastName || 'B',
+          email: profile.email || 'garik+10@theticketfairy.com',
           phone: profile.phone || '',
         }
       }
@@ -371,14 +372,7 @@ export const useCheckoutFlow = ({
   const handleCheckout = useCallback(
     async (values: CheckoutFormValues) => {
       try {
-        const ticketQuantity =
-          (cartQuery.data?.data?.attributes?.cart?.[0] as any)?.quantity || 1
-
-        const checkoutBody = createCheckoutBody(
-          values,
-          ticketQuantity,
-          isAgeRequired
-        )
+        const checkoutBody = createCheckoutBody(values, isAgeRequired)
         const checkoutResponse = await checkoutMutation.mutateAsync(
           checkoutBody
         )
@@ -394,13 +388,7 @@ export const useCheckoutFlow = ({
         throw error
       }
     },
-    [
-      cartQuery.data?.data?.attributes?.cart,
-      checkoutMutation,
-      isAgeRequired,
-      onCheckoutSuccess,
-      onCheckoutError,
-    ]
+    [checkoutMutation, isAgeRequired, onCheckoutSuccess, onCheckoutError]
   )
 
   const onSubmit = useCallback(

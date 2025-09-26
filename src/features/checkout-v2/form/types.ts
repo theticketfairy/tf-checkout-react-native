@@ -20,7 +20,7 @@ export interface CheckoutFormValues {
   email: string
   emailConfirmation: string
   phone: string
-  dateOfBirth?: Date
+  dateOfBirth?: string
 
   // Address information
   street: string
