@@ -1,30 +1,37 @@
 import _map from 'lodash/map'
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import {
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native'
 
 export interface IOrderItem {
   id: string
   title: string
   subtitle?: string
   value: string
-  styles?: {
-    title?: any
-    value?: any
-    container?: any
-    subtitle?: any
-  }
+  styles?: OrderReviewItemStyles
+}
+
+export interface OrderReviewItemStyles {
+  container?: StyleProp<ViewStyle>
+  title?: StyleProp<TextStyle>
+  subtitle?: StyleProp<TextStyle>
+  value?: StyleProp<TextStyle>
+}
+
+export interface OrderReviewStyles {
+  item?: OrderReviewItemStyles
+  rootContainer?: StyleProp<ViewStyle>
 }
 
 export interface IOrderReviewProps {
   orderItems: IOrderItem[]
-  styles?: {
-    item?: {
-      title?: any
-      value?: any
-      container?: any
-    }
-    rootContainer?: any
-  }
+  styles?: OrderReviewStyles
 }
 
 const styles = StyleSheet.create({
@@ -90,7 +97,12 @@ const OrderReview = ({
         title={item.title}
         subtitle={item.subtitle}
         value={item.value}
-        styles={customStyles?.item}
+        styles={{
+          container: customStyles?.item?.container ?? item.styles?.container,
+          title: customStyles?.item?.title ?? item.styles?.title,
+          subtitle: customStyles?.item?.subtitle ?? item.styles?.subtitle,
+          value: customStyles?.item?.value ?? item.styles?.value,
+        }}
       />
     ))}
   </View>

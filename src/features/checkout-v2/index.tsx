@@ -1,19 +1,28 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { ScrollView, StyleSheet } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  ScrollView,
+  StyleProp,
+  StyleSheet,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 
 import { CartTimer, FormField, Login } from '../../components'
+import { ICartTimerStyles } from '../../components/cartTimer/types'
 import {
   ILoginBrandImages,
   ILoginSuccessData,
+  ILoginViewStyles,
 } from '../../components/login/types'
-import { useRegisterUser, useUserProfile } from '../../features/auth/api-hooks'
-import { storeAuthTokens } from '../../features/auth/utils'
 import { IError } from '../../types'
+import { useRegisterUser, useUserProfile } from '../auth/api-hooks'
+import { storeAuthTokens } from '../auth/utils'
 import { CheckoutForm, PaymentForm } from './form'
+import { CheckoutFormStyles } from './form/styles'
 import { CheckoutFormValues } from './form/types'
 import { CheckoutData, useCheckoutFlow } from './hooks/use-checkout'
-import { OrderResult } from './types'
+import { CheckoutTexts, OrderResult } from './types'
 import { createRegistrationData } from './utils'
 
 export interface CheckoutV2Props {
@@ -31,15 +40,27 @@ export interface CheckoutV2Props {
   isPhoneRequired?: boolean
   isPhoneHidden?: boolean
   loginBrandImages?: ILoginBrandImages
+  styles?: CheckoutStyles
+  texts?: CheckoutTexts
 }
 
-const styles = StyleSheet.create({
+export interface CheckoutStyles {
+  container?: StyleProp<ViewStyle>
+  contentContainer?: StyleProp<ViewStyle>
+  title?: StyleProp<TextStyle>
+  login?: ILoginViewStyles
+  cartTimer?: ICartTimerStyles
+  form?: CheckoutFormStyles
+  paymentForm?: CheckoutFormStyles
+}
+
+const defaultStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
     padding: 20,
   },
-  contentContainerStyle: {
+  contentContainer: {
     paddingBottom: 24,
   },
   title: {
@@ -64,15 +85,39 @@ export const CheckoutControllerRaw = ({
   isPhoneRequired = false,
   isPhoneHidden = false,
   loginBrandImages,
+  styles: stylesProp,
+  texts: textsProp,
 }: CheckoutV2Props) => {
   const scrollRef = useRef<ScrollView>(null)
   const [checkoutData, setCheckoutData] = useState<CheckoutData>()
   const [loginMessage, setLoginMessage] = useState('')
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
 
+  const formTexts = textsProp?.form
+  const loginTexts = useMemo(() => {
+    const baseLogin = textsProp?.login
+    const baseDialog = baseLogin?.dialog ?? {}
+    const dialogMessage = loginMessage || baseDialog.message
+
+    if (!baseLogin && !dialogMessage) {
+      return undefined
+    }
+
+    return {
+      ...baseLogin,
+      dialog: {
+        ...baseDialog,
+        message: dialogMessage,
+      },
+    }
+  }, [loginMessage, textsProp])
+
+  const cartTimerTexts = textsProp?.cartTimer
+  console.log('TEXTS', JSON.stringify(textsProp))
+
   const { data: userProfile, invalidate } = useUserProfile()
   const registerUserMutation = useRegisterUser()
-
+  console.log('STYLES FORM FIELDS', stylesProp?.form?.fields)
   // Helper function to handle registration error
   const handleRegistrationError = useCallback((registerError: any): boolean => {
     // Check for already registered user (422 status)
@@ -135,7 +180,6 @@ export const CheckoutControllerRaw = ({
         // Create and submit registration data
         const registerUserData = createRegistrationData(values, isAgeRequired)
         const result = await registerUserMutation.mutateAsync(registerUserData)
-        console.log('User registration result:', JSON.stringify(result))
 
         // Store tokens and extract user data
         await storeAuthTokens(result.data.attributes)
@@ -145,7 +189,6 @@ export const CheckoutControllerRaw = ({
         // Registration successful
         return true
       } catch (registerError: any) {
-        console.error('Registration failed:', registerError)
         return !handleRegistrationError(registerError)
       }
     },
@@ -194,7 +237,6 @@ export const CheckoutControllerRaw = ({
 
   const handleLoginSuccess = useCallback(
     (data: ILoginSuccessData) => {
-      console.log('Login success', data)
       invalidate()
       _onLoginSuccess?.(data)
       setIsLoginDialogVisible(false)
@@ -211,12 +253,25 @@ export const CheckoutControllerRaw = ({
     }
   }, [setSelectedCountry, userProfile])
 
+  const containerStyle = StyleSheet.flatten([
+    defaultStyles.container,
+    stylesProp?.container,
+  ]) as StyleProp<ViewStyle>
+  const contentContainerStyle = StyleSheet.flatten([
+    defaultStyles.contentContainer,
+    stylesProp?.contentContainer,
+  ]) as StyleProp<ViewStyle>
+  const titleStyle = StyleSheet.flatten([
+    defaultStyles.title,
+    stylesProp?.title,
+  ]) as StyleProp<TextStyle>
+
   return (
     <>
       <ScrollView
         ref={scrollRef}
-        style={styles.container}
-        contentContainerStyle={styles.contentContainerStyle}
+        style={containerStyle}
+        contentContainerStyle={contentContainerStyle}
         keyboardShouldPersistTaps='handled'
       >
         {/* Login Component */}
@@ -232,21 +287,29 @@ export const CheckoutControllerRaw = ({
           }}
           userFirstName={userProfile?.data?.firstName}
           brandImages={loginBrandImages}
-          texts={{ dialog: { message: loginMessage } }}
+          texts={loginTexts}
+          styles={stylesProp?.login}
         />
 
         <FormField
           fieldType='title'
-          title='Personal Information'
-          titleStyle={styles.title}
+          title={formTexts?.form?.sectionTitle || 'Personal Information'}
+          titleStyle={titleStyle}
         />
 
         {/* Use our new CheckoutForm component */}
         {isSinglePageCheckout || !checkoutData ? (
-          <CheckoutForm scrollRef={scrollRef} {...checkoutFlow} />
+          <CheckoutForm
+            scrollRef={scrollRef}
+            styles={stylesProp?.form}
+            texts={formTexts}
+            {...checkoutFlow}
+          />
         ) : (
           <PaymentForm
             scrollRef={scrollRef}
+            styles={stylesProp?.paymentForm ?? stylesProp?.form}
+            texts={formTexts}
             onSubmit={async () =>
               await checkoutFlow.handlePayment(checkoutData)
             }
@@ -257,7 +320,12 @@ export const CheckoutControllerRaw = ({
 
       {/* Cart Timer */}
       {typeof secondsLeft === 'number' && secondsLeft > 0 && (
-        <CartTimer secondsLeft={secondsLeft} shouldNotMinimize={false} />
+        <CartTimer
+          secondsLeft={secondsLeft}
+          shouldNotMinimize={false}
+          styles={stylesProp?.cartTimer}
+          texts={cartTimerTexts}
+        />
       )}
     </>
   )
@@ -266,6 +334,7 @@ export const CheckoutControllerRaw = ({
 const queryClient = new QueryClient()
 
 export const CheckoutControllerWrapper = (props: CheckoutV2Props) => {
+  console.log('Checkout Props', props)
   return (
     <QueryClientProvider client={queryClient}>
       <CheckoutControllerRaw {...props} />

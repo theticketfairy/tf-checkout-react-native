@@ -1,16 +1,17 @@
 import React from 'react'
 import { ScrollView } from 'react-native'
 
-import { IDropdownItem } from '../../../components/dropdown/types'
-import { Field } from '../../event/types'
+import { CustomField } from '../../event/types'
 import { IOrderItem } from '../components/OrderReview'
 import { AddonItem } from '../types'
+import { CheckoutFormStyles } from './styles'
 
 export interface TicketHolderFormValues {
   firstName: string
   lastName: string
   email: string
   phone: string
+  customFields?: Record<string, string | string[]>
 }
 
 export interface CheckoutFormValues {
@@ -69,12 +70,15 @@ export interface CheckoutFormProps {
 
   // Country & State data
   countries: Array<{ id: string; name: string }>
-  states: Array<{ label: string; value: number }>
-  onCountryChange: (countryId: string, item: IDropdownItem) => void
+  states: Array<{ label: string; value: string }>
+  onCountryChange: (countryId: string) => void
 
   // Order data
   orderItems: IOrderItem[]
-  orderCustomFields?: Field[]
+  orderCustomFields?: CustomField[]
+
+  // Ticket data
+  ticketCustomFields?: CustomField[]
 
   // Add-ons data
   availableAddons?: AddonItem[]
@@ -92,6 +96,97 @@ export interface CheckoutFormProps {
   onSubmit: (values: CheckoutFormValues) => void | Promise<void>
 
   scrollRef: React.RefObject<ScrollView | null>
+  styles?: CheckoutFormStyles
+  texts?: CheckoutFormTexts
+}
+
+export interface CheckoutFormTexts {
+  form?: CheckoutFormFormTexts
+  ticketHolders?: CheckoutFormTicketHolderTexts
+  marketingOptIns?: CheckoutFormMarketingTexts
+  addons?: CheckoutFormAddonTexts
+  orderSummary?: CheckoutFormOrderSummaryTexts
+  payment?: CheckoutFormPaymentTexts
+  buttons?: CheckoutFormButtonTexts
+  conditions?: CheckoutFormConditionsTexts
+}
+
+export interface CheckoutFormFormTexts {
+  sectionTitle?: string
+  firstName?: string
+  firstNamePlaceholder?: string
+  lastName?: string
+  lastNamePlaceholder?: string
+  email?: string
+  emailPlaceholder?: string
+  emailConfirmation?: string
+  emailConfirmationPlaceholder?: string
+  password?: string
+  passwordPlaceholder?: string
+  passwordConfirmation?: string
+  passwordConfirmationPlaceholder?: string
+  phone?: string
+  phonePlaceholder?: string
+  dateOfBirth?: string
+  dateOfBirthPlaceholder?: string
+  street?: string
+  streetPlaceholder?: string
+  city?: string
+  cityPlaceholder?: string
+  country?: string
+  countryPlaceholder?: string
+  state?: string
+  statePlaceholder?: string
+  postalCode?: string
+  postalCodePlaceholder?: string
+  customFields?: Record<string, { label?: string; placeholder?: string }>
+}
+
+export interface CheckoutFormTicketHolderTexts {
+  title?: string
+  itemTitle?: string
+  firstName?: string
+  firstNamePlaceholder?: string
+  lastName?: string
+  lastNamePlaceholder?: string
+  email?: string
+  emailPlaceholder?: string
+  phone?: string
+  phonePlaceholder?: string
+  customFields?: Record<string, { label?: string; placeholder?: string }>
+}
+
+export interface CheckoutFormMarketingTexts {
+  ticketFairyOptIn?: string
+  organizerOptIn?: string
+}
+
+export interface CheckoutFormAddonTexts {
+  title?: string
+  quantityLabel?: string
+  priceWithFeesSuffix?: string
+}
+
+export interface CheckoutFormOrderSummaryTexts {
+  sectionTitle?: string
+}
+
+export interface CheckoutFormPaymentTexts {
+  sectionTitle?: string
+  errorRequired?: string
+}
+
+export interface CheckoutFormButtonTexts {
+  singlePageSubmit?: string
+  goToPayment?: string
+  paymentSubmit?: string
+}
+
+export interface CheckoutFormConditionsTexts {
+  title?: string
+  acceptLabel?: string
+  viewButton?: string
+  hideButton?: string
 }
 
 export interface PaymentFormProps {
@@ -100,4 +195,21 @@ export interface PaymentFormProps {
   // Form handlers
   onSubmit: () => void | Promise<void>
   scrollRef: React.RefObject<ScrollView | null>
+  styles?: CheckoutFormStyles
+  texts?: CheckoutFormTexts
+}
+
+export interface CreateFormFieldsOptions {
+  isLoggedIn: CheckoutFormProps['isLoggedIn']
+  isAgeRequired: CheckoutFormProps['isAgeRequired']
+  isPhoneHidden: CheckoutFormProps['isPhoneHidden']
+  isPhoneRequired: CheckoutFormProps['isPhoneRequired']
+  countries: CheckoutFormProps['countries']
+  states: CheckoutFormProps['states']
+  onCountryChange: CheckoutFormProps['onCountryChange']
+  orderCustomFields: CheckoutFormProps['orderCustomFields']
+  availableAddons: CheckoutFormProps['availableAddons']
+  eventCurrency: CheckoutFormProps['eventCurrency']
+  onAddonChange: CheckoutFormProps['onAddonChange']
+  ticketHoldersCount: number
 }

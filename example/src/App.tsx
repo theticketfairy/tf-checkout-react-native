@@ -23,6 +23,8 @@ import { ComponentEnum } from './enums'
 import styles from './styles'
 import { IMyOrderDetailsTicket } from '../../src/api/types'
 import { CheckoutData } from '../../src/features/checkout-v2/hooks/use-checkout'
+import { checkoutStyles } from './config/styles'
+import { checkoutTexts } from './config/texts'
 
 const GOOGLE_IMAGE = require('./google_logo.png')
 const AMAZON_IMAGE = require('./amazon_logo.png')
@@ -278,6 +280,7 @@ const App = () => {
     </View>
   )
   const RenderComponent = () => {
+    console.log('Checkout Texts', checkoutTexts)
     // Checkout flow using components
     switch (componentToShow) {
       case ComponentEnum.CheckoutV2:
@@ -316,6 +319,8 @@ const App = () => {
             }}
             isAgeRequired={false}
             // minimumAge={18}
+            styles={checkoutStyles}
+            texts={checkoutTexts}
           />
         )
       case ComponentEnum.PurchaseConfirmation:

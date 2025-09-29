@@ -10,10 +10,10 @@ export interface Group {
   image: string
   type: 'order' | 'ticket' | 'add-on'
   order: string
-  fields: Field[]
+  fields: CustomField[]
 }
 
-export interface Field {
+export interface CustomField {
   id: string
   image: string
   type: FieldType

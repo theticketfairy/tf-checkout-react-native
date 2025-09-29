@@ -6,7 +6,7 @@ export interface CountryInfo {
 
 export interface StateInfo {
   label: string
-  value: number
+  value: string
 }
 
 export type CountriesResponse = CountryInfo[]

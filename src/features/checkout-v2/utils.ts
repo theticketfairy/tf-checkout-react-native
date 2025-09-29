@@ -118,12 +118,9 @@ export const createCheckoutBody = (
     body.attributes.dob_year = dob.getFullYear()
   }
 
-  console.log('VALUES CUSTOM FIELDS:', values.customFields)
-
   // Add custom fields if present
   if (values.customFields && Object.keys(values.customFields).length > 0) {
     body.attributes.data_capture = {}
-    console.log('values.customFields', values.customFields)
     // Format custom fields for API
     Object.entries(values.customFields).forEach(([key, value]) => {
       if (value !== undefined && value !== '') {

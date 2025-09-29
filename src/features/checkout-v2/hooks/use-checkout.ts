@@ -15,11 +15,11 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import BackgroundTimer from 'react-native-background-timer'
 
-import { CustomerProfileResponse } from '../../../features/auth/types'
-import { useCountries, useStates } from '../../../features/geo/api-hooks'
 import { logError } from '../../../utils/handlers'
+import { CustomerProfileResponse } from '../../auth/types'
 import { useEventCustomFields } from '../../event/api-hooks'
-import { OrderAttribute } from '../../event/types'
+import { OrderAttribute, TicketAttribute } from '../../event/types'
+import { useCountries, useStates } from '../../geo/api-hooks'
 import { CheckoutFormProps, CheckoutFormValues } from '../form/types'
 import { IOrderItem, OrderResult } from '../types'
 import { createCheckoutBody, priceWithCurrency } from '../utils'
@@ -133,6 +133,31 @@ export const useCheckoutFlow = ({
     return fields
   }, [customFieldsQuery.data])
 
+  // Extract and sort ticket custom fields
+  const ticketCustomFields = useMemo(() => {
+    if (!customFieldsQuery.data?.data?.attributes) {
+      return []
+    }
+
+    // Filter for ticket attributes only
+    const ticketAttributes = customFieldsQuery.data.data.attributes.filter(
+      (attr) => 'ticket' in attr
+    ) as TicketAttribute[]
+
+    // Extract fields from ticket attributes and sort by order property
+    const fields = ticketAttributes
+      .map((attr) => attr.ticket.group.fields)
+      .flat()
+      .sort((a, b) => {
+        // Convert order strings to numbers for comparison
+        const orderA = parseInt(a.order, 10) || 0
+        const orderB = parseInt(b.order, 10) || 0
+        return orderA - orderB
+      })
+
+    return fields
+  }, [customFieldsQuery.data])
+
   const { confirmPayment } = useConfirmPayment()
 
   const isInitialLoading = useMemo(() => {
@@ -152,7 +177,8 @@ export const useCheckoutFlow = ({
   ])
 
   const defaultCustomFieldValues = useMemo(() => {
-    const defaults: Record<string, string | string[]> = {}
+    const orderDefaults: Record<string, string | string[]> = {}
+    const ticketDefaults: Record<string, string | string[]> = {}
 
     // Get the custom fields from the query response
     if (customFieldsQuery.data?.data?.attributes) {
@@ -161,38 +187,49 @@ export const useCheckoutFlow = ({
         (attr): attr is OrderAttribute => 'order' in attr
       )
 
+      const ticketAttributes = customFieldsQuery.data.data.attributes.filter(
+        (attr): attr is TicketAttribute => 'ticket' in attr
+      )
+
       // Extract fields from order attributes - now TypeScript knows these are OrderAttribute
-      const fields = orderAttributes
+      const orderFields = orderAttributes
         .map((attr) => attr.order.group.fields)
         .flat()
-
       // Set default values for fields that have them
-      fields.forEach((field) => {
+      orderFields.forEach((field) => {
         if (field.defaultValue !== undefined && field.defaultValue !== null) {
-          defaults[field.name] = field.defaultValue
+          orderDefaults[field.name] = field.defaultValue
+        }
+      })
+
+      // Extract fields from ticket attributes - now TypeScript knows these are TicketAttribute
+      const ticketFields = ticketAttributes
+        .map((attr) => attr.ticket.group.fields)
+        .flat()
+
+      ticketFields.forEach((field) => {
+        if (field.defaultValue !== undefined && field.defaultValue !== null) {
+          ticketDefaults[field.name] = field.defaultValue
         }
       })
     }
 
-    return defaults
+    return { orderDefaults, ticketDefaults }
   }, [customFieldsQuery.data])
 
   // Prefill form with user profile data when available
   const initialValues = useMemo(() => {
     // Get ticket quantity from cart
     const ticketQuantity =
-      (cartQuery.data?.data?.attributes?.cart?.[0] as any)?.quantity || 1
-
+      cartQuery.data?.data?.attributes?.cart?.[0]?.quantity || 1
     // Create empty ticket holders array based on ticket quantity
-    const ticketHolders = Array(ticketQuantity)
-      .fill(null)
-      .map(() => ({
-        firstName: 'G',
-        lastName: 'B',
-        email: '',
-        phone: '',
-      }))
-
+    const ticketHolders = Array.from({ length: ticketQuantity }, () => ({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      customFields: { ...defaultCustomFieldValues.ticketDefaults }, // Apply default values for ticket custom fields
+    }))
     const base: CheckoutFormValues = {
       firstName: 'G',
       lastName: 'B',
@@ -212,7 +249,7 @@ export const useCheckoutFlow = ({
       state: '1',
       addons: {},
       acceptedConditions: {},
-      customFields: { ...defaultCustomFieldValues },
+      customFields: { ...defaultCustomFieldValues.orderDefaults },
       ticketHolders,
     }
 
@@ -235,6 +272,7 @@ export const useCheckoutFlow = ({
       // Fill first ticket holder info from the user's profile data
       if (base.ticketHolders.length > 0) {
         base.ticketHolders[0] = {
+          ...base.ticketHolders[0],
           firstName: profile.firstName || 'G',
           lastName: profile.lastName || 'B',
           email: profile.email || 'garik+10@theticketfairy.com',
@@ -544,7 +582,6 @@ export const useCheckoutFlow = ({
   // Function to handle addon changes from the form
   const onAddonChange = useCallback(
     (addonId: string, quantity: number) => {
-      console.log('Addon quantity changed', { addonId, quantity })
       const updatedAddons = { [addonId]: quantity }
       updateCheckoutWithAddOns(updatedAddons)
     },
@@ -620,7 +657,6 @@ export const useCheckoutFlow = ({
     // Handlers
     onAddonChange,
     onCountryChange,
-    orderCustomFields,
     onSubmit,
 
     setSecondsLeft,
@@ -646,5 +682,8 @@ export const useCheckoutFlow = ({
     isPhoneHidden,
     minimumAge,
     isSinglePageCheckout,
+
+    orderCustomFields,
+    ticketCustomFields,
   }
 }

@@ -13,6 +13,7 @@ export interface IOnChangePhoneNumberPayload {
 export interface IPhoneInputProps {
   phoneNumber: string
   onChangePhoneNumber: (payload: IOnChangePhoneNumberPayload) => void
+  onBlur?: () => void
   styles?: IPhoneInputStyles
   error?: string
   texts?: IPhoneInputTexts

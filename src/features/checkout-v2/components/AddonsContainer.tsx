@@ -1,30 +1,42 @@
 import React, { useCallback } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import {
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native'
 
 import { DropdownMaterial } from '../../../components'
+import { IDropdownMaterialStyles } from '../../../components/dropdownMaterial/types'
 import { AddonItem } from '../types'
 import { priceWithCurrency } from '../utils'
 
+export interface AddonsContainerStyles {
+  container?: StyleProp<ViewStyle>
+  title?: StyleProp<TextStyle>
+  addonList?: StyleProp<ViewStyle>
+  addonItem?: StyleProp<ViewStyle>
+  addonInfo?: StyleProp<ViewStyle>
+  addonName?: StyleProp<TextStyle>
+  addonPrice?: StyleProp<TextStyle>
+  addonPriceWithFees?: StyleProp<TextStyle>
+  addonDescription?: StyleProp<TextStyle>
+  addonSelectContainer?: StyleProp<ViewStyle>
+  dropdownMaterial?: IDropdownMaterialStyles
+}
+
 interface AddonsContainerProps {
-  addons: Record<string, number> // Current selected addons (id -> quantity)
-  availableAddons: AddonItem[] // All available addons from the API
+  addons: Record<string, number>
+  availableAddons: AddonItem[]
   onAddonChange: (addonId: string, quantity: number) => void
   currency?: string
-  styles?: {
-    container?: object
-    title?: object
-    addonList?: object
-    addonItem?: object
-    addonInfo?: object
-    addonName?: object
-    addonPrice?: object
-    addonPriceWithFees?: object
-    addonDescription?: object
-    addonSelectContainer?: object
-    dropdownMaterialStyles?: object
-  }
+  styles?: AddonsContainerStyles
   texts?: {
     title?: string
+    quantityLabel?: string
+    priceWithFeesSuffix?: string
   }
 }
 
@@ -60,7 +72,6 @@ const AddonsContainer: React.FC<AddonsContainerProps> = ({
   if (!availableAddons || availableAddons.length === 0) {
     return null
   }
-
   return (
     <View style={[styles.container, customStyles?.container]}>
       <Text style={[styles.title, customStyles?.title]}>
@@ -100,7 +111,7 @@ const AddonsContainer: React.FC<AddonsContainerProps> = ({
                         customStyles?.addonPriceWithFees,
                       ]}
                     >
-                      {' (with fees)'}
+                      {texts?.priceWithFeesSuffix || ' (with fees)'}
                     </Text>
                   )}
                 </Text>
@@ -134,9 +145,9 @@ const AddonsContainer: React.FC<AddonsContainerProps> = ({
                     label: (addons[addonId] || 0).toString(),
                   }}
                   materialInputProps={{
-                    label: 'Qty',
+                    label: texts?.quantityLabel || 'Qty',
                   }}
-                  styles={customStyles?.dropdownMaterialStyles}
+                  styles={customStyles?.dropdownMaterial}
                 />
               </View>
             </View>

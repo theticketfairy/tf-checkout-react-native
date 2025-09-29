@@ -53,6 +53,7 @@ const Input = (props: IInputProps) => {
   return (
     <View style={[s.container, styles?.container]}>
       <TextField
+        placeholderTextColor={styles?.placeholderColor}
         inputRef={reference}
         value={value}
         onChangeText={(text: string) =>

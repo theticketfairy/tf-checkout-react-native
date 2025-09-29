@@ -75,7 +75,11 @@ import {
   IGetTicketsPayload,
   IGroupedTickets,
 } from './core/TicketsCore/TicketsCoreTypes'
-import { CheckoutControllerWrapper as CheckoutV2 } from './features/checkout-v2'
+import {
+  CheckoutControllerWrapper as CheckoutV2,
+  CheckoutStyles,
+} from './features/checkout-v2'
+import { CheckoutTexts } from './features/checkout-v2/types'
 import { setConfig } from './helpers/Config'
 import { deleteAllData, deleteUserData } from './helpers/LocalStorage'
 import { refreshAccessToken } from './helpers/RefreshAccessToken'
@@ -105,6 +109,8 @@ export {
   Checkout,
   CheckoutCore,
   CheckoutCoreHandle,
+  CheckoutStyles,
+  CheckoutTexts,
   CheckoutV2,
   deleteAllData,
   deleteUserData,
@@ -176,5 +182,4 @@ export {
   WaitingListCore,
   WaitingListCoreHandle,
 }
-
 export default NativeModules.TFCheckoutRNModule

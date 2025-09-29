@@ -1,6 +1,9 @@
-import { StyleSheet } from 'react-native'
+import { CardFormView } from '@stripe/stripe-react-native'
+import { StyleProp, StyleSheet, TextStyle, ViewStyle } from 'react-native'
 
-const styles = StyleSheet.create({
+import type { FormikFieldComponentStyles } from '../../form'
+
+const baseStyles = StyleSheet.create({
   form: {
     width: '100%',
     marginBottom: 50,
@@ -124,6 +127,129 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderRadius: 8,
   },
+  ticketHolderTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 16,
+  },
 })
 
-export default styles
+export interface CheckoutFormStyles {
+  form?: StyleProp<ViewStyle>
+  sectionTitle?: StyleProp<TextStyle>
+  sectionContainer?: StyleProp<ViewStyle>
+  paymentContainer?: StyleProp<ViewStyle>
+  cardContainer?: StyleProp<ViewStyle>
+  orderReviewContainer?: StyleProp<ViewStyle>
+  orderReviewItem?: {
+    container?: StyleProp<ViewStyle>
+    title?: StyleProp<TextStyle>
+    subtitle?: StyleProp<TextStyle>
+    value?: StyleProp<TextStyle>
+  }
+  addonSection?: StyleProp<ViewStyle>
+  addonItem?: StyleProp<ViewStyle>
+  addonInfo?: StyleProp<ViewStyle>
+  addonName?: StyleProp<TextStyle>
+  addonPrice?: StyleProp<TextStyle>
+  addonPriceWithFees?: StyleProp<TextStyle>
+  addonDescription?: StyleProp<TextStyle>
+  addonSelectContainer?: StyleProp<ViewStyle>
+  addonMainTitle?: StyleProp<TextStyle>
+  addonSubtitle?: StyleProp<TextStyle>
+  button?: StyleProp<ViewStyle>
+  buttonDisabled?: StyleProp<ViewStyle>
+  buttonText?: StyleProp<TextStyle>
+  errorContainer?: StyleProp<ViewStyle>
+  errorText?: StyleProp<TextStyle>
+  paymentContainerInner?: StyleProp<ViewStyle>
+  cardStyle?: Partial<CardFormView.Styles>
+  ticketHolderTitle?: StyleProp<TextStyle>
+  fields?: FormikFieldComponentStyles
+}
+
+export type CheckoutFormComputedStyles = ReturnType<
+  typeof mergeCheckoutFormStyles
+>
+
+export const mergeCheckoutFormStyles = (overrides?: CheckoutFormStyles) => ({
+  form: StyleSheet.flatten([baseStyles.form, overrides?.form]),
+  sectionTitle: StyleSheet.flatten([
+    baseStyles.sectionTitle,
+    overrides?.sectionTitle,
+  ]),
+  sectionContainer: StyleSheet.flatten([
+    baseStyles.sectionContainer,
+    overrides?.sectionContainer,
+  ]),
+  paymentContainer: StyleSheet.flatten([
+    baseStyles.paymentContainer,
+    overrides?.paymentContainer,
+  ]),
+  cardContainer: StyleSheet.flatten([
+    baseStyles.cardContainer,
+    overrides?.cardContainer,
+  ]),
+  orderReviewContainer: StyleSheet.flatten([
+    baseStyles.orderReviewContainer,
+    overrides?.orderReviewContainer,
+  ]),
+  orderReviewItem: overrides?.orderReviewItem,
+  addonSection: StyleSheet.flatten([
+    baseStyles.addonSection,
+    overrides?.addonSection,
+  ]),
+  addonItem: StyleSheet.flatten([baseStyles.addonItem, overrides?.addonItem]),
+  addonInfo: StyleSheet.flatten([baseStyles.addonInfo, overrides?.addonInfo]),
+  addonName: StyleSheet.flatten([baseStyles.addonName, overrides?.addonName]),
+  addonPrice: StyleSheet.flatten([
+    baseStyles.addonPrice,
+    overrides?.addonPrice,
+  ]),
+  addonPriceWithFees: StyleSheet.flatten([
+    baseStyles.addonPriceWithFees,
+    overrides?.addonPriceWithFees,
+  ]),
+  addonDescription: StyleSheet.flatten([
+    baseStyles.addonDescription,
+    overrides?.addonDescription,
+  ]),
+  addonSelectContainer: StyleSheet.flatten([
+    baseStyles.addonSelectContainer,
+    overrides?.addonSelectContainer,
+  ]),
+  addonMainTitle: StyleSheet.flatten([
+    baseStyles.addonMainTitle,
+    overrides?.addonMainTitle,
+  ]),
+  addonSubtitle: StyleSheet.flatten([
+    baseStyles.addonSubtitle,
+    overrides?.addonSubtitle,
+  ]),
+  button: StyleSheet.flatten([baseStyles.button, overrides?.button]),
+  buttonDisabled: StyleSheet.flatten([
+    baseStyles.buttonDisabled,
+    overrides?.buttonDisabled,
+  ]),
+  buttonText: StyleSheet.flatten([
+    baseStyles.buttonText,
+    overrides?.buttonText,
+  ]),
+  errorContainer: StyleSheet.flatten([
+    baseStyles.errorContainer,
+    overrides?.errorContainer,
+  ]),
+  errorText: StyleSheet.flatten([baseStyles.errorText, overrides?.errorText]),
+  paymentContainerInner: StyleSheet.flatten([overrides?.paymentContainerInner]),
+  cardStyle: {
+    ...baseStyles.cardStyle,
+    ...(overrides?.cardStyle || {}),
+  },
+  ticketHolderTitle: StyleSheet.flatten([
+    baseStyles.ticketHolderTitle,
+    overrides?.ticketHolderTitle,
+  ]),
+  fields: overrides?.fields,
+})
+
+export default baseStyles

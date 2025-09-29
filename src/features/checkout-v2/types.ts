@@ -1,6 +1,9 @@
 /**
  * Type definitions for checkout API interactions
  */
+import type { ICartTimerTexts } from '../../components/cartTimer/types'
+import type { ILoginViewTexts } from '../../components/login/types'
+import type { CheckoutFormTexts } from './form/types'
 
 /**
  * Event-related types
@@ -404,4 +407,10 @@ export interface IOrderItem {
     container?: any
     subtitle?: any
   }
+}
+
+export interface CheckoutTexts {
+  form?: CheckoutFormTexts
+  login?: ILoginViewTexts
+  cartTimer?: ICartTimerTexts
 }

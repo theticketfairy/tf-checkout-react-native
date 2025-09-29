@@ -3,7 +3,7 @@ import { StyleProp, TextStyle } from 'react-native'
 
 import { ICheckboxStyles } from '../checkbox/types'
 import { IDatePickerProps } from '../datePicker/types'
-import { IDropdownItem, IDropdownStyles } from '../dropdown/types'
+import { IDropdownItem } from '../dropdown/types'
 import { IInputProps } from '../input/types'
 import { IRadioGroupProps } from '../radioGroup/types'
 

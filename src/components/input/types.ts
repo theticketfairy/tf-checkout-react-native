@@ -19,6 +19,7 @@ export interface IInputStyles {
   errorColor?: ColorValue
   fieldWrapper?: StyleProp<ViewStyle>
   showPasswordIcon?: StyleProp<ImageStyle>
+  placeholderColor?: ColorValue
 }
 
 export interface IInputProps extends TextFieldProps {

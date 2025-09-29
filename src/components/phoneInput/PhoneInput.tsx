@@ -9,6 +9,7 @@ import { IOnChangePhoneNumberPayload, IPhoneInputProps } from './types'
 const PhoneInput: FC<IPhoneInputProps> = ({
   phoneNumber,
   onChangePhoneNumber,
+  onBlur,
   styles,
   error,
   texts,
@@ -32,6 +33,7 @@ const PhoneInput: FC<IPhoneInputProps> = ({
     <View style={[s.rootContainer, styles?.rootContainer]}>
       <Input
         onChangeText={setLocalValue}
+        onBlur={onBlur}
         label={texts?.label || 'Phone number'}
         keyboardType='phone-pad'
         value={localValue}

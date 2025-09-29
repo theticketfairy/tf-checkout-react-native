@@ -33,7 +33,7 @@ export const useStates = (countryId?: string) => {
           ...response.data,
           data: Object.entries(response.data.data || {}).map(([id, name]) => ({
             label: String(name),
-            value: parseInt(String(id), 10),
+            value: id,
           })),
         }
       }),

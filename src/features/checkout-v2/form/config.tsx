@@ -1,6 +1,6 @@
 import * as Yup from 'yup'
 
-import { Field } from '../../event/types'
+import { CustomField } from '../../event/types'
 
 export const createCheckoutFormConfig = ({
   minimumAge,
@@ -10,6 +10,7 @@ export const createCheckoutFormConfig = ({
   requiredConditions = [],
   isPhoneRequired = false,
   orderCustomFields = [],
+  ticketCustomFields = [],
 }: {
   minimumAge?: number
   isAgeRequired: boolean
@@ -18,7 +19,8 @@ export const createCheckoutFormConfig = ({
   isSinglePageCheckout?: boolean
   requiredConditions?: Array<{ id: string }>
   isPhoneRequired?: boolean
-  orderCustomFields?: Field[]
+  orderCustomFields?: CustomField[]
+  ticketCustomFields?: CustomField[]
 }) =>
   Yup.object().shape({
     firstName: Yup.string().required('First name is required'),
@@ -110,6 +112,39 @@ export const createCheckoutFormConfig = ({
         lastName: Yup.string().required('Last name is required'),
         email: Yup.string().email('Invalid email format'), // Email not required
         phone: Yup.string().optional(),
+        customFields: Yup.object().test(
+          'validate-ticket-custom-fields',
+          'Please fill out all required ticket fields',
+          (value: Record<string, string | string[]> | undefined) => {
+            // If no ticket custom fields, validation passes
+            if (!ticketCustomFields || ticketCustomFields.length === 0) {
+              return true
+            }
+
+            // Find required fields
+            const requiredFields = ticketCustomFields.filter(
+              (field) => field.required
+            )
+
+            // If no required fields, validation passes
+            if (requiredFields.length === 0) {
+              return true
+            }
+
+            // Check that all required fields have values
+            return requiredFields.every((field) => {
+              const fieldValue = value?.[field.name]
+
+              // For arrays (multi-select), check that there's at least one item
+              if (Array.isArray(fieldValue)) {
+                return fieldValue.length > 0
+              }
+
+              // For strings, check that it's not empty
+              return fieldValue !== undefined && fieldValue !== ''
+            })
+          }
+        ),
       })
     ),
 
@@ -148,3 +183,21 @@ export const createCheckoutFormConfig = ({
       }
     ),
   })
+
+export const formFieldsOrder = [
+  'firstName',
+  'lastName',
+  'email',
+  'emailConfirmation',
+  'password',
+  'passwordConfirmation',
+  'phone',
+  'dateOfBirth',
+  'street',
+  'city',
+  'country',
+  'postalCode',
+  'state',
+  'ticketHolders',
+  'isCardFormComplete',
+]
