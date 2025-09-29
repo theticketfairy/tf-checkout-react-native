@@ -242,6 +242,10 @@ As of the latest version, we're introducing a new hooks-based API that provides 
 
 ### Checkout Hooks
 
+Wrapping with CheckoutProvider
+
+All checkout components & hooks (CheckoutV2, CustomCheckout, or your own flow) must be wrapped in CheckoutProvider to work correctly.
+
 | Hook                   | Description                                                                        |
 | ---------------------- | ---------------------------------------------------------------------------------- |
 | `useCheckoutFlow()`    | Complete checkout flow with form management, data fetching, and payment processing |
@@ -277,7 +281,7 @@ If you're currently using `BillingCore` or `CheckoutCore` components, please ref
 ## Example Usage
 
 ```tsx
-import { useCheckoutFlow } from 'tf-checkout-react-native'
+import { useCheckoutFlow, CheckoutForm, CheckoutProvider } from 'tf-checkout-react-native'
 
 const CheckoutScreen = () => {
   const {
@@ -315,6 +319,15 @@ const CheckoutScreen = () => {
     />
   )
 }
+
+export default MyCustomCheckout() => {
+  return (
+    <CheckoutProvider>
+      <CheckoutScreen />
+    </CheckoutProvider>
+  )
+}
+
 ```
 
 # Component styling
@@ -3369,108 +3382,3 @@ isPhoneHidden?: boolean
 - Added cartTimer component, that will show the cart's remaining expiration time in the Billing screen.
 - setConfig not longer receives the `DOMAIN` prop, instead it receives the `CLIENT`
 - Added a three dot button to my orders to show the possible actions.
-
-## CheckoutV2 (✅ Recommended)
-
-`CheckoutV2` is the new prebuilt checkout component. It combines hooks and UI components (`useCheckoutFlow`, `CheckoutForm`, `PaymentForm`, `Login`, `CartTimer`) to provide a full checkout flow out of the box.
-
-- Supports **single-page checkout** and **two-step checkout**
-- Handles login, registration, cart expiration, checkout flow, and payment
-- Provides consistent styling and text overrides
-
-### Example
-
-See [example/App.tsx](./example/src/App.tsx) for a complete usage example with toggle between single-page and two-step checkout.
-
-### Common Props
-
-| Prop                   | Type                            | Description                                           |
-| ---------------------- | ------------------------------- | ----------------------------------------------------- |
-| `isSinglePageCheckout` | `boolean` (default: `true`)     | Switch between single-page checkout or two-step flow. |
-| `onCartExpired`        | `() => void`                    | Called when the cart timer expires.                   |
-| `onCheckoutSuccess`    | `(data: CheckoutData) => void`  | Called after checkout (before payment).               |
-| `onPaymentSuccess`     | `(result: OrderResult) => void` | Called after successful payment.                      |
-| `loginBrandImages`     | `ILoginBrandImages`             | Configure brand login buttons.                        |
-| `styles`               | `CheckoutStyles`                | Override component styles.                            |
-| `texts`                | `CheckoutTexts`                 | Override component texts.                             |
-
----
-
-## Custom Checkout with Hooks
-
-You don’t have to use `CheckoutV2`. You can build your own flow by combining hooks and components.
-
-### Key Hooks and Components
-
-- **Hooks**
-
-  - `useCheckoutFlow` – orchestrates the entire checkout process
-  - `useCart` – fetches cart details
-  - `useUserProfile` – fetches user profile
-  - `useRegisterUser` – handles registration
-
-- **UI Components**
-  - `CheckoutForm` – renders the main checkout form
-  - `PaymentForm` – renders the payment form
-  - `Login` – handles authentication
-  - `CartTimer` – shows cart expiration countdown
-
-### Example (Custom Flow)
-
-```tsx
-import React, { useRef } from 'react'
-import { ScrollView } from 'react-native'
-import {
-  useCheckoutFlow,
-  CheckoutForm,
-  PaymentForm,
-  CartTimer,
-  Login
-} from 'tf-checkout-react-native'
-
-const CustomCheckout = () => {
-  const scrollRef = useRef<ScrollView>(null)
-
-  const {
-    orderItems,
-    secondsLeft,
-    onSubmit,
-    initialValues,
-    isSubmitting,
-    checkoutData,
-    handlePayment
-  } = useCheckoutFlow({
-    onCheckoutSuccess: (data) => console.log('Checkout success:', data),
-    onPaymentSuccess: (result) => console.log('Payment success:', result),
-    onCartExpired: () => console.log('Cart expired')
-  })
-
-  return (
-    <>
-      <ScrollView ref={scrollRef}>
-        <Login onLoginSuccessful={(data) => console.log('Logged in:', data)} />
-
-        {!checkoutData ? (
-          <CheckoutForm
-            scrollRef={scrollRef}
-            onSubmit={onSubmit}
-            orderItems={orderItems}
-            initialValues={initialValues}
-            isSubmitting={isSubmitting}
-          />
-        ) : (
-          <PaymentForm
-            scrollRef={scrollRef}
-            orderItems={orderItems}
-            onSubmit={() => handlePayment(checkoutData)}
-          />
-        )}
-      </ScrollView>
-
-      {typeof secondsLeft === 'number' && secondsLeft > 0 && (
-        <CartTimer secondsLeft={secondsLeft} />
-      )}
-    </>
-  )
-}
-```

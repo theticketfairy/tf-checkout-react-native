@@ -13,6 +13,7 @@ import {
   MyOrderRequestFromType,
 } from './api/types'
 import {
+  CartTimer,
   Dropdown,
   DropdownMaterial,
   Loading,
@@ -75,6 +76,7 @@ import {
   CheckoutProvider,
   CheckoutStyles,
 } from './features/checkout-v2'
+import { CheckoutForm, PaymentForm } from './features/checkout-v2/form'
 import {
   useAddons,
   useAddToCart,
@@ -111,7 +113,6 @@ import {
 LogBox.ignoreAllLogs()
 // @ts-ignore
 console.reportErrorsAsExceptions = false
-
 export {
   /**
    * @deprecated Use hooks like useCart(), useCheckout(), etc. imported directly from 'tf-checkout-react-native'. See core/MIGRATION.md
@@ -122,15 +123,17 @@ export {
    */
   BillingCoreHandle,
   BillingInfo,
+  CartTimer,
   Checkout,
   /**
    * @deprecated Use hooks like usePaymentData(), useEventConditions(), etc. imported directly from 'tf-checkout-react-native'. See core/MIGRATION.md
    */
   CheckoutCore,
+  CheckoutCoreHandle,
   /**
    * @deprecated Use hooks like usePaymentData(), useEventConditions(), etc. imported directly from 'tf-checkout-react-native'. See core/MIGRATION.md
    */
-  CheckoutCoreHandle,
+  CheckoutForm,
   CheckoutProvider,
   CheckoutStyles,
   CheckoutTexts,
@@ -182,6 +185,7 @@ export {
   MyOrdersCoreHandle,
   OrderDetailsCore,
   OrderDetailsCoreHandle,
+  PaymentForm,
   PromoCode,
   PurchaseConfirmation,
   PurchaseConfirmationCore,
