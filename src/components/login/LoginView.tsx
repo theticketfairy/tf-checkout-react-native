@@ -12,8 +12,8 @@ import s from './styles'
 import { ILoginViewProps, ILoginViewState } from './types'
 
 const initialState: ILoginViewState = {
-  loginEmail: 'garik+10@theticketfairy.com',
-  loginPassword: '12345678?',
+  loginEmail: '',
+  loginPassword: '',
 }
 
 const LoginView: FC<ILoginViewProps> = ({

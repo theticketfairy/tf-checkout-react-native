@@ -7,6 +7,7 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import { CartTimer, FormField, Login } from '../../components'
 import { ICartTimerStyles } from '../../components/cartTimer/types'
@@ -197,8 +198,8 @@ export const CheckoutController = ({
 
   return (
     <>
-      <ScrollView
-        ref={scrollRef}
+      <KeyboardAwareScrollView
+        innerRef={(ref) => (scrollRef.current = ref)}
         style={containerStyle}
         contentContainerStyle={contentContainerStyle}
         keyboardShouldPersistTaps='handled'
@@ -245,7 +246,7 @@ export const CheckoutController = ({
             orderItems={checkoutFlow.orderItems}
           />
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {/* Cart Timer */}
       {typeof secondsLeft === 'number' && secondsLeft > 0 && (

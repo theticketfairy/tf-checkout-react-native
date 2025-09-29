@@ -327,17 +327,17 @@ export const useCheckoutFlow = ({
       customFields: { ...defaultCustomFieldValues.ticketDefaults }, // Apply default values for ticket custom fields
     }))
     const base: CheckoutFormValues = {
-      firstName: 'G',
-      lastName: 'B',
-      email: 'garik+10@theticketfairy.com',
-      emailConfirmation: 'garik+10@theticketfairy.com',
+      firstName: '',
+      lastName: '',
+      email: '',
+      emailConfirmation: '',
       phone: '',
       dateOfBirth: undefined,
-      street: 'Test',
-      city: 'Test',
-      postalCode: '123',
-      password: '12345678?',
-      passwordConfirmation: '12345678?',
+      street: '',
+      city: '',
+      postalCode: '',
+      password: '',
+      passwordConfirmation: '',
       isSubToTicketFairy: false,
       isSubToBrand: false,
       isCardFormComplete: false,
@@ -369,9 +369,9 @@ export const useCheckoutFlow = ({
       if (base.ticketHolders.length > 0) {
         base.ticketHolders[0] = {
           ...base.ticketHolders[0],
-          firstName: profile.firstName || 'G',
-          lastName: profile.lastName || 'B',
-          email: profile.email || 'garik+10@theticketfairy.com',
+          firstName: profile.firstName || '',
+          lastName: profile.lastName || '',
+          email: profile.email || '',
           phone: profile.phone || '',
         }
       }
