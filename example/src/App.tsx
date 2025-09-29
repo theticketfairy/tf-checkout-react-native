@@ -2,7 +2,6 @@ import _ from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View, Switch } from 'react-native'
 import {
-  CheckoutV2,
   IMyOrderDetailsData,
   MyOrderDetails,
   MyOrders,
@@ -13,6 +12,9 @@ import {
   ResaleTickets,
   ResetPassword,
   SessionHandleType,
+  CheckoutProvider,
+  Checkout,
+  CheckoutV2,
 } from 'tf-checkout-react-native'
 import { IConfig } from '../../src/helpers/Config'
 import R from '../../src/res'
@@ -46,7 +48,7 @@ const config: IConfig = {
 // mana-onetree-testing-brand
 // the-ticket-fairy
 
-const App = () => {
+const AppRaw = () => {
   // Toggle for checkout mode
   const [isSinglePageCheckout, setIsSinglePageCheckout] = useState(false)
   
@@ -275,8 +277,6 @@ const App = () => {
     </View>
   )
   const RenderComponent = () => {
-    console.log('Checkout Texts', checkoutTexts)
-    // Checkout flow using components
     switch (componentToShow) {
       case ComponentEnum.CheckoutV2:
         return (
@@ -285,12 +285,12 @@ const App = () => {
             isSinglePageCheckout={isSinglePageCheckout}
             onCartExpired={handleOnCartExpired}
             onCheckoutSuccess={handleOnCheckoutSuccess}
-            onCheckoutError={(error) => {
+            onCheckoutError={(error: any) => {
               console.log('checkout error', error)
               Alert.alert('Checkout Error', error?.message || 'Unknown error')
             }}
             onPaymentSuccess={handleOnPaymentSuccess}
-            onPaymentError={(error) => {
+            onPaymentError={(error: any) => {
               console.log('payment error', error)
               Alert.alert('Payment Error', error?.message || 'Unknown error')
             }}
@@ -1039,6 +1039,14 @@ const App = () => {
       {componentToShow === ComponentEnum.Tickets && <RenderToggle />}
       {RenderComponent()}
     </SafeAreaView>
+  )
+}
+
+const App = () => {
+  return (
+    <CheckoutProvider>
+      <AppRaw />
+    </CheckoutProvider>
   )
 }
 

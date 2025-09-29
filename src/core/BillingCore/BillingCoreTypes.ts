@@ -1,4 +1,3 @@
-import { IOnCheckoutSuccess } from '../..'
 import {
   ICartResponse,
   ICheckoutBody,
@@ -7,6 +6,7 @@ import {
   IStatesResponse,
   IUserProfileResponse,
 } from '../../api/types'
+import { IOnCheckoutSuccess } from '../../containers/billingInfo/types'
 import { IError } from '../../types'
 import { ICoreProps } from '../CoreProps'
 import { SessionCoreHandleType } from '../Session/SessionCoreTypes'

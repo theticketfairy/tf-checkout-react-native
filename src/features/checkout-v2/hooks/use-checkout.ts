@@ -16,13 +16,22 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import BackgroundTimer from 'react-native-background-timer'
 
 import { logError } from '../../../utils/handlers'
-import { CustomerProfileResponse } from '../../auth/types'
+import { useRegisterUser } from '../../auth/api-hooks'
+import {
+  CustomerProfileResponse,
+  IRegisterUserResponse,
+} from '../../auth/types'
+import { storeAuthTokens } from '../../auth/utils'
 import { useEventCustomFields } from '../../event/api-hooks'
 import { OrderAttribute, TicketAttribute } from '../../event/types'
 import { useCountries, useStates } from '../../geo/api-hooks'
 import { CheckoutFormProps, CheckoutFormValues } from '../form/types'
 import { IOrderItem, OrderResult } from '../types'
-import { createCheckoutBody, priceWithCurrency } from '../utils'
+import {
+  createCheckoutBody,
+  createRegistrationData,
+  priceWithCurrency,
+} from '../utils'
 import {
   useAddons,
   useCart,
@@ -48,7 +57,8 @@ export interface UseCheckoutFlowProps {
   onPaymentSuccess?: (data: OrderResult) => void
   onPaymentError?: (error: any) => void
   //   Return true if the form should be submitted
-  onBeforeSubmit?: (values: CheckoutFormValues) => boolean | Promise<boolean>
+  onRegistrationSuccess?: (data: IRegisterUserResponse) => void
+  onRegistrationError?: (error: any) => void
 }
 
 export interface UseCheckoutFlowReturn
@@ -79,9 +89,10 @@ export const useCheckoutFlow = ({
   isPhoneRequired,
   isPhoneHidden,
   minimumAge,
-  onBeforeSubmit = () => true,
   isSinglePageCheckout,
   customerProfile,
+  onRegistrationSuccess,
+  onRegistrationError,
 }: UseCheckoutFlowProps): UseCheckoutFlowReturn => {
   const cartQuery = useCart()
   const eventId = cartQuery.data?.data?.attributes?.eventId
@@ -107,6 +118,91 @@ export const useCheckoutFlow = ({
   const addonsQuery = useAddons(eventId)
   const statesQuery = useStates(selectedCountry)
   const conditionsQuery = useEventConditions(eventId)
+
+  const handleRegistrationError = useCallback(
+    (registerError: any): boolean => {
+      // Check for already registered user (422 status)
+      if (registerError?.response?.status === 422) {
+        const errorData = registerError.response?.data
+
+        // Check all possible email error structures
+        const emailErrors =
+          errorData?.errors?.email ||
+          errorData?.data?.message?.email ||
+          (errorData?.message?.email ? errorData.message.email : null)
+
+        if (emailErrors) {
+          // Show login dialog for already registered user
+          const emailAlreadyRegisteredText =
+            'It appears this email is already attached to an account. Please log in here to complete your registration.'
+
+          let errorMessage: string
+          if (Array.isArray(emailErrors)) {
+            errorMessage = emailErrors[0]
+          } else if (typeof emailErrors === 'string') {
+            errorMessage = emailErrors
+          } else {
+            errorMessage = emailAlreadyRegisteredText
+          }
+
+          if (errorMessage === 'The email is already used') {
+            errorMessage = emailAlreadyRegisteredText
+          }
+
+          // Show login dialog
+          onRegistrationError?.(errorMessage)
+          return true // Registration handled, don't continue with checkout
+        } else {
+          // Other validation errors
+          const errorMessages = Object.entries(errorData?.errors || {})
+            .map(
+              ([field, messages]) =>
+                `${field}: ${
+                  Array.isArray(messages) ? messages.join(', ') : messages
+                }`
+            )
+            .join('\n')
+          throw new Error(`Validation errors: ${errorMessages}`)
+        }
+      }
+
+      // Generic error
+      throw new Error(registerError?.message || 'Registration failed')
+    },
+    [onRegistrationError]
+  )
+
+  const registerUserMutation = useRegisterUser()
+
+  const registerUser = useCallback(
+    async (values: CheckoutFormValues): Promise<boolean> => {
+      try {
+        // User is already registered or logged in, skip registration
+        if (customerProfile) {
+          return true
+        }
+        // Create and submit registration data
+        const registerUserData = createRegistrationData(values, isAgeRequired)
+        const result = await registerUserMutation.mutateAsync(registerUserData)
+
+        // Store tokens and extract user data
+        await storeAuthTokens(result.data.attributes)
+
+        // Registration successful
+        onRegistrationSuccess?.(result.data)
+        return true
+      } catch (registerError: any) {
+        return !handleRegistrationError(registerError)
+      }
+    },
+    [
+      customerProfile,
+      isAgeRequired,
+      registerUserMutation,
+      handleRegistrationError,
+      onRegistrationSuccess,
+    ]
+  )
 
   // Extract and sort order custom fields
   const orderCustomFields = useMemo(() => {
@@ -433,7 +529,7 @@ export const useCheckoutFlow = ({
     async (values: CheckoutFormValues) => {
       try {
         setIsSubmitting(true)
-        if (!(await onBeforeSubmit(values))) return
+        if (!(await registerUser(values))) return
 
         const { hash, total } = await handleCheckout(values)
 
@@ -450,7 +546,7 @@ export const useCheckoutFlow = ({
         setIsSubmitting(false)
       }
     },
-    [onBeforeSubmit, handleCheckout, isSinglePageCheckout, handlePayment]
+    [registerUser, handleCheckout, isSinglePageCheckout, handlePayment]
   )
 
   const updateOrderItemsFromCheckoutData = useCallback(
@@ -652,6 +748,15 @@ export const useCheckoutFlow = ({
       setOrderItems(items)
     }
   }, [cartQuery.data, eventInfoQuery.data])
+
+  useEffect(() => {
+    if (customerProfile) {
+      const profile = customerProfile
+      if (profile.countryId) {
+        setSelectedCountry(profile.countryId.toString())
+      }
+    }
+  }, [setSelectedCountry, customerProfile])
 
   return {
     // Handlers

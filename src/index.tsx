@@ -69,11 +69,27 @@ import {
   IGetTicketsPayload,
   IGroupedTickets,
 } from './core/TicketsCore/TicketsCoreTypes'
+import { useRegisterUser, useUserProfile } from './features/auth/api-hooks'
 import {
-  CheckoutControllerWrapper as CheckoutV2,
+  CheckoutController as CheckoutV2,
+  CheckoutProvider,
   CheckoutStyles,
 } from './features/checkout-v2'
+import {
+  useAddons,
+  useAddToCart,
+  useCart,
+  useCheckout,
+  useEventConditions,
+  useEventInfo,
+  usePaymentData,
+  usePaymentSuccess,
+  useTickets,
+  useUpdateCheckout,
+} from './features/checkout-v2/hooks/api-hooks'
+import { useCheckoutFlow } from './features/checkout-v2/hooks/use-checkout'
 import { CheckoutTexts } from './features/checkout-v2/types'
+import { useCountries, useStates } from './features/geo/api-hooks'
 import { setConfig } from './helpers/Config'
 import { deleteAllData, deleteUserData } from './helpers/LocalStorage'
 import { refreshAccessToken } from './helpers/RefreshAccessToken'
@@ -93,16 +109,29 @@ import {
 } from './types'
 
 LogBox.ignoreAllLogs()
-// @ts-ignore
+// @ts-ignore
 console.reportErrorsAsExceptions = false
 
 export {
+  /**
+   * @deprecated Use hooks like useCart(), useCheckout(), etc. imported directly from 'tf-checkout-react-native'. See core/MIGRATION.md
+   */
   BillingCore,
+  /**
+   * @deprecated Use hooks like useCart(), useCheckout(), etc. imported directly from 'tf-checkout-react-native'. See core/MIGRATION.md
+   */
   BillingCoreHandle,
   BillingInfo,
   Checkout,
+  /**
+   * @deprecated Use hooks like usePaymentData(), useEventConditions(), etc. imported directly from 'tf-checkout-react-native'. See core/MIGRATION.md
+   */
   CheckoutCore,
+  /**
+   * @deprecated Use hooks like usePaymentData(), useEventConditions(), etc. imported directly from 'tf-checkout-react-native'. See core/MIGRATION.md
+   */
   CheckoutCoreHandle,
+  CheckoutProvider,
   CheckoutStyles,
   CheckoutTexts,
   CheckoutV2,
@@ -168,6 +197,22 @@ export {
   Tickets,
   TicketsCore,
   TicketsCoreHandle,
+  useAddons,
+  useAddToCart,
+  // New checkout hooks (replacing BillingCore and CheckoutCore functionality)
+  useCart,
+  useCheckout,
+  useCheckoutFlow,
+  useCountries,
+  useEventConditions,
+  useEventInfo,
+  usePaymentData,
+  usePaymentSuccess,
+  useRegisterUser,
+  useStates,
+  useTickets,
+  useUpdateCheckout,
+  useUserProfile,
   WaitingList,
   WaitingListCore,
   WaitingListCoreHandle,

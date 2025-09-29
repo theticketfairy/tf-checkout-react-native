@@ -7,8 +7,8 @@ import _map from 'lodash/map'
 import _mapKeys from 'lodash/mapKeys'
 import _sortBy from 'lodash/sortBy'
 
-import { IOnCheckoutSuccess } from '..'
 import { IWaitingListFields } from '../components/waitingList/types'
+import { IOnCheckoutSuccess } from '../containers/billingInfo/types'
 import { Config } from '../helpers/Config'
 import { getDomainByClientAndEnv } from '../helpers/Domains'
 import {

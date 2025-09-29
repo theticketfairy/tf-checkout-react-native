@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios'
 
-import { IOnCheckoutSuccess } from '..'
+import { IOnCheckoutSuccess } from '../containers/billingInfo/types'
 import { IError, IEvent, ITicket, IUserProfile } from '../types'
 import { ICountry } from '../types/ICountry'
 

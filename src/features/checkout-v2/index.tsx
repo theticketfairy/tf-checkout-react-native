@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import {
   ScrollView,
   StyleProp,
@@ -16,14 +16,12 @@ import {
   ILoginViewStyles,
 } from '../../components/login/types'
 import { IError } from '../../types'
-import { useRegisterUser, useUserProfile } from '../auth/api-hooks'
-import { storeAuthTokens } from '../auth/utils'
+import { useUserProfile } from '../auth/api-hooks'
+import { IRegisterUserResponse } from '../auth/types'
 import { CheckoutForm, PaymentForm } from './form'
 import { CheckoutFormStyles } from './form/styles'
-import { CheckoutFormValues } from './form/types'
 import { CheckoutData, useCheckoutFlow } from './hooks/use-checkout'
 import { CheckoutTexts, OrderResult } from './types'
-import { createRegistrationData } from './utils'
 
 export interface CheckoutV2Props {
   isSinglePageCheckout?: boolean
@@ -35,6 +33,8 @@ export interface CheckoutV2Props {
   onLoginSuccess?: (data: ILoginSuccessData) => void
   onLoginError?: (error: any) => void
   onLogoutSuccess?: () => void
+  onRegistrationSuccess?: (data: IRegisterUserResponse) => void
+  onRegistrationError?: (error: any) => void
   isAgeRequired?: boolean
   minimumAge?: number
   isPhoneRequired?: boolean
@@ -70,7 +70,7 @@ const defaultStyles = StyleSheet.create({
   },
 })
 
-export const CheckoutControllerRaw = ({
+export const CheckoutController = ({
   isSinglePageCheckout = true,
   onCartExpired: _onCartExpired,
   onCheckoutSuccess: _onCheckoutSuccess,
@@ -80,6 +80,8 @@ export const CheckoutControllerRaw = ({
   onLoginSuccess: _onLoginSuccess,
   onLoginError: _onLoginError,
   onLogoutSuccess: _onLogoutSuccess,
+  onRegistrationSuccess: _onRegistrationSuccess,
+  onRegistrationError: _onRegistrationError,
   isAgeRequired = false,
   minimumAge = 18,
   isPhoneRequired = false,
@@ -115,89 +117,6 @@ export const CheckoutControllerRaw = ({
   const cartTimerTexts = textsProp?.cartTimer
 
   const { data: userProfile, invalidate } = useUserProfile()
-  const registerUserMutation = useRegisterUser()
-  // Helper function to handle registration error
-  const handleRegistrationError = useCallback((registerError: any): boolean => {
-    // Check for already registered user (422 status)
-    if (registerError?.response?.status === 422) {
-      const errorData = registerError.response?.data
-
-      // Check all possible email error structures
-      const emailErrors =
-        errorData?.errors?.email ||
-        errorData?.data?.message?.email ||
-        (errorData?.message?.email ? errorData.message.email : null)
-
-      if (emailErrors) {
-        // Show login dialog for already registered user
-        const emailAlreadyRegisteredText =
-          'It appears this email is already attached to an account. Please log in here to complete your registration.'
-
-        let errorMessage: string
-        if (Array.isArray(emailErrors)) {
-          errorMessage = emailErrors[0]
-        } else if (typeof emailErrors === 'string') {
-          errorMessage = emailErrors
-        } else {
-          errorMessage = emailAlreadyRegisteredText
-        }
-
-        if (errorMessage === 'The email is already used') {
-          errorMessage = emailAlreadyRegisteredText
-        }
-
-        // Show login dialog
-        setLoginMessage(errorMessage)
-        setIsLoginDialogVisible(true)
-        return true // Registration handled, don't continue with checkout
-      } else {
-        // Other validation errors
-        const errorMessages = Object.entries(errorData?.errors || {})
-          .map(
-            ([field, messages]) =>
-              `${field}: ${
-                Array.isArray(messages) ? messages.join(', ') : messages
-              }`
-          )
-          .join('\n')
-        throw new Error(`Validation errors: ${errorMessages}`)
-      }
-    }
-
-    // Generic error
-    throw new Error(registerError?.message || 'Registration failed')
-  }, [])
-
-  const registerUser = useCallback(
-    async (values: CheckoutFormValues): Promise<boolean> => {
-      try {
-        // User is already registered or logged in, skip registration
-        if (userProfile?.data) {
-          return true
-        }
-        // Create and submit registration data
-        const registerUserData = createRegistrationData(values, isAgeRequired)
-        const result = await registerUserMutation.mutateAsync(registerUserData)
-
-        // Store tokens and extract user data
-        await storeAuthTokens(result.data.attributes)
-
-        invalidate()
-
-        // Registration successful
-        return true
-      } catch (registerError: any) {
-        return !handleRegistrationError(registerError)
-      }
-    },
-    [
-      userProfile?.data,
-      isAgeRequired,
-      registerUserMutation,
-      invalidate,
-      handleRegistrationError,
-    ]
-  )
 
   const onCheckoutSuccess = useCallback(
     (data: CheckoutData) => {
@@ -207,13 +126,32 @@ export const CheckoutControllerRaw = ({
     [_onCheckoutSuccess]
   )
 
+  const onRegistrationSuccess = useCallback(
+    (data: IRegisterUserResponse) => {
+      _onRegistrationSuccess?.(data)
+      invalidate()
+    },
+    [_onRegistrationSuccess, invalidate]
+  )
+
+  const onRegistrationError = useCallback(
+    (error: any) => {
+      _onRegistrationError?.(error)
+      // Show login dialog
+      setLoginMessage(error)
+      setIsLoginDialogVisible(true)
+    },
+    [_onRegistrationError]
+  )
+
   const checkoutFlow = useCheckoutFlow({
     onCheckoutSuccess,
     onCartExpired: _onCartExpired,
-    onBeforeSubmit: registerUser,
     onCheckoutError: _onCheckoutError,
     onPaymentError: _onPaymentError,
     onPaymentSuccess: _onPaymentSuccess,
+    onRegistrationSuccess,
+    onRegistrationError,
     isPhoneRequired,
     isAgeRequired,
     isPhoneHidden,
@@ -222,7 +160,7 @@ export const CheckoutControllerRaw = ({
     customerProfile: userProfile?.data,
   })
 
-  const { setSelectedCountry, secondsLeft } = checkoutFlow
+  const { secondsLeft } = checkoutFlow
 
   const handleLoginError = (error: IError) => {
     _onLoginError?.(error)
@@ -242,23 +180,16 @@ export const CheckoutControllerRaw = ({
     [_onLoginSuccess, invalidate]
   )
 
-  useEffect(() => {
-    if (userProfile?.data) {
-      const profile = userProfile.data
-      if (profile.countryId) {
-        setSelectedCountry(profile.countryId.toString())
-      }
-    }
-  }, [setSelectedCountry, userProfile])
-
   const containerStyle = StyleSheet.flatten([
     defaultStyles.container,
     stylesProp?.container,
   ]) as StyleProp<ViewStyle>
+
   const contentContainerStyle = StyleSheet.flatten([
     defaultStyles.contentContainer,
     stylesProp?.contentContainer,
   ]) as StyleProp<ViewStyle>
+
   const titleStyle = StyleSheet.flatten([
     defaultStyles.title,
     stylesProp?.title,
@@ -331,10 +262,12 @@ export const CheckoutControllerRaw = ({
 
 const queryClient = new QueryClient()
 
-export const CheckoutControllerWrapper = (props: CheckoutV2Props) => {
+export const CheckoutProvider = ({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <CheckoutControllerRaw {...props} />
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 }

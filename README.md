@@ -234,6 +234,89 @@ After opening and URL with the corresponding schema, use this component to let t
 
 - refreshAccessToken: Let refresh the expired access token.
 
+# React Hooks API
+
+As of the latest version, we're introducing a new hooks-based API that provides a more modern and flexible approach to implementing the checkout flow. The hooks-based implementation replaces the Core components (`BillingCore` and `CheckoutCore`) which are now deprecated.
+
+## Available Hooks
+
+### Checkout Hooks
+
+| Hook                   | Description                                                                        |
+| ---------------------- | ---------------------------------------------------------------------------------- |
+| `useCheckoutFlow()`    | Complete checkout flow with form management, data fetching, and payment processing |
+| `useCart()`            | Fetch cart data with automatic expiration countdown                                |
+| `useCheckout()`        | Process checkout with payment information                                          |
+| `useAddToCart()`       | Add items to cart                                                                  |
+| `useTickets()`         | Fetch available tickets for an event                                               |
+| `useEventInfo()`       | Fetch event information                                                            |
+| `usePaymentData()`     | Get payment data for an order                                                      |
+| `usePaymentSuccess()`  | Process payment success                                                            |
+| `useEventConditions()` | Fetch event conditions                                                             |
+| `useAddons()`          | Fetch and manage event add-ons                                                     |
+| `useUpdateCheckout()`  | Update checkout with add-ons                                                       |
+
+### Location Hooks
+
+| Hook                   | Description                         |
+| ---------------------- | ----------------------------------- |
+| `useCountries()`       | Fetch countries list                |
+| `useStates(countryId)` | Fetch states for a specific country |
+
+### Auth Hooks
+
+| Hook                | Description                      |
+| ------------------- | -------------------------------- |
+| `useUserProfile()`  | Fetch authenticated user profile |
+| `useRegisterUser()` | Register a new user              |
+
+## Migration from Core Components
+
+If you're currently using `BillingCore` or `CheckoutCore` components, please refer to the [Migration Guide](./src/core/MIGRATION.md) for detailed instructions on how to update your code to use the new hooks-based API.
+
+## Example Usage
+
+```tsx
+import { useCheckoutFlow } from 'tf-checkout-react-native'
+
+const CheckoutScreen = () => {
+  const {
+    onSubmit,
+    initialValues,
+    countries,
+    states,
+    orderItems,
+    secondsLeft,
+    isSubmitting,
+    isInitialLoading
+  } = useCheckoutFlow({
+    onCartExpired: () => navigation.navigate('ExpiredScreen'),
+    onCheckoutSuccess: ({ hash, total, values }) => {
+      // Handle checkout success
+    },
+    onPaymentSuccess: (result) => {
+      // Handle payment success
+    }
+  })
+
+  if (isInitialLoading) {
+    return <LoadingIndicator />
+  }
+
+  return (
+    <CheckoutForm
+      onSubmit={onSubmit}
+      initialValues={initialValues}
+      countries={countries}
+      states={states}
+      orderItems={orderItems}
+      secondsLeft={secondsLeft}
+      isSubmitting={isSubmitting}
+    />
+  )
+}
+```
+
 # Component styling
 
 ### Button
@@ -1286,88 +1369,6 @@ Currently, Stripe card is not customizable. Please see the open issues in their 
 - [285](https://github.com/stripe/stripe-react-native/issues/285)
 
 Additionally, if you are encountering problems with building your project, please take a look at the [Stripe troubleshooting](https://github.com/stripe/stripe-react-native#troubleshooting).
-
----
-
-## CheckoutSP UI
-
-Import the component from the library
-
-```js
-import { CheckoutSP, SessionHandleType } from 'tf-checkout-react-native'
-```
-
-The CheckoutSP component provides a streamlined single-page checkout experience that combines billing info collection and payment processing in one unified interface:
-
-```tsx
-// Basic usage
-<CheckoutSP
-  onPaymentSuccess={(orderData) => {
-    // Handle successful payment
-    console.log(orderData.orderHash)
-  }}
-  isAgeRequired={true}
-  minimumAge={18}
-  userFirstName={userFirstName}
-  onLoginSuccess={handleLoginSuccess}
-  onLogoutSuccess={handleLogout}
-/>
-```
-
-### Props
-
-| Property                      | Description                                           |
-| ----------------------------- | ----------------------------------------------------- |
-| `onPaymentSuccess`            | Callback when payment completes successfully          |
-| `isAgeRequired`               | Whether to show date of birth field                   |
-| `minimumAge`                  | Minimum age required (when `isAgeRequired` is true)   |
-| `userFirstName`               | First name of logged in user (empty if not logged in) |
-| `onLoginSuccess`              | Callback when login is successful                     |
-| `onLogoutSuccess`             | Callback when logout is successful                    |
-| `onCartExpired`               | Called when cart timer expires                        |
-| `loginBrandImages`            | Brand images to display in login component            |
-| `areAlertsEnabled`            | Whether to show error alerts (default: true)          |
-| `areLoadingIndicatorsEnabled` | Whether to show loading indicators (default: true)    |
-| `texts`                       | Custom text labels                                    |
-| `styles`                      | Custom styling                                        |
-
-### Styling
-
-CheckoutSP supports comprehensive styling options matching the original checkout flow:
-
-```tsx
-<CheckoutSP
-  // ...other props
-  styles={{
-    title: { fontSize: 22, fontWeight: '700' },
-    subTitle: { fontSize: 16, fontWeight: '600' },
-
-    // Order review styling
-    orderReview: {
-      item: {
-        title: { color: '#4a5568' },
-        value: { color: '#1a202c', fontWeight: '600' }
-      }
-    },
-
-    // Payment styling
-    payment: {
-      container: { marginVertical: 20 },
-      title: { fontSize: 18, fontWeight: '600' },
-      cardContainer: { minHeight: 180, borderRadius: 10 },
-      cardStyle: { backgroundColor: '#FFFFFF', textColor: '#000000' }
-    },
-
-    // Button styling
-    checkoutButton: {
-      button: { backgroundColor: '#3182ce' },
-      text: { color: '#FFFFFF', fontWeight: '700' }
-    }
-  }}
-/>
-```
-
----
 
 ## Purchase Confirmation UI
 
@@ -2548,7 +2549,9 @@ const handleAddToWaitingList = async (params: IAddToWaitingListCoreParams) => {
 
 ---
 
-## BillingCore
+## BillingCore ⚠️ Deprecated
+
+> This component is deprecated. Please migrate to hooks. See [Migration Guide](./MIGRATION.md).
 
 This component collects user's billing information and checks the order out. If the entered user data is already in the system it will perform checkout, other wise it will perform a registration and then the checkout.
 
@@ -2676,7 +2679,9 @@ Exposes the following functions:
 
 ---
 
-## CheckoutCore
+## CheckoutCore ⚠️ Deprecated
+
+> This component is deprecated. Please migrate to hooks. See [Migration Guide](./MIGRATION.md).
 
 Shows the event conditions, purchase details and process the payment and free registration to an event.
 
@@ -3221,12 +3226,12 @@ Wrap your component with the Core component.
 
 ## Version 1.0.38
 
-- Add new `CheckoutSP` component for single-page checkout experience
-  - Combines billing and payment in a single view
-  - Provides the same styling options as the original checkout components
-  - Full compatibility with all existing style and text customization options
-  - Uses the same OrderReview component as the standard checkout
-- Update documentation with usage examples and component API
+- Add `CheckoutV2` – new recommended checkout component combining hooks and UI pieces.
+- Add `Custom Checkout with Hooks` example in docs.
+- Add `MIGRATION.md` – detailed migration guide for moving from Core components to hooks.
+
+- Documentation updated to reflect `CheckoutV2` as the default recommended approach.
+- `BillingCore` and `CheckoutCore` marked as **⚠️ Deprecated**.
 
 ## Version 1.0.32
 
@@ -3364,3 +3369,108 @@ isPhoneHidden?: boolean
 - Added cartTimer component, that will show the cart's remaining expiration time in the Billing screen.
 - setConfig not longer receives the `DOMAIN` prop, instead it receives the `CLIENT`
 - Added a three dot button to my orders to show the possible actions.
+
+## CheckoutV2 (✅ Recommended)
+
+`CheckoutV2` is the new prebuilt checkout component. It combines hooks and UI components (`useCheckoutFlow`, `CheckoutForm`, `PaymentForm`, `Login`, `CartTimer`) to provide a full checkout flow out of the box.
+
+- Supports **single-page checkout** and **two-step checkout**
+- Handles login, registration, cart expiration, checkout flow, and payment
+- Provides consistent styling and text overrides
+
+### Example
+
+See [example/App.tsx](./example/src/App.tsx) for a complete usage example with toggle between single-page and two-step checkout.
+
+### Common Props
+
+| Prop                   | Type                            | Description                                           |
+| ---------------------- | ------------------------------- | ----------------------------------------------------- |
+| `isSinglePageCheckout` | `boolean` (default: `true`)     | Switch between single-page checkout or two-step flow. |
+| `onCartExpired`        | `() => void`                    | Called when the cart timer expires.                   |
+| `onCheckoutSuccess`    | `(data: CheckoutData) => void`  | Called after checkout (before payment).               |
+| `onPaymentSuccess`     | `(result: OrderResult) => void` | Called after successful payment.                      |
+| `loginBrandImages`     | `ILoginBrandImages`             | Configure brand login buttons.                        |
+| `styles`               | `CheckoutStyles`                | Override component styles.                            |
+| `texts`                | `CheckoutTexts`                 | Override component texts.                             |
+
+---
+
+## Custom Checkout with Hooks
+
+You don’t have to use `CheckoutV2`. You can build your own flow by combining hooks and components.
+
+### Key Hooks and Components
+
+- **Hooks**
+
+  - `useCheckoutFlow` – orchestrates the entire checkout process
+  - `useCart` – fetches cart details
+  - `useUserProfile` – fetches user profile
+  - `useRegisterUser` – handles registration
+
+- **UI Components**
+  - `CheckoutForm` – renders the main checkout form
+  - `PaymentForm` – renders the payment form
+  - `Login` – handles authentication
+  - `CartTimer` – shows cart expiration countdown
+
+### Example (Custom Flow)
+
+```tsx
+import React, { useRef } from 'react'
+import { ScrollView } from 'react-native'
+import {
+  useCheckoutFlow,
+  CheckoutForm,
+  PaymentForm,
+  CartTimer,
+  Login
+} from 'tf-checkout-react-native'
+
+const CustomCheckout = () => {
+  const scrollRef = useRef<ScrollView>(null)
+
+  const {
+    orderItems,
+    secondsLeft,
+    onSubmit,
+    initialValues,
+    isSubmitting,
+    checkoutData,
+    handlePayment
+  } = useCheckoutFlow({
+    onCheckoutSuccess: (data) => console.log('Checkout success:', data),
+    onPaymentSuccess: (result) => console.log('Payment success:', result),
+    onCartExpired: () => console.log('Cart expired')
+  })
+
+  return (
+    <>
+      <ScrollView ref={scrollRef}>
+        <Login onLoginSuccessful={(data) => console.log('Logged in:', data)} />
+
+        {!checkoutData ? (
+          <CheckoutForm
+            scrollRef={scrollRef}
+            onSubmit={onSubmit}
+            orderItems={orderItems}
+            initialValues={initialValues}
+            isSubmitting={isSubmitting}
+          />
+        ) : (
+          <PaymentForm
+            scrollRef={scrollRef}
+            orderItems={orderItems}
+            onSubmit={() => handlePayment(checkoutData)}
+          />
+        )}
+      </ScrollView>
+
+      {typeof secondsLeft === 'number' && secondsLeft > 0 && (
+        <CartTimer secondsLeft={secondsLeft} />
+      )}
+    </>
+  )
+}
+```

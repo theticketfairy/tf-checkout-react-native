@@ -34,6 +34,7 @@ import OrderReview from './components/OrderReview'
 import s from './styles'
 import { ICheckoutProps, IOrderDetails, IOrderItem } from './types'
 
+/** @deprecated Use CheckoutV2 instead */
 const Checkout = forwardRef<SessionHandleType, ICheckoutProps>(
   (
     {

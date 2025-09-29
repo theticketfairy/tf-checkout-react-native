@@ -1,3 +1,8 @@
+/**
+ * @deprecated This component is deprecated and will be removed in a future release.
+ * Please use the hooks from 'src/features/checkout-v2/hooks' instead.
+ * See README.md in this directory for migration guide.
+ */
 import React, { useCallback, useEffect, useState } from 'react'
 import { forwardRef, useImperativeHandle } from 'react'
 import BackgroundTimer from 'react-native-background-timer'
@@ -26,6 +31,9 @@ import {
   ICheckoutResponse,
 } from './BillingCoreTypes'
 
+/**
+ * @deprecated Use the hooks from 'src/features/checkout-v2/hooks' instead
+ */
 const BillingCore = forwardRef<BillingCoreHandle, IBillingCoreProps>(
   (props, ref) => {
     const [secondsLeft, setSecondsLeft] = useState(420)
