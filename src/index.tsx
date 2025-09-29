@@ -34,12 +34,6 @@ import {
   ResetPassword,
   Tickets,
 } from './containers'
-import {
-  IBillingProps,
-  IOnCheckoutSuccess,
-  SkippingStatusType,
-} from './containers/billingInfo/types'
-import { ICheckoutProps } from './containers/checkout/types'
 import { IMyOrderDetailsProps } from './containers/myOrderDetails/types'
 import { IMyOrdersProps } from './containers/myOrders/types'
 import { IPurchaseConfirmationProps } from './containers/purchaseConfirmation/types'
@@ -122,10 +116,8 @@ export {
   IAccountTicketsData,
   IAccountTicketsResponse,
   IAddToCartResponse,
-  IBillingProps,
   IBookTicketsOptions,
   ICheckoutBody,
-  ICheckoutProps,
   IDropdownStyles,
   IError,
   IEvent,
@@ -138,7 +130,6 @@ export {
   IMyOrderDetailsProps,
   IMyOrdersOrder,
   IMyOrdersProps,
-  IOnCheckoutSuccess,
   IPasswordProtectedEventData,
   IPromoCodeResponse,
   IPurchaseConfirmationData,
@@ -174,7 +165,6 @@ export {
   SessionCoreHandleType,
   SessionHandleType,
   setConfig,
-  SkippingStatusType,
   Tickets,
   TicketsCore,
   TicketsCoreHandle,

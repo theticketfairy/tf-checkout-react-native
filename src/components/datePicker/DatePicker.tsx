@@ -17,7 +17,6 @@ const DatePicker = ({
 }: IDatePickerProps) => {
   const [isVisible, setIsVisible] = useState(false)
   const onButtonPress = () => {
-    console.log('onButtonPress')
     setIsVisible(true)
   }
 

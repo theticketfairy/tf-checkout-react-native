@@ -124,33 +124,6 @@ Client.interceptors.response.use(
     return response
   },
   async (error: AxiosError) => {
-    const request = error.config
-    const url = request?.url
-    const method = request?.method?.toUpperCase()
-    const data = request?.data
-    const headers = request?.headers
-
-    // Response details
-    const status = error.response?.status
-    const responseData = error.response?.data
-
-    // Custom log
-    console.log(
-      '[API ERROR]',
-      JSON.stringify(
-        {
-          baseURL: Client.defaults.baseURL,
-          url,
-          method,
-          status,
-          requestData: data,
-          responseData,
-          headers,
-        },
-        null,
-        2
-      )
-    )
     if (error?.response?.status === 401) {
       error.code = error.code
       error.message = error.response.data.error_description

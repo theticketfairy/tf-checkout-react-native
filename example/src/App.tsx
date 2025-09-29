@@ -4,14 +4,12 @@ import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View, S
 import {
   CheckoutV2,
   IMyOrderDetailsData,
-  IOnCheckoutSuccess,
   MyOrderDetails,
   MyOrders,
   PurchaseConfirmation,
   Tickets,
   setConfig,
   ITicketsResponseData,
-  SkippingStatusType,
   ResaleTickets,
   ResetPassword,
   SessionHandleType,
@@ -70,7 +68,6 @@ const App = () => {
   const [referredId, setReferredId] = useState<undefined | string>(undefined)
   const [isCheckingCurrentSession, setIsCheckingCurrentSession] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
-  const [skippingStatus, setSkippingStatus] = useState<SkippingStatusType>(undefined)
 
   const [selectedOrderDetails, setSelectedOrderDetails] =
     useState<IMyOrderDetailsData>()
@@ -93,7 +90,6 @@ const App = () => {
   const resetData = () => {
     setCartProps(undefined)
     setIsLoading(false)
-    setSkippingStatus(undefined)
     setOrderHash('')
     setComponentToShow(ComponentEnum.Tickets)
     // Keep user login state intact during reset - don't clear userFirstName/isUserLoggedIn
@@ -184,7 +180,6 @@ const App = () => {
   const handleOnCartExpired = () => {
     Alert.alert('Cart Expired', 'Your cart has expired. Please select your tickets again.')
     setComponentToShow(ComponentEnum.Tickets)
-    setSkippingStatus(undefined)
     setCartProps(undefined)
   }
 

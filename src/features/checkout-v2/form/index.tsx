@@ -140,7 +140,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
   // 2) helper: scroll to a field by key
   const scrollToField = (key: string, attempt: number = 0) => {
-    console.log('SCROLL TO:', key)
     if (key === 'isCardFormComplete') return
 
     const targetRef = fieldRefs.current[key]
@@ -155,7 +154,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           ;(targetRef as any).measureLayout(
             scrollNode,
             (x: number, y: number) => {
-              console.log('MEASURED Y:', y)
               scrollRef.current?.scrollTo({
                 y: Math.max(0, y - 16),
                 animated: true,
@@ -169,7 +167,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           )
           return
         } catch (e) {
-          console.log('measureLayout failed for', key, e)
+          console.error('measureLayout failed for', key, e)
         }
       }
     }

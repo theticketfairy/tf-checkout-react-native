@@ -113,11 +113,9 @@ export const CheckoutControllerRaw = ({
   }, [loginMessage, textsProp])
 
   const cartTimerTexts = textsProp?.cartTimer
-  console.log('TEXTS', JSON.stringify(textsProp))
 
   const { data: userProfile, invalidate } = useUserProfile()
   const registerUserMutation = useRegisterUser()
-  console.log('STYLES FORM FIELDS', stylesProp?.form?.fields)
   // Helper function to handle registration error
   const handleRegistrationError = useCallback((registerError: any): boolean => {
     // Check for already registered user (422 status)
@@ -334,7 +332,6 @@ export const CheckoutControllerRaw = ({
 const queryClient = new QueryClient()
 
 export const CheckoutControllerWrapper = (props: CheckoutV2Props) => {
-  console.log('Checkout Props', props)
   return (
     <QueryClientProvider client={queryClient}>
       <CheckoutControllerRaw {...props} />
