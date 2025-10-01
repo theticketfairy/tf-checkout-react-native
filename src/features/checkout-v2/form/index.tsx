@@ -191,10 +191,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     }
 
     if (typeof y === 'number' && Number.isFinite(y) && scrollRef.current) {
-      console.log('SCROLL Y:', y);
       scrollRef.current.scrollTo({ y: Math.max(0, y - 16), animated: true });
     } else {
-      console.log('SCROLL TARGET NOT FOUND for', key, 'attempt', attempt);
       if (attempt < 3) {
         setTimeout(() => scrollToField(key, attempt + 1), 50);
       }

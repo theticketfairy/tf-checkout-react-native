@@ -203,6 +203,8 @@ export const CheckoutController = ({
         style={containerStyle}
         contentContainerStyle={contentContainerStyle}
         keyboardShouldPersistTaps="handled"
+        enableAutomaticScroll={false}
+        extraScrollHeight={0}
       >
         {/* Login Component */}
         <Login
@@ -249,14 +251,14 @@ export const CheckoutController = ({
       </KeyboardAwareScrollView>
 
       {/* Cart Timer */}
-      {/* {typeof secondsLeft === 'number' && secondsLeft > 0 && (
+      {typeof secondsLeft === 'number' && secondsLeft > 0 && (
         <CartTimer
           secondsLeft={secondsLeft}
           shouldNotMinimize={false}
           styles={stylesProp?.cartTimer}
           texts={cartTimerTexts}
         />
-      )} */}
+      )}
     </>
   );
 };

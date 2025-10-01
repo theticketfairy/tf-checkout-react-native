@@ -101,7 +101,7 @@ export const useCheckoutFlow = ({
   const [secondsLeft, setSecondsLeft] = useState<number | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [selectedCountry, setSelectedCountry] = useState<string>('');
+  const [selectedCountry, setSelectedCountry] = useState<string>('1');
   const [addons, setAddons] = useState<Record<string, number>>({});
 
   const ticketsQuery = useTickets(eventId);
@@ -342,7 +342,7 @@ export const useCheckoutFlow = ({
       isSubToBrand: false,
       isCardFormComplete: false,
       country: '1',
-      state: '1',
+      state: '-1',
       addons: {},
       acceptedConditions: {},
       customFields: { ...defaultCustomFieldValues.orderDefaults },
