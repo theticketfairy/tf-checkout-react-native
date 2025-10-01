@@ -37,16 +37,12 @@ const PhoneInput: FC<IPhoneInputProps> = ({
         label={texts?.label || 'Phone number'}
         keyboardType="phone-pad"
         value={localValue}
-        style={
-          error
-            ? { color: styles?.input?.errorColor }
-            : { color: styles?.input?.baseColor }
-        }
         styles={{
           container: s.phoneInputContainer,
           ...styles?.input,
-          color: styles?.input?.color,
+          color: error ? styles?.input?.errorColor : styles?.input?.baseColor,
         }}
+        labelOffset={{ x1: -32 }}
         renderLeftAccessory={() => (
           <View style={(s.countryContainer, styles?.country?.container)}>
             <InputPhone

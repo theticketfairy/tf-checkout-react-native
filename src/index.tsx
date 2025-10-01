@@ -1,8 +1,3 @@
-import { LogBox, NativeModules } from 'react-native';
-
-console.log('Loaded native modules:', Object.keys(NativeModules));
-
-import * as React from 'react'; //Needed to render
 import { IMyOrderDetailsTicket } from './api/types';
 import {
   ICheckoutBody,
@@ -113,9 +108,11 @@ import {
   ITicketsResponseData,
   IUserProfile,
 } from './types';
-// LogBox.ignoreAllLogs();
-// @ts-ignore
-console.reportErrorsAsExceptions = false;
+
+import { LogBox, NativeModules } from 'react-native';
+
+LogBox.ignoreAllLogs();
+
 export {
   /**
    * @deprecated Use hooks like useCart(), useCheckout(), etc. imported directly from 'tf-checkout-react-native'. See core/MIGRATION.md
