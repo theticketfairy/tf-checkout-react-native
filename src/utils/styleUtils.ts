@@ -9,19 +9,19 @@
  */
 function deepMerge<T>(target: T, source: Partial<T>): T {
   if (!source || typeof source !== 'object') {
-    return target
+    return target;
   }
 
   if (!target || typeof target !== 'object') {
-    return source as T
+    return source as T;
   }
 
-  const result = { ...target }
+  const result = { ...target };
 
   for (const key in source) {
     if (source.hasOwnProperty(key)) {
-      const sourceValue = source[key]
-      const targetValue = result[key]
+      const sourceValue = source[key];
+      const targetValue = result[key];
 
       if (
         sourceValue &&
@@ -32,15 +32,15 @@ function deepMerge<T>(target: T, source: Partial<T>): T {
         !Array.isArray(targetValue)
       ) {
         // Recursively merge nested objects
-        result[key] = deepMerge(targetValue, sourceValue as any)
+        result[key] = deepMerge(targetValue, sourceValue as any);
       } else {
         // Direct assignment for primitives, arrays, or null values
-        result[key] = sourceValue as any
+        result[key] = sourceValue as any;
       }
     }
   }
 
-  return result
+  return result;
 }
 
 /**
@@ -53,10 +53,10 @@ export function mergeConfig(
   userConfig?: Partial<any>
 ): any {
   if (!userConfig) {
-    return defaultConfig
+    return defaultConfig;
   }
 
-  return deepMerge(defaultConfig, userConfig)
+  return deepMerge(defaultConfig, userConfig);
 }
 
 /**
@@ -65,15 +65,15 @@ export function mergeConfig(
  */
 export function merge<T>(defaults: T, overrides?: Partial<T>): T {
   if (!overrides) {
-    return defaults
+    return defaults;
   }
 
-  return deepMerge(defaults, overrides)
+  return deepMerge(defaults, overrides);
 }
 
 // Legacy functions for backwards compatibility
 export const mergeCheckoutStyles = (defaults: any, overrides?: Partial<any>) =>
-  merge(defaults, overrides)
+  merge(defaults, overrides);
 
 export const mergeStyles = <T>(defaults: T, overrides?: Partial<T>) =>
-  merge(defaults, overrides)
+  merge(defaults, overrides);

@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import React, { useEffect, useRef, useState } from 'react'
-import { Alert, Linking, Platform, SafeAreaView, Text, TouchableOpacity, View, Switch } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import { Alert, Linking, SafeAreaView, Text, TouchableOpacity, View, Switch } from 'react-native'
 import {
   IMyOrderDetailsData,
   MyOrderDetails,
@@ -13,22 +13,18 @@ import {
   ResetPassword,
   SessionHandleType,
   CheckoutProvider,
-  Checkout,
   CheckoutV2,
+  IConfig,
 } from 'tf-checkout-react-native'
-import { IConfig } from '../../src/helpers/Config'
-import R from '../../src/res'
-import Color from './Colors'
-import { ComponentEnum } from './enums'
-import styles from './styles'
 import { IMyOrderDetailsTicket } from '../../src/api/types'
 import { CheckoutData } from '../../src/features/checkout-v2/hooks/use-checkout'
 import { checkoutStyles } from './config/styles'
 import { checkoutTexts } from './config/texts'
+import { Color, ComponentEnum } from './config/common'
+import styles from './styles'
 
-const GOOGLE_IMAGE = require('./google_logo.png')
-const AMAZON_IMAGE = require('./amazon_logo.png')
-
+const GOOGLE_IMAGE = require('./resources/google_logo.png')
+const AMAZON_IMAGE = require('./resources/amazon_logo.png')
 
 interface IDeepLinkUrl {
   url: string
@@ -217,7 +213,7 @@ const AppRaw = () => {
         return;
       }
 
-      return handleOpenUrl({url: initialUrl})
+      return handleOpenUrl({url: initialUrl || ''})
   }
 
   //#region effects
@@ -458,13 +454,13 @@ const AppRaw = () => {
               styles={{
                 bottomSheetModal:{
                   content: {
-                    backgroundColor: R.colors.primary
+                    backgroundColor: Color.primary
                   },
                   headerContainer: {
                     justifyContent: 'space-between',
                   },
                   title: {
-                    color: R.colors.white,
+                    color: Color.white,
                   },
                 },
                 
@@ -474,11 +470,11 @@ const AppRaw = () => {
                     marginVertical: 8,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderBottomColor: R.colors.disabled,
+                    borderBottomColor: Color.disabled,
                     borderBottomWidth: 1
                   },
                   text: {
-                    color: R.colors.white,
+                    color: Color.white,
                     fontSize: 20,
                     textAlignVertical: 'center',
                   }
@@ -530,7 +526,7 @@ const AppRaw = () => {
                     fontWeight: '600',
                   },
                   moreButtonIcon: {
-                    tintColor: R.colors.white
+                    tintColor: Color.white
                   }
                 },
                 sectionHeader: {

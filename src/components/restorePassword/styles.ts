@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 
 export const restorePasswordStyles = StyleSheet.create({
   rootContainer: {
@@ -16,7 +16,7 @@ export const restorePasswordStyles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
   },
-})
+});
 
 export const restorePasswordSuccessStyles = StyleSheet.create({
   rootContainer: {
@@ -35,4 +35,4 @@ export const restorePasswordSuccessStyles = StyleSheet.create({
   message: {
     color: R.colors.black,
   },
-})
+});

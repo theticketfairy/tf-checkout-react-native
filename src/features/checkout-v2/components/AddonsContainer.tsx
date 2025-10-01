@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback } from 'react';
 import {
   StyleProp,
   StyleSheet,
@@ -6,38 +6,38 @@ import {
   TextStyle,
   View,
   ViewStyle,
-} from 'react-native'
+} from 'react-native';
 
-import { DropdownMaterial } from '../../../components'
-import { IDropdownMaterialStyles } from '../../../components/dropdownMaterial/types'
-import { AddonItem } from '../types'
-import { priceWithCurrency } from '../utils'
+import { DropdownMaterial } from '../../../components';
+import { IDropdownMaterialStyles } from '../../../components/dropdownMaterial/types';
+import { AddonItem } from '../types';
+import { priceWithCurrency } from '../utils';
 
 export interface AddonsContainerStyles {
-  container?: StyleProp<ViewStyle>
-  title?: StyleProp<TextStyle>
-  addonList?: StyleProp<ViewStyle>
-  addonItem?: StyleProp<ViewStyle>
-  addonInfo?: StyleProp<ViewStyle>
-  addonName?: StyleProp<TextStyle>
-  addonPrice?: StyleProp<TextStyle>
-  addonPriceWithFees?: StyleProp<TextStyle>
-  addonDescription?: StyleProp<TextStyle>
-  addonSelectContainer?: StyleProp<ViewStyle>
-  dropdownMaterial?: IDropdownMaterialStyles
+  container?: StyleProp<ViewStyle>;
+  title?: StyleProp<TextStyle>;
+  addonList?: StyleProp<ViewStyle>;
+  addonItem?: StyleProp<ViewStyle>;
+  addonInfo?: StyleProp<ViewStyle>;
+  addonName?: StyleProp<TextStyle>;
+  addonPrice?: StyleProp<TextStyle>;
+  addonPriceWithFees?: StyleProp<TextStyle>;
+  addonDescription?: StyleProp<TextStyle>;
+  addonSelectContainer?: StyleProp<ViewStyle>;
+  dropdownMaterial?: IDropdownMaterialStyles;
 }
 
 interface AddonsContainerProps {
-  addons: Record<string, number>
-  availableAddons: AddonItem[]
-  onAddonChange: (addonId: string, quantity: number) => void
-  currency?: string
-  styles?: AddonsContainerStyles
+  addons: Record<string, number>;
+  availableAddons: AddonItem[];
+  onAddonChange: (addonId: string, quantity: number) => void;
+  currency?: string;
+  styles?: AddonsContainerStyles;
   texts?: {
-    title?: string
-    quantityLabel?: string
-    priceWithFeesSuffix?: string
-  }
+    title?: string;
+    quantityLabel?: string;
+    priceWithFeesSuffix?: string;
+  };
 }
 
 const AddonsContainer: React.FC<AddonsContainerProps> = ({
@@ -51,26 +51,26 @@ const AddonsContainer: React.FC<AddonsContainerProps> = ({
   // Generate quantity options for the dropdown
   const generateAddonQuantityOptions = useCallback(
     (addon: AddonItem['attributes']) => {
-      const options = []
+      const options = [];
       // Check different possible locations for max quantity
-      const maxQty = addon.maxQuantity || '1'
-      const maxQtyNum = parseInt(maxQty, 10)
+      const maxQty = addon.maxQuantity || '1';
+      const maxQtyNum = parseInt(maxQty, 10);
 
       for (let i = 0; i <= maxQtyNum; i++) {
         options.push({
           value: i.toString(),
           label: i.toString(),
-        })
+        });
       }
 
-      return options
+      return options;
     },
     []
-  )
+  );
 
   // Don't render if no addons available
   if (!availableAddons || availableAddons.length === 0) {
-    return null
+    return null;
   }
   return (
     <View style={[styles.container, customStyles?.container]}>
@@ -81,17 +81,20 @@ const AddonsContainer: React.FC<AddonsContainerProps> = ({
       <View style={[styles.addonList, customStyles?.addonList]}>
         {availableAddons.map((addon) => {
           // Extract addon data from the API structure
-          const addonData = addon.attributes
-          const addonId = addon.id || addonData.id
+          const addonData = addon.attributes;
+          const addonId = addon.id || addonData.id;
 
           // Get price (could be in different locations based on API structure)
-          const priceWithFees = addonData.price || 0
-          const addonCurrency = addonData.currency || currency
-          const isAddonFree = Number(priceWithFees) === 0
+          const priceWithFees = addonData.price || 0;
+          const addonCurrency = addonData.currency || currency;
+          const isAddonFree = Number(priceWithFees) === 0;
 
           const basePriceFormatted = isAddonFree
             ? 'FREE'
-            : priceWithCurrency((priceWithFees / 100).toString(), addonCurrency)
+            : priceWithCurrency(
+                (priceWithFees / 100).toString(),
+                addonCurrency
+              );
 
           return (
             <View
@@ -138,7 +141,7 @@ const AddonsContainer: React.FC<AddonsContainerProps> = ({
                     onAddonChange(
                       addonId.toString(),
                       parseInt(item.value.toString(), 10)
-                    )
+                    );
                   }}
                   selectedOption={{
                     value: (addons[addonId] || 0).toString(),
@@ -151,12 +154,12 @@ const AddonsContainer: React.FC<AddonsContainerProps> = ({
                 />
               </View>
             </View>
-          )
+          );
         })}
       </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -204,6 +207,6 @@ const styles = StyleSheet.create({
   addonSelectContainer: {
     width: 80,
   },
-})
+});
 
-export default AddonsContainer
+export default AddonsContainer;

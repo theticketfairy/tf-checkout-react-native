@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../../res'
+import R from '../../../res';
 
 export const OrderListItemStyles = StyleSheet.create({
   rootContainer: {
@@ -52,4 +52,4 @@ export const OrderListItemStyles = StyleSheet.create({
   eventName: {
     width: '65%',
   },
-})
+});

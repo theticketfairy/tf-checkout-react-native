@@ -1,8 +1,8 @@
-import React, { FC } from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import React, { FC } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
-import s from './styles'
-import { IRadioButtonProps } from './types'
+import s from './styles';
+import { IRadioButtonProps } from './types';
 
 const RadioButton: FC<IRadioButtonProps> = ({
   styles,
@@ -21,6 +21,6 @@ const RadioButton: FC<IRadioButtonProps> = ({
       <Text style={styles?.text}>{text}</Text>
     </View>
   </TouchableOpacity>
-)
+);
 
-export default RadioButton
+export default RadioButton;

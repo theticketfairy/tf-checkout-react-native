@@ -1,14 +1,14 @@
-import React, { forwardRef, useImperativeHandle } from 'react'
+import React, { forwardRef, useImperativeHandle } from 'react';
 
-import { removeTicketFromResale, resaleTicket } from '../../api/ApiClient'
+import { removeTicketFromResale, resaleTicket } from '../../api/ApiClient';
 import {
   IFetchAccessTokenResponse,
   IRemoveTicketFromResaleResponse,
   IResaleTicketResponse,
-} from '../../api/types'
-import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
-import { ICoreProps } from '../CoreProps'
-import { OrderDetailsCoreHandle } from './OrderDetailsCoreTypes'
+} from '../../api/types';
+import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken';
+import { ICoreProps } from '../CoreProps';
+import { OrderDetailsCoreHandle } from './OrderDetailsCoreTypes';
 
 const OrderDetailsCore = forwardRef<OrderDetailsCoreHandle, ICoreProps>(
   (props, ref) => {
@@ -17,24 +17,24 @@ const OrderDetailsCore = forwardRef<OrderDetailsCoreHandle, ICoreProps>(
         data: FormData,
         orderHash: string
       ): Promise<IResaleTicketResponse> {
-        return await resaleTicket(data, orderHash)
+        return await resaleTicket(data, orderHash);
       },
 
       async removeTicketFromResale(
         orderHash: string
       ): Promise<IRemoveTicketFromResaleResponse> {
-        return await removeTicketFromResale(orderHash)
+        return await removeTicketFromResale(orderHash);
       },
 
       async refreshAccessToken(
         refreshToken?: string
       ): Promise<IFetchAccessTokenResponse> {
-        return await refreshAccessTokenAsync(refreshToken)
+        return await refreshAccessTokenAsync(refreshToken);
       },
-    }))
+    }));
 
-    return <>{props.children}</>
+    return <>{props.children}</>;
   }
-)
+);
 
-export default OrderDetailsCore
+export default OrderDetailsCore;

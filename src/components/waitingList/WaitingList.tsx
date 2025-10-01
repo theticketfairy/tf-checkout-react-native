@@ -5,17 +5,17 @@ import React, {
   useImperativeHandle,
   useRef,
   useState,
-} from 'react'
-import { Alert } from 'react-native'
+} from 'react';
+import { Alert } from 'react-native';
 
-import { IFetchAccessTokenResponse } from '../../api/types'
-import { WaitingListCore, WaitingListCoreHandle } from '../../core'
-import { SessionCoreHandleType } from '../../core/Session/SessionCoreTypes'
-import { IAddToWaitingListCoreParams } from '../../core/WaitingListCore/WaitingListCoreTypes'
-import { useDebounced } from '../../helpers/Debounced'
-import { validateEmail, validateEmpty } from '../../helpers/Validators'
-import { IWaitingListProps } from './types'
-import WaitingListView from './WaitingListView'
+import { IFetchAccessTokenResponse } from '../../api/types';
+import { WaitingListCore, WaitingListCoreHandle } from '../../core';
+import { SessionCoreHandleType } from '../../core/Session/SessionCoreTypes';
+import { IAddToWaitingListCoreParams } from '../../core/WaitingListCore/WaitingListCoreTypes';
+import { useDebounced } from '../../helpers/Debounced';
+import { validateEmail, validateEmpty } from '../../helpers/Validators';
+import { IWaitingListProps } from './types';
+import WaitingListView from './WaitingListView';
 
 const WaitingList = forwardRef<SessionCoreHandleType, IWaitingListProps>(
   (
@@ -30,30 +30,30 @@ const WaitingList = forwardRef<SessionCoreHandleType, IWaitingListProps>(
     ref
   ) => {
     //#region State
-    const [isSuccess, setIsSuccess] = useState<boolean | undefined>(undefined)
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
-    const [email, setEmail] = useState('')
+    const [isSuccess, setIsSuccess] = useState<boolean | undefined>(undefined);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
 
-    const firstNameError = useDebounced(firstName, validateEmpty)
-    const lastNameError = useDebounced(lastName, validateEmpty)
-    const emailError = useDebounced(email, validateEmail)
+    const firstNameError = useDebounced(firstName, validateEmpty);
+    const lastNameError = useDebounced(lastName, validateEmpty);
+    const emailError = useDebounced(email, validateEmail);
     //#endregion State
 
-    const handleSetFirstName = (val: string) => setFirstName(val)
-    const handleSetLastName = (val: string) => setLastName(val)
-    const handleSetEmail = (val: string) => setEmail(val)
+    const handleSetFirstName = (val: string) => setFirstName(val);
+    const handleSetLastName = (val: string) => setLastName(val);
+    const handleSetEmail = (val: string) => setEmail(val);
 
     //#region Ref
-    const waitingListCoreRef = useRef<WaitingListCoreHandle>(null)
+    const waitingListCoreRef = useRef<WaitingListCoreHandle>(null);
     //#endregion Ref
 
     const showAlert = (message: string) => {
       if (areAlertsEnabled) {
-        Alert.alert('', message)
+        Alert.alert('', message);
       }
-    }
+    };
 
     //#region Imperative Handler
     useImperativeHandle(ref, () => ({
@@ -61,63 +61,63 @@ const WaitingList = forwardRef<SessionCoreHandleType, IWaitingListProps>(
         refreshToken: string
       ): Promise<IFetchAccessTokenResponse> {
         const { accessTokenError, accessTokenData } =
-          await waitingListCoreRef.current!.refreshAccessToken(refreshToken)
+          await waitingListCoreRef.current!.refreshAccessToken(refreshToken);
 
         return {
           accessTokenData,
           accessTokenError,
-        }
+        };
       },
 
       async reloadData() {},
-    }))
+    }));
     //#endregion Imperative Handler
 
     //#region Handlers
     const handleOnPressButton = async () => {
       if (!waitingListCoreRef.current) {
-        showAlert('WaitingListCore is not initialized')
+        showAlert('WaitingListCore is not initialized');
         return onAddToWaitingListError?.({
           message: 'WaitingListCore is not initialized',
-        })
+        });
       }
 
       const values: IAddToWaitingListCoreParams = {
         firstName: firstName,
         lastName: lastName,
         email: email,
-      }
+      };
 
-      setIsLoading(true)
+      setIsLoading(true);
 
       const { addToWaitingListData, addToWaitingListError } =
-        await waitingListCoreRef.current.addToWaitingList(values)
+        await waitingListCoreRef.current.addToWaitingList(values);
 
-      setIsLoading(false)
+      setIsLoading(false);
       if (addToWaitingListError) {
-        setIsSuccess(false)
-        showAlert(addToWaitingListError.message)
-        onAddToWaitingListError?.(addToWaitingListError)
-        return
+        setIsSuccess(false);
+        showAlert(addToWaitingListError.message);
+        onAddToWaitingListError?.(addToWaitingListError);
+        return;
       }
 
       if (addToWaitingListData) {
-        onAddToWaitingListSuccess?.()
-        setIsSuccess(true)
+        onAddToWaitingListSuccess?.();
+        setIsSuccess(true);
       }
-    }
+    };
 
     const onLoadingChangeCallback = useCallback(
       (loading: boolean) => {
-        onLoadingChange?.(loading)
+        onLoadingChange?.(loading);
       },
       [onLoadingChange]
-    )
+    );
     //#endregion Handlers
 
     useEffect(() => {
-      onLoadingChangeCallback(isLoading)
-    }, [isLoading, onLoadingChangeCallback])
+      onLoadingChangeCallback(isLoading);
+    }, [isLoading, onLoadingChangeCallback]);
 
     //#region RENDER
     return (
@@ -141,9 +141,9 @@ const WaitingList = forwardRef<SessionCoreHandleType, IWaitingListProps>(
           isLoading={isLoading}
         />
       </WaitingListCore>
-    )
+    );
     //#endregion RENDER
   }
-)
+);
 
-export default WaitingList
+export default WaitingList;

@@ -1,6 +1,6 @@
-import { CardForm, CardFormView } from '@stripe/stripe-react-native'
-import { FormikProvider, useFormik } from 'formik'
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import { CardForm, CardFormView } from '@stripe/stripe-react-native';
+import { FormikProvider, useFormik } from 'formik';
+import React, { ComponentRef, ElementRef, useCallback, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   findNodeHandle,
@@ -8,47 +8,47 @@ import {
   TouchableOpacity,
   View,
   ViewProps,
-} from 'react-native'
+} from 'react-native';
 
-import { Loading } from '../../../components'
-import { readableError } from '../../../utils/handlers'
-import { CustomField } from '../../event/types'
-import { FormikField } from '../../form'
-import { FieldType } from '../../form/types'
-import AddonsContainer from '../components/AddonsContainer'
-import Conditions from '../components/Conditions'
-import OrderReview, { IOrderItem } from '../components/OrderReview'
-import { createCheckoutFormConfig, formFieldsOrder } from './config'
-import { CheckoutFormComputedStyles, mergeCheckoutFormStyles } from './styles'
-import { mergeCheckoutFormTexts } from './texts'
+import { Loading } from '../../../components';
+import { readableError } from '../../../utils/handlers';
+import { CustomField } from '../../event/types';
+import { FormikField } from '../../form';
+import { FieldType } from '../../form/types';
+import AddonsContainer from '../components/AddonsContainer';
+import Conditions from '../components/Conditions';
+import OrderReview, { IOrderItem } from '../components/OrderReview';
+import { createCheckoutFormConfig, formFieldsOrder } from './config';
+import { CheckoutFormComputedStyles, mergeCheckoutFormStyles } from './styles';
+import { mergeCheckoutFormTexts } from './texts';
 import {
   CheckoutFormOrderSummaryTexts,
   CheckoutFormPaymentTexts,
   CheckoutFormProps,
   CheckoutFormTexts,
   PaymentFormProps,
-} from './types'
+} from './types';
 
-const MemoizedAddonsContainer = React.memo(AddonsContainer)
-const MemoizedConditions = React.memo(Conditions)
-const MemoizedOrderReview = React.memo(OrderReview)
+const MemoizedAddonsContainer = React.memo(AddonsContainer);
+const MemoizedConditions = React.memo(Conditions);
+const MemoizedOrderReview = React.memo(OrderReview);
 
 const getFieldType = (type: CustomField['type']): FieldType => {
   switch (type) {
     case 'text':
-      return FieldType.INPUT
+      return FieldType.INPUT;
     case 'textarea':
-      return FieldType.TEXTAREA
+      return FieldType.TEXTAREA;
     case 'phone':
-      return FieldType.PHONE
+      return FieldType.PHONE;
     case 'radio':
-      return FieldType.RADIO
+      return FieldType.RADIO;
     case 'select':
-      return FieldType.SELECT
+      return FieldType.SELECT;
     case 'select_multi':
-      return FieldType.SELECT_MULTI
+      return FieldType.SELECT_MULTI;
   }
-}
+};
 
 export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   initialValues,
@@ -77,20 +77,20 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   texts: textsProp,
 }) => {
   // Handle card form state for payment
-  const [isCardFormComplete, setIsCardFormComplete] = useState(false)
-  const [cardFormError, setCardFormError] = useState<string>()
+  const [isCardFormComplete, setIsCardFormComplete] = useState(false);
+  const [cardFormError, setCardFormError] = useState<string>();
 
   const styles = useMemo<CheckoutFormComputedStyles>(
     () => mergeCheckoutFormStyles(stylesProp),
     [stylesProp]
-  )
+  );
 
   const texts = useMemo<Required<CheckoutFormTexts>>(
     () => mergeCheckoutFormTexts(textsProp),
     [textsProp]
-  )
+  );
 
-  const fieldComponentStyles = styles.fields
+  const fieldComponentStyles = styles.fields;
 
   const addonsStyles = useMemo(
     () => ({
@@ -106,17 +106,17 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
       dropdownMaterial: fieldComponentStyles?.select,
     }),
     [fieldComponentStyles, styles]
-  )
+  );
 
   // Initial values already include default custom field values from the hook
   const modifiedInitialValues = {
     ...initialValues,
     isCardFormComplete: isTicketFree ? true : initialValues.isCardFormComplete,
-  }
+  };
   const requiredConditions = useMemo(
     () => conditions?.filter((c) => c.is_required) || [],
     [conditions]
-  )
+  );
 
   const formik = useFormik({
     initialValues: modifiedInitialValues,
@@ -134,159 +134,162 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     }),
     validateOnChange: true,
     enableReinitialize: true,
-  })
-  const fieldTopRef = useRef<Record<string, number>>({})
-  const fieldRefs = useRef<Record<string, View | null>>({})
+  });
+  const fieldTopRef = useRef<Record<string, number>>({});
 
+  const fieldRefs = useRef<Record<string, ComponentRef<typeof View> | null>>({});
   // 2) helper: scroll to a field by key
   const scrollToField = (key: string, attempt: number = 0) => {
-    if (key === 'isCardFormComplete') return
+    if (key === 'isCardFormComplete') return;
 
-    const targetRef = fieldRefs.current[key]
+    const targetRef = fieldRefs.current[key];
     if (targetRef && scrollRef.current) {
       const scrollNode =
         (scrollRef.current as any).getScrollableNode?.() ??
         (scrollRef.current as any).getInnerViewNode?.() ??
-        findNodeHandle(scrollRef.current)
+        findNodeHandle(scrollRef.current);
 
       if (scrollNode != null) {
         try {
-          ;(targetRef as any).measureLayout(
+          (targetRef as any).measureLayout(
             scrollNode,
             (x: number, y: number) => {
               scrollRef.current?.scrollTo({
                 y: Math.max(0, y - 16),
                 animated: true,
-              })
+              });
             },
             () => {
               if (attempt < 3) {
-                setTimeout(() => scrollToField(key, attempt + 1), 50)
+                setTimeout(() => scrollToField(key, attempt + 1), 50);
               }
             }
-          )
-          return
+          );
+          return;
         } catch (e) {
-          console.error('measureLayout failed for', key, e)
+          console.error('measureLayout failed for', key, e);
         }
       }
     }
 
-    let y = fieldTopRef.current[key]
+    let y = fieldTopRef.current[key];
 
     // Fallbacks for nested ticket holder fields
     if (
       !(typeof y === 'number' && Number.isFinite(y)) &&
       key.startsWith('ticketHolders[')
     ) {
-      const holderMatch = key.match(/^ticketHolders\[(\d+)\]/)
-      const index = holderMatch ? holderMatch[1] : undefined
+      const holderMatch = key.match(/^ticketHolders\[(\d+)\]/);
+      const index = holderMatch ? holderMatch[1] : undefined;
       if (index != null) {
-        const holderKey = `ticketHolders[${index}]`
-        y = fieldTopRef.current[holderKey]
+        const holderKey = `ticketHolders[${index}]`;
+        y = fieldTopRef.current[holderKey];
         if (!(typeof y === 'number' && Number.isFinite(y))) {
-          y = fieldTopRef.current.ticketHolders
+          y = fieldTopRef.current.ticketHolders;
         }
       }
     }
 
     if (typeof y === 'number' && Number.isFinite(y) && scrollRef.current) {
-      console.log('SCROLL Y:', y)
-      scrollRef.current.scrollTo({ y: Math.max(0, y - 16), animated: true })
+      console.log('SCROLL Y:', y);
+      scrollRef.current.scrollTo({ y: Math.max(0, y - 16), animated: true });
     } else {
-      console.log('SCROLL TARGET NOT FOUND for', key, 'attempt', attempt)
+      console.log('SCROLL TARGET NOT FOUND for', key, 'attempt', attempt);
       if (attempt < 3) {
-        setTimeout(() => scrollToField(key, attempt + 1), 50)
+        setTimeout(() => scrollToField(key, attempt + 1), 50);
       }
     }
-  }
+  };
 
   const onPressSubmit = async () => {
-    console.log('ON PRESS SUBMIT')
-    const allFields = Object.keys(initialValues)
+    console.log('ON PRESS SUBMIT');
+    const allFields = Object.keys(initialValues);
 
     // Create touched fields with special handling for nested ticket holders
-    const touchedFields = allFields.reduce((acc, field) => {
-      // Handle ticketHolders specially as a nested structure
-      if (field === 'ticketHolders') {
-        // Create a properly structured touched fields object for ticket holders
-        acc[field] = formik.values.ticketHolders.map(() => ({
-          firstName: true,
-          lastName: true,
-          email: true,
-          phone: true,
-        }))
-      } else {
-        // Mark all other fields as touched
-        acc[field] = true
-      }
-      return acc
-    }, {} as Record<string, boolean | Record<string, boolean>[]>)
+    const touchedFields = allFields.reduce(
+      (acc, field) => {
+        // Handle ticketHolders specially as a nested structure
+        if (field === 'ticketHolders') {
+          // Create a properly structured touched fields object for ticket holders
+          acc[field] = formik.values.ticketHolders.map(() => ({
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+          }));
+        } else {
+          // Mark all other fields as touched
+          acc[field] = true;
+        }
+        return acc;
+      },
+      {} as Record<string, boolean | Record<string, boolean>[]>
+    );
 
-    const result = await formik.setTouched(touchedFields, true)
-    const formErrors = result ?? {}
+    const result = await formik.setTouched(touchedFields, true);
+    const formErrors = typeof result === 'object' ? result : {};
     const paymentValid =
-      isCardFormComplete || isTicketFree || !isSinglePageCheckout
-    console.log('PAYMENT VALID', paymentValid)
+      isCardFormComplete || isTicketFree || !isSinglePageCheckout;
+    console.log('PAYMENT VALID', paymentValid);
     if (!paymentValid) {
-      setCardFormError(texts.payment.errorRequired)
+      setCardFormError(texts.payment.errorRequired);
     }
 
     if (Object.keys(formErrors).length === 0 && paymentValid) {
-      console.log('PRESS SUBMIT')
-      formik.handleSubmit()
-      return
+      console.log('PRESS SUBMIT');
+      formik.handleSubmit();
+      return;
     }
 
-    console.log('FORM ERRORS', formErrors)
+    console.log('FORM ERRORS', formErrors);
 
     const firstErroredKey = formFieldsOrder.find(
       (k) => (formErrors as any)[k as keyof typeof formErrors] != null
-    )
+    );
 
-    console.log('FIRST ERRORED KEY', firstErroredKey)
+    console.log('FIRST ERRORED KEY', firstErroredKey);
 
     if (firstErroredKey === 'ticketHolders') {
-      const thErrors = (formErrors as any).ticketHolders as Array<any>
+      const thErrors = (formErrors as any).ticketHolders as Array<any>;
       if (Array.isArray(thErrors)) {
         const erroredIndex = thErrors.findIndex(
           (e) => e && Object.keys(e).length > 0
-        )
+        );
         if (erroredIndex >= 0) {
           // Try to scroll to the first specific field with an error; fallback to the ticket holder block
-          const fieldPriority = ['firstName', 'lastName', 'email', 'phone']
-          let targetKey = `ticketHolders[${erroredIndex}]`
-          const holderError = thErrors[erroredIndex] || {}
+          const fieldPriority = ['firstName', 'lastName', 'email', 'phone'];
+          let targetKey = `ticketHolders[${erroredIndex}]`;
+          const holderError = thErrors[erroredIndex] || {};
           for (const f of fieldPriority) {
             if (holderError[f]) {
-              targetKey = `ticketHolders[${erroredIndex}].${f}`
-              break
+              targetKey = `ticketHolders[${erroredIndex}].${f}`;
+              break;
             }
           }
-          scrollToField(targetKey)
-          return
+          scrollToField(targetKey);
+          return;
         }
       }
       // Fallback to the section if we can't resolve a specific index
-      scrollToField('ticketHolders')
+      scrollToField('ticketHolders');
     } else if (firstErroredKey) {
-      scrollToField(firstErroredKey)
+      scrollToField(firstErroredKey);
     } else if (!paymentValid) {
-      scrollToField('isCardFormComplete')
+      scrollToField('isCardFormComplete');
     }
-  }
+  };
 
   const handleAddonChange = useCallback(
     (addonId: string, quantity: number) => {
       const updatedAddons = {
         ...formik.values.addons,
         [addonId]: quantity,
-      }
-      formik.setFieldValue('addons', updatedAddons)
-      onAddonChange?.(addonId, quantity)
+      };
+      formik.setFieldValue('addons', updatedAddons);
+      onAddonChange?.(addonId, quantity);
     },
     [formik, onAddonChange]
-  )
+  );
   return (
     <FormikProvider value={formik}>
       {isInitialLoading && <Loading />}
@@ -453,7 +456,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 label: c.name,
               })),
               onChange: (val) => {
-                onCountryChange(val)
+                onCountryChange(val);
               },
             }}
             styles={fieldComponentStyles}
@@ -535,10 +538,10 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         <View
           collapsable={false}
           onLayout={(e) => {
-            fieldTopRef.current.ticketHolders = e.nativeEvent.layout.y
+            fieldTopRef.current.ticketHolders = e.nativeEvent.layout.y;
           }}
           ref={(el) => {
-            fieldRefs.current.ticketHolders = el
+            fieldRefs.current.ticketHolders = el;
           }}
         >
           <Text style={styles.sectionTitle}>{texts.ticketHolders.title}</Text>
@@ -546,19 +549,19 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           {formik.values.ticketHolders.map((_, index) => {
             const ticketLabel = (
               texts.ticketHolders.itemTitle || 'Ticket {index}'
-            ).replace('{index}', String(index + 1))
+            ).replace('{index}', String(index + 1));
 
             return (
               <View
                 key={index}
                 collapsable={false}
                 onLayout={(e) => {
-                  const sectionY = fieldTopRef.current.ticketHolders ?? 0
-                  const holderY = sectionY + e.nativeEvent.layout.y
-                  fieldTopRef.current[`ticketHolders[${index}]`] = holderY
+                  const sectionY = fieldTopRef.current.ticketHolders ?? 0;
+                  const holderY = sectionY + e.nativeEvent.layout.y;
+                  fieldTopRef.current[`ticketHolders[${index}]`] = holderY;
                 }}
                 ref={(el) => {
-                  fieldRefs.current[`ticketHolders[${index}]`] = el
+                  fieldRefs.current[`ticketHolders[${index}]`] = el;
                 }}
               >
                 <Text style={styles.ticketHolderTitle}>{ticketLabel}</Text>
@@ -569,12 +572,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     const baseY =
                       fieldTopRef.current[`ticketHolders[${index}]`] ??
                       fieldTopRef.current.ticketHolders ??
-                      0
+                      0;
                     fieldTopRef.current[`ticketHolders[${index}].firstName`] =
-                      baseY + e.nativeEvent.layout.y
+                      baseY + e.nativeEvent.layout.y;
                   }}
                   ref={(el) => {
-                    fieldRefs.current[`ticketHolders[${index}].firstName`] = el
+                    fieldRefs.current[`ticketHolders[${index}].firstName`] = el;
                   }}
                 >
                   <FormikField
@@ -594,12 +597,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     const baseY =
                       fieldTopRef.current[`ticketHolders[${index}]`] ??
                       fieldTopRef.current.ticketHolders ??
-                      0
+                      0;
                     fieldTopRef.current[`ticketHolders[${index}].lastName`] =
-                      baseY + e.nativeEvent.layout.y
+                      baseY + e.nativeEvent.layout.y;
                   }}
                   ref={(el) => {
-                    fieldRefs.current[`ticketHolders[${index}].lastName`] = el
+                    fieldRefs.current[`ticketHolders[${index}].lastName`] = el;
                   }}
                 >
                   <FormikField
@@ -619,12 +622,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     const baseY =
                       fieldTopRef.current[`ticketHolders[${index}]`] ??
                       fieldTopRef.current.ticketHolders ??
-                      0
+                      0;
                     fieldTopRef.current[`ticketHolders[${index}].email`] =
-                      baseY + e.nativeEvent.layout.y
+                      baseY + e.nativeEvent.layout.y;
                   }}
                   ref={(el) => {
-                    fieldRefs.current[`ticketHolders[${index}].email`] = el
+                    fieldRefs.current[`ticketHolders[${index}].email`] = el;
                   }}
                 >
                   <FormikField
@@ -644,12 +647,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     const baseY =
                       fieldTopRef.current[`ticketHolders[${index}]`] ??
                       fieldTopRef.current.ticketHolders ??
-                      0
+                      0;
                     fieldTopRef.current[`ticketHolders[${index}].phone`] =
-                      baseY + e.nativeEvent.layout.y
+                      baseY + e.nativeEvent.layout.y;
                   }}
                   ref={(el) => {
-                    fieldRefs.current[`ticketHolders[${index}].phone`] = el
+                    fieldRefs.current[`ticketHolders[${index}].phone`] = el;
                   }}
                 >
                   <FormikField
@@ -688,7 +691,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   ))}
                 </View>
               </View>
-            )
+            );
           })}
         </View>
         <View style={styles.sectionContainer}>
@@ -715,7 +718,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 formik.setFieldValue('acceptedConditions', {
                   ...formik.values.acceptedConditions,
                   [conditionId]: isAccepted,
-                })
+                });
               }}
               texts={{
                 title: texts.conditions.title,
@@ -738,7 +741,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
             <Payment
               orderItems={orderItems}
               onFormComplete={(details) => {
-                setIsCardFormComplete(details.complete)
+                setIsCardFormComplete(details.complete);
               }}
               error={cardFormError}
               styles={styles}
@@ -757,7 +760,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <ActivityIndicator size='small' color='#ffffff' />
+            <ActivityIndicator size="small" color="#ffffff" />
           ) : (
             <Text style={styles.buttonText}>
               {isSinglePageCheckout
@@ -768,19 +771,19 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         </TouchableOpacity>
       </View>
     </FormikProvider>
-  )
-}
+  );
+};
 
 interface PaymentProps {
-  onFormComplete: (details: CardFormView.Details) => void
-  error?: string
-  orderItems: IOrderItem[]
-  paymentViewProps?: ViewProps
-  styles: CheckoutFormComputedStyles
+  onFormComplete: (details: CardFormView.Details) => void;
+  error?: string;
+  orderItems: IOrderItem[];
+  paymentViewProps?: ViewProps;
+  styles: CheckoutFormComputedStyles;
   texts: {
-    orderSummary: CheckoutFormOrderSummaryTexts
-    payment: CheckoutFormPaymentTexts
-  }
+    orderSummary: CheckoutFormOrderSummaryTexts;
+    payment: CheckoutFormPaymentTexts;
+  };
 }
 
 export const Payment = ({
@@ -819,8 +822,8 @@ export const Payment = ({
         </View>
       </View>
     </View>
-  )
-}
+  );
+};
 
 export const PaymentForm = ({
   orderItems,
@@ -828,42 +831,42 @@ export const PaymentForm = ({
   styles: stylesProp,
   texts: textsProp,
 }: PaymentFormProps) => {
-  const [error, setError] = useState<string>()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isCardFormComplete, setIsCardFormComplete] = useState(false)
+  const [error, setError] = useState<string>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCardFormComplete, setIsCardFormComplete] = useState(false);
 
   const styles = useMemo<CheckoutFormComputedStyles>(
     () => mergeCheckoutFormStyles(stylesProp),
     [stylesProp]
-  )
+  );
 
   const texts = useMemo<Required<CheckoutFormTexts>>(
     () => mergeCheckoutFormTexts(textsProp),
     [textsProp]
-  )
+  );
 
   const onFormComplete = (details: CardFormView.Details) => {
-    setIsCardFormComplete(details.complete)
+    setIsCardFormComplete(details.complete);
 
     if (details.complete) {
-      setError(undefined)
+      setError(undefined);
     }
-  }
+  };
 
   const onPressSubmit = async () => {
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
       if (!isCardFormComplete) {
-        throw new Error(texts.payment.errorRequired)
+        throw new Error(texts.payment.errorRequired);
       }
 
-      await onSubmit()
+      await onSubmit();
     } catch (e) {
-      setError(readableError(e))
+      setError(readableError(e));
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <View>
@@ -885,11 +888,11 @@ export const PaymentForm = ({
         disabled={isSubmitting}
       >
         {isSubmitting ? (
-          <ActivityIndicator size='small' color='#ffffff' />
+          <ActivityIndicator size="small" color="#ffffff" />
         ) : (
           <Text style={styles.buttonText}>{texts.buttons.paymentSubmit}</Text>
         )}
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};

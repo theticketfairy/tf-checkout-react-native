@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
-import { ApiResponse } from '../../api/api.types'
-import { Client } from '../../api/ApiClient'
-import { QueryOpts } from '../../common/query.types'
-import { IEventCustomFields } from './types'
+import { ApiResponse } from '../../api/api.types';
+import { Client } from '../../api/ApiClient';
+import { QueryOpts } from '../../common/query.types';
+import { IEventCustomFields } from './types';
 
 /**
  * Hook to fetch user profile
@@ -22,7 +22,7 @@ export const useEventCustomFields = (
     retry: false,
     enabled: !!eventId,
     ...options,
-  })
+  });
 
-  return { ...query }
-}
+  return { ...query };
+};

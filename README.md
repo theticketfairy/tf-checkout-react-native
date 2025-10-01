@@ -47,6 +47,28 @@ To download the PDFs, add the following flags to `Info.plist` file:
 
 # Installation
 
+🔗 Required peer dependencies
+This package relies on several React Native native modules. You need to install them in your app for the SDK to work properly:
+If you are running on bare React Native, you will need to install the following dependencies:
+
+```sh
+yarn add \
+@react-native-async-storage/async-storage@^2.2.0 \
+@react-native-clipboard/clipboard@^1.16.3 \
+@react-native-community/datetimepicker@^8.4.5 \
+react-native-background-timer@^2.4.1 \
+react-native-device-country@^1.1.1 \
+react-native-fs@^2.20.0 \
+@stripe/stripe-react-native@^0.54.0
+```
+
+If you are running on expo, you will need to install the following dependencies:
+
+```sh
+yarn add \
+@react-native-async-storage/async-storage@^2.2.0
+```
+
 ```sh
 yarn add tf-checkout-react-native
 ```

@@ -1,10 +1,10 @@
-import _find from 'lodash/find'
+import _find from 'lodash/find';
 
 export const getCountryDialCode = (country: string) =>
   _find(
     countryCodes,
     (item) => item.code.toUpperCase() === country.toUpperCase()
-  )?.dial_code || '+1'
+  )?.dial_code || '+1';
 
 export const countryCodes = [
   {
@@ -3381,4 +3381,4 @@ export const countryCodes = [
     code: 'AX',
     flag: '🇦🇽',
   },
-]
+];

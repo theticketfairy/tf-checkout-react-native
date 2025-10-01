@@ -1,21 +1,21 @@
-import React from 'react'
-import { forwardRef, useImperativeHandle } from 'react'
+import React from 'react';
+import { forwardRef, useImperativeHandle } from 'react';
 
 import {
   fetchAccountTickets,
   fetchMyOrders,
   fetchOrderDetails,
-} from '../../api/ApiClient'
+} from '../../api/ApiClient';
 import {
   IFetchAccessTokenResponse,
   IMyOrderDetailsResponse,
   IMyOrdersRequestParams,
   IMyOrdersResponse,
-} from '../../api/types'
-import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
-import { IAccountTicketsResponse } from '../../types'
-import { ICoreProps } from '../CoreProps'
-import { MyOrdersCoreHandle } from './MyOrdersCoreTypes'
+} from '../../api/types';
+import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken';
+import { IAccountTicketsResponse } from '../../types';
+import { ICoreProps } from '../CoreProps';
+import { MyOrdersCoreHandle } from './MyOrdersCoreTypes';
 
 const MyOrdersCore = forwardRef<MyOrdersCoreHandle, ICoreProps>(
   (props, ref) => {
@@ -23,28 +23,28 @@ const MyOrdersCore = forwardRef<MyOrdersCoreHandle, ICoreProps>(
       async getMyOrders(
         params: IMyOrdersRequestParams
       ): Promise<IMyOrdersResponse> {
-        return await fetchMyOrders(params)
+        return await fetchMyOrders(params);
       },
 
       async getOrderDetails(orderId: string): Promise<IMyOrderDetailsResponse> {
-        return await fetchOrderDetails(orderId)
+        return await fetchOrderDetails(orderId);
       },
 
       async refreshAccessToken(
         refreshToken?: string
       ): Promise<IFetchAccessTokenResponse> {
-        return await refreshAccessTokenAsync(refreshToken)
+        return await refreshAccessTokenAsync(refreshToken);
       },
 
       async getAccountTickets(
         params: IMyOrdersRequestParams
       ): Promise<IAccountTicketsResponse> {
-        return await fetchAccountTickets(params)
+        return await fetchAccountTickets(params);
       },
-    }))
+    }));
 
-    return <>{props.children}</>
+    return <>{props.children}</>;
   }
-)
+);
 
-export default MyOrdersCore
+export default MyOrdersCore;

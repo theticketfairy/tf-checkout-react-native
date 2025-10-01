@@ -11,27 +11,27 @@ import {
   BillingDetails,
   initStripe,
   useConfirmPayment,
-} from '@stripe/stripe-react-native'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import BackgroundTimer from 'react-native-background-timer'
+} from '@stripe/stripe-react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import BackgroundTimer from 'react-native-background-timer';
 
-import { logError } from '../../../utils/handlers'
-import { useRegisterUser } from '../../auth/api-hooks'
+import { logError } from '../../../utils/handlers';
+import { useRegisterUser } from '../../auth/api-hooks';
 import {
   CustomerProfileResponse,
   IRegisterUserResponse,
-} from '../../auth/types'
-import { storeAuthTokens } from '../../auth/utils'
-import { useEventCustomFields } from '../../event/api-hooks'
-import { OrderAttribute, TicketAttribute } from '../../event/types'
-import { useCountries, useStates } from '../../geo/api-hooks'
-import { CheckoutFormProps, CheckoutFormValues } from '../form/types'
-import { IOrderItem, OrderResult } from '../types'
+} from '../../auth/types';
+import { storeAuthTokens } from '../../auth/utils';
+import { useEventCustomFields } from '../../event/api-hooks';
+import { OrderAttribute, TicketAttribute } from '../../event/types';
+import { useCountries, useStates } from '../../geo/api-hooks';
+import { CheckoutFormProps, CheckoutFormValues } from '../form/types';
+import { IOrderItem, OrderResult } from '../types';
 import {
   createCheckoutBody,
   createRegistrationData,
   priceWithCurrency,
-} from '../utils'
+} from '../utils';
 import {
   useAddons,
   useCart,
@@ -42,41 +42,41 @@ import {
   usePaymentSuccess,
   useTickets,
   useUpdateCheckout,
-} from './api-hooks'
+} from './api-hooks';
 
 export interface UseCheckoutFlowProps {
-  onCartExpired?: () => void
-  isSinglePageCheckout?: boolean
-  isAgeRequired?: boolean
-  isPhoneRequired?: boolean
-  isPhoneHidden?: boolean
-  minimumAge?: number
-  customerProfile?: CustomerProfileResponse
-  onCheckoutSuccess?: (data: CheckoutData) => void
-  onCheckoutError?: (error: any) => void
-  onPaymentSuccess?: (data: OrderResult) => void
-  onPaymentError?: (error: any) => void
+  onCartExpired?: () => void;
+  isSinglePageCheckout?: boolean;
+  isAgeRequired?: boolean;
+  isPhoneRequired?: boolean;
+  isPhoneHidden?: boolean;
+  minimumAge?: number;
+  customerProfile?: CustomerProfileResponse;
+  onCheckoutSuccess?: (data: CheckoutData) => void;
+  onCheckoutError?: (error: any) => void;
+  onPaymentSuccess?: (data: OrderResult) => void;
+  onPaymentError?: (error: any) => void;
   //   Return true if the form should be submitted
-  onRegistrationSuccess?: (data: IRegisterUserResponse) => void
-  onRegistrationError?: (error: any) => void
+  onRegistrationSuccess?: (data: IRegisterUserResponse) => void;
+  onRegistrationError?: (error: any) => void;
 }
 
 export interface UseCheckoutFlowReturn
   extends Omit<CheckoutFormProps, 'scrollRef'> {
-  secondsLeft: number | undefined
-  eventId: string | undefined
-  isInitialLoading: boolean
-  isSubmitting: boolean
-  isLoggedIn: boolean
-  setSecondsLeft: React.Dispatch<React.SetStateAction<number | undefined>>
-  setSelectedCountry: React.Dispatch<React.SetStateAction<string>>
-  handlePayment: (input: CheckoutData) => Promise<void>
+  secondsLeft: number | undefined;
+  eventId: string | undefined;
+  isInitialLoading: boolean;
+  isSubmitting: boolean;
+  isLoggedIn: boolean;
+  setSecondsLeft: React.Dispatch<React.SetStateAction<number | undefined>>;
+  setSelectedCountry: React.Dispatch<React.SetStateAction<string>>;
+  handlePayment: (input: CheckoutData) => Promise<void>;
 }
 
 export interface CheckoutData {
-  hash: string
-  total: string | number
-  values: CheckoutFormValues
+  hash: string;
+  total: string | number;
+  values: CheckoutFormValues;
 }
 
 export const useCheckoutFlow = ({
@@ -94,64 +94,64 @@ export const useCheckoutFlow = ({
   onRegistrationSuccess,
   onRegistrationError,
 }: UseCheckoutFlowProps): UseCheckoutFlowReturn => {
-  const cartQuery = useCart()
-  const eventId = cartQuery.data?.data?.attributes?.eventId
+  const cartQuery = useCart();
+  const eventId = cartQuery.data?.data?.attributes?.eventId;
 
-  const [orderItems, setOrderItems] = useState<IOrderItem[]>([])
-  const [secondsLeft, setSecondsLeft] = useState<number | undefined>(undefined)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [orderItems, setOrderItems] = useState<IOrderItem[]>([]);
+  const [secondsLeft, setSecondsLeft] = useState<number | undefined>(undefined);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [selectedCountry, setSelectedCountry] = useState<string>('')
-  const [addons, setAddons] = useState<Record<string, number>>({})
+  const [selectedCountry, setSelectedCountry] = useState<string>('');
+  const [addons, setAddons] = useState<Record<string, number>>({});
 
-  const ticketsQuery = useTickets(eventId)
-  const eventInfoQuery = useEventInfo(eventId)
+  const ticketsQuery = useTickets(eventId);
+  const eventInfoQuery = useEventInfo(eventId);
 
-  const countriesQuery = useCountries()
+  const countriesQuery = useCountries();
 
-  const checkoutMutation = useCheckout()
-  const paymentDataMutation = usePaymentData()
-  const updateCheckoutMutation = useUpdateCheckout()
-  const paymentSuccessMutation = usePaymentSuccess()
-  const customFieldsQuery = useEventCustomFields(eventId)
+  const checkoutMutation = useCheckout();
+  const paymentDataMutation = usePaymentData();
+  const updateCheckoutMutation = useUpdateCheckout();
+  const paymentSuccessMutation = usePaymentSuccess();
+  const customFieldsQuery = useEventCustomFields(eventId);
 
-  const addonsQuery = useAddons(eventId)
-  const statesQuery = useStates(selectedCountry)
-  const conditionsQuery = useEventConditions(eventId)
+  const addonsQuery = useAddons(eventId);
+  const statesQuery = useStates(selectedCountry);
+  const conditionsQuery = useEventConditions(eventId);
 
   const handleRegistrationError = useCallback(
     (registerError: any): boolean => {
       // Check for already registered user (422 status)
       if (registerError?.response?.status === 422) {
-        const errorData = registerError.response?.data
+        const errorData = registerError.response?.data;
 
         // Check all possible email error structures
         const emailErrors =
           errorData?.errors?.email ||
           errorData?.data?.message?.email ||
-          (errorData?.message?.email ? errorData.message.email : null)
+          (errorData?.message?.email ? errorData.message.email : null);
 
         if (emailErrors) {
           // Show login dialog for already registered user
           const emailAlreadyRegisteredText =
-            'It appears this email is already attached to an account. Please log in here to complete your registration.'
+            'It appears this email is already attached to an account. Please log in here to complete your registration.';
 
-          let errorMessage: string
+          let errorMessage: string;
           if (Array.isArray(emailErrors)) {
-            errorMessage = emailErrors[0]
+            errorMessage = emailErrors[0];
           } else if (typeof emailErrors === 'string') {
-            errorMessage = emailErrors
+            errorMessage = emailErrors;
           } else {
-            errorMessage = emailAlreadyRegisteredText
+            errorMessage = emailAlreadyRegisteredText;
           }
 
           if (errorMessage === 'The email is already used') {
-            errorMessage = emailAlreadyRegisteredText
+            errorMessage = emailAlreadyRegisteredText;
           }
 
           // Show login dialog
-          onRegistrationError?.(errorMessage)
-          return true // Registration handled, don't continue with checkout
+          onRegistrationError?.(errorMessage);
+          return true; // Registration handled, don't continue with checkout
         } else {
           // Other validation errors
           const errorMessages = Object.entries(errorData?.errors || {})
@@ -161,38 +161,38 @@ export const useCheckoutFlow = ({
                   Array.isArray(messages) ? messages.join(', ') : messages
                 }`
             )
-            .join('\n')
-          throw new Error(`Validation errors: ${errorMessages}`)
+            .join('\n');
+          throw new Error(`Validation errors: ${errorMessages}`);
         }
       }
 
       // Generic error
-      throw new Error(registerError?.message || 'Registration failed')
+      throw new Error(registerError?.message || 'Registration failed');
     },
     [onRegistrationError]
-  )
+  );
 
-  const registerUserMutation = useRegisterUser()
+  const registerUserMutation = useRegisterUser();
 
   const registerUser = useCallback(
     async (values: CheckoutFormValues): Promise<boolean> => {
       try {
         // User is already registered or logged in, skip registration
         if (customerProfile) {
-          return true
+          return true;
         }
         // Create and submit registration data
-        const registerUserData = createRegistrationData(values, isAgeRequired)
-        const result = await registerUserMutation.mutateAsync(registerUserData)
+        const registerUserData = createRegistrationData(values, isAgeRequired);
+        const result = await registerUserMutation.mutateAsync(registerUserData);
 
         // Store tokens and extract user data
-        await storeAuthTokens(result.data.attributes)
+        await storeAuthTokens(result.data.attributes);
 
         // Registration successful
-        onRegistrationSuccess?.(result.data)
-        return true
+        onRegistrationSuccess?.(result.data);
+        return true;
       } catch (registerError: any) {
-        return !handleRegistrationError(registerError)
+        return !handleRegistrationError(registerError);
       }
     },
     [
@@ -202,18 +202,18 @@ export const useCheckoutFlow = ({
       handleRegistrationError,
       onRegistrationSuccess,
     ]
-  )
+  );
 
   // Extract and sort order custom fields
   const orderCustomFields = useMemo(() => {
     if (!customFieldsQuery.data?.data?.attributes) {
-      return []
+      return [];
     }
 
     // Filter for order attributes only
     const orderAttributes = customFieldsQuery.data.data.attributes.filter(
       (attr): attr is OrderAttribute => 'order' in attr
-    )
+    );
 
     // Extract fields from order attributes and sort by order property
     const fields = orderAttributes
@@ -221,24 +221,24 @@ export const useCheckoutFlow = ({
       .flat()
       .sort((a, b) => {
         // Convert order strings to numbers for comparison
-        const orderA = parseInt(a.order, 10) || 0
-        const orderB = parseInt(b.order, 10) || 0
-        return orderA - orderB
-      })
+        const orderA = parseInt(a.order, 10) || 0;
+        const orderB = parseInt(b.order, 10) || 0;
+        return orderA - orderB;
+      });
 
-    return fields
-  }, [customFieldsQuery.data])
+    return fields;
+  }, [customFieldsQuery.data]);
 
   // Extract and sort ticket custom fields
   const ticketCustomFields = useMemo(() => {
     if (!customFieldsQuery.data?.data?.attributes) {
-      return []
+      return [];
     }
 
     // Filter for ticket attributes only
     const ticketAttributes = customFieldsQuery.data.data.attributes.filter(
       (attr) => 'ticket' in attr
-    ) as TicketAttribute[]
+    ) as TicketAttribute[];
 
     // Extract fields from ticket attributes and sort by order property
     const fields = ticketAttributes
@@ -246,78 +246,78 @@ export const useCheckoutFlow = ({
       .flat()
       .sort((a, b) => {
         // Convert order strings to numbers for comparison
-        const orderA = parseInt(a.order, 10) || 0
-        const orderB = parseInt(b.order, 10) || 0
-        return orderA - orderB
-      })
+        const orderA = parseInt(a.order, 10) || 0;
+        const orderB = parseInt(b.order, 10) || 0;
+        return orderA - orderB;
+      });
 
-    return fields
-  }, [customFieldsQuery.data])
+    return fields;
+  }, [customFieldsQuery.data]);
 
-  const { confirmPayment } = useConfirmPayment()
+  const { confirmPayment } = useConfirmPayment();
 
   const isInitialLoading = useMemo(() => {
-    if (cartQuery.isPending) return true
-    if (eventInfoQuery.isPending) return true
-    if (ticketsQuery.isPending) return true
-    if (countriesQuery.isPending) return true
-    if (customFieldsQuery.isPending) return true
+    if (cartQuery.isPending) return true;
+    if (eventInfoQuery.isPending) return true;
+    if (ticketsQuery.isPending) return true;
+    if (countriesQuery.isPending) return true;
+    if (customFieldsQuery.isPending) return true;
 
-    return false
+    return false;
   }, [
     cartQuery.isPending,
     eventInfoQuery.isPending,
     ticketsQuery.isPending,
     countriesQuery.isPending,
     customFieldsQuery.isPending,
-  ])
+  ]);
 
   const defaultCustomFieldValues = useMemo(() => {
-    const orderDefaults: Record<string, string | string[]> = {}
-    const ticketDefaults: Record<string, string | string[]> = {}
+    const orderDefaults: Record<string, string | string[]> = {};
+    const ticketDefaults: Record<string, string | string[]> = {};
 
     // Get the custom fields from the query response
     if (customFieldsQuery.data?.data?.attributes) {
       // Filter to only include OrderAttribute types and cast accordingly
       const orderAttributes = customFieldsQuery.data.data.attributes.filter(
         (attr): attr is OrderAttribute => 'order' in attr
-      )
+      );
 
       const ticketAttributes = customFieldsQuery.data.data.attributes.filter(
         (attr): attr is TicketAttribute => 'ticket' in attr
-      )
+      );
 
       // Extract fields from order attributes - now TypeScript knows these are OrderAttribute
       const orderFields = orderAttributes
         .map((attr) => attr.order.group.fields)
-        .flat()
+        .flat();
       // Set default values for fields that have them
       orderFields.forEach((field) => {
         if (field.defaultValue !== undefined && field.defaultValue !== null) {
-          orderDefaults[field.name] = field.defaultValue
+          orderDefaults[field.name] = field.defaultValue;
         }
-      })
+      });
 
       // Extract fields from ticket attributes - now TypeScript knows these are TicketAttribute
       const ticketFields = ticketAttributes
         .map((attr) => attr.ticket.group.fields)
-        .flat()
+        .flat();
 
       ticketFields.forEach((field) => {
         if (field.defaultValue !== undefined && field.defaultValue !== null) {
-          ticketDefaults[field.name] = field.defaultValue
+          ticketDefaults[field.name] = field.defaultValue;
         }
-      })
+      });
     }
 
-    return { orderDefaults, ticketDefaults }
-  }, [customFieldsQuery.data])
+    return { orderDefaults, ticketDefaults };
+  }, [customFieldsQuery.data]);
 
   // Prefill form with user profile data when available
   const initialValues = useMemo(() => {
     // Get ticket quantity from cart
     const ticketQuantity =
-      cartQuery.data?.data?.attributes?.cart?.[0]?.quantity || 1
+      cartQuery.data?.data?.attributes?.cart?.[0]?.quantity || 1;
     // Create empty ticket holders array based on ticket quantity
     const ticketHolders = Array.from({ length: ticketQuantity }, () => ({
       firstName: '',
@@ -325,7 +325,7 @@ export const useCheckoutFlow = ({
       email: '',
       phone: '',
       customFields: { ...defaultCustomFieldValues.ticketDefaults }, // Apply default values for ticket custom fields
-    }))
+    }));
     const base: CheckoutFormValues = {
       firstName: '',
       lastName: '',
@@ -347,23 +347,23 @@ export const useCheckoutFlow = ({
       acceptedConditions: {},
       customFields: { ...defaultCustomFieldValues.orderDefaults },
       ticketHolders,
-    }
+    };
 
     if (customerProfile) {
-      const profile = customerProfile
+      const profile = customerProfile;
 
       // Fill main user info
-      base.firstName = profile.firstName || ''
-      base.lastName = profile.lastName || ''
-      base.email = profile.email || ''
-      base.emailConfirmation = profile.email || ''
-      base.phone = profile.phone || ''
-      base.street = profile.streetAddress || ''
-      base.city = profile.city || ''
-      base.postalCode = profile.zipCode || ''
-      base.country = profile.countryId || '-1'
-      base.state = profile.stateId || '-1'
-      base.dateOfBirth = profile.dateOfBirth || undefined
+      base.firstName = profile.firstName || '';
+      base.lastName = profile.lastName || '';
+      base.email = profile.email || '';
+      base.emailConfirmation = profile.email || '';
+      base.phone = profile.phone || '';
+      base.street = profile.streetAddress || '';
+      base.city = profile.city || '';
+      base.postalCode = profile.zipCode || '';
+      base.country = profile.countryId || '-1';
+      base.state = profile.stateId || '-1';
+      base.dateOfBirth = profile.dateOfBirth || undefined;
 
       // Fill first ticket holder info from the user's profile data
       if (base.ticketHolders.length > 0) {
@@ -373,69 +373,69 @@ export const useCheckoutFlow = ({
           lastName: profile.lastName || '',
           email: profile.email || '',
           phone: profile.phone || '',
-        }
+        };
       }
     }
 
-    return base
+    return base;
   }, [
     cartQuery.data?.data?.attributes?.cart,
     customerProfile,
     defaultCustomFieldValues,
-  ])
+  ]);
 
   const countries = useMemo(() => {
-    return countriesQuery.data?.data || []
-  }, [countriesQuery.data?.data])
+    return countriesQuery.data?.data || [];
+  }, [countriesQuery.data?.data]);
 
   const states = useMemo(() => {
-    return statesQuery?.data?.data || []
-  }, [statesQuery?.data?.data])
+    return statesQuery?.data?.data || [];
+  }, [statesQuery?.data?.data]);
 
   const availableAddons = useMemo(() => {
-    return addonsQuery.data?.data?.attributes?.add_ons || []
-  }, [addonsQuery.data?.data?.attributes?.add_ons])
+    return addonsQuery.data?.data?.attributes?.add_ons || [];
+  }, [addonsQuery.data?.data?.attributes?.add_ons]);
 
   const conditions = useMemo(() => {
-    return conditionsQuery.data?.data?.attributes?.conditions || []
-  }, [conditionsQuery.data?.data?.attributes?.conditions])
+    return conditionsQuery.data?.data?.attributes?.conditions || [];
+  }, [conditionsQuery.data?.data?.attributes?.conditions]);
 
   const eventCurrency = useMemo(() => {
-    return eventInfoQuery.data?.data.attributes.currency.currency
-  }, [eventInfoQuery.data?.data.attributes.currency.currency])
+    return eventInfoQuery.data?.data.attributes.currency.currency;
+  }, [eventInfoQuery.data?.data.attributes.currency.currency]);
 
   const isLoggedIn = useMemo(() => {
-    return !!customerProfile
-  }, [customerProfile])
+    return !!customerProfile;
+  }, [customerProfile]);
 
   // Handle payment processing
   const handlePayment = useCallback(
     async (input: CheckoutData) => {
       try {
-        setIsSubmitting(true)
+        setIsSubmitting(true);
 
         // Get payment data
         const paymentResponse = await paymentDataMutation.mutateAsync(
           String(input.hash)
-        )
+        );
         const { order_details, payment_method } =
-          paymentResponse.data.attributes
+          paymentResponse.data.attributes;
         // Check if this is a free ticket
         const isFreeTicket =
-          Number(input.total) === 0 || Number(order_details.pay_now) === 0
+          Number(input.total) === 0 || Number(order_details.pay_now) === 0;
 
         if (isFreeTicket) {
           // For free tickets, just confirm the order
-          await paymentSuccessMutation.mutateAsync(String(input.hash))
+          await paymentSuccessMutation.mutateAsync(String(input.hash));
 
           const result: OrderResult = {
             orderHash: String(input.hash),
             total: Number(input.total),
             currency: order_details.currency,
             email: input.values.email,
-          }
+          };
 
-          onPaymentSuccess?.(result)
+          onPaymentSuccess?.(result);
         } else {
           // For paid tickets, handle Stripe payment
           // Initialize Stripe with payment method details
@@ -445,9 +445,9 @@ export const useCheckoutFlow = ({
             payment_method.stripe_connected_account !== ''
               ? { stripeAccountId: payment_method.stripe_connected_account }
               : {}),
-          }
+          };
 
-          await initStripe(stripeConfig)
+          await initStripe(stripeConfig);
 
           // Create comprehensive billing details for payment
           const billingDetails: BillingDetails = {
@@ -461,20 +461,20 @@ export const useCheckoutFlow = ({
               postalCode: input.values.postalCode || undefined,
               state: input.values.state || undefined,
             },
-          }
+          };
 
           // Confirm payment with Stripe
           const { error: confirmError, paymentIntent } = await confirmPayment(
             payment_method.stripe_client_secret!,
             { paymentMethodType: 'Card', paymentMethodData: { billingDetails } }
-          )
+          );
 
           if (confirmError || paymentIntent?.status !== 'Succeeded') {
-            throw new Error(confirmError?.message || 'Payment failed')
+            throw new Error(confirmError?.message || 'Payment failed');
           }
 
           // Notify backend of successful payment
-          await paymentSuccessMutation.mutateAsync(String(input.hash))
+          await paymentSuccessMutation.mutateAsync(String(input.hash));
 
           // Notify about successful payment
           const result: OrderResult = {
@@ -483,15 +483,15 @@ export const useCheckoutFlow = ({
             currency: order_details.currency,
             email: input.values.email,
             paymentIntentId: paymentIntent.id,
-          }
+          };
 
-          setIsSubmitting(false)
-          onPaymentSuccess?.(result)
+          setIsSubmitting(false);
+          onPaymentSuccess?.(result);
         }
       } catch (error) {
-        logError(error, 'Checkout: handlePayment')
-        onPaymentError?.(error)
-        throw error
+        logError(error, 'Checkout: handlePayment');
+        onPaymentError?.(error);
+        throw error;
       }
     },
     [
@@ -501,61 +501,60 @@ export const useCheckoutFlow = ({
       onPaymentError,
       confirmPayment,
     ]
-  )
+  );
 
   const handleCheckout = useCallback(
     async (values: CheckoutFormValues) => {
       try {
-        const checkoutBody = createCheckoutBody(values, isAgeRequired)
-        const checkoutResponse = await checkoutMutation.mutateAsync(
-          checkoutBody
-        )
+        const checkoutBody = createCheckoutBody(values, isAgeRequired);
+        const checkoutResponse =
+          await checkoutMutation.mutateAsync(checkoutBody);
 
-        const hash = checkoutResponse.data.attributes.hash
-        const total = checkoutResponse.data.attributes.total
-        onCheckoutSuccess?.({ hash, total, values })
+        const hash = checkoutResponse.data.attributes.hash;
+        const total = checkoutResponse.data.attributes.total;
+        onCheckoutSuccess?.({ hash, total, values });
 
-        return { hash, total }
+        return { hash, total };
       } catch (error) {
-        logError(error, 'Checkout: handleCheckout')
-        onCheckoutError?.(error)
-        throw error
+        logError(error, 'Checkout: handleCheckout');
+        onCheckoutError?.(error);
+        throw error;
       }
     },
     [checkoutMutation, isAgeRequired, onCheckoutSuccess, onCheckoutError]
-  )
+  );
 
   const onSubmit = useCallback(
     async (values: CheckoutFormValues) => {
       try {
-        setIsSubmitting(true)
-        if (!(await registerUser(values))) return
+        setIsSubmitting(true);
+        if (!(await registerUser(values))) return;
 
-        const { hash, total } = await handleCheckout(values)
+        const { hash, total } = await handleCheckout(values);
 
         if (isSinglePageCheckout) {
           await handlePayment({
             hash,
             total,
             values,
-          })
+          });
         }
       } catch (error) {
-        logError(error, 'Checkout: onSubmit')
+        logError(error, 'Checkout: onSubmit');
       } finally {
-        setIsSubmitting(false)
+        setIsSubmitting(false);
       }
     },
     [registerUser, handleCheckout, isSinglePageCheckout, handlePayment]
-  )
+  );
 
   const updateOrderItemsFromCheckoutData = useCallback(
     (cartPriceBreakdown: any) => {
-      if (!cartPriceBreakdown) return
+      if (!cartPriceBreakdown) return;
 
       // Update order items with the latest pricing information
-      const updatedOrderItems: IOrderItem[] = []
-      const currency = cartPriceBreakdown.currency?.currency || 'USD'
+      const updatedOrderItems: IOrderItem[] = [];
+      const currency = cartPriceBreakdown.currency?.currency || 'USD';
 
       // Add ticket items
       if (cartPriceBreakdown.tickets_price_breakdown) {
@@ -568,8 +567,8 @@ export const useCheckoutFlow = ({
               currency
             )}`,
             value: priceWithCurrency(ticket.total_price.toString(), currency),
-          })
-        })
+          });
+        });
       }
 
       // Add add-ons
@@ -587,8 +586,8 @@ export const useCheckoutFlow = ({
               currency
             )}`,
             value: priceWithCurrency(addon.total_price.toString(), currency),
-          })
-        })
+          });
+        });
       }
 
       // Add tax if available
@@ -600,7 +599,7 @@ export const useCheckoutFlow = ({
             cartPriceBreakdown.goods_tax.toString(),
             currency
           ),
-        })
+        });
       }
 
       // Add total
@@ -608,42 +607,42 @@ export const useCheckoutFlow = ({
         id: 'total',
         title: 'Total',
         value: priceWithCurrency(cartPriceBreakdown.total.toString(), currency),
-      })
+      });
 
       // Update the order items state
-      setOrderItems(updatedOrderItems)
+      setOrderItems(updatedOrderItems);
     },
     [setOrderItems]
-  )
+  );
 
   // Function to update checkout with add-ons
   const updateCheckoutWithAddOns = useCallback(
     async (newAddons: { [key: string]: number } = {}) => {
       if (!eventId) {
-        console.warn('Cannot update addons - no event ID')
-        return
+        console.warn('Cannot update addons - no event ID');
+        return;
       }
 
-      const mergedAddons = { ...addons, ...newAddons }
+      const mergedAddons = { ...addons, ...newAddons };
       console.log('Updating checkout with addons', {
         eventId,
         newAddons,
         mergedAddons,
-      })
+      });
 
       // Remove zero quantities
       Object.entries(mergedAddons).forEach(([key, value]) => {
         if (!Number(value)) {
-          delete mergedAddons[key]
+          delete mergedAddons[key];
         }
-      })
+      });
 
       try {
         console.log('Updating checkout with addons', {
           event_id: eventId,
           add_ons: mergedAddons,
           is_from_resale: false,
-        })
+        });
         // Call the API
         const response = await updateCheckoutMutation.mutateAsync({
           attributes: {
@@ -651,19 +650,19 @@ export const useCheckoutFlow = ({
             add_ons: mergedAddons,
             is_from_resale: false,
           },
-        })
+        });
 
-        console.log('Update checkout response', JSON.stringify(response))
+        console.log('Update checkout response', JSON.stringify(response));
 
         if (response.data?.attributes) {
           const cartPriceBreakdown =
-            response.data.attributes.cart_price_breakdown || {}
+            response.data.attributes.cart_price_breakdown || {};
 
-          setAddons(mergedAddons)
-          updateOrderItemsFromCheckoutData(cartPriceBreakdown)
+          setAddons(mergedAddons);
+          updateOrderItemsFromCheckoutData(cartPriceBreakdown);
         }
       } catch (error) {
-        console.error('Failed to update addons', { error, eventId })
+        console.error('Failed to update addons', { error, eventId });
       }
     },
     [
@@ -673,49 +672,49 @@ export const useCheckoutFlow = ({
       setAddons,
       updateOrderItemsFromCheckoutData,
     ]
-  )
+  );
 
   // Function to handle addon changes from the form
   const onAddonChange = useCallback(
     (addonId: string, quantity: number) => {
-      const updatedAddons = { [addonId]: quantity }
-      updateCheckoutWithAddOns(updatedAddons)
+      const updatedAddons = { [addonId]: quantity };
+      updateCheckoutWithAddOns(updatedAddons);
     },
     [updateCheckoutWithAddOns]
-  )
+  );
 
   const onCountryChange = useCallback(
     (countryId: string) => {
-      setSelectedCountry(countryId)
+      setSelectedCountry(countryId);
     },
     [setSelectedCountry]
-  )
+  );
 
   useEffect(() => {
     if (cartQuery.data?.data?.attributes?.expiresAt) {
-      const expiresAt = cartQuery.data.data.attributes.expiresAt
-      setSecondsLeft(expiresAt)
+      const expiresAt = cartQuery.data.data.attributes.expiresAt;
+      setSecondsLeft(expiresAt);
 
       BackgroundTimer.runBackgroundTimer(() => {
         setSecondsLeft((prev: number | undefined) => {
           if (!prev || prev <= 1) {
-            BackgroundTimer.stopBackgroundTimer()
-            onCartExpired?.()
-            return 0
+            BackgroundTimer.stopBackgroundTimer();
+            onCartExpired?.();
+            return 0;
           }
-          return prev - 1
-        })
-      }, 1000)
+          return prev - 1;
+        });
+      }, 1000);
 
-      return () => BackgroundTimer.stopBackgroundTimer()
+      return () => BackgroundTimer.stopBackgroundTimer();
     }
-  }, [cartQuery.data, setSecondsLeft, onCartExpired])
+  }, [cartQuery.data, setSecondsLeft, onCartExpired]);
 
   useEffect(() => {
     if (cartQuery.data?.data?.attributes) {
-      const cartData = cartQuery.data.data.attributes
-      const currency = (cartData.cart?.[0] as any)?.currency || 'USD'
-      const eventName = eventInfoQuery.data?.data.attributes.name ?? 'Event'
+      const cartData = cartQuery.data.data.attributes;
+      const currency = (cartData.cart?.[0] as any)?.currency || 'USD';
+      const eventName = eventInfoQuery.data?.data.attributes.name ?? 'Event';
 
       const items: IOrderItem[] = [
         {
@@ -728,35 +727,35 @@ export const useCheckoutFlow = ({
           title: 'Number of Tickets',
           value: (cartData.cart?.[0] as any)?.quantity?.toString() || '1',
         },
-      ]
+      ];
 
       if ((cartData.cart?.[0] as any)?.price) {
         items.push({
           id: 'price',
           title: 'Ticket Price',
           value: priceWithCurrency((cartData.cart[0] as any).price, currency),
-        })
+        });
       }
 
-      const total = (cartData.cart?.[0] as any)?.price || 0
+      const total = (cartData.cart?.[0] as any)?.price || 0;
       items.push({
         id: 'total',
         title: 'Total',
         value: priceWithCurrency(total, currency),
-      })
+      });
 
-      setOrderItems(items)
+      setOrderItems(items);
     }
-  }, [cartQuery.data, eventInfoQuery.data])
+  }, [cartQuery.data, eventInfoQuery.data]);
 
   useEffect(() => {
     if (customerProfile) {
-      const profile = customerProfile
+      const profile = customerProfile;
       if (profile.countryId) {
-        setSelectedCountry(profile.countryId.toString())
+        setSelectedCountry(profile.countryId.toString());
       }
     }
-  }, [setSelectedCountry, customerProfile])
+  }, [setSelectedCountry, customerProfile]);
 
   return {
     // Handlers
@@ -790,5 +789,5 @@ export const useCheckoutFlow = ({
 
     orderCustomFields,
     ticketCustomFields,
-  }
-}
+  };
+};

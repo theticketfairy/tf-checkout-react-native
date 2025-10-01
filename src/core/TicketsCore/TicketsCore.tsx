@@ -1,10 +1,10 @@
-import jwtDecode from 'jwt-decode'
-import _find from 'lodash/find'
-import _groupBy from 'lodash/groupBy'
-import _map from 'lodash/map'
-import _mapKeys from 'lodash/mapKeys'
-import _sortBy from 'lodash/sortBy'
-import React, { forwardRef, useImperativeHandle } from 'react'
+import jwtDecode from 'jwt-decode';
+import _find from 'lodash/find';
+import _groupBy from 'lodash/groupBy';
+import _map from 'lodash/map';
+import _mapKeys from 'lodash/mapKeys';
+import _sortBy from 'lodash/sortBy';
+import React, { forwardRef, useImperativeHandle } from 'react';
 
 import {
   addToCart,
@@ -14,7 +14,7 @@ import {
   fetchTickets,
   postReferralVisit,
   unlockPasswordProtectedEvent,
-} from '../../api/ApiClient'
+} from '../../api/ApiClient';
 import {
   IAddToCartParams,
   ICloseSessionResponse,
@@ -22,27 +22,27 @@ import {
   IFetchAccessTokenResponse,
   IMyOrdersRequestParams,
   IPostReferralResponse,
-} from '../../api/types'
-import { Config } from '../../helpers/Config'
+} from '../../api/types';
+import { Config } from '../../helpers/Config';
 import {
   deleteData,
   getData,
   LocalStorageKeys,
-} from '../../helpers/LocalStorage'
-import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
+} from '../../helpers/LocalStorage';
+import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken';
 import {
   IAccountTicketsResponse,
   IAddToCartResponse,
   ITicket,
-} from '../../types'
-import { ICoreProps } from '../CoreProps'
+} from '../../types';
+import { ICoreProps } from '../CoreProps';
 import {
   IBookTicketsOptions,
   IGetTicketsOptions,
   IGetTicketsPayload,
   IGroupedTickets,
   TicketsCoreHandle,
-} from './TicketsCoreTypes'
+} from './TicketsCoreTypes';
 
 const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
@@ -58,38 +58,38 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
           return {
             ...ticket,
             groupName: ticket.groupName || '',
-          }
-        })
-        const groupedTickets = _groupBy(ticketsWithGroupName, 'groupName')
-        const ticketsSections: IGroupedTickets[] = []
+          };
+        });
+        const groupedTickets = _groupBy(ticketsWithGroupName, 'groupName');
+        const ticketsSections: IGroupedTickets[] = [];
         _mapKeys(groupedTickets, (val, key) => {
           ticketsSections.push({
             title: key,
             data: val,
-          })
-        })
+          });
+        });
 
-        return ticketsSections
-      }
+        return ticketsSections;
+      };
       // PromoCode higher priority than ReferredId
 
       const ticketsResponse = await fetchTickets({
         promoCode: promoCode,
         referredId: referredId,
-      })
+      });
 
       if (ticketsResponse.error || !ticketsResponse.tickets) {
-        return ticketsResponse
+        return ticketsResponse;
       }
 
       const sortedTickets = areTicketsSortedBySoldOut
         ? _sortBy(_sortBy(ticketsResponse.tickets, 'sortOrder'), 'soldOut')
-        : _sortBy(ticketsResponse.tickets, 'sortOrder')
+        : _sortBy(ticketsResponse.tickets, 'sortOrder');
 
       const areGroupsShown = !!_find(
         sortedTickets,
         (ticket) => ticket.groupName
-      )
+      );
 
       if (!areTicketsSortedBySoldOut) {
         if (!areTicketsGrouped) {
@@ -97,20 +97,20 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
             ...ticketsResponse,
             tickets: sortedTickets,
             areGroupsShown: false,
-          }
+          };
         }
         if (areGroupsShown) {
           return {
             ...ticketsResponse,
             tickets: groupTickets(sortedTickets),
             areGroupsShown: areGroupsShown,
-          }
+          };
         } else {
           return {
             ...ticketsResponse,
             tickets: sortedTickets,
             areGroupsShown: areGroupsShown,
-          }
+          };
         }
       } else {
         // Sort tickets by sold out
@@ -119,32 +119,32 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
             ...ticketsResponse,
             tickets: sortedTickets,
             areGroupsShown: false,
-          }
+          };
         } else {
           if (areGroupsShown) {
             return {
               ...ticketsResponse,
               tickets: groupTickets(sortedTickets),
               areGroupsShown: areGroupsShown,
-            }
+            };
           }
           return {
             ...ticketsResponse,
             tickets: sortedTickets,
             areGroupsShown: areGroupsShown,
-          }
+          };
         }
       }
     },
 
     async getEvent(): Promise<IEventResponse> {
-      return await fetchEvent()
+      return await fetchEvent();
     },
 
     async unlockPasswordProtectedEvent(
       password: string
     ): Promise<IEventResponse> {
-      return await unlockPasswordProtectedEvent(password)
+      return await unlockPasswordProtectedEvent(password);
     },
 
     async addToCart({
@@ -158,12 +158,12 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
           error: {
             message: 'Event ID is not configured',
           },
-        }
+        };
       }
       const parsedEventId =
         typeof Config.EVENT_ID === 'string'
           ? parseInt(Config.EVENT_ID, 10)
-          : Config.EVENT_ID
+          : Config.EVENT_ID;
 
       const data: IAddToCartParams = {
         attributes: {
@@ -183,51 +183,51 @@ const TicketsCore = forwardRef<TicketsCoreHandle, ICoreProps>((props, ref) => {
             },
           },
         },
-      }
-      return await addToCart(data)
+      };
+      return await addToCart(data);
     },
 
     async getIsUserLoggedIn(): Promise<boolean> {
-      const token = await getData(LocalStorageKeys.ACCESS_TOKEN)
+      const token = await getData(LocalStorageKeys.ACCESS_TOKEN);
 
       if (!token) {
-        return false
+        return false;
       }
 
-      const decodedToken = jwtDecode<{ exp: number }>(token)
+      const decodedToken = jwtDecode<{ exp: number }>(token);
       if (decodedToken && decodedToken.exp < Date.now() / 1000) {
-        await deleteData(LocalStorageKeys.ACCESS_TOKEN)
-        await deleteData(LocalStorageKeys.USER_DATA)
-        return false
+        await deleteData(LocalStorageKeys.ACCESS_TOKEN);
+        await deleteData(LocalStorageKeys.USER_DATA);
+        return false;
       }
 
-      return true
+      return true;
     },
 
     async logout(): Promise<ICloseSessionResponse> {
-      return await closeSession()
+      return await closeSession();
     },
 
     async postReferralVisit(
       referralId: string
     ): Promise<IPostReferralResponse> {
-      return await postReferralVisit(referralId)
+      return await postReferralVisit(referralId);
     },
 
     async refreshAccessToken(
       refreshToken?: string
     ): Promise<IFetchAccessTokenResponse> {
-      return await refreshAccessTokenAsync(refreshToken)
+      return await refreshAccessTokenAsync(refreshToken);
     },
 
     async getAccountTickets(
       params: IMyOrdersRequestParams
     ): Promise<IAccountTicketsResponse> {
-      return await fetchAccountTickets(params)
+      return await fetchAccountTickets(params);
     },
-  }))
+  }));
 
-  return <>{props.children}</>
-})
+  return <>{props.children}</>;
+});
 
-export default TicketsCore
+export default TicketsCore;

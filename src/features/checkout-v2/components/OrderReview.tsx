@@ -1,5 +1,5 @@
-import _map from 'lodash/map'
-import React from 'react'
+import _map from 'lodash/map';
+import React from 'react';
 import {
   StyleProp,
   StyleSheet,
@@ -7,31 +7,31 @@ import {
   TextStyle,
   View,
   ViewStyle,
-} from 'react-native'
+} from 'react-native';
 
 export interface IOrderItem {
-  id: string
-  title: string
-  subtitle?: string
-  value: string
-  styles?: OrderReviewItemStyles
+  id: string;
+  title: string;
+  subtitle?: string;
+  value: string;
+  styles?: OrderReviewItemStyles;
 }
 
 export interface OrderReviewItemStyles {
-  container?: StyleProp<ViewStyle>
-  title?: StyleProp<TextStyle>
-  subtitle?: StyleProp<TextStyle>
-  value?: StyleProp<TextStyle>
+  container?: StyleProp<ViewStyle>;
+  title?: StyleProp<TextStyle>;
+  subtitle?: StyleProp<TextStyle>;
+  value?: StyleProp<TextStyle>;
 }
 
 export interface OrderReviewStyles {
-  item?: OrderReviewItemStyles
-  rootContainer?: StyleProp<ViewStyle>
+  item?: OrderReviewItemStyles;
+  rootContainer?: StyleProp<ViewStyle>;
 }
 
 export interface IOrderReviewProps {
-  orderItems: IOrderItem[]
-  styles?: OrderReviewStyles
+  orderItems: IOrderItem[];
+  styles?: OrderReviewStyles;
 }
 
 const styles = StyleSheet.create({
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 4,
   },
-})
+});
 
 const OrderItem = ({
   title,
@@ -83,7 +83,7 @@ const OrderItem = ({
       {value}
     </Text>
   </View>
-)
+);
 
 const OrderReview = ({
   orderItems,
@@ -106,6 +106,6 @@ const OrderReview = ({
       />
     ))}
   </View>
-)
+);
 
-export default OrderReview
+export default OrderReview;

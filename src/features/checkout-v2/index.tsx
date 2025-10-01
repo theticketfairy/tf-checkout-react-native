@@ -1,58 +1,59 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React, { JSX, useCallback, useMemo, useRef, useState } from 'react';
 import {
   ScrollView,
+  ScrollViewScrollToOptions,
   StyleProp,
   StyleSheet,
   TextStyle,
   ViewStyle,
-} from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+} from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import { CartTimer, FormField, Login } from '../../components'
-import { ICartTimerStyles } from '../../components/cartTimer/types'
+import { CartTimer, FormField, Login } from '../../components';
+import { ICartTimerStyles } from '../../components/cartTimer/types';
 import {
   ILoginBrandImages,
   ILoginSuccessData,
   ILoginViewStyles,
-} from '../../components/login/types'
-import { IError } from '../../types'
-import { useUserProfile } from '../auth/api-hooks'
-import { IRegisterUserResponse } from '../auth/types'
-import { CheckoutForm, PaymentForm } from './form'
-import { CheckoutFormStyles } from './form/styles'
-import { CheckoutData, useCheckoutFlow } from './hooks/use-checkout'
-import { CheckoutTexts, OrderResult } from './types'
+} from '../../components/login/types';
+import { IError } from '../../types';
+import { useUserProfile } from '../auth/api-hooks';
+import { IRegisterUserResponse } from '../auth/types';
+import { CheckoutForm, PaymentForm } from './form';
+import { CheckoutFormStyles } from './form/styles';
+import { CheckoutData, useCheckoutFlow } from './hooks/use-checkout';
+import { CheckoutTexts, OrderResult } from './types';
 
 export interface CheckoutV2Props {
-  isSinglePageCheckout?: boolean
-  onCartExpired?: () => void
-  onCheckoutSuccess?: (data: CheckoutData) => void
-  onCheckoutError?: (error: any) => void
-  onPaymentSuccess?: (data: OrderResult) => void
-  onPaymentError?: (error: any) => void
-  onLoginSuccess?: (data: ILoginSuccessData) => void
-  onLoginError?: (error: any) => void
-  onLogoutSuccess?: () => void
-  onRegistrationSuccess?: (data: IRegisterUserResponse) => void
-  onRegistrationError?: (error: any) => void
-  isAgeRequired?: boolean
-  minimumAge?: number
-  isPhoneRequired?: boolean
-  isPhoneHidden?: boolean
-  loginBrandImages?: ILoginBrandImages
-  styles?: CheckoutStyles
-  texts?: CheckoutTexts
+  isSinglePageCheckout?: boolean;
+  onCartExpired?: () => void;
+  onCheckoutSuccess?: (data: CheckoutData) => void;
+  onCheckoutError?: (error: any) => void;
+  onPaymentSuccess?: (data: OrderResult) => void;
+  onPaymentError?: (error: any) => void;
+  onLoginSuccess?: (data: ILoginSuccessData) => void;
+  onLoginError?: (error: any) => void;
+  onLogoutSuccess?: () => void;
+  onRegistrationSuccess?: (data: IRegisterUserResponse) => void;
+  onRegistrationError?: (error: any) => void;
+  isAgeRequired?: boolean;
+  minimumAge?: number;
+  isPhoneRequired?: boolean;
+  isPhoneHidden?: boolean;
+  loginBrandImages?: ILoginBrandImages;
+  styles?: CheckoutStyles;
+  texts?: CheckoutTexts;
 }
 
 export interface CheckoutStyles {
-  container?: StyleProp<ViewStyle>
-  contentContainer?: StyleProp<ViewStyle>
-  title?: StyleProp<TextStyle>
-  login?: ILoginViewStyles
-  cartTimer?: ICartTimerStyles
-  form?: CheckoutFormStyles
-  paymentForm?: CheckoutFormStyles
+  container?: StyleProp<ViewStyle>;
+  contentContainer?: StyleProp<ViewStyle>;
+  title?: StyleProp<TextStyle>;
+  login?: ILoginViewStyles;
+  cartTimer?: ICartTimerStyles;
+  form?: CheckoutFormStyles;
+  paymentForm?: CheckoutFormStyles;
 }
 
 const defaultStyles = StyleSheet.create({
@@ -69,7 +70,7 @@ const defaultStyles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-})
+});
 
 export const CheckoutController = ({
   isSinglePageCheckout = true,
@@ -91,19 +92,18 @@ export const CheckoutController = ({
   styles: stylesProp,
   texts: textsProp,
 }: CheckoutV2Props) => {
-  const scrollRef = useRef<ScrollView>(null)
-  const [checkoutData, setCheckoutData] = useState<CheckoutData>()
-  const [loginMessage, setLoginMessage] = useState('')
-  const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
-
-  const formTexts = textsProp?.form
+  const scrollRef = useRef<{scrollTo: (options: ScrollViewScrollToOptions) => void}>(null);
+  const [checkoutData, setCheckoutData] = useState<CheckoutData>();
+  const [loginMessage, setLoginMessage] = useState('');
+  const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false);
+  const formTexts = textsProp?.form;
   const loginTexts = useMemo(() => {
-    const baseLogin = textsProp?.login
-    const baseDialog = baseLogin?.dialog ?? {}
-    const dialogMessage = loginMessage || baseDialog.message
+    const baseLogin = textsProp?.login;
+    const baseDialog = baseLogin?.dialog ?? {};
+    const dialogMessage = loginMessage || baseDialog.message;
 
     if (!baseLogin && !dialogMessage) {
-      return undefined
+      return undefined;
     }
 
     return {
@@ -112,38 +112,38 @@ export const CheckoutController = ({
         ...baseDialog,
         message: dialogMessage,
       },
-    }
-  }, [loginMessage, textsProp])
+    };
+  }, [loginMessage, textsProp]);
 
-  const cartTimerTexts = textsProp?.cartTimer
+  const cartTimerTexts = textsProp?.cartTimer;
 
-  const { data: userProfile, invalidate } = useUserProfile()
+  const { data: userProfile, invalidate } = useUserProfile();
 
   const onCheckoutSuccess = useCallback(
     (data: CheckoutData) => {
-      setCheckoutData(data)
-      _onCheckoutSuccess?.(data)
+      setCheckoutData(data);
+      _onCheckoutSuccess?.(data);
     },
     [_onCheckoutSuccess]
-  )
+  );
 
   const onRegistrationSuccess = useCallback(
     (data: IRegisterUserResponse) => {
-      _onRegistrationSuccess?.(data)
-      invalidate()
+      _onRegistrationSuccess?.(data);
+      invalidate();
     },
     [_onRegistrationSuccess, invalidate]
-  )
+  );
 
   const onRegistrationError = useCallback(
     (error: any) => {
-      _onRegistrationError?.(error)
+      _onRegistrationError?.(error);
       // Show login dialog
-      setLoginMessage(error)
-      setIsLoginDialogVisible(true)
+      setLoginMessage(error);
+      setIsLoginDialogVisible(true);
     },
     [_onRegistrationError]
-  )
+  );
 
   const checkoutFlow = useCheckoutFlow({
     onCheckoutSuccess,
@@ -159,42 +159,42 @@ export const CheckoutController = ({
     minimumAge,
     isSinglePageCheckout,
     customerProfile: userProfile?.data,
-  })
+  });
 
-  const { secondsLeft } = checkoutFlow
+  const { secondsLeft } = checkoutFlow;
 
   const handleLoginError = (error: IError) => {
-    _onLoginError?.(error)
-  }
+    _onLoginError?.(error);
+  };
 
   const handleLogout = () => {
-    invalidate()
-    _onLogoutSuccess?.()
-  }
+    invalidate();
+    _onLogoutSuccess?.();
+  };
 
   const handleLoginSuccess = useCallback(
     (data: ILoginSuccessData) => {
-      invalidate()
-      _onLoginSuccess?.(data)
-      setIsLoginDialogVisible(false)
+      invalidate();
+      _onLoginSuccess?.(data);
+      setIsLoginDialogVisible(false);
     },
     [_onLoginSuccess, invalidate]
-  )
+  );
 
   const containerStyle = StyleSheet.flatten([
     defaultStyles.container,
     stylesProp?.container,
-  ]) as StyleProp<ViewStyle>
+  ]) as StyleProp<ViewStyle>;
 
   const contentContainerStyle = StyleSheet.flatten([
     defaultStyles.contentContainer,
     stylesProp?.contentContainer,
-  ]) as StyleProp<ViewStyle>
+  ]) as StyleProp<ViewStyle>;
 
   const titleStyle = StyleSheet.flatten([
     defaultStyles.title,
     stylesProp?.title,
-  ]) as StyleProp<TextStyle>
+  ]) as StyleProp<TextStyle>;
 
   return (
     <>
@@ -202,7 +202,7 @@ export const CheckoutController = ({
         innerRef={(ref) => (scrollRef.current = ref)}
         style={containerStyle}
         contentContainerStyle={contentContainerStyle}
-        keyboardShouldPersistTaps='handled'
+        keyboardShouldPersistTaps="handled"
       >
         {/* Login Component */}
         <Login
@@ -212,8 +212,8 @@ export const CheckoutController = ({
           isLoginDialogVisible={isLoginDialogVisible}
           showLoginDialog={() => setIsLoginDialogVisible(true)}
           hideLoginDialog={() => {
-            setIsLoginDialogVisible(false)
-            setLoginMessage('')
+            setIsLoginDialogVisible(false);
+            setLoginMessage('');
           }}
           userFirstName={userProfile?.data?.firstName}
           brandImages={loginBrandImages}
@@ -222,7 +222,7 @@ export const CheckoutController = ({
         />
 
         <FormField
-          fieldType='title'
+          fieldType="title"
           title={formTexts?.form?.sectionTitle || 'Personal Information'}
           titleStyle={titleStyle}
         />
@@ -249,26 +249,26 @@ export const CheckoutController = ({
       </KeyboardAwareScrollView>
 
       {/* Cart Timer */}
-      {typeof secondsLeft === 'number' && secondsLeft > 0 && (
+      {/* {typeof secondsLeft === 'number' && secondsLeft > 0 && (
         <CartTimer
           secondsLeft={secondsLeft}
           shouldNotMinimize={false}
           styles={stylesProp?.cartTimer}
           texts={cartTimerTexts}
         />
-      )}
+      )} */}
     </>
-  )
-}
+  );
+};
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 export const CheckoutProvider = ({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) => {
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  )
-}
+  );
+};

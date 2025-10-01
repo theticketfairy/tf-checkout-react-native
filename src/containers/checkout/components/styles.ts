@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
 export const OrderReviewStyles = StyleSheet.create({
   rootContainer: {
@@ -19,10 +19,10 @@ export const OrderReviewStyles = StyleSheet.create({
   orderItemValue: {
     lineHeight: 20,
   },
-})
+});
 
 export const ConditionsStyles = StyleSheet.create({
   rootContainer: {
     marginVertical: 16,
   },
-})
+});

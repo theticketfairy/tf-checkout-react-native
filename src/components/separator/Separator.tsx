@@ -1,7 +1,7 @@
-import React from 'react'
-import { View } from 'react-native'
+import React from 'react';
+import { View } from 'react-native';
 
-import { ISeparatorProps } from './types'
+import { ISeparatorProps } from './types';
 
 const Separator = ({
   color,
@@ -20,7 +20,7 @@ const Separator = ({
         marginVertical: marginVertical,
       }}
     />
-  )
-}
+  );
+};
 
-export default Separator
+export default Separator;

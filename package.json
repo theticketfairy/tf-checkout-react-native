@@ -3,111 +3,179 @@
   "version": "1.0.38",
   "description": "TheTicketFairy ReactNative Checkout library",
   "homepage": "https://github.com/theticketfairy/tf-checkout-react-native",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
   "author": "TheTicketFairy <dev.jorgtz@gmail.com>",
   "license": "MIT",
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
+    "src",
+    "lib",
     "android",
     "ios",
-    "lib",
-    "assets",
-    "tf-checkout-react-native.podspec",
+    "cpp",
+    "*.podspec",
+    "react-native.config.js",
+    "!ios/build",
     "!android/build",
-    "!.DS_Store",
-    "!.gradle",
-    "!.idea",
-    "!build",
-    "!gradle",
-    "!*.iml",
-    "!gradlew",
-    "!gradlew.bat",
-    "!local.properties",
-    "!project.xcworkspace",
-    "!xcshareddata",
-    "!xcuserdata"
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
   ],
   "scripts": {
-    "compile": "rm -rf lib && tsc -p .",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "prepare": "yarn compile",
-    "test": "jest"
+    "example:ios": "yarn workspace example ios",
+    "example:android": "yarn workspace example android",
+    "test": "jest",
+    "typecheck": "tsc",
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "lint:fix": "eslint \"**/*.{js,ts,tsx}\" --fix",
+    "clean": "del-cli lib",
+    "prepare": "bob build",
+    "release": "release-it --only-version"
+  },
+  "keywords": [
+    "react-native",
+    "ios",
+    "android"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theticketfairy/tf-checkout-react-native.git"
+  },
+  "bugs": {
+    "url": "https://github.com/theticketfairy/tf-checkout-react-native/issues"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "@babel/core": "7.16.0",
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-proposal-private-methods": "^7.18.6",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/plugin-transform-flow-strip-types": "^7.27.1",
-    "@babel/plugin-transform-private-methods": "^7.27.1",
-    "@babel/plugin-transform-private-property-in-object": "^7.27.1",
-    "@babel/runtime": "7.16.3",
-    "@react-native-async-storage/async-storage": "^2.0.0",
-    "@react-native-clipboard/clipboard": "^1.14.0",
-    "@react-native-community/datetimepicker": "^8.4.5",
-    "@react-native-community/eslint-config": "3.0.1",
-    "@sesamsolutions/phone-input": "jorgtz/react-native-phone-input",
-    "@stripe/stripe-react-native": "^0.39.0",
-    "@types/jest": "27.0.3",
-    "@types/lodash": "4.14.178",
-    "@types/react-native": "0.72.8",
-    "@types/react-native-background-timer": "2.0.0",
-    "@types/react-test-renderer": "17.0.1",
-    "@types/rn-material-ui-textfield": "1.0.2",
-    "axios": "0.24.0",
-    "axios-retry": "3.2.4",
-    "babel-jest": "27.3.1",
-    "eslint": "7.14.0",
-    "eslint-plugin-simple-import-sort": "7.0.0",
-    "formik": "^2.4.5",
-    "jest": "27.3.1",
-    "jwt-decode": "3.1.2",
-    "lodash": "4.17.21",
-    "metro-react-native-babel-preset": "^0.70.3",
-    "react": "18.1.0",
-    "react-native": "0.72.9",
-    "react-native-background-timer": "2.4.1",
-    "react-native-device-country": "1.0.2",
-    "react-native-fs": "2.18.0",
-    "react-native-keyboard-aware-scroll-view": "0.9.5",
-    "react-test-renderer": "18.1.0",
-    "rn-material-ui-textfield": "https://github.com/jorgtz/rn-material-ui-textfield",
-    "typescript": "4.5.2",
-    "yup": "^1.4.0"
+    "@commitlint/config-conventional": "^19.8.1",
+    "@eslint/js": "^9.36.0",
+    "@evilmartians/lefthook": "^1.12.3",
+    "@react-native/babel-preset": "0.81.1",
+    "@release-it/conventional-changelog": "^10.0.1",
+    "@types/jest": "^29.5.14",
+    "@types/lodash": "^4.17.20",
+    "@types/react": "^19.1.12",
+    "@types/react-native": "^0.73.0",
+    "@types/react-native-background-timer": "^2.0.2",
+    "@types/react-test-renderer": "^19.1.0",
+    "commitlint": "^19.8.1",
+    "del-cli": "^6.0.0",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react": "^7.37.5",
+    "expo": "^54.0.10",
+    "globals": "^16.4.0",
+    "jest": "^29.7.0",
+    "jiti": "^2.6.0",
+    "prettier": "^3.6.2",
+    "react": "19.1.0",
+    "react-native": "0.81.4",
+    "react-native-builder-bob": "^0.40.13",
+    "release-it": "^19.0.4",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.45.0"
   },
-  "peerDependencies": {
+  "workspaces": [
+    "example"
+  ],
+  "packageManager": "yarn@3.6.1",
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": true
+    },
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": {
+          "name": "angular"
+        }
+      }
+    }
+  },
+  "prettier": {
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  },
+  "create-react-native-library": {
+    "languages": "js",
+    "type": "library",
+    "version": "0.54.3"
+  },
+  "dependencies": {
     "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-clipboard/clipboard": "^1.14.0",
     "@react-native-community/datetimepicker": "^8.0.0",
     "@sesamsolutions/phone-input": "jorgtz/react-native-phone-input",
     "@stripe/stripe-react-native": "^0.39.0",
+    "@tanstack/react-query": "^5.89.0",
     "axios": "0.24.0",
     "axios-retry": "3.2.4",
+    "deprecated-react-native-prop-types": "^5.0.0",
     "formik": "^2.4.5",
     "jwt-decode": "3.1.2",
     "lodash": "4.17.21",
-    "react": "18.1.0",
-    "react-native": "0.72.9",
     "react-native-background-timer": "2.4.1",
     "react-native-device-country": "1.0.2",
     "react-native-fs": "2.18.0",
     "react-native-keyboard-aware-scroll-view": "0.9.5",
-    "rn-material-ui-textfield": "https://github.com/jorgtz/rn-material-ui-textfield",
+    "react-native-modal-datetime-picker": "^18.0.0",
+    "react-native-safe-area-context": "^5.6.1",
     "yup": "^1.4.0"
   },
-  "jest": {
-    "preset": "react-native",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
-  },
-  "dependencies": {
-    "@tanstack/react-query": "^5.89.0",
-    "react-native-modal-datetime-picker": "^18.0.0"
+  "peerDependencies": {
+    "@stripe/stripe-react-native": "^0.39.0",
+    "react": "*",
+    "react-native": "*"
   }
 }

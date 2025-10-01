@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   title: {
@@ -6,4 +6,4 @@ export default StyleSheet.create({
     fontWeight: '800',
     marginBottom: 24,
   },
-})
+});

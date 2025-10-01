@@ -1,26 +1,26 @@
-import { ReactNode } from 'react'
-import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native'
+import { ReactNode } from 'react';
+import { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 export interface IBottomSheetModalStyles {
-  rootContainer?: StyleProp<ViewStyle>
-  headerContainer?: StyleProp<ViewStyle>
-  content?: StyleProp<ViewStyle>
-  title?: StyleProp<TextStyle>
-  closeButton?: StyleProp<ViewStyle>
-  closeButtonIcon?: StyleProp<ImageStyle>
-  contentContainer?: StyleProp<ViewStyle>
+  rootContainer?: StyleProp<ViewStyle>;
+  headerContainer?: StyleProp<ViewStyle>;
+  content?: StyleProp<ViewStyle>;
+  title?: StyleProp<TextStyle>;
+  closeButton?: StyleProp<ViewStyle>;
+  closeButtonIcon?: StyleProp<ImageStyle>;
+  contentContainer?: StyleProp<ViewStyle>;
 }
 
 export interface IBottomSheetModalTexts {
-  title?: string
+  title?: string;
 }
 
 export interface IBottomSheetModalProps {
-  title?: string
-  onClose: () => void
-  content: ReactNode
-  contentHeight?: number
+  title?: string;
+  onClose: () => void;
+  content: ReactNode;
+  contentHeight?: number;
 
-  styles?: IBottomSheetModalStyles
-  texts?: IBottomSheetModalTexts
+  styles?: IBottomSheetModalStyles;
+  texts?: IBottomSheetModalTexts;
 }

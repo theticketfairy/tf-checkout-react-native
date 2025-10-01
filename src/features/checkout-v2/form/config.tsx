@@ -1,6 +1,6 @@
-import * as Yup from 'yup'
+import * as Yup from 'yup';
 
-import { CustomField } from '../../event/types'
+import { CustomField } from '../../event/types';
 
 export const createCheckoutFormConfig = ({
   minimumAge,
@@ -12,15 +12,15 @@ export const createCheckoutFormConfig = ({
   orderCustomFields = [],
   ticketCustomFields = [],
 }: {
-  minimumAge?: number
-  isAgeRequired: boolean
-  requirePassword: boolean
-  isTicketFree?: boolean
-  isSinglePageCheckout?: boolean
-  requiredConditions?: Array<{ id: string }>
-  isPhoneRequired?: boolean
-  orderCustomFields?: CustomField[]
-  ticketCustomFields?: CustomField[]
+  minimumAge?: number;
+  isAgeRequired: boolean;
+  requirePassword: boolean;
+  isTicketFree?: boolean;
+  isSinglePageCheckout?: boolean;
+  requiredConditions?: Array<{ id: string }>;
+  isPhoneRequired?: boolean;
+  orderCustomFields?: CustomField[];
+  ticketCustomFields?: CustomField[];
 }) =>
   Yup.object().shape({
     firstName: Yup.string().required('First name is required'),
@@ -38,23 +38,23 @@ export const createCheckoutFormConfig = ({
             'is-old-enough',
             `You must be at least ${minimumAge} years old`,
             (value) => {
-              if (!value) return false
+              if (!value) return false;
 
-              const today = new Date()
-              const birthDate = new Date(value)
+              const today = new Date();
+              const birthDate = new Date(value);
 
-              let age = today.getFullYear() - birthDate.getFullYear()
-              const monthDiff = today.getMonth() - birthDate.getMonth()
+              let age = today.getFullYear() - birthDate.getFullYear();
+              const monthDiff = today.getMonth() - birthDate.getMonth();
 
               // Adjust age if birthday hasn't occurred this year yet
               if (
                 monthDiff < 0 ||
                 (monthDiff === 0 && today.getDate() < birthDate.getDate())
               ) {
-                age--
+                age--;
               }
 
-              return age >= (minimumAge || 0)
+              return age >= (minimumAge || 0);
             }
           )
       : Yup.date().optional(),
@@ -94,14 +94,14 @@ export const createCheckoutFormConfig = ({
       (value) => {
         // If no required conditions, skip validation
         if (!requiredConditions || requiredConditions.length === 0) {
-          return true
+          return true;
         }
 
         // Check that all required conditions are accepted
         return requiredConditions.every(
           (condition) =>
             value && value[condition.id as keyof typeof value] === true
-        )
+        );
       }
     ),
 
@@ -118,31 +118,31 @@ export const createCheckoutFormConfig = ({
           (value: Record<string, string | string[]> | undefined) => {
             // If no ticket custom fields, validation passes
             if (!ticketCustomFields || ticketCustomFields.length === 0) {
-              return true
+              return true;
             }
 
             // Find required fields
             const requiredFields = ticketCustomFields.filter(
               (field) => field.required
-            )
+            );
 
             // If no required fields, validation passes
             if (requiredFields.length === 0) {
-              return true
+              return true;
             }
 
             // Check that all required fields have values
             return requiredFields.every((field) => {
-              const fieldValue = value?.[field.name]
+              const fieldValue = value?.[field.name];
 
               // For arrays (multi-select), check that there's at least one item
               if (Array.isArray(fieldValue)) {
-                return fieldValue.length > 0
+                return fieldValue.length > 0;
               }
 
               // For strings, check that it's not empty
-              return fieldValue !== undefined && fieldValue !== ''
-            })
+              return fieldValue !== undefined && fieldValue !== '';
+            });
           }
         ),
       })
@@ -155,34 +155,34 @@ export const createCheckoutFormConfig = ({
       (value: Record<string, string | string[]> | undefined) => {
         // If no custom fields, validation passes
         if (!orderCustomFields || orderCustomFields.length === 0) {
-          return true
+          return true;
         }
 
         // Find required fields
         const requiredFields = orderCustomFields.filter(
           (field) => field.required
-        )
+        );
 
         // If no required fields, validation passes
         if (requiredFields.length === 0) {
-          return true
+          return true;
         }
 
         // Check that all required fields have values
         return requiredFields.every((field) => {
-          const fieldValue = value?.[field.name]
+          const fieldValue = value?.[field.name];
 
           // For arrays (multi-select), check that there's at least one item
           if (Array.isArray(fieldValue)) {
-            return fieldValue.length > 0
+            return fieldValue.length > 0;
           }
 
           // For strings, check that it's not empty
-          return fieldValue !== undefined && fieldValue !== ''
-        })
+          return fieldValue !== undefined && fieldValue !== '';
+        });
       }
     ),
-  })
+  });
 
 export const formFieldsOrder = [
   'firstName',
@@ -200,4 +200,4 @@ export const formFieldsOrder = [
   'state',
   'ticketHolders',
   'isCardFormComplete',
-]
+];

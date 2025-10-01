@@ -1,13 +1,13 @@
-import React from 'react'
-import { Image, Text, TouchableOpacity, View } from 'react-native'
+import React from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
-import R from '../../../../res'
-import s from './TicketListItemStyles'
-import { ITicketListItemProps } from './TicketListItemTypes'
+import R from '../../../../res';
+import s from './TicketListItemStyles';
+import { ITicketListItemProps } from './TicketListItemTypes';
 
 export interface IOnPressTicketDownload {
-  pdfLink?: string
-  hash: string
+  pdfLink?: string;
+  hash: string;
 }
 
 const TicketListItem = ({
@@ -18,8 +18,8 @@ const TicketListItem = ({
   onPressActionsButton,
 }: ITicketListItemProps) => {
   const handleOnPressActionsButton = () => {
-    onPressActionsButton(data)
-  }
+    onPressActionsButton(data);
+  };
 
   return (
     <View>
@@ -57,7 +57,7 @@ const TicketListItem = ({
         </View>
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default TicketListItem
+export default TicketListItem;

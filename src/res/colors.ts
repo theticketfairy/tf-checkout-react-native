@@ -11,6 +11,6 @@ const colors = {
   validGreen: '#139679',
   fff: '#fff',
   timerBackground: '#f4daa3',
-}
+};
 
-export default colors
+export default colors;

@@ -1,13 +1,13 @@
-import React from 'react'
-import { Text } from 'react-native'
+import React from 'react';
+import { Text } from 'react-native';
 
-import Checkbox from '../checkbox/Checkbox'
-import DatePicker from '../datePicker/DatePicker'
-import DropdownMaterial from '../dropdownMaterial/DropdownMaterial'
-import Input from '../input/Input'
-import RadioGroup from '../radioGroup'
-import styles from './styles'
-import { IFormFieldProps } from './types'
+import Checkbox from '../checkbox/Checkbox';
+import DatePicker from '../datePicker/DatePicker';
+import DropdownMaterial from '../dropdownMaterial/DropdownMaterial';
+import Input from '../input/Input';
+import RadioGroup from '../radioGroup';
+import styles from './styles';
+import { IFormFieldProps } from './types';
 
 const FormField = ({
   id,
@@ -34,7 +34,7 @@ const FormField = ({
           error={error}
           {...inputProps}
         />
-      )
+      );
 
     case 'dropdown':
       // Special handling for multi-select dropdown
@@ -43,13 +43,13 @@ const FormField = ({
         const selectedText =
           dropdownProps.selectedOptions.length > 0
             ? dropdownProps.selectedOptions.map((item) => item.label).join(', ')
-            : `Select ${dropdownProps?.style?.label?.text || 'items'}`
+            : `Select ${dropdownProps?.style?.label?.text || 'items'}`;
 
         // Use a fake selectedOption for the display
         const displayOption = {
           value: '',
           label: selectedText,
-        }
+        };
 
         // Return with special multi-select handling
         return (
@@ -62,7 +62,7 @@ const FormField = ({
               error: error,
             }}
           />
-        )
+        );
       } else {
         // Standard single-select dropdown
         return (
@@ -75,17 +75,17 @@ const FormField = ({
               error: error,
             }}
           />
-        )
+        );
       }
 
     case 'title':
-      return <Text style={[styles.title, titleStyle]}>{title}</Text>
+      return <Text style={[styles.title, titleStyle]}>{title}</Text>;
 
     case 'header':
-      return <Text style={[styles.header, headerStyle]}>{title}</Text>
+      return <Text style={[styles.header, headerStyle]}>{title}</Text>;
 
     case 'text':
-      return <Text style={[styles.text, textStyle]}>{title}</Text>
+      return <Text style={[styles.text, textStyle]}>{title}</Text>;
 
     case 'checkbox':
       return (
@@ -93,12 +93,12 @@ const FormField = ({
           isActive={checkboxProps!.isActive}
           text={checkboxProps!.text}
           onPress={() => {
-            checkboxProps!.onPress(id!)
+            checkboxProps!.onPress(id!);
           }}
           styles={checkboxProps?.styles}
           customTextComp={checkboxProps?.customTextComp}
         />
-      )
+      );
 
     case 'datePicker':
       return (
@@ -109,7 +109,7 @@ const FormField = ({
           onCancel={datePickerProps?.onCancel}
           selectedDate={datePickerProps!.selectedDate}
         />
-      )
+      );
 
     case 'radio':
       return (
@@ -118,14 +118,14 @@ const FormField = ({
           selectedValue={radioProps!.selectedValue}
           onValueChange={(value) => {
             // Just call the function directly since we're using non-null assertion
-            radioProps!.onValueChange(value)
+            radioProps!.onValueChange(value);
           }}
           label={radioProps?.label}
           error={error}
           styles={radioProps?.styles}
         />
-      )
+      );
   }
-}
+};
 
-export default FormField
+export default FormField;

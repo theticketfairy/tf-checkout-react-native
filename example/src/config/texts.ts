@@ -1,4 +1,4 @@
-import { CheckoutTexts } from 'tf-checkout-react-native'
+import { CheckoutTexts } from "tf-checkout-react-native";
 
 export const checkoutTexts: CheckoutTexts = {
   form: {

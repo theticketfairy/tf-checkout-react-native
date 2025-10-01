@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 
 export default StyleSheet.create({
   container: {
@@ -27,4 +27,4 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
   },
-})
+});

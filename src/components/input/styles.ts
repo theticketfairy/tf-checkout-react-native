@@ -1,10 +1,10 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 
-const LEFT_ICON_SIZE = 22
-const TEXT_LEFT_MARGIN = LEFT_ICON_SIZE + 10
-const FONT_SIZE = 16
+const LEFT_ICON_SIZE = 22;
+const TEXT_LEFT_MARGIN = LEFT_ICON_SIZE + 10;
+const FONT_SIZE = 16;
 
 export default StyleSheet.create({
   container: {
@@ -50,4 +50,4 @@ export default StyleSheet.create({
     width: 24,
     height: 24,
   },
-})
+});

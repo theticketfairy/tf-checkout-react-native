@@ -1,9 +1,9 @@
-import React, { FC } from 'react'
-import { Alert, View } from 'react-native'
+import React, { FC } from 'react';
+import { Alert, View } from 'react-native';
 
-import { Button } from '..'
-import s from './styles'
-import { ILoggedInProps } from './types'
+import { Button } from '..';
+import s from './styles';
+import { ILoggedInProps } from './types';
 
 const LoggedIn: FC<ILoggedInProps> = ({
   styles,
@@ -13,13 +13,13 @@ const LoggedIn: FC<ILoggedInProps> = ({
 }) => {
   const { rootContainer, myOrdersButton, logOutButton } = {
     ...styles,
-  }
-  const { logoutDialog, myOrderButtonText, logOutButtonText } = { ...texts }
+  };
+  const { logoutDialog, myOrderButtonText, logOutButtonText } = { ...texts };
   const handleMyOrdersPress = async () => {
     if (onPressMyOrders) {
-      onPressMyOrders()
+      onPressMyOrders();
     }
-  }
+  };
 
   const handleLogOutPress = () => {
     if (onPressLogout) {
@@ -37,9 +37,9 @@ const LoggedIn: FC<ILoggedInProps> = ({
             text: logoutDialog?.cancelButton || 'No',
           },
         ]
-      )
+      );
     }
-  }
+  };
 
   return (
     <View style={[s.rootContainer, rootContainer]}>
@@ -54,7 +54,7 @@ const LoggedIn: FC<ILoggedInProps> = ({
         styles={logOutButton}
       />
     </View>
-  )
-}
+  );
+};
 
-export default LoggedIn
+export default LoggedIn;

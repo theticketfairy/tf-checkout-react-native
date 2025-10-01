@@ -3,7 +3,7 @@ import React, {
   useEffect,
   useImperativeHandle,
   useRef,
-} from 'react'
+} from 'react';
 import {
   Animated,
   Dimensions,
@@ -13,49 +13,49 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native'
+} from 'react-native';
 
-import R from '../../res'
-import s from './BottomSheetModalStyles'
-import { IBottomSheetModalProps } from './BottomSheetModalTypes'
+import R from '../../res';
+import s from './BottomSheetModalStyles';
+import { IBottomSheetModalProps } from './BottomSheetModalTypes';
 
-const animationDuration = 350
-const { height: screenHeight } = Dimensions.get('window')
+const animationDuration = 350;
+const { height: screenHeight } = Dimensions.get('window');
 
 export type BottomSheetHandle = {
-  close(): void
-}
+  close(): void;
+};
 
 const BottomSheetModal = forwardRef<BottomSheetHandle, IBottomSheetModalProps>(
   (
     { onClose, texts, styles, content, contentHeight = screenHeight / 2 },
     ref
   ) => {
-    const contentYPosition = useRef(new Animated.Value(contentHeight)).current
+    const contentYPosition = useRef(new Animated.Value(contentHeight)).current;
 
     const showContent = () => {
       Animated.timing(contentYPosition, {
         toValue: 0,
         duration: animationDuration,
         useNativeDriver: true,
-      }).start()
-    }
+      }).start();
+    };
 
     const hideContent = () => {
       Animated.timing(contentYPosition, {
         toValue: contentHeight,
         duration: animationDuration,
         useNativeDriver: true,
-      }).start(onClose)
-    }
+      }).start(onClose);
+    };
 
     useEffect(() => {
-      showContent()
-    })
+      showContent();
+    });
 
     const onCloseHandler = () => {
-      hideContent()
-    }
+      hideContent();
+    };
 
     const animatedStyle: StyleProp<any> = {
       height: contentHeight,
@@ -64,17 +64,17 @@ const BottomSheetModal = forwardRef<BottomSheetHandle, IBottomSheetModalProps>(
           translateY: contentYPosition,
         },
       ],
-    }
+    };
 
     useImperativeHandle(ref, () => ({
       async close() {
-        hideContent()
+        hideContent();
       },
-    }))
+    }));
 
-    const mergedStyle = [s.animatedContent, animatedStyle, styles?.content]
+    const mergedStyle = [s.animatedContent, animatedStyle, styles?.content];
 
-    const title = texts?.title || 'Title'
+    const title = texts?.title || 'Title';
 
     return (
       <RNModal transparent>
@@ -98,8 +98,8 @@ const BottomSheetModal = forwardRef<BottomSheetHandle, IBottomSheetModalProps>(
           </Animated.View>
         </View>
       </RNModal>
-    )
+    );
   }
-)
+);
 
-export default BottomSheetModal
+export default BottomSheetModal;

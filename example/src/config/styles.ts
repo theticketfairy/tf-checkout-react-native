@@ -1,5 +1,5 @@
-import Color from "../Colors";
 import { CheckoutStyles } from "tf-checkout-react-native";
+import { Color } from "./common";
 
 export const checkoutStyles: CheckoutStyles = {
     container: {

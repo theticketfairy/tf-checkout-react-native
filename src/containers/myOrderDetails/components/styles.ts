@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../../res'
+import R from '../../../res';
 
 export const NotificationStyles = StyleSheet.create({
   rootContainer: {
@@ -39,4 +39,4 @@ export const NotificationStyles = StyleSheet.create({
     width: 16,
     resizeMode: 'contain',
   },
-})
+});

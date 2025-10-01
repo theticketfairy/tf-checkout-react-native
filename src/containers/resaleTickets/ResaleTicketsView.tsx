@@ -1,14 +1,14 @@
-import React, { FC, useEffect, useMemo, useRef } from 'react'
-import { Text, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { TextField } from 'rn-material-ui-textfield'
+import React, { FC, useEffect, useMemo, useRef } from 'react';
+import { Text, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { TextField } from '../../packages/rn-material-ui-textfield';
 
-import { Button, Checkbox, Input, RadioButton } from '../../components'
+import { Button, Checkbox, Input, RadioButton } from '../../components';
 import {
   IResaleTicketsViewProps,
   IResaleTicketsViewTexts,
   ResaleToWhomFieldIdEnum,
-} from './types'
+} from './types';
 
 const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
   styles,
@@ -64,33 +64,33 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
       emailConfirm: texts?.friendForm?.emailConfirm || 'Confirm Email Address',
     },
     resaleTicketsButton: texts?.resaleTicketsButton || 'Resale Ticket',
-  }
+  };
   //#endregion
 
   //#region Refs
-  const firstNameRef = useRef<TextField>(null)
-  const lastNameRef = useRef(null)
-  const emailRef = useRef(null)
-  const confirmEmailRef = useRef(null)
+  const firstNameRef = useRef<TextField>(null);
+  const lastNameRef = useRef(null);
+  const emailRef = useRef(null);
+  const confirmEmailRef = useRef(null);
   //#endregion
 
   //#region Styles
-  const ticketBuyerFormStyles = styles?.ticketBuyerForm
-  const ticketOrderDetailsStyles = styles?.ticketOrderDetails
-  const termsStyles = styles?.terms
+  const ticketBuyerFormStyles = styles?.ticketBuyerForm;
+  const ticketOrderDetailsStyles = styles?.ticketOrderDetails;
+  const termsStyles = styles?.terms;
   const buttonStyles = !isDataValid
     ? styles?.resaleTicketsButtonDisabled
-    : styles?.resaleTicketsButton
+    : styles?.resaleTicketsButton;
   //#endregion
 
   const {
     someoneData: { firstName, lastName, email, emailConfirm },
     toWhom,
     isTermsAgreed,
-  } = resaleToWhomData
+  } = resaleToWhomData;
 
   const { firstNameError, lastNameError, emailError, emailConfirmError } =
-    someoneDataErrors
+    someoneDataErrors;
 
   const Terms = useMemo(
     () => (
@@ -141,7 +141,7 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
       txt.terms?.paragraph3_2,
       txt.terms?.title,
     ]
-  )
+  );
 
   const OrderDetails = useMemo(
     () => (
@@ -176,7 +176,7 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
       txt.orderDetails?.orderedBy,
       txt.orderDetails?.title,
     ]
-  )
+  );
 
   const TicketBuyerForm = useMemo(
     () => (
@@ -212,7 +212,7 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
               blurOnSubmit={false}
               //@ts-ignore
               onSubmitEditing={lastNameRef.current?.focus}
-              returnKeyType='next'
+              returnKeyType="next"
             />
             <Input
               reference={lastNameRef}
@@ -230,16 +230,16 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
               onSubmitEditing={() => {
                 if (emailRef.current) {
                   //@ts-ignore
-                  emailRef.current.focus()
+                  emailRef.current.focus();
                 }
               }}
-              returnKeyType='next'
+              returnKeyType="next"
             />
             <Input
               reference={emailRef}
               label={txt.friendForm!.email!}
-              autoCapitalize='none'
-              keyboardType='email-address'
+              autoCapitalize="none"
+              keyboardType="email-address"
               value={email}
               onChangeText={(text) =>
                 onResaleToWhomDataChanged(ResaleToWhomFieldIdEnum.email, text)
@@ -250,16 +250,16 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
               onSubmitEditing={() => {
                 if (confirmEmailRef.current) {
                   //@ts-ignore
-                  confirmEmailRef.current.focus()
+                  confirmEmailRef.current.focus();
                 }
               }}
-              returnKeyType='next'
+              returnKeyType="next"
             />
             <Input
               reference={confirmEmailRef}
               label={txt.friendForm!.emailConfirm!}
-              autoCapitalize='none'
-              keyboardType='email-address'
+              autoCapitalize="none"
+              keyboardType="email-address"
               value={emailConfirm}
               onChangeText={(text) =>
                 onResaleToWhomDataChanged(
@@ -270,7 +270,7 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
               styles={ticketBuyerFormStyles?.inputs}
               error={emailConfirmError}
               blurOnSubmit={true}
-              returnKeyType='go'
+              returnKeyType="go"
             />
           </View>
         )}
@@ -307,14 +307,13 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
       txt.friendForm,
       txt.sellToWhom,
     ]
-  )
+  );
 
   useEffect(() => {
     if (!isTicketsTypeActive) {
-      onResaleToWhomDataChanged(ResaleToWhomFieldIdEnum.radioIndex, 0)
+      onResaleToWhomDataChanged(ResaleToWhomFieldIdEnum.radioIndex, 0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   return (
     <KeyboardAwareScrollView extraScrollHeight={32}>
@@ -332,7 +331,7 @@ const ResaleTicketsView: FC<IResaleTicketsViewProps> = ({
         />
       </View>
     </KeyboardAwareScrollView>
-  )
-}
+  );
+};
 
-export default ResaleTicketsView
+export default ResaleTicketsView;

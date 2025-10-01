@@ -1,16 +1,16 @@
-import { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import { StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 export interface IButtonStyles {
-  container?: StyleProp<ViewStyle>
-  button?: StyleProp<ViewStyle>
-  text?: StyleProp<TextStyle>
+  container?: StyleProp<ViewStyle>;
+  button?: StyleProp<ViewStyle>;
+  text?: StyleProp<TextStyle>;
 }
 
 export interface IButtonProps {
-  text: string
-  onPress: () => void
-  styles?: IButtonStyles
-  isUpperCase?: boolean
-  isDisabled?: boolean
-  isLoading?: boolean
+  text: string;
+  onPress: () => void;
+  styles?: IButtonStyles;
+  isUpperCase?: boolean;
+  isDisabled?: boolean;
+  isLoading?: boolean;
 }
