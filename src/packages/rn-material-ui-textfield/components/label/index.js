@@ -69,11 +69,11 @@ export default class Label extends PureComponent {
     let color = disabled
       ? baseColor
       : restricted
-      ? errorColor
-      : focusAnimation.interpolate({
-          inputRange: [-1, 0, 1],
-          outputRange: [errorColor, baseColor, tintColor],
-        });
+        ? errorColor
+        : focusAnimation.interpolate({
+            inputRange: [-1, 0, 1],
+            outputRange: [errorColor, baseColor, tintColor],
+          });
 
     let textStyle = {
       lineHeight: (style && style.lineHeight) || fontSize,

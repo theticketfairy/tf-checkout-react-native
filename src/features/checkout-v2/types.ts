@@ -393,6 +393,7 @@ export interface ICheckoutBody {
     dob_year?: number;
     add_ons?: Record<string, number>;
     data_capture?: Record<string, string | string[]>;
+    add_on_data_capture?: Record<string, Record<string, string>>;
   };
 }
 

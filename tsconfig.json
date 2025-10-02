@@ -3,11 +3,11 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "tf-checkout-react-native": ["./src/index"],
+      "tf-checkout-react-native": ["./src/index"]
     },
     "types": ["react", "react-native"],
     "allowUnreachableCode": false,
-    "allowUnusedLabels": false, 
+    "allowUnusedLabels": false,
     "customConditions": ["react-native-strict-api"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -29,6 +29,6 @@
     "strict": false,
     "target": "ES2018",
     "verbatimModuleSyntax": false,
-    "noImplicitAny": false,
+    "noImplicitAny": false
   }
 }

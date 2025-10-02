@@ -8,7 +8,6 @@
 //   module.exports = require('./metro.dev');
 // }
 
-
 const path = require('path');
 const { getDefaultConfig } = require('@expo/metro-config');
 const { withMetroConfig } = require('react-native-monorepo-config');

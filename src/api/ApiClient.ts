@@ -271,15 +271,12 @@ export const fetchUserProfile = async (): Promise<IUserProfileResponse> => {
   let response: AxiosResponse<any> | undefined;
 
   try {
-    response = await Client.get(
-      '/customer/profile/',
-      {
-        headers: {
-          ...HEADERS,
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    response = await Client.get('/customer/profile/', {
+      headers: {
+        ...HEADERS,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
   } catch (error) {
     const axiosError = error as AxiosError;
     responseError = {
@@ -310,15 +307,11 @@ export const registerNewUser = async (
   let res: AxiosResponse<any> | undefined;
 
   try {
-    res = await Client.post(
-      '/v1/oauth/register-rn',
-      data,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    );
+    res = await Client.post('/v1/oauth/register-rn', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   } catch (error) {
     const axiosError = error as AxiosError;
     const messageObject = axiosError.response?.data.message;
@@ -454,7 +447,7 @@ export const fetchMyOrders = async ({
   const withFrom = from ? `&filter[from]=${from}` : '';
 
   const endpoint = `/v1/account/orders/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}${withFrom}`;
-  
+
   try {
     response = await Client.get(endpoint);
   } catch (error) {
@@ -497,7 +490,8 @@ export const fetchOrderDetails = async (
     const axiosError = error as AxiosError;
     responseError = {
       message:
-        axiosError.response?.data.message || 'Error while fetching order details',
+        axiosError.response?.data.message ||
+        'Error while fetching order details',
       code: axiosError.response?.status,
     };
   }
@@ -719,7 +713,9 @@ export const addToCart = async (
       isNameRequired: attributes?.names_required ?? false,
       isAgeRequired: attributes?.age_required ?? false,
       isPhoneRequired: attributes?.phone_required ?? false,
-      minimumAge: attributes?.age_required ? attributes?.minimum_age ?? 18 : undefined,
+      minimumAge: attributes?.age_required
+        ? (attributes?.minimum_age ?? 18)
+        : undefined,
       isTicketFree: attributes?.free_ticket ?? false,
       isPhoneHidden: attributes?.hide_phone_field && false,
     };
@@ -740,14 +736,11 @@ export const fetchEvent = async (): Promise<IEventResponse> => {
   let responseError: IError | undefined;
   let event: IEvent | undefined;
   let response: AxiosResponse<any> | undefined;
-  
+
   try {
-    response = await Client.get(
-      `v1/event/${Config.EVENT_ID}`,
-      {
-        headers: HEADERS,
-      }
-    );
+    response = await Client.get(`v1/event/${Config.EVENT_ID}`, {
+      headers: HEADERS,
+    });
   } catch (error) {
     const axiosError = error as AxiosError;
     responseError = {
@@ -788,15 +781,15 @@ export const postReferralVisit = async (
   let response: AxiosResponse<any> | undefined;
 
   try {
-    response = await Client.post(
-      `v1/event/${eventId}/referrer/`,
-      {
-        referrer: referralIdNumber,
-      }
-    );
+    response = await Client.post(`v1/event/${eventId}/referrer/`, {
+      referrer: referralIdNumber,
+    });
   } catch (error) {
     const axiosError = error as AxiosError;
-    if (axiosError.response?.data.errors && axiosError.response?.data.errors.length > 0) {
+    if (
+      axiosError.response?.data.errors &&
+      axiosError.response?.data.errors.length > 0
+    ) {
       responseError = {
         code: axiosError.response?.data.errors[0].status,
         message: axiosError.response?.data.errors[0].details,
@@ -808,7 +801,10 @@ export const postReferralVisit = async (
       };
     }
 
-    if (axiosError.response?.status === 422 && responseError.message === undefined) {
+    if (
+      axiosError.response?.status === 422 &&
+      responseError.message === undefined
+    ) {
       responseError.message = 'Cannot process request';
     }
   }
@@ -851,14 +847,12 @@ export const unlockPasswordProtectedEvent = async (
   };
 
   try {
-    response = await Client.post(
-      `v1/event/${eventId}/authenticate`,
-      body
-    );
+    response = await Client.post(`v1/event/${eventId}/authenticate`, body);
   } catch (error) {
     const axiosError = error as AxiosError;
     responseError = {
-      message: axiosError.response?.data.message || 'Error while unlocking Event',
+      message:
+        axiosError.response?.data.message || 'Error while unlocking Event',
       code: axiosError?.response?.status,
     };
   }
@@ -886,7 +880,7 @@ export const unlockPasswordProtectedEvent = async (
 export const fetchCountries = async (): Promise<ICountriesResponse> => {
   let responseError: IError | undefined;
   let response: AxiosResponse<any> | undefined;
-  
+
   try {
     response = await Client.get('/countries/list');
   } catch (error) {
@@ -912,7 +906,7 @@ export const fetchStates = async (
 ): Promise<IStatesResponse> => {
   let responseError: IError | undefined;
   let response: AxiosResponse<any> | undefined;
-  
+
   try {
     response = await Client.get(`/countries/${countryId}/states/`);
   } catch (error) {
@@ -937,7 +931,7 @@ export const fetchCart = async (): Promise<ICartResponse> => {
   let responseError: IError | undefined;
   let cartData = {} as ICartData;
   let res: AxiosResponse<any> | undefined;
-  
+
   try {
     res = await Client.get('v1/cart/');
   } catch (error) {
@@ -947,7 +941,7 @@ export const fetchCart = async (): Promise<ICartResponse> => {
       message: axiosError.response?.data.message,
     };
   }
-  
+
   const data = res?.data.data;
   if (data?.attributes) {
     const attr = data?.attributes;
@@ -1000,7 +994,7 @@ export const checkoutOrder = async (
   }
   let responseError: IError | undefined;
   let res: AxiosResponse<any> | undefined;
-  
+
   try {
     res = await Client.post(
       'v1/on-checkout/',
@@ -1071,7 +1065,7 @@ export const fetchOrderReview = async (
 ): Promise<IOrderReviewResponse> => {
   let responseError: IError | undefined;
   let response: AxiosResponse<any> | undefined;
-  
+
   try {
     response = await Client.get(`v1/order/${hash}/review/`);
   } catch (error) {
@@ -1170,7 +1164,7 @@ export const updateCheckout = async (
   let responseError: IError | undefined;
   let responseData: any | undefined;
   let response: AxiosResponse<any> | undefined;
-  
+
   try {
     response = await Client.post('v1/checkout', {
       data,
@@ -1232,7 +1226,8 @@ export const getPaymentData = async (hash: string): Promise<any> => {
   } catch (error) {
     const axiosError = error as AxiosError;
     responseError = {
-      message: axiosError.response?.data.message || 'Error fetching payment data',
+      message:
+        axiosError.response?.data.message || 'Error fetching payment data',
       code: axiosError.response?.status,
     };
   }
@@ -1258,7 +1253,8 @@ export const postOnPaymentSuccess = async (orderHash: string) => {
     const axiosError = error as AxiosError;
     responseError = {
       message:
-        axiosError.response?.data.message || 'Error while notifying Payment Success',
+        axiosError.response?.data.message ||
+        'Error while notifying Payment Success',
       code: axiosError.response?.status,
     };
   }
@@ -1277,9 +1273,7 @@ export const postOnFreeRegistration = async (
   let res: AxiosResponse<any> | undefined;
 
   try {
-    res = await Client.post(
-      `v1/order/${orderHash}/complete_free_registration`
-    );
+    res = await Client.post(`v1/order/${orderHash}/complete_free_registration`);
   } catch (error) {
     const axiosError = error as AxiosError;
     responseError = {
@@ -1367,7 +1361,8 @@ export const resaleTicket = async (
   } catch (error) {
     const axiosError = error as AxiosError;
     responseError = {
-      message: axiosError.response?.data.message || 'Error while re-sale ticket',
+      message:
+        axiosError.response?.data.message || 'Error while re-sale ticket',
     };
   }
 
@@ -1452,16 +1447,14 @@ export const requestRestorePassword = async (
   let response: AxiosResponse<any> | undefined;
 
   try {
-    response = await Client.post(
-      `v1/oauth/restore-password-rn`,
-      {
-        email: email,
-      }
-    );
+    response = await Client.post(`v1/oauth/restore-password-rn`, {
+      email: email,
+    });
   } catch (error) {
     const axiosError = error as AxiosError;
     responseError = {
-      message: axiosError.response?.data.message || 'Error while restoring password',
+      message:
+        axiosError.response?.data.message || 'Error while restoring password',
       code: axiosError.response?.status,
     };
   }

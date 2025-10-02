@@ -8,27 +8,32 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import { DropdownMaterial } from '../../../components';
 import { IDropdownMaterialStyles } from '../../../components/dropdownMaterial/types';
 import { AddonItem } from '../types';
-import { priceWithCurrency } from '../utils';
+import { getFieldType, priceWithCurrency } from '../utils';
+import { CheckoutFormProps, CheckoutFormValues } from '../form/types';
+import { FormikField, FormikFieldComponentStyles } from '../../form';
+import { DropdownMaterial } from '../../../components';
 
 export interface AddonsContainerStyles {
   container?: StyleProp<ViewStyle>;
   title?: StyleProp<TextStyle>;
+  addonRow?: StyleProp<ViewStyle>;
   addonList?: StyleProp<ViewStyle>;
   addonItem?: StyleProp<ViewStyle>;
   addonInfo?: StyleProp<ViewStyle>;
   addonName?: StyleProp<TextStyle>;
   addonPrice?: StyleProp<TextStyle>;
   addonPriceWithFees?: StyleProp<TextStyle>;
+
   addonDescription?: StyleProp<TextStyle>;
   addonSelectContainer?: StyleProp<ViewStyle>;
   dropdownMaterial?: IDropdownMaterialStyles;
+  fieldComponentStyles?: FormikFieldComponentStyles;
 }
 
 interface AddonsContainerProps {
-  addons: Record<string, number>;
+  addons: CheckoutFormValues['addons'];
   availableAddons: AddonItem[];
   onAddonChange: (addonId: string, quantity: number) => void;
   currency?: string;
@@ -38,6 +43,7 @@ interface AddonsContainerProps {
     quantityLabel?: string;
     priceWithFeesSuffix?: string;
   };
+  addonCustomFields?: CheckoutFormProps['addonCustomFields'];
 }
 
 const AddonsContainer: React.FC<AddonsContainerProps> = ({
@@ -47,6 +53,7 @@ const AddonsContainer: React.FC<AddonsContainerProps> = ({
   currency,
   styles: customStyles,
   texts,
+  addonCustomFields,
 }) => {
   // Generate quantity options for the dropdown
   const generateAddonQuantityOptions = useCallback(
@@ -72,13 +79,14 @@ const AddonsContainer: React.FC<AddonsContainerProps> = ({
   if (!availableAddons || availableAddons.length === 0) {
     return null;
   }
+
   return (
-    <View style={[styles.container, customStyles?.container]}>
-      <Text style={[styles.title, customStyles?.title]}>
+    <View style={[customStyles?.container]}>
+      <Text style={[customStyles?.title]}>
         {texts?.title || 'Available Add-ons'}
       </Text>
 
-      <View style={[styles.addonList, customStyles?.addonList]}>
+      <View style={[customStyles?.addonList]}>
         {availableAddons.map((addon) => {
           // Extract addon data from the API structure
           const addonData = addon.attributes;
@@ -97,62 +105,64 @@ const AddonsContainer: React.FC<AddonsContainerProps> = ({
               );
 
           return (
-            <View
-              key={addonId}
-              style={[styles.addonItem, customStyles?.addonItem]}
-            >
-              <View style={[styles.addonInfo, customStyles?.addonInfo]}>
-                <Text style={[styles.addonName, customStyles?.addonName]}>
-                  {addonData.name || 'Add-on'}
-                </Text>
-                <Text style={[styles.addonPrice, customStyles?.addonPrice]}>
-                  {basePriceFormatted}
-                  {!isAddonFree && (
-                    <Text
-                      style={[
-                        styles.addonPriceWithFees,
-                        customStyles?.addonPriceWithFees,
-                      ]}
-                    >
-                      {texts?.priceWithFeesSuffix || ' (with fees)'}
+            <View key={addonId} style={[customStyles?.addonItem]}>
+              <View style={[customStyles?.addonRow]}>
+                <View style={[customStyles?.addonInfo]}>
+                  <Text style={[customStyles?.addonName]}>
+                    {addonData.name || 'Add-on'}
+                  </Text>
+                  <Text style={[customStyles?.addonPrice]}>
+                    {basePriceFormatted}
+                    {!isAddonFree && (
+                      <Text style={[customStyles?.addonPriceWithFees]}>
+                        {texts?.priceWithFeesSuffix || ' (with fees)'}
+                      </Text>
+                    )}
+                  </Text>
+                  {addonData.description && (
+                    <Text style={[customStyles?.addonDescription]}>
+                      {addonData.description}
                     </Text>
                   )}
-                </Text>
-                {addonData.description && (
-                  <Text
-                    style={[
-                      styles.addonDescription,
-                      customStyles?.addonDescription,
-                    ]}
-                  >
-                    {addonData.description}
-                  </Text>
-                )}
+                </View>
+                <View style={[customStyles?.addonSelectContainer]}>
+                  <DropdownMaterial
+                    items={generateAddonQuantityOptions(addonData)}
+                    onSelectItem={(item) => {
+                      onAddonChange(
+                        addonId.toString(),
+                        parseInt(item.value.toString(), 10)
+                      );
+                    }}
+                    selectedOption={{
+                      value: (addons[addonId]?.quantity || 0).toString(),
+                      label: (addons[addonId]?.quantity || 0).toString(),
+                    }}
+                    materialInputProps={{
+                      label: texts?.quantityLabel || 'Qty',
+                    }}
+                    styles={customStyles?.fieldComponentStyles?.select}
+                  />
+                </View>
               </View>
-              <View
-                style={[
-                  styles.addonSelectContainer,
-                  customStyles?.addonSelectContainer,
-                ]}
-              >
-                <DropdownMaterial
-                  items={generateAddonQuantityOptions(addonData)}
-                  onSelectItem={(item) => {
-                    onAddonChange(
-                      addonId.toString(),
-                      parseInt(item.value.toString(), 10)
-                    );
-                  }}
-                  selectedOption={{
-                    value: (addons[addonId] || 0).toString(),
-                    label: (addons[addonId] || 0).toString(),
-                  }}
-                  materialInputProps={{
-                    label: texts?.quantityLabel || 'Qty',
-                  }}
-                  styles={customStyles?.dropdownMaterial}
-                />
-              </View>
+              {(addons[addonId]?.quantity ?? 0) > 0 &&
+                addonCustomFields.map((field) => (
+                  <FormikField
+                    key={`${addonId}-${field.name}`}
+                    field={{
+                      name: `addons.${addonId}.customFields.${field.name}`,
+                      type: getFieldType(field.type),
+                      label: field.label,
+                      required: field.required,
+                      placeholder: field.description || `Enter ${field.label}`,
+                      options: field.options?.map((o) => ({
+                        value: o.value,
+                        label: o.name,
+                      })),
+                    }}
+                    styles={customStyles?.fieldComponentStyles}
+                  />
+                ))}
             </View>
           );
         })}
@@ -160,53 +170,5 @@ const AddonsContainer: React.FC<AddonsContainerProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 16,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  addonList: {
-    gap: 12,
-  },
-  addonItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eaeaea',
-    paddingBottom: 12,
-    marginBottom: 12,
-  },
-  addonInfo: {
-    flex: 1,
-  },
-  addonName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  addonPrice: {
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  addonPriceWithFees: {
-    fontSize: 12,
-    color: '#666',
-  },
-  addonDescription: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
-  },
-  addonSelectContainer: {
-    width: 80,
-  },
-});
 
 export default AddonsContainer;

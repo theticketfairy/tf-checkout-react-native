@@ -3,6 +3,8 @@
  */
 
 import { Config } from '../../helpers/Config';
+import { CustomField } from '../event/types';
+import { FieldType } from '../form/types';
 import { CheckoutFormValues } from './form/types';
 import { ICheckoutBody } from './types';
 
@@ -84,6 +86,7 @@ export const createCheckoutBody = (
     last_name: holder.lastName,
     phone: holder.phone,
   }));
+
   const body: ICheckoutBody = {
     attributes: {
       city: values.city,
@@ -106,9 +109,32 @@ export const createCheckoutBody = (
       ticket_holders: ticketHolders,
       ttf_opt_in: values.isSubToTicketFairy,
       brand_opt_in: values.isSubToBrand,
-      add_ons: values.addons,
     },
   };
+
+  if (values.addons && Object.keys(values.addons).length > 0) {
+    body.attributes.add_ons = {};
+    body.attributes.add_on_data_capture = {};
+
+    Object.entries(values.addons).forEach(([addonId, addonData]) => {
+      if (addonData.quantity > 0) {
+        body.attributes.add_ons[addonId] = addonData.quantity;
+
+        if (
+          addonData.customFields &&
+          Object.keys(addonData.customFields).length > 0
+        ) {
+          body.attributes.add_on_data_capture[addonId] = {};
+
+          Object.entries(addonData.customFields).forEach(([key, value]) => {
+            if (value !== undefined && value !== '') {
+              body.attributes.add_on_data_capture[addonId][key] = value;
+            }
+          });
+        }
+      }
+    });
+  }
 
   // Add date of birth if required
   if (isAgeRequired && values.dateOfBirth) {
@@ -130,4 +156,21 @@ export const createCheckoutBody = (
   }
 
   return body;
+};
+
+export const getFieldType = (type: CustomField['type']): FieldType => {
+  switch (type) {
+    case 'text':
+      return FieldType.INPUT;
+    case 'textarea':
+      return FieldType.TEXTAREA;
+    case 'phone':
+      return FieldType.PHONE;
+    case 'radio':
+      return FieldType.RADIO;
+    case 'select':
+      return FieldType.SELECT;
+    case 'select_multi':
+      return FieldType.SELECT_MULTI;
+  }
 };

@@ -42,21 +42,25 @@ npm install rn-material-ui-textfield
 ## Usage
 
 ```javascript
-import React, { Component } from 'react'
-import { TextField, FilledTextField, OutlinedTextField } from 'rn-material-ui-textfield'
+import React, { Component } from 'react';
+import {
+  TextField,
+  FilledTextField,
+  OutlinedTextField,
+} from 'rn-material-ui-textfield';
 
 class Example extends Component {
-  fieldRef = React.createRef()
+  fieldRef = React.createRef();
 
   onSubmit = () => {
-    let { current: field } = this.fieldRef
+    let { current: field } = this.fieldRef;
 
-    console.log(field.value())
-  }
+    console.log(field.value());
+  };
 
   formatText = (text) => {
-    return text.replace(/[^+\d]/g, '')
-  }
+    return text.replace(/[^+\d]/g, '');
+  };
 
   render() {
     return (
@@ -67,7 +71,7 @@ class Example extends Component {
         onSubmitEditing={this.onSubmit}
         ref={this.fieldRef}
       />
-    )
+    );
   }
 }
 ```

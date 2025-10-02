@@ -1,5 +1,8 @@
 import React, { JSX } from 'react';
-import type { ScrollViewScrollToOptions, ScrollView as ScrollViewType } from 'react-native'; // 👈 grab the instance type
+import type {
+  ScrollViewScrollToOptions,
+  ScrollView as ScrollViewType,
+} from 'react-native'; // 👈 grab the instance type
 
 import { CustomField } from '../../event/types';
 import { IOrderItem } from '../components/OrderReview';
@@ -42,7 +45,12 @@ export interface CheckoutFormValues {
   isCardFormComplete: boolean;
 
   // Add-ons
-  addons: Record<string, number>;
+  addons: {
+    [addonId: string]: {
+      quantity: number;
+      customFields: Record<string, string>;
+    };
+  };
   acceptedConditions: Record<string, boolean>;
 
   // Custom fields
@@ -82,6 +90,7 @@ export interface CheckoutFormProps {
 
   // Add-ons data
   availableAddons?: AddonItem[];
+  addonCustomFields?: CustomField[];
   onAddonChange?: (addonId: string, quantity: number) => void;
 
   // Conditions
@@ -95,7 +104,9 @@ export interface CheckoutFormProps {
   // Form handlers
   onSubmit: (values: CheckoutFormValues) => void | Promise<void>;
 
-  scrollRef: React.RefObject<{ scrollTo: (options: ScrollViewScrollToOptions) => void } | null>;
+  scrollRef: React.RefObject<{
+    scrollTo: (options: ScrollViewScrollToOptions) => void;
+  } | null>;
   styles?: CheckoutFormStyles;
   texts?: CheckoutFormTexts;
 }
@@ -194,7 +205,9 @@ export interface PaymentFormProps {
   orderItems: IOrderItem[];
   // Form handlers
   onSubmit: () => void | Promise<void>;
-  scrollRef: React.RefObject<{ scrollTo: (options: ScrollViewScrollToOptions) => void } | null>;
+  scrollRef: React.RefObject<{
+    scrollTo: (options: ScrollViewScrollToOptions) => void;
+  } | null>;
   styles?: CheckoutFormStyles;
   texts?: CheckoutFormTexts;
 }

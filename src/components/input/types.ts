@@ -8,7 +8,9 @@ import {
   ViewStyle,
   TextInput,
 } from 'react-native';
-import TextField, { TextFieldProps } from '../../packages/rn-material-ui-textfield';
+import TextField, {
+  TextFieldProps,
+} from '../../packages/rn-material-ui-textfield';
 
 export interface IInputStyles {
   color?: ColorValue;

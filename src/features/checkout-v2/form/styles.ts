@@ -41,7 +41,7 @@ const baseStyles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
   },
-  addonItem: {
+  addonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -49,6 +49,10 @@ const baseStyles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
+  },
+  addonItem: {
+    flexDirection: 'column',
+    gap: 16,
   },
   addonInfo: {
     flex: 1,
@@ -138,6 +142,7 @@ export interface CheckoutFormStyles {
     subtitle?: StyleProp<TextStyle>;
     value?: StyleProp<TextStyle>;
   };
+  addonRow?: StyleProp<ViewStyle>;
   addonSection?: StyleProp<ViewStyle>;
   addonItem?: StyleProp<ViewStyle>;
   addonInfo?: StyleProp<ViewStyle>;
@@ -199,6 +204,7 @@ export const mergeCheckoutFormStyles = (overrides?: CheckoutFormStyles) => ({
     baseStyles.addonSection,
     overrides?.addonSection,
   ]),
+  addonRow: StyleSheet.flatten([baseStyles.addonRow, overrides?.addonRow]),
   addonItem: StyleSheet.flatten([baseStyles.addonItem, overrides?.addonItem]),
   addonInfo: StyleSheet.flatten([baseStyles.addonInfo, overrides?.addonInfo]),
   addonName: StyleSheet.flatten([baseStyles.addonName, overrides?.addonName]),

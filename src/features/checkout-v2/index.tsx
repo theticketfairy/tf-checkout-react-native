@@ -92,7 +92,9 @@ export const CheckoutController = ({
   styles: stylesProp,
   texts: textsProp,
 }: CheckoutV2Props) => {
-  const scrollRef = useRef<{scrollTo: (options: ScrollViewScrollToOptions) => void}>(null);
+  const scrollRef = useRef<{
+    scrollTo: (options: ScrollViewScrollToOptions) => void;
+  }>(null);
   const [checkoutData, setCheckoutData] = useState<CheckoutData>();
   const [loginMessage, setLoginMessage] = useState('');
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false);
@@ -222,7 +224,6 @@ export const CheckoutController = ({
           texts={loginTexts}
           styles={stylesProp?.login}
         />
-
         <FormField
           fieldType="title"
           title={formTexts?.form?.sectionTitle || 'Personal Information'}

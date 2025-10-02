@@ -121,7 +121,7 @@ Set appropriate style in your styles.xml file.
 Import the function from the library.
 
 ```ts
-import { setConfig } from 'tf-checkout-react-native'
+import { setConfig } from 'tf-checkout-react-native';
 ```
 
 Use it in your initial useEffect function, please keep in mind this is an `async` function. It is highly recommended that you track when `setConfig` is finished, and pass that control prop to the Tickets component.
@@ -358,9 +358,9 @@ export default MyCustomCheckout() => {
 
 ```ts
 interface IButtonStyles {
-  container?: StyleProp<ViewStyle>
-  button?: StyleProp<ViewStyle>
-  text?: StyleProp<TextStyle>
+  container?: StyleProp<ViewStyle>;
+  button?: StyleProp<ViewStyle>;
+  text?: StyleProp<TextStyle>;
 }
 ```
 
@@ -368,13 +368,13 @@ interface IButtonStyles {
 
 ```ts
 interface IInputStyles {
-  color?: ColorValue
-  container?: StyleProp<ViewStyle>
-  input?: StyleProp<TextStyle>
-  lineWidth?: number
-  activeLineWidth?: number
-  baseColor?: ColorValue
-  errorColor?: ColorValue
+  color?: ColorValue;
+  container?: StyleProp<ViewStyle>;
+  input?: StyleProp<TextStyle>;
+  lineWidth?: number;
+  activeLineWidth?: number;
+  baseColor?: ColorValue;
+  errorColor?: ColorValue;
 }
 ```
 
@@ -382,13 +382,13 @@ interface IInputStyles {
 
 ```ts
 interface ICheckboxStyles {
-  container?: StyleProp<ViewStyle>
-  content?: StyleProp<ViewStyle>
-  indicator?: StyleProp<ViewStyle>
-  indicatorDisabled?: StyleProp<ViewStyle>
-  text?: StyleProp<TextStyle>
-  box?: StyleProp<ViewStyle>
-  icon?: StyleProp<ImageStyle>
+  container?: StyleProp<ViewStyle>;
+  content?: StyleProp<ViewStyle>;
+  indicator?: StyleProp<ViewStyle>;
+  indicatorDisabled?: StyleProp<ViewStyle>;
+  text?: StyleProp<TextStyle>;
+  box?: StyleProp<ViewStyle>;
+  icon?: StyleProp<ImageStyle>;
 }
 ```
 
@@ -400,22 +400,22 @@ Set the configuration for the library.
 
 ```ts
 export interface IConfig {
-  EVENT_ID: string | number
-  CLIENT?: string
-  ENV?: EnvType
-  CLIENT_ID?: string
-  CLIENT_SECRET?: string
-  TIMEOUT?: number
-  BRAND?: string
-  ARE_SUB_BRANDS_INCLUDED?: boolean
+  EVENT_ID: string | number;
+  CLIENT?: string;
+  ENV?: EnvType;
+  CLIENT_ID?: string;
+  CLIENT_SECRET?: string;
+  TIMEOUT?: number;
+  BRAND?: string;
+  ARE_SUB_BRANDS_INCLUDED?: boolean;
   // AUTH is used for single sign on v1.
   // It receives the needed information for the authenticated user.
   AUTH?: {
-    ACCESS_TOKEN: string
-    REFRESH_TOKEN: string
-    TOKEN_TYPE: string
-    SCOPE: string
-  }
+    ACCESS_TOKEN: string;
+    REFRESH_TOKEN: string;
+    TOKEN_TYPE: string;
+    SCOPE: string;
+  };
 }
 ```
 
@@ -457,10 +457,10 @@ Example:
 In your parent component
 
 ```ts
-const sessionHandleRef = useRef<SessionHandleType>(null)
+const sessionHandleRef = useRef<SessionHandleType>(null);
 
 // Call the refreshAccessToken function by using
-await sessionHandleRef.current?.refreshAccessToken()
+await sessionHandleRef.current?.refreshAccessToken();
 ```
 
 # Exported components
@@ -509,7 +509,7 @@ In all components with the exception of Login and Reset Password, you can pass a
 Import the component from the library
 
 ```tsx
-import { Login } from 'tf-checkout-react-native'
+import { Login } from 'tf-checkout-react-native';
 ```
 
 Then add it to the render function.
@@ -592,10 +592,10 @@ Then add it to the render function.
 
 ```ts
 {
-  accessToken: string
-  refreshToken: string
-  tokenType: string
-  scope: string
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  scope: string;
 }
 ```
 
@@ -729,7 +729,7 @@ If the Event's response returns a `401` error, then it means it's password prote
 Import the component from the library.
 
 ```js
-import { Tickets } from 'tf-checkout-react-native'
+import { Tickets } from 'tf-checkout-react-native';
 ```
 
 Then add it to the render function.
@@ -1002,7 +1002,7 @@ You can then call the `BillingInfo` component and pass them as props in the `car
 Import the component from the library
 
 ```js
-import { BillingInfo } from 'tf-checkout-react-native'
+import { BillingInfo } from 'tf-checkout-react-native';
 ```
 
 Add it to the render function.
@@ -1119,25 +1119,25 @@ ILoginSuccessData
 ```ts
 interface ILoginSuccessData {
   userProfile: {
-    customerId: string
-    firstName: string
-    lastName: string
-    email: string
-    phone: string
-    streetAddress: string
-    zipCode: string
-    countryId: string
-    company?: string
-    state: string
-    stateId: string
-    city: string
-  }
+    customerId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    streetAddress: string;
+    zipCode: string;
+    countryId: string;
+    company?: string;
+    state: string;
+    stateId: string;
+    city: string;
+  };
   accessTokenData?: {
-    accessToken: string
-    refreshToken: string
-    tokenType: string
-    scope: string
-  }
+    accessToken: string;
+    refreshToken: string;
+    tokenType: string;
+    scope: string;
+  };
 }
 ```
 
@@ -1276,7 +1276,7 @@ interface IBillingInfoViewStyles {
 Import the component from the library
 
 ```js
-import { Checkout } from 'tf-checkout-react-native'
+import { Checkout } from 'tf-checkout-react-native';
 ```
 
 Add it to the render function.
@@ -1412,8 +1412,8 @@ Import the component from the library
 ```js
 import {
   PurchaseConfirmation,
-  SessionHandleType
-} from 'tf-checkout-react-native'
+  SessionHandleType,
+} from 'tf-checkout-react-native';
 ```
 
 Add it to the render function.
@@ -1471,7 +1471,7 @@ If there is a valid session, there will appear a button to access `MyOrders` in 
 Import the component from the library.
 
 ```js
-import { MyOrders, SessionHandleType } from 'tf-checkout-react-native'
+import { MyOrders, SessionHandleType } from 'tf-checkout-react-native';
 ```
 
 ### Props
@@ -1764,7 +1764,7 @@ When user selects an order from the `MyOrders` component, will show it details.
 Import the component from the library.
 
 ```js
-import { MyOrderDetails, SessionHandleType } from 'tf-checkout-react-native'
+import { MyOrderDetails, SessionHandleType } from 'tf-checkout-react-native';
 ```
 
 ### Props
@@ -1932,7 +1932,7 @@ Allows the user to resale the tickets they bought. They can decide wether sell i
 Import the component from the library.
 
 ```js
-import { ResaleTickets, SessionHandleType } from 'tf-checkout-react-native'
+import { ResaleTickets, SessionHandleType } from 'tf-checkout-react-native';
 ```
 
 ### Props
@@ -2041,7 +2041,7 @@ After opening and URL with the corresponding schema and token, use this componen
 Import the component from the library.
 
 ```ts
-import { ResetPassword } from 'tf-checkout-react-native'
+import { ResetPassword } from 'tf-checkout-react-native';
 ```
 
 Then add it to the render function.
@@ -2156,7 +2156,7 @@ import {
 Declare a reference to pass it to the component.
 
 ```js
-const ticketsCoreRef = useRef < TicketsCoreHandle > null
+const ticketsCoreRef = useRef < TicketsCoreHandle > null;
 ```
 
 Then add it to the render function and assign the reference to the corresponding component.
@@ -2171,8 +2171,8 @@ Use the reference to access the component methods.
 
 ```js
 const handleGetTickets = async () => {
-  const res = await ticketsCoreRef.current.refreshAccessToken()
-}
+  const res = await ticketsCoreRef.current.refreshAccessToken();
+};
 ```
 
 ---
@@ -2473,7 +2473,7 @@ import {
 Declare a reference to pass it to the component.
 
 ```js
-const ticketsCoreRef = useRef < TicketsCoreHandle > null
+const ticketsCoreRef = useRef < TicketsCoreHandle > null;
 ```
 
 Then add it to the render function and assign the reference to the corresponding component.
@@ -2488,8 +2488,8 @@ Use the reference to access the component methods.
 
 ```js
 const handleGetTickets = async () => {
-  const res = await ticketsCoreRef.current.getTickets()
-}
+  const res = await ticketsCoreRef.current.getTickets();
+};
 ```
 
 ---
@@ -2528,9 +2528,9 @@ Exposes the following functions:
 **addToWaitingList** Receives params with the following properties:
 
 ```js
-firstName: string
-lastName: string
-email: string
+firstName: string;
+lastName: string;
+email: string;
 ```
 
 And returns a Promise with the following object:
@@ -2563,7 +2563,7 @@ import {
 Declare a reference to pass it to the component.
 
 ```js
-const waitingListCoreRef = useRef < WaitingListCoreHandle > null
+const waitingListCoreRef = useRef < WaitingListCoreHandle > null;
 ```
 
 Then add it to the render function and assign the reference to the corresponding component.
@@ -3087,14 +3087,14 @@ Import it from the library.
 ```ts
 import {
   OrderDetailsCore,
-  OrderDetailsCoreHandle
-} from 'tf-checkout-react-native'
+  OrderDetailsCoreHandle,
+} from 'tf-checkout-react-native';
 ```
 
 Create a ref
 
 ```ts
-const myOrderDetailsCoreRef = useRef<OrderDetailsCoreHandle>(null)
+const myOrderDetailsCoreRef = useRef<OrderDetailsCoreHandle>(null);
 ```
 
 Assign the ref to the wrapper component.
@@ -3106,7 +3106,7 @@ Assign the ref to the wrapper component.
 Access the exposed function through the current value.
 
 ```ts
-await myOrderDetailsCoreRef.current.removeTicketFromResale(ticket.hash)
+await myOrderDetailsCoreRef.current.removeTicketFromResale(ticket.hash);
 ```
 
 ```ts
@@ -3241,8 +3241,8 @@ Import it from the library.
 ```ts
 import {
   ResetPasswordCore,
-  ResetPasswordCoreHandle
-} from 'tf-checkout-react-native'
+  ResetPasswordCoreHandle,
+} from 'tf-checkout-react-native';
 ```
 
 Wrap your component with the Core component.
@@ -3320,10 +3320,10 @@ Wrap your component with the Core component.
 - Add filter to `getMyOrders` request in `MyOrdersCore` component, to filter by time frame by passing the following string:
 
 ```ts
-;'upcoming_events' |
+'upcoming_events' |
   'ongoing_and_upcoming_events' |
   'ongoing_events' |
-  'past_events'
+  'past_events';
 ```
 
 - Add more data to the `getMyOrders` success response.
@@ -3343,7 +3343,6 @@ Wrap your component with the Core component.
 ## Version 1.0.26
 
 - Add the possibility to remove all of the following Billing/Street Address fields from free tickets:
-
   - Billing Street Address
   - City
   - State/County

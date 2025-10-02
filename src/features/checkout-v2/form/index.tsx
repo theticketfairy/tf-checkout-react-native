@@ -1,6 +1,12 @@
 import { CardForm, CardFormView } from '@stripe/stripe-react-native';
 import { FormikProvider, useFormik } from 'formik';
-import React, { ComponentRef, ElementRef, useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+  ComponentRef,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   findNodeHandle,
@@ -12,7 +18,6 @@ import {
 
 import { Loading } from '../../../components';
 import { readableError } from '../../../utils/handlers';
-import { CustomField } from '../../event/types';
 import { FormikField } from '../../form';
 import { FieldType } from '../../form/types';
 import AddonsContainer from '../components/AddonsContainer';
@@ -28,27 +33,11 @@ import {
   CheckoutFormTexts,
   PaymentFormProps,
 } from './types';
+import { getFieldType } from '../utils';
 
 const MemoizedAddonsContainer = React.memo(AddonsContainer);
 const MemoizedConditions = React.memo(Conditions);
 const MemoizedOrderReview = React.memo(OrderReview);
-
-const getFieldType = (type: CustomField['type']): FieldType => {
-  switch (type) {
-    case 'text':
-      return FieldType.INPUT;
-    case 'textarea':
-      return FieldType.TEXTAREA;
-    case 'phone':
-      return FieldType.PHONE;
-    case 'radio':
-      return FieldType.RADIO;
-    case 'select':
-      return FieldType.SELECT;
-    case 'select_multi':
-      return FieldType.SELECT_MULTI;
-  }
-};
 
 export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   initialValues,
@@ -73,6 +62,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   isSinglePageCheckout = true,
   orderCustomFields = [],
   ticketCustomFields = [],
+  addonCustomFields = [],
   styles: stylesProp,
   texts: textsProp,
 }) => {
@@ -99,11 +89,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
       addonItem: styles.addonItem,
       addonInfo: styles.addonInfo,
       addonName: styles.addonName,
+      addonRow: styles.addonRow,
       addonPrice: styles.addonPrice,
       addonPriceWithFees: styles.addonPriceWithFees,
       addonDescription: styles.addonDescription,
       addonSelectContainer: styles.addonSelectContainer,
-      dropdownMaterial: fieldComponentStyles?.select,
+      fieldComponentStyles,
     }),
     [fieldComponentStyles, styles]
   );
@@ -137,7 +128,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   });
   const fieldTopRef = useRef<Record<string, number>>({});
 
-  const fieldRefs = useRef<Record<string, ComponentRef<typeof View> | null>>({});
+  const fieldRefs = useRef<Record<string, ComponentRef<typeof View> | null>>(
+    {}
+  );
   // 2) helper: scroll to a field by key
   const scrollToField = (key: string, attempt: number = 0) => {
     if (key === 'isCardFormComplete') return;
@@ -279,11 +272,20 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
   const handleAddonChange = useCallback(
     (addonId: string, quantity: number) => {
-      const updatedAddons = {
-        ...formik.values.addons,
-        [addonId]: quantity,
-      };
-      formik.setFieldValue('addons', updatedAddons);
+      formik.setFieldValue(`addons.${addonId}.quantity`, quantity);
+      if (quantity > 0) {
+        // reapply defaults if coming from 0
+        addonCustomFields.forEach((field) => {
+          if (field.defaultValue != null) {
+            formik.setFieldValue(
+              `addons.${addonId}.customFields.${field.name}`,
+              Array.isArray(field.defaultValue)
+                ? field.defaultValue.join(',')
+                : field.defaultValue
+            );
+          }
+        });
+      }
       onAddonChange?.(addonId, quantity);
     },
     [formik, onAddonChange]
@@ -694,6 +696,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         </View>
         <View style={styles.sectionContainer}>
           <MemoizedAddonsContainer
+            addonCustomFields={addonCustomFields}
             addons={formik.values.addons}
             availableAddons={availableAddons || []}
             onAddonChange={handleAddonChange}

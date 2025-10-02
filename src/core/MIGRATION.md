@@ -9,7 +9,11 @@ The legacy Core components (`BillingCore` and `CheckoutCore`) are being deprecat
 All hooks are exported directly from the package root, so you can import them like this:
 
 ```tsx
-import { useCart, useCheckout, useCheckoutFlow } from 'tf-checkout-react-native'
+import {
+  useCart,
+  useCheckout,
+  useCheckoutFlow,
+} from 'tf-checkout-react-native';
 ```
 
 ## Core Components to Hooks Mapping
@@ -84,13 +88,13 @@ useEffect(() => {
 ### After (using hooks):
 
 ```tsx
-import { useCart, useCheckoutFlow } from 'tf-checkout-react-native'
+import { useCart, useCheckoutFlow } from 'tf-checkout-react-native';
 
-const { data: cart, isLoading } = useCart()
+const { data: cart, isLoading } = useCart();
 const { secondsLeft } = useCheckoutFlow({
-  onCartExpired: handleCartExpired
+  onCartExpired: handleCartExpired,
   // other options
-})
+});
 
 // Cart data is available in cart.data.attributes
 // secondsLeft provides the remaining cart time
@@ -107,7 +111,7 @@ const { secondsLeft } = useCheckoutFlow({
 ## Full Example Using the Checkout Flow
 
 ```tsx
-import { useCheckoutFlow } from 'tf-checkout-react-native'
+import { useCheckoutFlow } from 'tf-checkout-react-native';
 
 const CheckoutScreen = () => {
   const {
@@ -118,7 +122,7 @@ const CheckoutScreen = () => {
     orderItems,
     secondsLeft,
     isSubmitting,
-    isInitialLoading
+    isInitialLoading,
   } = useCheckoutFlow({
     onCartExpired: () => navigation.navigate('ExpiredScreen'),
     onCheckoutSuccess: ({ hash, total, values }) => {
@@ -126,11 +130,11 @@ const CheckoutScreen = () => {
     },
     onPaymentSuccess: (result) => {
       // Handle payment success
-    }
-  })
+    },
+  });
 
   if (isInitialLoading) {
-    return <LoadingIndicator />
+    return <LoadingIndicator />;
   }
 
   return (
@@ -143,6 +147,6 @@ const CheckoutScreen = () => {
       secondsLeft={secondsLeft}
       isSubmitting={isSubmitting}
     />
-  )
-}
+  );
+};
 ```

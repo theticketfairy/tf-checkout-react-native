@@ -23,7 +23,11 @@ import {
 } from '../../auth/types';
 import { storeAuthTokens } from '../../auth/utils';
 import { useEventCustomFields } from '../../event/api-hooks';
-import { OrderAttribute, TicketAttribute } from '../../event/types';
+import {
+  AddOnAttribute,
+  OrderAttribute,
+  TicketAttribute,
+} from '../../event/types';
 import { useCountries, useStates } from '../../geo/api-hooks';
 import { CheckoutFormProps, CheckoutFormValues } from '../form/types';
 import { IOrderItem, OrderResult } from '../types';
@@ -254,6 +258,30 @@ export const useCheckoutFlow = ({
     return fields;
   }, [customFieldsQuery.data]);
 
+  const addonCustomFields = useMemo(() => {
+    if (!customFieldsQuery.data?.data?.attributes) {
+      return [];
+    }
+
+    // Filter for addon attributes only
+    const addonAttributes = customFieldsQuery.data.data.attributes.filter(
+      (attr) => 'add-on' in attr
+    ) as AddOnAttribute[];
+
+    // Extract fields from addon attributes and sort by order property
+    const fields = addonAttributes
+      .map((attr) => attr['add-on'].group.fields)
+      .flat()
+      .sort((a, b) => {
+        // Convert order strings to numbers for comparison
+        const orderA = parseInt(a.order, 10) || 0;
+        const orderB = parseInt(b.order, 10) || 0;
+        return orderA - orderB;
+      });
+
+    return fields;
+  }, [customFieldsQuery.data]);
+
   const { confirmPayment } = useConfirmPayment();
 
   const isInitialLoading = useMemo(() => {
@@ -275,6 +303,7 @@ export const useCheckoutFlow = ({
   const defaultCustomFieldValues = useMemo(() => {
     const orderDefaults: Record<string, string | string[]> = {};
     const ticketDefaults: Record<string, string | string[]> = {};
+    const addonDefaults: Record<string, string | string[]> = {};
 
     // Get the custom fields from the query response
     if (customFieldsQuery.data?.data?.attributes) {
@@ -287,6 +316,9 @@ export const useCheckoutFlow = ({
         (attr): attr is TicketAttribute => 'ticket' in attr
       );
 
+      const addonAttributes = customFieldsQuery.data.data.attributes.filter(
+        (attr): attr is AddOnAttribute => 'add-on' in attr
+      );
       // Extract fields from order attributes - now TypeScript knows these are OrderAttribute
       const orderFields = orderAttributes
         .map((attr) => attr.order.group.fields)
@@ -308,9 +340,22 @@ export const useCheckoutFlow = ({
           ticketDefaults[field.name] = field.defaultValue;
         }
       });
+
+      // Extract fields from addon attributes - now TypeScript knows these are AddOnAttribute
+      const addonFields = addonAttributes
+        .map((attr) => attr['add-on'].group.fields)
+        .flat();
+
+      addonFields.forEach((field) => {
+        if (field.defaultValue !== undefined && field.defaultValue !== null) {
+          addonDefaults[field.name] = field.defaultValue;
+        }
+      });
     }
 
-    return { orderDefaults, ticketDefaults };
+    console.log(addonDefaults, 'addonDefaults');
+
+    return { orderDefaults, ticketDefaults, addonDefaults };
   }, [customFieldsQuery.data]);
 
   // Prefill form with user profile data when available
@@ -326,6 +371,32 @@ export const useCheckoutFlow = ({
       phone: '',
       customFields: { ...defaultCustomFieldValues.ticketDefaults }, // Apply default values for ticket custom fields
     }));
+
+    const availableAddons = addonsQuery.data?.data?.attributes?.add_ons || [];
+
+    // build addon defaults
+    const addonDefaults: CheckoutFormValues['addons'] = {};
+
+    availableAddons.forEach((addon) => {
+      const addonId = addon.id?.toString();
+
+      addonDefaults[addonId] = {
+        quantity: 0,
+        customFields: {},
+      };
+
+      // every add-on uses the same addonCustomFields list
+      addonCustomFields.forEach((field) => {
+        if (field.defaultValue != null) {
+          addonDefaults[addonId].customFields[field.name] = Array.isArray(
+            field.defaultValue
+          )
+            ? field.defaultValue.join(',')
+            : field.defaultValue;
+        }
+      });
+    });
+
     const base: CheckoutFormValues = {
       firstName: '',
       lastName: '',
@@ -343,7 +414,7 @@ export const useCheckoutFlow = ({
       isCardFormComplete: false,
       country: '1',
       state: '-1',
-      addons: {},
+      addons: addonDefaults,
       acceptedConditions: {},
       customFields: { ...defaultCustomFieldValues.orderDefaults },
       ticketHolders,
@@ -789,5 +860,6 @@ export const useCheckoutFlow = ({
 
     orderCustomFields,
     ticketCustomFields,
+    addonCustomFields,
   };
 };
