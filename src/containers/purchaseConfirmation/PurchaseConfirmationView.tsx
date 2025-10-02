@@ -1,9 +1,9 @@
-import React, { FC } from 'react'
-import { Text, View } from 'react-native'
+import React, { FC } from 'react';
+import { Text, View } from 'react-native';
 
-import { Button, Loading } from '../../components'
-import s from './styles'
-import { IPurchaseConfirmationViewProps } from './types'
+import { Button, Loading } from '../../components';
+import s from './styles';
+import { IPurchaseConfirmationViewProps } from './types';
 
 const PurchaseConfirmationView: FC<IPurchaseConfirmationViewProps> = ({
   texts,
@@ -77,6 +77,6 @@ const PurchaseConfirmationView: FC<IPurchaseConfirmationViewProps> = ({
     />
     {areActivityIndicatorsEnabled && isLoading && <Loading />}
   </View>
-)
+);
 
-export default PurchaseConfirmationView
+export default PurchaseConfirmationView;

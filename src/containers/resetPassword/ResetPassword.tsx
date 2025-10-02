@@ -1,10 +1,10 @@
-import React, { FC, useRef, useState } from 'react'
+import React, { FC, useRef, useState } from 'react';
 
-import { ResetPasswordCore, ResetPasswordCoreHandle } from '../../core'
-import { useDebounced } from '../../helpers/Debounced'
-import { validatePasswords } from '../../helpers/Validators'
-import ResetPasswordView from './ResetPasswordView'
-import { IResetPasswordProps } from './types'
+import { ResetPasswordCore, ResetPasswordCoreHandle } from '../../core';
+import { useDebounced } from '../../helpers/Debounced';
+import { validatePasswords } from '../../helpers/Validators';
+import ResetPasswordView from './ResetPasswordView';
+import { IResetPasswordProps } from './types';
 
 const ResetPassword: FC<IResetPasswordProps> = ({
   token,
@@ -16,71 +16,71 @@ const ResetPassword: FC<IResetPasswordProps> = ({
   onPressResetButton,
 }) => {
   //#region State
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmNewPassword, setConfirmNewPassword] = useState('')
-  const [apiError, setApiError] = useState('')
-  const [apiSuccess, setApiSuccess] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [apiError, setApiError] = useState('');
+  const [apiSuccess, setApiSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   //#endregion State
 
-  const resetPasswordCoreRef = useRef<ResetPasswordCoreHandle>(null)
+  const resetPasswordCoreRef = useRef<ResetPasswordCoreHandle>(null);
 
   const newPasswordError = useDebounced(newPassword, () =>
     validatePasswords(newPassword, confirmNewPassword)
-  )
+  );
 
   const confirmNewPasswordError = useDebounced(confirmNewPassword, () =>
     validatePasswords(newPassword, confirmNewPassword)
-  )
+  );
 
   const isDataValid = (): boolean => {
     if (!newPassword) {
-      return false
+      return false;
     }
 
     if (!confirmNewPassword) {
-      return false
+      return false;
     }
 
     if (newPassword !== confirmNewPassword) {
-      return false
+      return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   //#region Handlers
   const handleOnPressResetPasswordButton = async () => {
     if (!resetPasswordCoreRef.current) {
-      return
+      return;
     }
 
-    onPressResetButton?.()
+    onPressResetButton?.();
 
     if (!isDataValid()) {
-      return
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     const response = await resetPasswordCoreRef.current.postResetPassword({
       token: token,
       password: newPassword,
       password_confirmation: confirmNewPassword,
-    })
-    setIsLoading(false)
+    });
+    setIsLoading(false);
 
     if (response.error) {
-      setApiError(response.error.message)
-      return onResetPasswordError?.(response.error)
+      setApiError(response.error.message);
+      return onResetPasswordError?.(response.error);
     }
 
-    setApiSuccess(response.data!.message)
-    return onResetPasswordSuccess?.(response.data!)
-  }
+    setApiSuccess(response.data!.message);
+    return onResetPasswordSuccess?.(response.data!);
+  };
 
   const handleOnPressCancelButton = () => {
-    onPressCancelButton?.()
-  }
+    onPressCancelButton?.();
+  };
   //#endregion Handlers
 
   //#region Return
@@ -103,8 +103,8 @@ const ResetPassword: FC<IResetPasswordProps> = ({
         apiSuccess={apiSuccess}
       />
     </ResetPasswordCore>
-  )
+  );
   //#endregion Return
-}
+};
 
-export default ResetPassword
+export default ResetPassword;

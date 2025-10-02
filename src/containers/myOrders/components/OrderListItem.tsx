@@ -1,9 +1,9 @@
-import React, { FC } from 'react'
-import { Image, Text, TouchableOpacity, View } from 'react-native'
+import React, { FC } from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
-import R from '../../../res'
-import { OrderListItemStyles as s } from './styles'
-import { IOrderListItemProps } from './types'
+import R from '../../../res';
+import { OrderListItemStyles as s } from './styles';
+import { IOrderListItemProps } from './types';
 
 const OrderListItem: FC<IOrderListItemProps> = ({
   order,
@@ -14,7 +14,7 @@ const OrderListItem: FC<IOrderListItemProps> = ({
     <View style={[s.rootContainer, styles?.rootContainer]}>
       <TouchableOpacity
         onPress={() => {
-          onSelectOrder(order)
+          onSelectOrder(order);
         }}
       >
         <View style={[s.contentContainer, styles?.contentContainer]}>
@@ -59,7 +59,7 @@ const OrderListItem: FC<IOrderListItemProps> = ({
         </View>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
-export default OrderListItem
+export default OrderListItem;

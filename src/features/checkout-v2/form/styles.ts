@@ -1,7 +1,7 @@
-import { CardFormView } from '@stripe/stripe-react-native'
-import { StyleProp, StyleSheet, TextStyle, ViewStyle } from 'react-native'
+import { CardFormView } from '@stripe/stripe-react-native';
+import { StyleProp, StyleSheet, TextStyle, ViewStyle } from 'react-native';
 
-import type { FormikFieldComponentStyles } from '../../form'
+import type { FormikFieldComponentStyles } from '../../form';
 
 const baseStyles = StyleSheet.create({
   form: {
@@ -41,7 +41,7 @@ const baseStyles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
   },
-  addonItem: {
+  addonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -49,6 +49,10 @@ const baseStyles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
+  },
+  addonItem: {
+    flexDirection: 'column',
+    gap: 16,
   },
   addonInfo: {
     flex: 1,
@@ -118,59 +122,60 @@ const baseStyles = StyleSheet.create({
     color: '#d32f2f',
     marginBottom: 10,
   },
-
-  cardStyle: {
-    backgroundColor: '#FFFFFF',
-    textColor: '#000000',
-    placeholderColor: '#999999',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-  },
   ticketHolderTitle: {
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 16,
   },
-})
+});
 
 export interface CheckoutFormStyles {
-  form?: StyleProp<ViewStyle>
-  sectionTitle?: StyleProp<TextStyle>
-  sectionContainer?: StyleProp<ViewStyle>
-  paymentContainer?: StyleProp<ViewStyle>
-  cardContainer?: StyleProp<ViewStyle>
-  orderReviewContainer?: StyleProp<ViewStyle>
+  form?: StyleProp<ViewStyle>;
+  sectionTitle?: StyleProp<TextStyle>;
+  sectionContainer?: StyleProp<ViewStyle>;
+  paymentContainer?: StyleProp<ViewStyle>;
+  cardContainer?: StyleProp<ViewStyle>;
+  orderReviewContainer?: StyleProp<ViewStyle>;
   orderReviewItem?: {
-    container?: StyleProp<ViewStyle>
-    title?: StyleProp<TextStyle>
-    subtitle?: StyleProp<TextStyle>
-    value?: StyleProp<TextStyle>
-  }
-  addonSection?: StyleProp<ViewStyle>
-  addonItem?: StyleProp<ViewStyle>
-  addonInfo?: StyleProp<ViewStyle>
-  addonName?: StyleProp<TextStyle>
-  addonPrice?: StyleProp<TextStyle>
-  addonPriceWithFees?: StyleProp<TextStyle>
-  addonDescription?: StyleProp<TextStyle>
-  addonSelectContainer?: StyleProp<ViewStyle>
-  addonMainTitle?: StyleProp<TextStyle>
-  addonSubtitle?: StyleProp<TextStyle>
-  button?: StyleProp<ViewStyle>
-  buttonDisabled?: StyleProp<ViewStyle>
-  buttonText?: StyleProp<TextStyle>
-  errorContainer?: StyleProp<ViewStyle>
-  errorText?: StyleProp<TextStyle>
-  paymentContainerInner?: StyleProp<ViewStyle>
-  cardStyle?: Partial<CardFormView.Styles>
-  ticketHolderTitle?: StyleProp<TextStyle>
-  fields?: FormikFieldComponentStyles
+    container?: StyleProp<ViewStyle>;
+    title?: StyleProp<TextStyle>;
+    subtitle?: StyleProp<TextStyle>;
+    value?: StyleProp<TextStyle>;
+  };
+  addonRow?: StyleProp<ViewStyle>;
+  addonSection?: StyleProp<ViewStyle>;
+  addonItem?: StyleProp<ViewStyle>;
+  addonInfo?: StyleProp<ViewStyle>;
+  addonName?: StyleProp<TextStyle>;
+  addonPrice?: StyleProp<TextStyle>;
+  addonPriceWithFees?: StyleProp<TextStyle>;
+  addonDescription?: StyleProp<TextStyle>;
+  addonSelectContainer?: StyleProp<ViewStyle>;
+  addonMainTitle?: StyleProp<TextStyle>;
+  addonSubtitle?: StyleProp<TextStyle>;
+  button?: StyleProp<ViewStyle>;
+  buttonDisabled?: StyleProp<ViewStyle>;
+  buttonText?: StyleProp<TextStyle>;
+  errorContainer?: StyleProp<ViewStyle>;
+  errorText?: StyleProp<TextStyle>;
+  paymentContainerInner?: StyleProp<ViewStyle>;
+  cardStyle?: Partial<CardFormView.Styles>;
+  ticketHolderTitle?: StyleProp<TextStyle>;
+  fields?: FormikFieldComponentStyles;
 }
 
 export type CheckoutFormComputedStyles = ReturnType<
   typeof mergeCheckoutFormStyles
->
+>;
+
+export const cardStyle: CardFormView.Styles = {
+  backgroundColor: '#FFFFFF',
+  textColor: '#000000',
+  placeholderColor: '#999999',
+  borderWidth: 1,
+  borderColor: '#E0E0E0',
+  borderRadius: 8,
+};
 
 export const mergeCheckoutFormStyles = (overrides?: CheckoutFormStyles) => ({
   form: StyleSheet.flatten([baseStyles.form, overrides?.form]),
@@ -199,6 +204,7 @@ export const mergeCheckoutFormStyles = (overrides?: CheckoutFormStyles) => ({
     baseStyles.addonSection,
     overrides?.addonSection,
   ]),
+  addonRow: StyleSheet.flatten([baseStyles.addonRow, overrides?.addonRow]),
   addonItem: StyleSheet.flatten([baseStyles.addonItem, overrides?.addonItem]),
   addonInfo: StyleSheet.flatten([baseStyles.addonInfo, overrides?.addonInfo]),
   addonName: StyleSheet.flatten([baseStyles.addonName, overrides?.addonName]),
@@ -242,7 +248,7 @@ export const mergeCheckoutFormStyles = (overrides?: CheckoutFormStyles) => ({
   errorText: StyleSheet.flatten([baseStyles.errorText, overrides?.errorText]),
   paymentContainerInner: StyleSheet.flatten([overrides?.paymentContainerInner]),
   cardStyle: {
-    ...baseStyles.cardStyle,
+    ...cardStyle,
     ...(overrides?.cardStyle || {}),
   },
   ticketHolderTitle: StyleSheet.flatten([
@@ -250,6 +256,6 @@ export const mergeCheckoutFormStyles = (overrides?: CheckoutFormStyles) => ({
     overrides?.ticketHolderTitle,
   ]),
   fields: overrides?.fields,
-})
+});
 
-export default baseStyles
+export default baseStyles;

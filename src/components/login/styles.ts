@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 export default StyleSheet.create({
   rootContainer: {
     paddingVertical: 16,
@@ -60,4 +60,4 @@ export default StyleSheet.create({
   forgotPassword: {
     color: R.colors.black,
   },
-})
+});

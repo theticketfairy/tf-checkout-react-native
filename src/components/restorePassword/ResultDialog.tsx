@@ -1,9 +1,9 @@
-import React, { FC } from 'react'
-import { Text, View } from 'react-native'
+import React, { FC } from 'react';
+import { Text, View } from 'react-native';
 
-import Button from '../button/Button'
-import { restorePasswordSuccessStyles as s } from './styles'
-import { IResultDialogProps } from './types'
+import Button from '../button/Button';
+import { restorePasswordSuccessStyles as s } from './styles';
+import { IResultDialogProps } from './types';
 
 const ResultDialog: FC<IResultDialogProps> = ({
   styles,
@@ -23,6 +23,6 @@ const ResultDialog: FC<IResultDialogProps> = ({
 
     <Button text={texts?.button || 'OK'} onPress={onPressButton!} />
   </View>
-)
+);
 
-export default ResultDialog
+export default ResultDialog;

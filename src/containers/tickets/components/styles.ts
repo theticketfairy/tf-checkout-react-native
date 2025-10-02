@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../../res'
+import R from '../../../res';
 
 export const CartListItemStyles = StyleSheet.create({
   container: {
@@ -51,4 +51,4 @@ export const CartListItemStyles = StyleSheet.create({
     color: R.colors.danger,
     textDecorationLine: 'line-through',
   },
-})
+});

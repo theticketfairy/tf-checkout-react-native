@@ -4,176 +4,176 @@ import {
   StyleProp,
   TextStyle,
   ViewStyle,
-} from 'react-native'
+} from 'react-native';
 
 import {
   IMyOrderDetailsData,
   IMyOrderDetailsItem,
   IMyOrderDetailsTicket,
-} from '../../api/types'
+} from '../../api/types';
 import {
   IBottomSheetModalStyles,
   IBottomSheetModalTexts,
-} from '../../components/bottomSheetModal/BottomSheetModalTypes'
-import { IButtonStyles } from '../../components/button/types'
-import { IError } from '../../types'
-import { INotificationIcons } from './components/Notification'
+} from '../../components/bottomSheetModal/BottomSheetModalTypes';
+import { IButtonStyles } from '../../components/button/types';
+import { IError } from '../../types';
+import { INotificationIcons } from './components/Notification';
 import {
   ITicketActionIcons,
   ITicketActionsStyles,
   ITicketActionTexts,
   TicketActionType,
-} from './components/TicketActions/TicketActionsTypes'
-import { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem'
+} from './components/TicketActions/TicketActionsTypes';
+import { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem';
 import {
   ITicketListItemStyles,
   ITicketListItemTexts,
-} from './components/TicketListItem/TicketListItemTypes'
+} from './components/TicketListItem/TicketListItemTypes';
 
 export interface IMyOrdersDetailsConfig {
-  areActivityIndicatorsEnabled?: boolean
-  areAlertsEnabled?: boolean
+  areActivityIndicatorsEnabled?: boolean;
+  areAlertsEnabled?: boolean;
 }
 
 export interface IMyOrderDetailsProps {
-  data: IMyOrderDetailsData
+  data: IMyOrderDetailsData;
 
   // Used to navigate to the Resale Tickets screen
   onPressResaleTicket: (
     ticket: IMyOrderDetailsTicket,
     isTicketTypeActive: boolean
-  ) => void
+  ) => void;
 
-  onRemoveTicketFromResaleSuccess: (message: string) => void
-  onRemoveTicketFromResaleError?: (error: IError) => void
+  onRemoveTicketFromResaleSuccess: (message: string) => void;
+  onRemoveTicketFromResaleError?: (error: IError) => void;
 
-  config?: IMyOrdersDetailsConfig
-  onDownloadStatusChange?: (status?: DownloadStatus) => void
-  downloadStatusIcons?: INotificationIcons
-  onAndroidWritePermission?: (permission?: boolean) => void
-  onLinkCopied?: (copied?: boolean) => void
+  config?: IMyOrdersDetailsConfig;
+  onDownloadStatusChange?: (status?: DownloadStatus) => void;
+  downloadStatusIcons?: INotificationIcons;
+  onAndroidWritePermission?: (permission?: boolean) => void;
+  onLinkCopied?: (copied?: boolean) => void;
 
-  moreButtonIcon?: StyleProp<ImageStyle>
+  moreButtonIcon?: StyleProp<ImageStyle>;
 
-  styles?: IMyOrderDetailsStyles
-  texts?: IMyOrderDetailsTexts
+  styles?: IMyOrderDetailsStyles;
+  texts?: IMyOrderDetailsTexts;
 
-  ticketActionsIcons?: ITicketActionIcons
+  ticketActionsIcons?: ITicketActionIcons;
 }
 
-export type DownloadStatus = 'downloading' | 'downloaded' | 'failed'
+export type DownloadStatus = 'downloading' | 'downloaded' | 'failed';
 
 export interface IMyOrderDetailsViewProps {
-  data: IMyOrderDetailsData
+  data: IMyOrderDetailsData;
 
-  config?: IMyOrdersDetailsConfig
+  config?: IMyOrdersDetailsConfig;
 
-  isLinkCopied?: boolean
-  onPressCopyLink: () => void
-  onPressTicketDownload: (payload: IOnPressTicketDownload) => void
+  isLinkCopied?: boolean;
+  onPressCopyLink: () => void;
+  onPressTicketDownload: (payload: IOnPressTicketDownload) => void;
 
   // Used to navigate to the Resale Tickets screen
-  onPressResaleTicket: (ticket: IMyOrderDetailsTicket) => void
-  onPressRemoveTicketFromResale: (ticket: IMyOrderDetailsTicket) => void
+  onPressResaleTicket: (ticket: IMyOrderDetailsTicket) => void;
+  onPressRemoveTicketFromResale: (ticket: IMyOrderDetailsTicket) => void;
 
-  downloadStatus?: DownloadStatus
-  isLoading: boolean
+  downloadStatus?: DownloadStatus;
+  isLoading: boolean;
 
-  downloadStatusIcons?: INotificationIcons
+  downloadStatusIcons?: INotificationIcons;
 
-  styles?: IMyOrderDetailsStyles
-  texts?: IMyOrderDetailsTexts
+  styles?: IMyOrderDetailsStyles;
+  texts?: IMyOrderDetailsTexts;
 
-  moreButtonIcon?: StyleProp<ImageStyle>
-  onTicketSelection: (ticket?: IMyOrderDetailsTicket) => void
-  selectedTicket?: IMyOrderDetailsTicket
-  onActionSelected: (action: TicketActionType) => void
+  moreButtonIcon?: StyleProp<ImageStyle>;
+  onTicketSelection: (ticket?: IMyOrderDetailsTicket) => void;
+  selectedTicket?: IMyOrderDetailsTicket;
+  onActionSelected: (action: TicketActionType) => void;
 
-  ticketActionsIcons?: ITicketActionIcons
+  ticketActionsIcons?: ITicketActionIcons;
 
-  bottomSheetModalRef?: any
+  bottomSheetModalRef?: any;
 }
 
 export interface IOrderDetailsSectionData {
-  id: string
-  item: IMyOrderDetailsItem
+  id: string;
+  item: IMyOrderDetailsItem;
 }
 
 export interface IOrderDetailsSectionTickets {
-  id: string
-  item: IMyOrderDetailsTicket
+  id: string;
+  item: IMyOrderDetailsTicket;
 }
 
 export interface IMyOrderDetailsTexts {
-  title?: string
-  subTitle?: string
-  referralLink?: string
+  title?: string;
+  subTitle?: string;
+  referralLink?: string;
   referral?: {
-    soFar?: string
-    tickets?: string
-  }
+    soFar?: string;
+    tickets?: string;
+  };
   listItem?: {
-    title?: string
-    ticketType?: string
-    price?: string
-    quantity?: string
-    total?: string
-  }
-  ticketItem?: ITicketListItemTexts
+    title?: string;
+    ticketType?: string;
+    price?: string;
+    quantity?: string;
+    total?: string;
+  };
+  ticketItem?: ITicketListItemTexts;
   downloadNotification?: {
-    successMessage?: string
-    errorMessage?: string
-  }
+    successMessage?: string;
+    errorMessage?: string;
+  };
   copyText?: {
-    copy?: string
-    copied?: string
-  }
-  sellTicket?: string
-  removeTicketFromResale?: string
-  ticketsTitle?: string
+    copy?: string;
+    copied?: string;
+  };
+  sellTicket?: string;
+  removeTicketFromResale?: string;
+  ticketsTitle?: string;
 
-  bottomSheetModal?: IBottomSheetModalTexts
-  ticketActions?: ITicketActionTexts
+  bottomSheetModal?: IBottomSheetModalTexts;
+  ticketActions?: ITicketActionTexts;
 }
 
 export interface IMyOrderDetailsStyles {
-  rootContainer?: StyleProp<ViewStyle>
+  rootContainer?: StyleProp<ViewStyle>;
   header?: {
-    container?: StyleProp<ViewStyle>
-    title?: StyleProp<TextStyle>
-    subTitle?: StyleProp<TextStyle>
+    container?: StyleProp<ViewStyle>;
+    title?: StyleProp<TextStyle>;
+    subTitle?: StyleProp<TextStyle>;
 
     shareLink?: {
-      container?: StyleProp<ViewStyle>
-      text?: StyleProp<TextStyle>
-      link?: StyleProp<TextStyle>
-      copyContainer?: StyleProp<ViewStyle>
-      copyText?: StyleProp<TextStyle>
-      copyIcon?: StyleProp<ImageStyle>
-      copyIconTint?: ColorValue
-      copyIconTintActive?: ColorValue
-      message?: StyleProp<TextStyle>
-      referrals?: StyleProp<TextStyle>
-      referralValue?: StyleProp<TextStyle>
-    }
-  }
+      container?: StyleProp<ViewStyle>;
+      text?: StyleProp<TextStyle>;
+      link?: StyleProp<TextStyle>;
+      copyContainer?: StyleProp<ViewStyle>;
+      copyText?: StyleProp<TextStyle>;
+      copyIcon?: StyleProp<ImageStyle>;
+      copyIconTint?: ColorValue;
+      copyIconTintActive?: ColorValue;
+      message?: StyleProp<TextStyle>;
+      referrals?: StyleProp<TextStyle>;
+      referralValue?: StyleProp<TextStyle>;
+    };
+  };
   section0Footer?: {
-    container?: StyleProp<ViewStyle>
-    label?: StyleProp<TextStyle>
-    value?: StyleProp<TextStyle>
-  }
-  sectionHeader?: StyleProp<TextStyle>
+    container?: StyleProp<ViewStyle>;
+    label?: StyleProp<TextStyle>;
+    value?: StyleProp<TextStyle>;
+  };
+  sectionHeader?: StyleProp<TextStyle>;
 
   listItem?: {
-    container?: StyleProp<ViewStyle>
-    innerLeftContainer?: StyleProp<ViewStyle>
-    innerRightContainer?: StyleProp<ViewStyle>
-    rowPlaceholder?: StyleProp<TextStyle>
-    rowValue?: StyleProp<TextStyle>
-  }
-  ticketItem?: ITicketListItemStyles
-  downloadButton?: IButtonStyles
+    container?: StyleProp<ViewStyle>;
+    innerLeftContainer?: StyleProp<ViewStyle>;
+    innerRightContainer?: StyleProp<ViewStyle>;
+    rowPlaceholder?: StyleProp<TextStyle>;
+    rowValue?: StyleProp<TextStyle>;
+  };
+  ticketItem?: ITicketListItemStyles;
+  downloadButton?: IButtonStyles;
 
-  bottomSheetModal?: IBottomSheetModalStyles
-  ticketActions?: ITicketActionsStyles
+  bottomSheetModal?: IBottomSheetModalStyles;
+  ticketActions?: ITicketActionsStyles;
 }

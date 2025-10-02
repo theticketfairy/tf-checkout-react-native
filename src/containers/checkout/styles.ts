@@ -1,6 +1,6 @@
-import { Platform, StyleSheet } from 'react-native'
+import { Platform, StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 
 export default StyleSheet.create({
   title: {
@@ -29,10 +29,6 @@ export default StyleSheet.create({
     padding: 8,
     alignSelf: 'center',
   },
-  cardStyle: {
-    backgroundColor: '#FFFFFF',
-    textColor: '#000000',
-  },
   missingStripeContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -45,4 +41,4 @@ export default StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
-})
+});

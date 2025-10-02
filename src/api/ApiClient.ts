@@ -1,30 +1,35 @@
-import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import axiosRetry from 'axios-retry'
-import _filter from 'lodash/filter'
-import _forEach from 'lodash/forEach'
-import _get from 'lodash/get'
-import _map from 'lodash/map'
-import _mapKeys from 'lodash/mapKeys'
-import _sortBy from 'lodash/sortBy'
+import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axiosRetry from 'axios-retry';
+import _filter from 'lodash/filter';
+import _forEach from 'lodash/forEach';
+import _get from 'lodash/get';
+import _map from 'lodash/map';
+import _mapKeys from 'lodash/mapKeys';
+import _sortBy from 'lodash/sortBy';
 
-import { IWaitingListFields } from '../components/waitingList/types'
-import { IOnCheckoutSuccess } from '../containers/billingInfo/types'
-import { Config } from '../helpers/Config'
-import { getDomainByClientAndEnv } from '../helpers/Domains'
+import { IWaitingListFields } from '../components/waitingList/types';
+import { IOnCheckoutSuccess } from '../containers/billingInfo/types';
+import { Config } from '../helpers/Config';
+import { getDomainByClientAndEnv } from '../helpers/Domains';
 import {
   deleteAllData,
   getData,
   LocalStorageKeys,
   storeData,
-} from '../helpers/LocalStorage'
-import { IAccountTicketsResponse, IError, IEvent, IUserProfile } from '../types'
+} from '../helpers/LocalStorage';
+import {
+  IAccountTicketsResponse,
+  IError,
+  IEvent,
+  IUserProfile,
+} from '../types';
 import {
   IAddToCartResponse,
   ITicket,
   ITicketsResponseData,
-} from '../types/ITicket'
-import Constants from './Constants'
-import { getApiError } from './ErrorHandler'
+} from '../types/ITicket';
+import Constants from './Constants';
+import { getApiError } from './ErrorHandler';
 import {
   IAddToCartParams,
   IAddToWaitingListResponse,
@@ -69,169 +74,179 @@ import {
   IStatesResponse,
   IUpdateCheckoutResponse,
   IUserProfileResponse,
-} from './types'
+} from './types';
 
 const HEADERS: { [key: string]: any } = {
-  Accept: 'application/vnd.api+json',
+  'Accept': 'application/vnd.api+json',
   'Content-Type': 'application/vnd.api+json',
-}
+};
 
 export const Client: IClientRequest = Axios.create({
   baseURL: Constants.BASE_URL,
   headers: HEADERS,
   timeout: Constants.TIMEOUT,
   data: {},
-}) as IClientRequest
+}) as IClientRequest;
 
-axiosRetry(Client, { retries: 3 })
+axiosRetry(Client, { retries: 3 });
 
 Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
-  const guestToken = await getData(LocalStorageKeys.AUTH_GUEST_TOKEN)
-  const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
-  const storedTokenType = await getData(LocalStorageKeys.AUTH_TOKEN_TYPE)
-  const tokenType = storedTokenType || 'Bearer'
+  const guestToken = await getData(LocalStorageKeys.AUTH_GUEST_TOKEN);
+  const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN);
+  const storedTokenType = await getData(LocalStorageKeys.AUTH_TOKEN_TYPE);
+  const tokenType = storedTokenType || 'Bearer';
 
   if (accessToken) {
     const updatedHeaders = {
       ...config.headers,
       Authorization: `${tokenType} ${accessToken}`,
-    }
-    config.headers = updatedHeaders
+    };
+    config.headers = updatedHeaders;
   }
 
   if (guestToken) {
-    Client.setGuestToken(guestToken)
+    Client.setGuestToken(guestToken);
     const updatedHeaders = {
       ...config.headers,
       'Authorization-Guest': guestToken,
-    }
-    config.headers = updatedHeaders
+    };
+    config.headers = updatedHeaders;
   }
 
   if (Config.CLIENT) {
     const updatedHeaders = {
       ...config.headers,
       origin: getDomainByClientAndEnv(Config.CLIENT, Config.ENV),
-    }
-    config.headers = updatedHeaders
+    };
+    config.headers = updatedHeaders;
   }
 
-  return config
-})
+  return config;
+});
 
 Client.interceptors.response.use(
   (response: AxiosResponse) => {
-    return response
+    return response;
   },
   async (error: AxiosError) => {
     if (error?.response?.status === 401) {
-      error.code = error.code
-      error.message = error.response.data.error_description
+      error.code = error.code;
+      error.message = error.response.data.error_description;
     } else if (error.message) {
-      error.message = error.message
+      error.message = error.message;
     }
 
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
 Client.setGuestToken = (token: string) =>
-  (Client.defaults.headers.common['Authorization-Guest'] = token)
+  (Client.defaults.headers.common['Authorization-Guest'] = token);
 
 Client.removeGuestToken = () =>
-  delete Client.defaults.headers.common['Authorization-Guest']
+  delete Client.defaults.headers.common['Authorization-Guest'];
 
 Client.removeAccessToken = () =>
-  delete Client.defaults.headers.common.Authorization
+  delete Client.defaults.headers.common.Authorization;
 
 Client.setAccessToken = (token: string) =>
-  (Client.defaults.headers.common.Authorization = token)
+  (Client.defaults.headers.common.Authorization = token);
 
-Client.setBaseUrl = (baseUrl: string) => (Client.defaults.baseURL = baseUrl)
+Client.setBaseUrl = (baseUrl: string) => (Client.defaults.baseURL = baseUrl);
 
-Client.setTimeOut = (timeOut: number) => (Client.defaults.timeout = timeOut)
+Client.setTimeOut = (timeOut: number) => (Client.defaults.timeout = timeOut);
 
 Client.setDomain = (domain: string) =>
   (Client.defaults.headers = {
     ...Client.defaults.headers,
     //@ts-ignore
     origin: domain,
-  })
+  });
 
 Client.setContentType = (contentType: string) =>
-  (Client.defaults.headers.common['Content-Type'] = contentType)
+  (Client.defaults.headers.common['Content-Type'] = contentType);
 
 export const setCustomHeader = (response: any) => {
-  const guestHeaderResponseValue = _get(response, 'headers.authorization-guest')
+  const guestHeaderResponseValue = _get(
+    response,
+    'headers.authorization-guest'
+  );
 
   const guestHeaderExistingValue = _get(
     response,
     'config.headers[Authorization-Guest]'
-  )
+  );
 
-  const guestHeader = guestHeaderResponseValue || guestHeaderExistingValue
+  const guestHeader = guestHeaderResponseValue || guestHeaderExistingValue;
 
   if (guestHeader) {
-    storeData(LocalStorageKeys.AUTH_GUEST_TOKEN, guestHeader)
-    Client.setGuestToken(guestHeader)
+    storeData(LocalStorageKeys.AUTH_GUEST_TOKEN, guestHeader);
+    Client.setGuestToken(guestHeader);
   }
-}
+};
 
 export const setAccessTokenHandler = async (accessToken: string) => {
-  await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken)
-  Client.setAccessToken(accessToken)
-}
+  await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken);
+  Client.setAccessToken(accessToken);
+};
 
 // API Authentication
 export const authorize = async (
   data: FormData
 ): Promise<IAuthorizeResponse> => {
-  let responseError: IError | undefined
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response = await Client.post(
-    `/v1/oauth/authorize-rn?client_id=${Config.CLIENT_ID}`,
-    data
-  ).catch((error: AxiosError) => {
+  try {
+    response = await Client.post(
+      `/v1/oauth/authorize-rn?client_id=${Config.CLIENT_ID}`,
+      data
+    );
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error?.response?.data.message || 'Authorization failed',
-      code: error?.response?.status,
-    }
-  })
+      message: axiosError?.response?.data.message || 'Authorization failed',
+      code: axiosError?.response?.status,
+    };
+  }
 
   return {
     error: responseError,
     code: response?.data?.data?.code,
-  }
-}
+  };
+};
 
 export const fetchAccessToken = async (
   data: FormData
 ): Promise<IFetchAccessTokenResponse> => {
-  let responseError: IError | undefined
-  const response = await Client.post('/v1/oauth/access_token', data).catch(
-    (error: AxiosError) => {
-      responseError = {
-        message: error.response?.data.message,
-        code: error.response?.status,
-      }
-    }
-  )
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const accessToken = _get(response, 'data.access_token')
+  try {
+    response = await Client.post('/v1/oauth/access_token', data);
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    responseError = {
+      message: axiosError.response?.data.message,
+      code: axiosError.response?.status,
+    };
+  }
+
+  const accessToken = _get(response, 'data.access_token');
   if (accessToken) {
-    await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken)
+    await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken);
   }
-  const refreshToken = _get(response, 'data.refresh_token')
+  const refreshToken = _get(response, 'data.refresh_token');
   if (refreshToken) {
-    await storeData(LocalStorageKeys.REFRESH_TOKEN, refreshToken)
+    await storeData(LocalStorageKeys.REFRESH_TOKEN, refreshToken);
   }
-  const tokenType = _get(response, 'data.token_type')
+  const tokenType = _get(response, 'data.token_type');
   if (tokenType) {
-    await storeData(LocalStorageKeys.TOKEN_TYPE, tokenType)
+    await storeData(LocalStorageKeys.TOKEN_TYPE, tokenType);
   }
-  const scope = _get(response, 'data.scope')
+  const scope = _get(response, 'data.scope');
   if (scope) {
-    await storeData(LocalStorageKeys.AUTH_SCOPE, scope)
+    await storeData(LocalStorageKeys.AUTH_SCOPE, scope);
   }
 
   return {
@@ -242,42 +257,43 @@ export const fetchAccessToken = async (
       tokenType,
       scope,
     },
-  }
-}
+  };
+};
 
 export const fetchUserProfile = async (): Promise<IUserProfileResponse> => {
-  const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
+  const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN);
   if (!accessToken) {
-    return { userProfileError: { message: 'Access token not found' } }
+    return { userProfileError: { message: 'Access token not found' } };
   }
 
-  let responseError: IError | undefined
-  let userProfile: IUserProfile | undefined
+  let responseError: IError | undefined;
+  let userProfile: IUserProfile | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.get(
-    '/customer/profile/',
-    {
+  try {
+    response = await Client.get('/customer/profile/', {
       headers: {
         ...HEADERS,
         Authorization: `Bearer ${accessToken}`,
       },
-    }
-  ).catch((error: AxiosError) => {
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error?.response?.data?.message,
-      code: error.response?.status!,
-    }
-  })
+      message: axiosError?.response?.data?.message,
+      code: axiosError.response?.status!,
+    };
+  }
 
   if (!responseError && response) {
-    userProfile = response.data.data
+    userProfile = response.data.data;
   }
 
   return {
     userProfileError: responseError,
     userProfileData: userProfile,
-  }
-}
+  };
+};
 
 //#region Register new user
 export const registerNewUser = async (
@@ -286,67 +302,68 @@ export const registerNewUser = async (
   const resultData: IRegisterNewUserResponse = {
     registerNewUserResponseError: undefined,
     registerNewUserResponseData: undefined,
-  }
+  };
 
-  const res: AxiosResponse | void = await Client.post(
-    '/v1/oauth/register-rn',
-    data,
-    {
+  let res: AxiosResponse<any> | undefined;
+
+  try {
+    res = await Client.post('/v1/oauth/register-rn', data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-    }
-  ).catch((error: AxiosError) => {
-    const messageObject = error.response?.data.message
-    let errorMessage = ''
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    const messageObject = axiosError.response?.data.message;
+    let errorMessage = '';
 
     if (!messageObject) {
       resultData.registerNewUserResponseError = {
         message: 'Error registering user',
-      }
+      };
     } else {
-      if (error.response?.data.message.email) {
+      if (axiosError.response?.data.message.email) {
         resultData.registerNewUserResponseError = {
           isAlreadyRegistered: true,
           message:
             'It appears this email is already attached to an account. Please log in here to complete your registration.',
-          raw: error.response,
-        }
+          raw: axiosError.response,
+        };
       } else {
         _mapKeys(messageObject, (value) => {
           _forEach(value, (eachVal) => {
-            errorMessage += `- ${eachVal} \n`
-          })
-        })
+            errorMessage += `- ${eachVal} \n`;
+          });
+        });
         resultData.registerNewUserResponseError = {
           message: errorMessage,
-        }
+        };
       }
     }
-  })
+  }
 
   if (res?.status === 200) {
-    const userProfile = _get(res, 'data.data.attributes.user_profile')
-    const accessToken = _get(res, 'data.data.attributes.access_token')
-    const refreshToken = _get(res, 'data.data.attributes.refresh_token')
-    const scope = _get(res, 'data.data.attributes.scope')
-    const tokenType = _get(res, 'data.data.attributes.token_type')
+    const userProfile = _get(res, 'data.data.attributes.user_profile');
+    const accessToken = _get(res, 'data.data.attributes.access_token');
+    const refreshToken = _get(res, 'data.data.attributes.refresh_token');
+    const scope = _get(res, 'data.data.attributes.scope');
+    const tokenType = _get(res, 'data.data.attributes.token_type');
 
     if (accessToken) {
-      await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken)
-      await setAccessTokenHandler(accessToken)
+      await storeData(LocalStorageKeys.ACCESS_TOKEN, accessToken);
+      await setAccessTokenHandler(accessToken);
     }
 
     if (refreshToken) {
-      await storeData(LocalStorageKeys.REFRESH_TOKEN, refreshToken)
+      await storeData(LocalStorageKeys.REFRESH_TOKEN, refreshToken);
     }
 
     if (tokenType) {
-      await storeData(LocalStorageKeys.TOKEN_TYPE, tokenType)
+      await storeData(LocalStorageKeys.TOKEN_TYPE, tokenType);
     }
 
     if (scope) {
-      await storeData(LocalStorageKeys.AUTH_SCOPE, scope)
+      await storeData(LocalStorageKeys.AUTH_SCOPE, scope);
     }
 
     resultData.registerNewUserResponseData = {
@@ -361,11 +378,11 @@ export const registerNewUser = async (
         lastName: _get(userProfile, 'last_name'),
         email: _get(userProfile, 'email'),
       },
-    }
+    };
   }
 
-  return resultData
-}
+  return resultData;
+};
 //#endregion
 
 //#region Waiting List
@@ -374,34 +391,32 @@ export const addToWaitingList = async (
 ): Promise<IAddToWaitingListResponse> => {
   if (!Config.EVENT_ID) {
     return {
-      addToWaitingListError: {
-        message: 'Event ID is not configured!',
-      },
-    }
+      addToWaitingListError: { message: 'Event ID is not configured!' },
+    };
   }
 
-  const requestData = {
-    data: {
-      attributes: values,
-    },
-  }
+  const requestData = { data: { attributes: values } };
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  let responseError: IError | undefined
-  const response: AxiosResponse | void = await Client.post(
-    `/v1/event/${Config.EVENT_ID}/add_to_waiting_list`,
-    requestData
-  ).catch((error: AxiosError) => {
+  try {
+    response = await Client.post(
+      `/v1/event/${Config.EVENT_ID}/add_to_waiting_list`,
+      requestData
+    );
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data.message,
-      code: error.response?.status!,
-    }
-  })
+      message: axiosError.response?.data.message,
+      code: axiosError.response?.status!,
+    };
+  }
 
   return {
     addToWaitingListError: responseError,
     addToWaitingListData: response?.data,
-  }
-}
+  };
+};
 //#endregion
 
 //#region MyOrders
@@ -420,64 +435,70 @@ export const fetchMyOrders = async ({
       totalCount: 0,
       totalPages: 0,
     },
-  }
-  let responseError: IError | undefined
+  };
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const withFilterEvent = filter ? `&filter[event]=${filter}` : ''
-  const withBrand = Config.BRAND ? `&filter[brand]=${Config.BRAND}` : ''
+  const withFilterEvent = filter ? `&filter[event]=${filter}` : '';
+  const withBrand = Config.BRAND ? `&filter[brand]=${Config.BRAND}` : '';
   const withSubBrands = Config.ARE_SUB_BRANDS_INCLUDED
     ? `&filter[subbrands]=${Config.ARE_SUB_BRANDS_INCLUDED}`
-    : ''
-  const withFrom = from ? `&filter[from]=${from}` : ''
+    : '';
+  const withFrom = from ? `&filter[from]=${from}` : '';
 
-  const endpoint = `/v1/account/orders/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}${withFrom}`
-  const response: AxiosResponse | void = await Client.get(endpoint).catch(
-    (error: AxiosError) => {
-      responseError = getApiError(error, 'Error fetching My Orders')
-    }
-  )
+  const endpoint = `/v1/account/orders/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}${withFrom}`;
+
+  try {
+    response = await Client.get(endpoint);
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    responseError = getApiError(axiosError, 'Error fetching My Orders');
+  }
 
   if (response?.data) {
-    const dataAttributes = response.data.data.attributes
+    const dataAttributes = response.data.data.attributes;
 
-    data.events = dataAttributes.purchased_events
-    data.orders = dataAttributes.orders
-    data.pagination.limit = dataAttributes.limit
-    data.pagination.page = dataAttributes.page
-    data.pagination.totalCount = dataAttributes.total_count
-    data.pagination.totalPages = dataAttributes.total_pages
-    data.filter = dataAttributes.filter
-    data.brandFilter = dataAttributes.brand_filter
-    data.subBrands = dataAttributes.sub_brands
+    data.events = dataAttributes.purchased_events;
+    data.orders = dataAttributes.orders;
+    data.pagination.limit = dataAttributes.limit;
+    data.pagination.page = dataAttributes.page;
+    data.pagination.totalCount = dataAttributes.total_count;
+    data.pagination.totalPages = dataAttributes.total_pages;
+    data.filter = dataAttributes.filter;
+    data.brandFilter = dataAttributes.brand_filter;
+    data.subBrands = dataAttributes.sub_brands;
   }
 
   return {
     myOrdersError: responseError,
     myOrdersData: data,
-  }
-}
+  };
+};
 //#endregion
 
 //#region OrderDetails
 export const fetchOrderDetails = async (
   orderId: string
 ): Promise<IMyOrderDetailsResponse> => {
-  let responseError: IError | undefined
-  let responseData: IMyOrderDetailsData | undefined
+  let responseError: IError | undefined;
+  let responseData: IMyOrderDetailsData | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response = await Client.get(`/v1/account/order/${orderId}`).catch(
-    (error: AxiosError) => {
-      responseError = {
-        message:
-          error.response?.data.message || 'Error while fetching order details',
-        code: error.response?.status,
-      }
-    }
-  )
+  try {
+    response = await Client.get(`/v1/account/order/${orderId}`);
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    responseError = {
+      message:
+        axiosError.response?.data.message ||
+        'Error while fetching order details',
+      code: axiosError.response?.status,
+    };
+  }
 
   if (!responseError && response) {
-    const { attributes } = response.data.data
-    let items: IMyOrderDetailsItem[] | undefined
+    const { attributes } = response.data.data;
+    let items: IMyOrderDetailsItem[] | undefined;
 
     if (attributes.items?.ticket_types) {
       items = _map(attributes.items.ticket_types, (item) => {
@@ -490,8 +511,8 @@ export const fetchOrderDetails = async (
           total: item.total,
           isActive: item.active,
           hash: item.hash,
-        }
-      })
+        };
+      });
     }
 
     const tickets: IMyOrderDetailsTicket[] = _map(
@@ -515,9 +536,9 @@ export const fetchOrderDetails = async (
           resaleFeeAmount: item.resale_fee_amount,
           ticketTypeHash: item.ticket_type_hash,
           isTable: item.is_table,
-        }
+        };
       }
-    )
+    );
     responseData = {
       header: {
         currency: attributes.currency,
@@ -553,14 +574,14 @@ export const fetchOrderDetails = async (
       },
       items: items,
       tickets: tickets,
-    }
+    };
   }
 
   return {
     orderDetailsError: responseError,
     orderDetailsData: responseData,
-  }
-}
+  };
+};
 
 //#endregion
 
@@ -575,73 +596,77 @@ export const fetchTickets = async ({
       error: {
         message: 'Event ID is not configured!',
       },
-    }
+    };
   }
 
-  const eventId = Config.EVENT_ID.toString()
+  const eventId = Config.EVENT_ID.toString();
   const headers = {
     'Promotion-Event': eventId,
     'Promotion-Code': promoCode,
     'Referrer-Id': referredId,
-  }
+  };
 
-  let responseError
+  let responseError;
+  let response: AxiosResponse<any> | undefined;
 
   if (!referredId) {
-    delete headers['Referrer-Id']
+    delete headers['Referrer-Id'];
   }
 
   if (!promoCode) {
     //@ts-ignore
-    delete headers['Promotion-Code']
+    delete headers['Promotion-Code'];
   }
 
   if (!promoCode && !referredId) {
     //@ts-ignore
-    delete headers['Promotion-Event']
+    delete headers['Promotion-Event'];
   }
 
   // If there are promoCode and referredId, then we need to remove the Referrer-Id header
   if (promoCode && referredId && headers['Referrer-Id']) {
-    delete headers['Referrer-Id']
+    delete headers['Referrer-Id'];
   }
 
-  const response = await Client.get(`v1/event/${eventId}/tickets/`, {
-    //@ts-ignore
-    headers: headers,
-  }).catch((error: AxiosError) => {
-    if (error.response) {
+  try {
+    response = await Client.get(`v1/event/${eventId}/tickets/`, {
+      //@ts-ignore
+      headers: headers,
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response) {
       responseError = {
-        code: error.response.status!,
-        message: error.response.data.message,
-      }
+        code: axiosError.response.status!,
+        message: axiosError.response.data.message,
+      };
     } else {
       responseError = {
-        message: error.message,
-      }
+        message: axiosError.message,
+      };
     }
-  })
+  }
 
   if (responseError) {
     return {
       error: responseError,
-    }
+    };
   }
 
-  const attributes = _get(response, 'data.data.attributes.tickets')
+  const attributes = _get(response, 'data.data.attributes.tickets');
   const ticketsAttributes = _filter(
     attributes,
     (item) => typeof item === 'object'
-  )
+  );
   const promoCodeResult: IPromoCodeResponse = {
     message: _get(response, 'data.data.attributes.PromoCodeValidationMessage'),
     isValid: _get(response, 'data.data.attributes.ValidPromoCode'),
-  }
+  };
 
-  const tickets = (Object.values(ticketsAttributes) || []) as ITicket[]
-  const guestHeaderValue = _get(response, 'headers.authorization-guest')
+  const tickets = (Object.values(ticketsAttributes) || []) as ITicket[];
+  const guestHeaderValue = _get(response, 'headers.authorization-guest');
   if (guestHeaderValue) {
-    setCustomHeader(response)
+    setCustomHeader(response);
   }
 
   return {
@@ -650,8 +675,8 @@ export const fetchTickets = async ({
     promoCodeResult: promoCodeResult,
     isInWaitingList: _get(response, 'data.data.attributes.showWaitingList'),
     isAccessCodeRequired: _get(response, 'data.data.attributes.is_access_code'),
-  }
-}
+  };
+};
 //#endregion Tickets
 
 export const addToCart = async (
@@ -659,51 +684,45 @@ export const addToCart = async (
 ): Promise<IAddToCartResponse> => {
   if (!Config.EVENT_ID) {
     return {
-      error: {
-        message: 'Event ID is not configured!',
-      },
-    }
+      error: { message: 'Event ID is not configured!' },
+    };
   }
 
-  let responseError: IError | undefined
-  let responseData: ITicketsResponseData | undefined
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.post(
-    `v1/event/${Config.EVENT_ID}/add-to-cart/`,
-    {
+  try {
+    response = await Client.post(`v1/event/${Config.EVENT_ID}/add-to-cart/`, {
       data,
-    }
-  ).catch((error: AxiosError) => {
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      code: error.response?.status!,
-      message: error.response?.data.message,
-    }
-  })
+      code: axiosError.response?.status!,
+      message: axiosError.response?.data.message,
+    };
+  }
 
-  if (!responseError) {
-    setCustomHeader(response)
-    const { attributes } = response?.data
+  let responseData: ITicketsResponseData | undefined;
+  if (!responseError && response) {
+    setCustomHeader(response);
+    const { attributes } = response.data;
 
     responseData = {
       isBillingRequired: !attributes?.skip_billing_page,
       isNameRequired: attributes?.names_required ?? false,
       isAgeRequired: attributes?.age_required ?? false,
       isPhoneRequired: attributes?.phone_required ?? false,
-      minimumAge: undefined,
+      minimumAge: attributes?.age_required
+        ? (attributes?.minimum_age ?? 18)
+        : undefined,
       isTicketFree: attributes?.free_ticket ?? false,
       isPhoneHidden: attributes?.hide_phone_field && false,
-    }
-
-    if (attributes?.age_required) {
-      responseData.minimumAge = attributes?.minimum_age ?? 18
-    }
+    };
   }
 
-  return {
-    data: responseData,
-    error: responseError,
-  }
-}
+  return { data: responseData, error: responseError };
+};
 
 export const fetchEvent = async (): Promise<IEventResponse> => {
   if (!Config.EVENT_ID) {
@@ -711,36 +730,38 @@ export const fetchEvent = async (): Promise<IEventResponse> => {
       eventError: {
         message: 'Event ID is not configured!',
       },
-    }
+    };
   }
 
-  let responseError: IError | undefined
-  let event: IEvent | undefined
-  const response: AxiosResponse | void = await Client.get(
-    `v1/event/${Config.EVENT_ID}`,
-    {
+  let responseError: IError | undefined;
+  let event: IEvent | undefined;
+  let response: AxiosResponse<any> | undefined;
+
+  try {
+    response = await Client.get(`v1/event/${Config.EVENT_ID}`, {
       headers: HEADERS,
-    }
-  ).catch((error: AxiosError) => {
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      code: error?.response?.data.status,
-      message: error.response?.data.message,
-    }
-  })
+      code: axiosError?.response?.data.status,
+      message: axiosError.response?.data.message,
+    };
+  }
 
   if (response?.status === 200) {
-    event = response.data.data.attributes
+    event = response.data.data.attributes;
   }
 
   if (event?.country) {
-    await storeData(LocalStorageKeys.EVENT_COUNTRY, event.country)
+    await storeData(LocalStorageKeys.EVENT_COUNTRY, event.country);
   }
 
   return {
     eventError: responseError,
     eventData: event,
-  }
-}
+  };
+};
 
 export const postReferralVisit = async (
   referralId: string
@@ -750,49 +771,56 @@ export const postReferralVisit = async (
       postReferralError: {
         message: 'Event ID is not configured!',
       },
-    }
+    };
   }
 
-  const eventId = Config.EVENT_ID.toString()
-  const referralIdNumber = parseInt(referralId, 10)
-  let responseError: IError | undefined
-  let responseData: IPostReferralData | undefined
+  const eventId = Config.EVENT_ID.toString();
+  const referralIdNumber = parseInt(referralId, 10);
+  let responseError: IError | undefined;
+  let responseData: IPostReferralData | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.post(
-    `v1/event/${eventId}/referrer/`,
-    {
+  try {
+    response = await Client.post(`v1/event/${eventId}/referrer/`, {
       referrer: referralIdNumber,
-    }
-  ).catch((error: AxiosError) => {
-    if (error.response?.data.errors && error.response?.data.errors.length > 0) {
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    if (
+      axiosError.response?.data.errors &&
+      axiosError.response?.data.errors.length > 0
+    ) {
       responseError = {
-        code: error.response?.data.errors[0].status,
-        message: error.response?.data.errors[0].details,
-      }
+        code: axiosError.response?.data.errors[0].status,
+        message: axiosError.response?.data.errors[0].details,
+      };
     } else {
       responseError = {
-        message: error.response?.data.message,
-        code: error.response?.status!,
-      }
+        message: axiosError.response?.data.message,
+        code: axiosError.response?.status!,
+      };
     }
 
-    if (error.response?.status === 422 && responseError.message === undefined) {
-      responseError.message = 'Cannot process request'
+    if (
+      axiosError.response?.status === 422 &&
+      responseError.message === undefined
+    ) {
+      responseError.message = 'Cannot process request';
     }
-  })
+  }
 
   if (response?.data && response.data.status === 200) {
     responseData = {
       message: response.data.message,
       status: response.data.status,
-    }
+    };
   }
 
   return {
     postReferralData: responseData,
     postReferralError: responseError,
-  }
-}
+  };
+};
 //#region Unlock Password Protected Event
 export const unlockPasswordProtectedEvent = async (
   password: string
@@ -802,12 +830,13 @@ export const unlockPasswordProtectedEvent = async (
       eventError: {
         message: 'Event ID is not configured!',
       },
-    }
+    };
   }
 
-  const eventId = Config.EVENT_ID.toString()
-  let responseError: IError | undefined
-  let responseData: any | undefined
+  const eventId = Config.EVENT_ID.toString();
+  let responseError: IError | undefined;
+  let responseData: any | undefined;
+  let response: AxiosResponse<any> | undefined;
 
   const body = {
     attributes: {
@@ -815,101 +844,112 @@ export const unlockPasswordProtectedEvent = async (
         password: password,
       },
     },
-  }
+  };
 
-  const response: AxiosResponse | void = await Client.post(
-    `v1/event/${eventId}/authenticate`,
-    body
-  ).catch((error: AxiosError) => {
+  try {
+    response = await Client.post(`v1/event/${eventId}/authenticate`, body);
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data.message || 'Error while unlocking Event',
-      code: error?.response?.status,
-    }
-  })
+      message:
+        axiosError.response?.data.message || 'Error while unlocking Event',
+      code: axiosError?.response?.status,
+    };
+  }
 
   if (response?.data) {
     responseData = {
       message: response.data.message,
       status: response.data.status,
-    }
+    };
 
-    const guestHeaderValue = _get(response, 'headers.authorization-guest')
+    const guestHeaderValue = _get(response, 'headers.authorization-guest');
     if (guestHeaderValue) {
-      setCustomHeader(response)
+      setCustomHeader(response);
     }
   }
 
   return {
     eventData: responseData,
     eventError: responseError,
-  }
-}
+  };
+};
 //#endregion Unlock Password Protected Event
 
 //#region Billing Information
 export const fetchCountries = async (): Promise<ICountriesResponse> => {
-  let responseError: IError | undefined
-  const response: AxiosResponse | void = await Client.get(
-    '/countries/list'
-  ).catch((error: AxiosError) => {
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
+
+  try {
+    response = await Client.get('/countries/list');
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data.message,
-      code: error.response?.status!,
-    }
-  })
+      message: axiosError.response?.data.message,
+      code: axiosError.response?.status!,
+    };
+  }
 
   if (response?.status === 200) {
-    setCustomHeader(response)
+    setCustomHeader(response);
   }
 
   return {
     countriesData: response?.data.data,
     countriesError: responseError,
-  }
-}
+  };
+};
 
 export const fetchStates = async (
   countryId: string
 ): Promise<IStatesResponse> => {
-  let responseError: IError | undefined
-  const response: void | AxiosResponse = await Client.get(
-    `/countries/${countryId}/states/`
-  ).catch((ex: AxiosError) => {
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
+
+  try {
+    response = await Client.get(`/countries/${countryId}/states/`);
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      code: ex.response?.status!,
-      message: ex.response?.data.message,
-    }
-  })
+      code: axiosError.response?.status!,
+      message: axiosError.response?.data.message,
+    };
+  }
 
   if (response?.status === 200) {
-    setCustomHeader(response)
+    setCustomHeader(response);
   }
 
   return {
     statesError: responseError,
     statesData: response?.data?.data,
-  }
-}
+  };
+};
 
 export const fetchCart = async (): Promise<ICartResponse> => {
-  let responseError: IError | undefined
-  let cartData = {} as ICartData
-  const res: AxiosResponse | void = await Client.get('v1/cart/').catch(
-    (error: AxiosError) => {
-      responseError = {
-        code: error.response?.status!,
-        message: error.response?.data.message,
-      }
-    }
-  )
-  const data = res?.data.data
+  let responseError: IError | undefined;
+  let cartData = {} as ICartData;
+  let res: AxiosResponse<any> | undefined;
+
+  try {
+    res = await Client.get('v1/cart/');
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    responseError = {
+      code: axiosError.response?.status!,
+      message: axiosError.response?.data.message,
+    };
+  }
+
+  const data = res?.data.data;
   if (data?.attributes) {
-    const attr = data?.attributes
-    const quantityString = _get(attr, 'cart[0].quantity', '1')
-    const tfOptIn = _get(attr, 'ttfOptIn', false)
-    const isMarketingOptedIn = _get(attr, 'optedIn', false)
-    const expiresAt = _get(attr, 'expiresAt', 420)
-    const eventId = _get(attr, 'eventId', null)
+    const attr = data?.attributes;
+    const quantityString = _get(attr, 'cart[0].quantity', '1');
+    const tfOptIn = _get(attr, 'ttfOptIn', false);
+    const isMarketingOptedIn = _get(attr, 'optedIn', false);
+    const expiresAt = _get(attr, 'expiresAt', 420);
+    const eventId = _get(attr, 'eventId', null);
 
     cartData = {
       quantity: parseInt(quantityString, 10),
@@ -920,57 +960,62 @@ export const fetchCart = async (): Promise<ICartResponse> => {
       isTfOptInHidden: _get(attr, 'hide_ttf_opt_in', false),
       isTfOptIn: typeof tfOptIn === 'number' ? tfOptIn > 0 : tfOptIn,
       expiresAt: expiresAt,
-    }
+    };
 
     return {
       success: true,
       cartError: responseError,
       cartData,
       eventId: eventId,
-    }
+    };
   } else {
     responseError = {
       message: 'Error fetching cart',
-    }
+    };
   }
 
   return {
     cartError: responseError,
     cartData: cartData,
-  }
-}
+  };
+};
 
 export const checkoutOrder = async (
   data: ICheckoutBody
 ): Promise<ICheckoutResponse> => {
-  const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
+  const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN);
 
   if (!accessToken) {
     return {
       error: {
         message: 'Access token not found',
       },
-    }
+    };
   }
-  let responseError: IError | undefined
-  const res: AxiosResponse | void = await Client.post(
-    'v1/on-checkout/',
-    { data },
-    {
-      headers: {
-        ...HEADERS,
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  ).catch((error: AxiosError) => {
+  let responseError: IError | undefined;
+  let res: AxiosResponse<any> | undefined;
+
+  try {
+    res = await Client.post(
+      'v1/on-checkout/',
+      { data },
+      {
+        headers: {
+          ...HEADERS,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      code: error.response?.status!,
-      message: error.response?.data.message,
-    }
-  })
+      code: axiosError.response?.status!,
+      message: axiosError.response?.data.message,
+    };
+  }
 
   if (!res || !res.data) {
-    return { error: responseError }
+    return { error: responseError };
   }
 
   const checkoutResponseData: IOnCheckoutSuccess = {
@@ -978,15 +1023,14 @@ export const checkoutOrder = async (
     hash: res.data.data.attributes.hash,
     total: res.data.data.attributes.total,
     status: res.data.data.attributes.status,
-  }
+  };
 
   return {
     error: responseError,
     data: checkoutResponseData,
-  }
-}
+  };
+};
 //#endregion
-
 //#region Checkout
 export const fetchEventConditions = async () => {
   if (!Config.EVENT_ID) {
@@ -994,44 +1038,49 @@ export const fetchEventConditions = async () => {
       error: {
         message: 'Event ID is not configured!',
       },
-    }
+    };
   }
 
-  let responseError: IError | undefined
-  const response: AxiosResponse | void = await Client.get(
-    `v1/event/${Config.EVENT_ID}/conditions`
-  ).catch((error: AxiosError) => {
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
+
+  try {
+    response = await Client.get(`v1/event/${Config.EVENT_ID}/conditions`);
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data,
-      code: error.response?.status!,
-    }
-  })
+      message: axiosError.response?.data,
+      code: axiosError.response?.status!,
+    };
+  }
 
   return {
     error: responseError,
-    data: response?.data?.data.attributes,
-  }
-}
+    data: response?.data?.data?.attributes,
+  };
+};
 
 export const fetchOrderReview = async (
   hash: string
 ): Promise<IOrderReviewResponse> => {
-  let responseError: IError | undefined
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.get(
-    `v1/order/${hash}/review/`
-  ).catch((error: AxiosError) => {
+  try {
+    response = await Client.get(`v1/order/${hash}/review/`);
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data.message,
-      code: error.response?.status!,
-    }
-  })
+      message: axiosError.response?.data.message,
+      code: axiosError.response?.status!,
+    };
+  }
 
-  let resData: IOrderReview | undefined
+  let resData: IOrderReview | undefined;
 
   if (!responseError) {
-    const attributes = _get(response, 'data.data.attributes')
-    const { cart, order_details, payment_method, billing_info } = attributes
+    const attributes = _get(response, 'data.data.attributes');
+    const { cart, order_details, payment_method, billing_info } = attributes;
 
     if (
       !payment_method.stripe_client_secret &&
@@ -1039,11 +1088,11 @@ export const fetchOrderReview = async (
     ) {
       responseError = {
         message: 'Stripe is not configured',
-      }
+      };
     } else {
       const {
         tickets: [ticket],
-      } = order_details
+      } = order_details;
 
       resData = {
         expiresAt: attributes.expires_at,
@@ -1099,161 +1148,177 @@ export const fetchOrderReview = async (
         isTtfOptedIn: attributes.hide_ttf_opt_in,
         eventDetails: attributes.event_details,
         countries: attributes.countries,
-      }
+      };
     }
   }
   return {
     orderReviewError: responseError,
     orderReviewData: resData,
-  }
-}
+  };
+};
 
 // Update checkout with add-ons and pricing
 export const updateCheckout = async (
   data: any
 ): Promise<IUpdateCheckoutResponse> => {
-  let responseError: IError | undefined
-  let responseData: any | undefined
+  let responseError: IError | undefined;
+  let responseData: any | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.post('v1/checkout', {
-    data,
-  }).catch((error: AxiosError) => {
+  try {
+    response = await Client.post('v1/checkout', {
+      data,
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data.message || 'Error updating checkout',
-      code: error.response?.status,
-    }
-  })
+      message: axiosError.response?.data.message || 'Error updating checkout',
+      code: axiosError.response?.status,
+    };
+  }
 
   if (response?.data) {
-    responseData = response.data
+    responseData = response.data;
   }
 
   return {
     success: !responseError,
     error: responseError,
     data: responseData,
-  }
-}
+  };
+};
 
 // Get add-ons for event
 export const getAddons = async (eventId: string): Promise<any> => {
-  let responseError: IError | undefined
-  let addonsData: any = {}
+  let responseError: IError | undefined;
+  let addonsData: any = {};
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.get(
-    `v1/event/${eventId}/add-ons`
-  ).catch((error: AxiosError) => {
+  try {
+    response = await Client.get(`v1/event/${eventId}/add-ons`);
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data.message || 'Error fetching add-ons',
-      code: error.response?.status,
-    }
-  })
+      message: axiosError.response?.data.message || 'Error fetching add-ons',
+      code: axiosError.response?.status,
+    };
+  }
 
   if (response?.data?.data?.attributes) {
-    addonsData = response.data.data.attributes
+    addonsData = response.data.data.attributes;
   }
 
   return {
     data: addonsData,
     error: responseError,
     success: !responseError,
-  }
-}
+  };
+};
 
 // Get payment data and order review
 export const getPaymentData = async (hash: string): Promise<any> => {
-  let responseError: IError | undefined
-  let responseData: any | undefined
+  let responseError: IError | undefined;
+  let responseData: any | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.get(
-    `v1/order/${hash}/review`
-  ).catch((error: AxiosError) => {
+  try {
+    response = await Client.get(`v1/order/${hash}/review`);
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data.message || 'Error fetching payment data',
-      code: error.response?.status,
-    }
-  })
+      message:
+        axiosError.response?.data.message || 'Error fetching payment data',
+      code: axiosError.response?.status,
+    };
+  }
 
   if (response?.data) {
-    responseData = response.data
+    responseData = response.data;
   }
 
   return {
     success: !responseError,
     error: responseError,
     data: responseData,
-  }
-}
+  };
+};
 
 export const postOnPaymentSuccess = async (orderHash: string) => {
-  let responseError: IError | undefined
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.post(
-    `v1/order/${orderHash}/success`
-  ).catch((error: AxiosError) => {
+  try {
+    response = await Client.post(`v1/order/${orderHash}/success`);
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
       message:
-        error.response?.data.message || 'Error while notifying Payment Success',
-      code: error.response?.status,
-    }
-  })
+        axiosError.response?.data.message ||
+        'Error while notifying Payment Success',
+      code: axiosError.response?.status,
+    };
+  }
 
   return {
     error: responseError,
     data: response?.data,
-  }
-}
+  };
+};
 
 export const postOnFreeRegistration = async (
   orderHash: string
 ): Promise<IFreeRegistrationResponse> => {
-  let responseError: IError | undefined
-  let responseData: IFreeRegistrationData | undefined
+  let responseError: IError | undefined;
+  let responseData: IFreeRegistrationData | undefined;
+  let res: AxiosResponse<any> | undefined;
 
-  const res: AxiosResponse | void = await Client.post(
-    `v1/order/${orderHash}/complete_free_registration`
-  ).catch((error: AxiosError) => {
+  try {
+    res = await Client.post(`v1/order/${orderHash}/complete_free_registration`);
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data.message,
-      code: error.response?.status,
-    }
-  })
+      message: axiosError.response?.data.message,
+      code: axiosError.response?.status,
+    };
+  }
 
   if (res?.data) {
-    const orderDetails = res.data.data.attributes.order_details
+    const orderDetails = res.data.data.attributes.order_details;
     responseData = {
       id: orderDetails.id,
       customerId: orderDetails.customer_id,
       total: orderDetails.total,
       currency: orderDetails.currency,
       orderHash: orderDetails.order_hash,
-    }
+    };
   }
   return {
     freeRegistrationError: responseError,
     freeRegistrationData: responseData,
-  }
-}
+  };
+};
 //#endregion
 
 //#region Purchase Confirmation
 export const fetchPurchaseConfirmation = async (
   orderHash: string
 ): Promise<IPurchaseConfirmationResponse> => {
-  let responseError: IError | undefined
-  let data: IPurchaseConfirmationData | undefined
+  let responseError: IError | undefined;
+  let data: IPurchaseConfirmationData | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.get(
-    `/v1/order/${orderHash}/payment/complete`
-  ).catch((error: AxiosError) => {
+  try {
+    response = await Client.get(`/v1/order/${orderHash}/payment/complete`);
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data.message,
-      code: error.response?.status,
-    }
-  })
+      message: axiosError.response?.data.message,
+      code: axiosError.response?.status,
+    };
+  }
 
   if (response?.data?.data.attributes) {
-    const resData = response.data.data.attributes
+    const resData = response.data.data.attributes;
     data = {
       conversionPixels: resData.conversion_pixels,
       currency: resData.currency,
@@ -1272,14 +1337,14 @@ export const fetchPurchaseConfirmation = async (
       productPrice: resData.product_price,
       productUrl: resData.product_url,
       personalShareSales: resData.personal_share_sales,
-    }
+    };
   }
 
   return {
     purchaseConfirmationError: responseError,
     purchaseConfirmationData: data,
-  }
-}
+  };
+};
 //#endregion
 
 //#region Resale Tickets
@@ -1287,147 +1352,157 @@ export const resaleTicket = async (
   data: FormData,
   orderHash: string
 ): Promise<IResaleTicketResponse> => {
-  let responseError: IError | undefined
-  let responseData: IResaleTicketData | undefined
+  let responseError: IError | undefined;
+  let responseData: IResaleTicketData | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response = await Client.post(`v1/ticket/${orderHash}/sell`, data).catch(
-    (error: AxiosError) => {
-      responseError = {
-        message: error.response?.data.message || 'Error while re-sale ticket',
-      }
-    }
-  )
+  try {
+    response = await Client.post(`v1/ticket/${orderHash}/sell`, data);
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    responseError = {
+      message:
+        axiosError.response?.data.message || 'Error while re-sale ticket',
+    };
+  }
 
   if (response?.data && response.data.status) {
     responseData = {
       message: response.data.message,
-    }
+    };
   }
 
   return {
     resaleTicketData: responseData,
     resaleTicketError: responseError,
-  }
-}
+  };
+};
 
 export const removeTicketFromResale = async (
   orderHash: string
 ): Promise<IRemoveTicketFromResaleResponse> => {
-  let responseError: IError | undefined
-  let responseData: IRemoveTicketFromResaleData | undefined
+  let responseError: IError | undefined;
+  let responseData: IRemoveTicketFromResaleData | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response = await Client.delete(`v1/ticket/${orderHash}/sell`).catch(
-    (error: AxiosError) => {
-      responseError =
-        error.response?.data.message || 'Error removing ticket from resale'
-    }
-  )
+  try {
+    response = await Client.delete(`v1/ticket/${orderHash}/sell`);
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    responseError =
+      axiosError.response?.data.message || 'Error removing ticket from resale';
+  }
 
   if (response?.data.message && response.data.status === 200) {
     responseData = {
       message: response.data.message,
-    }
+    };
   }
 
   return {
     removeTicketFromResaleData: responseData,
     removeTicketFromResaleError: responseError,
-  }
-}
+  };
+};
 //#endregion
 
 //#region Logout
 export const closeSession = async (): Promise<ICloseSessionResponse> => {
-  let responseData: ICloseSessionData | undefined
-  let responseError: IError | undefined
+  let responseData: ICloseSessionData | undefined;
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.delete('/auth').catch(
-    (error: AxiosError) => {
-      responseError =
-        error.response?.data.message || 'Error while closing session'
-    }
-  )
+  try {
+    response = await Client.delete('/auth');
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    responseError =
+      axiosError.response?.data.message || 'Error while closing session';
+  }
 
   if (response?.data && response.data.status && response.data.status === 200) {
     responseData = {
       message: response.data.message || 'Session closed successfully',
-    }
+    };
   }
 
-  await deleteAllData()
+  await deleteAllData();
 
-  Client.removeGuestToken()
-  Client.removeAccessToken()
+  Client.removeGuestToken();
+  Client.removeAccessToken();
 
   return {
     closeSessionData: responseData,
     closeSessionError: responseError,
-  }
-}
+  };
+};
 //endregion Logout
 
 //#region Restore Password
 export const requestRestorePassword = async (
   email: string
 ): Promise<IRestorePasswordResponse> => {
-  let responseError: IError | undefined
-  let successData: IRestorePasswordData | undefined
+  let responseError: IError | undefined;
+  let successData: IRestorePasswordData | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.post(
-    `v1/oauth/restore-password-rn`,
-    {
+  try {
+    response = await Client.post(`v1/oauth/restore-password-rn`, {
       email: email,
-    }
-  ).catch((error: AxiosError) => {
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data.message || 'Error while restoring password',
-      code: error.response?.status,
-    }
-  })
+      message:
+        axiosError.response?.data.message || 'Error while restoring password',
+      code: axiosError.response?.status,
+    };
+  }
 
   if (!responseError && response?.status === 200) {
     successData = {
       message: response.data.message,
       status: response.data.status,
-    }
+    };
   }
 
   return {
     data: successData,
     error: responseError,
-  }
-}
+  };
+};
 //#endregion
 
 //#region Request Password
 export const requestResetPassword = async (
   data: IResetPasswordRequestData
 ): Promise<IResetPasswordResponse> => {
-  let responseError: IError | undefined
-  let responseData: any | undefined
+  let responseError: IError | undefined;
+  let responseData: any | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const response: AxiosResponse | void = await Client.post(
-    `/auth/reset-password`,
-    data
-  ).catch((error: AxiosError) => {
+  try {
+    response = await Client.post(`/auth/reset-password`, data);
+  } catch (error) {
+    const axiosError = error as AxiosError;
     responseError = {
-      message: error.response?.data.message || 'Reset password error',
-      code: error.response?.data.status,
-    }
-  })
+      message: axiosError.response?.data.message || 'Reset password error',
+      code: axiosError.response?.data.status,
+    };
+  }
 
   if (!responseError && response?.status === 200) {
     responseData = {
       message: response.data.message,
       status: response.status,
-    }
+    };
   }
 
   return {
     error: responseError,
     data: responseData,
-  }
-}
+  };
+};
 //#endregion Request Password
 
 //#region Account Tickets
@@ -1437,39 +1512,41 @@ export const fetchAccountTickets = async ({
   filter = '',
   from = '',
 }: IMyOrdersRequestParams): Promise<IAccountTicketsResponse> => {
-  let responseError: IError | undefined
+  let responseError: IError | undefined;
+  let response: AxiosResponse<any> | undefined;
 
-  const withFilterEvent = filter ? `&filter[event]=${filter}` : ''
-  const withBrand = Config.BRAND ? `&filter[brand]=${Config.BRAND}` : ''
+  const withFilterEvent = filter ? `&filter[event]=${filter}` : '';
+  const withBrand = Config.BRAND ? `&filter[brand]=${Config.BRAND}` : '';
   const withSubBrands = Config.ARE_SUB_BRANDS_INCLUDED
     ? `&filter[subbrands]=${Config.ARE_SUB_BRANDS_INCLUDED}`
-    : ''
-  const withFrom = from ? `&filter[from]=${from}` : ''
+    : '';
+  const withFrom = from ? `&filter[from]=${from}` : '';
 
-  const endpoint = `/v1/account/tickets/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}${withFrom}`
+  const endpoint = `/v1/account/tickets/?page=${page}&limit=${limit}${withFilterEvent}${withBrand}${withSubBrands}${withFrom}`;
 
-  const response: AxiosResponse | void = await Client.get(endpoint).catch(
-    (error: AxiosError) => {
-      responseError = getApiError(error)
-    }
-  )
+  try {
+    response = await Client.get(endpoint);
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    responseError = getApiError(axiosError);
+  }
 
   if (responseError) {
     return {
       error: responseError,
-    }
+    };
   }
 
   if (response?.data) {
     return {
       data: response.data.data,
-    }
+    };
   }
 
   return {
     error: {
       message: 'No data was received in Account Tickets.',
     },
-  }
-}
+  };
+};
 //#endregion Account Tickets

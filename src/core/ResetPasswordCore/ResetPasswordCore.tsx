@@ -1,12 +1,12 @@
-import React, { forwardRef, useImperativeHandle } from 'react'
+import React, { forwardRef, useImperativeHandle } from 'react';
 
-import { requestResetPassword } from '../../api/ApiClient'
+import { requestResetPassword } from '../../api/ApiClient';
 import {
   IResetPasswordRequestData,
   IResetPasswordResponse,
-} from '../../api/types'
-import { ICoreProps } from '../CoreProps'
-import { ResetPasswordCoreHandle } from './ResetPasswordCoreTypes'
+} from '../../api/types';
+import { ICoreProps } from '../CoreProps';
+import { ResetPasswordCoreHandle } from './ResetPasswordCoreTypes';
 
 const ResetPasswordCore = forwardRef<ResetPasswordCoreHandle, ICoreProps>(
   (props, ref) => {
@@ -14,11 +14,11 @@ const ResetPasswordCore = forwardRef<ResetPasswordCoreHandle, ICoreProps>(
       async postResetPassword(
         data: IResetPasswordRequestData
       ): Promise<IResetPasswordResponse> {
-        return await requestResetPassword(data)
+        return await requestResetPassword(data);
       },
-    }))
-    return <>{props.children}</>
+    }));
+    return <>{props.children}</>;
   }
-)
+);
 
-export default ResetPasswordCore
+export default ResetPasswordCore;

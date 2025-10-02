@@ -1,9 +1,9 @@
-import { ViewStyle } from 'react-native'
+import { ViewStyle } from 'react-native';
 
 export interface ISeparatorProps {
-  color?: string
-  height?: number
-  width?: ViewStyle['width']
-  marginLeft?: ViewStyle['marginLeft']
-  marginVertical?: ViewStyle['marginVertical']
+  color?: string;
+  height?: number;
+  width?: ViewStyle['width'];
+  marginLeft?: ViewStyle['marginLeft'];
+  marginVertical?: ViewStyle['marginVertical'];
 }

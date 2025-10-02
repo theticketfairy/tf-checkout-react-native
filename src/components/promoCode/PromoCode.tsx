@@ -1,10 +1,10 @@
-import React, { FC, useState } from 'react'
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import React, { FC, useState } from 'react';
+import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-import R from '../../res'
-import Button from '../button/Button'
-import s from './styles'
-import { IPromoCodeProps } from './types'
+import R from '../../res';
+import Button from '../button/Button';
+import s from './styles';
+import { IPromoCodeProps } from './types';
 
 const PromoCode: FC<IPromoCodeProps> = ({
   onPressApply,
@@ -15,48 +15,48 @@ const PromoCode: FC<IPromoCodeProps> = ({
   isAccessCodeEnabled,
   closeButtonIcon,
 }) => {
-  const [isActive, setIsActive] = useState(false)
-  const [promoCode, setPromoCode] = useState('')
+  const [isActive, setIsActive] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
 
-  const activate = () => setIsActive(true)
+  const activate = () => setIsActive(true);
   const deactivate = (): string => {
-    const code = promoCode
-    setIsActive(false)
-    setPromoCode('')
-    return code
-  }
+    const code = promoCode;
+    setIsActive(false);
+    setPromoCode('');
+    return code;
+  };
 
   const handleOnPressPromoCode = () => {
-    activate()
-  }
+    activate();
+  };
 
   const handleOnPressApply = () => {
-    onPressApply(promoCode)
-  }
+    onPressApply(promoCode);
+  };
 
   const isCodeValid = () => {
     if (typeof isPromoCodeValid === 'boolean') {
-      return isPromoCodeValid
+      return isPromoCodeValid;
     } else if (typeof isPromoCodeValid === 'number') {
-      return isPromoCodeValid > 0
+      return isPromoCodeValid > 0;
     }
-  }
+  };
 
-  const isApplyButtonDisabled = promoCode.length === 0
+  const isApplyButtonDisabled = promoCode.length === 0;
   const submitButton = texts?.apply
     ? texts.apply
     : isAccessCodeEnabled
-    ? 'ENTER'
-    : 'APPLY'
+      ? 'ENTER'
+      : 'APPLY';
 
-  const resultMessageValidStyle = [s.validMessage, styles?.validMessage]
-  const resultMessageErrorStyle = [s.errorMessage, styles?.errorMessage]
+  const resultMessageValidStyle = [s.validMessage, styles?.validMessage];
+  const resultMessageErrorStyle = [s.errorMessage, styles?.errorMessage];
   const resultMessageStyle = isCodeValid()
     ? resultMessageValidStyle
-    : resultMessageErrorStyle
+    : resultMessageErrorStyle;
   const resultMessage = isCodeValid()
     ? texts?.validMessage || 'Valid promo code'
-    : texts?.errorMessage || promoCodeValidationMessage
+    : texts?.errorMessage || promoCodeValidationMessage;
 
   return (
     <View style={[{}, styles?.rootContainer]}>
@@ -71,7 +71,7 @@ const PromoCode: FC<IPromoCodeProps> = ({
               value={promoCode}
               style={[s.input, styles?.input]}
               onChangeText={(text) => setPromoCode(text)}
-              autoCapitalize='none'
+              autoCapitalize="none"
               underlineColorAndroid={R.colors.transparent}
             />
 
@@ -111,7 +111,7 @@ const PromoCode: FC<IPromoCodeProps> = ({
         />
       )}
     </View>
-  )
-}
+  );
+};
 
-export default PromoCode
+export default PromoCode;

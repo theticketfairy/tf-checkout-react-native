@@ -1,22 +1,22 @@
-import { EnvType } from './Config'
+import { EnvType } from './Config';
 
 export const getDomainByClientAndEnv = (
   client: string = 'ttf',
   env: EnvType = 'PROD'
 ): string => {
   //@ts-ignore
-  const brand = domains[client] ?? 'ttf'
-  let origin = ''
+  const brand = domains[client] ?? 'ttf';
+  let origin = '';
 
   if (typeof brand === 'string') {
     //@ts-ignore
-    origin = domains[brand][env] ?? 'https://www.ticketfairy.com'
+    origin = domains[brand][env] ?? 'https://www.ticketfairy.com';
   } else {
-    origin = brand[env]
+    origin = brand[env];
   }
 
-  return origin
-}
+  return origin;
+};
 
 const domains = {
   mana: {
@@ -29,4 +29,4 @@ const domains = {
     STAG: 'https://test.ticketfairy.com',
     PROD: 'https://www.ticketfairy.com',
   },
-}
+};

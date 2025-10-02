@@ -1,4 +1,4 @@
-import { ReactElement } from 'react'
+import { ReactElement } from 'react';
 
 export enum FieldType {
   INPUT = 'input',
@@ -14,25 +14,25 @@ export enum FieldType {
 }
 
 export interface BaseFieldConfig<TValues extends {}> {
-  name: string
-  type: FieldType
-  label?: string
-  placeholder?: string
-  required?: boolean
-  options?: { value: string; label: string }[]
-  defaultValue?: TValues[keyof TValues]
-  onChange?: (value: any) => void
-  hide?: boolean
+  name: string;
+  type: FieldType;
+  label?: string;
+  placeholder?: string;
+  required?: boolean;
+  options?: { value: string; label: string }[];
+  defaultValue?: TValues[keyof TValues];
+  onChange?: (value: any) => void;
+  hide?: boolean;
 }
 
 // Specialized config when type = component
 export interface ComponentFieldConfig<TValues extends {}>
   extends Omit<BaseFieldConfig<TValues>, 'type'> {
-  type: FieldType.COMPONENT
-  render: (field: BaseFieldConfig<TValues>) => ReactElement
+  type: FieldType.COMPONENT;
+  render: (field: BaseFieldConfig<TValues>) => ReactElement;
 }
 
 // Union type: either a normal field or a component field
 export type FieldConfig<TValues extends {}> =
   | BaseFieldConfig<TValues>
-  | ComponentFieldConfig<TValues>
+  | ComponentFieldConfig<TValues>;

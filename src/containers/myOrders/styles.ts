@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 
 export const MyOrdersViewStyles = StyleSheet.create({
   eventsContainer: {
@@ -39,4 +39,4 @@ export const MyOrdersViewStyles = StyleSheet.create({
     width: 20,
     height: 20,
   },
-})
+});

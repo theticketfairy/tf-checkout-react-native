@@ -1,10 +1,10 @@
-import React, { FC, useRef, useState } from 'react'
-import { Keyboard } from 'react-native'
+import React, { FC, useRef, useState } from 'react';
+import { Keyboard } from 'react-native';
 
-import { LoginCore, LoginCoreHandle } from '../../core'
-import { IUserProfilePublic } from '../../types'
-import LoginView from './LoginView'
-import { ILoginFields, ILoginProps, LoginContentType } from './types'
+import { LoginCore, LoginCoreHandle } from '../../core';
+import { IUserProfilePublic } from '../../types';
+import LoginView from './LoginView';
+import { ILoginFields, ILoginProps, LoginContentType } from './types';
 
 const Login: FC<ILoginProps> = ({
   onLoginSuccessful,
@@ -24,107 +24,107 @@ const Login: FC<ILoginProps> = ({
   onRestorePasswordSuccess,
 }) => {
   //#region State
-  const [isLoading, setIsLoading] = useState(false)
-  const [loginApiError, setLoginApiError] = useState('')
-  const [restorePasswordApiError, setRestorePasswordApiError] = useState('')
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginApiError, setLoginApiError] = useState('');
+  const [restorePasswordApiError, setRestorePasswordApiError] = useState('');
   const [restorePasswordSuccessMessage, setRestorePasswordSuccessMessage] =
-    useState('')
-  const [userProfileData, setUserProfileData] = useState<IUserProfilePublic>()
+    useState('');
+  const [userProfileData, setUserProfileData] = useState<IUserProfilePublic>();
   const [loginContentType, setLoginContentType] =
-    useState<LoginContentType>('login')
+    useState<LoginContentType>('login');
   const [isRestorePasswordLoading, setIsRestorePasswordLoading] =
-    useState(false)
+    useState(false);
   //#endregion State
 
-  const loginCoreRef = useRef<LoginCoreHandle>(null)
+  const loginCoreRef = useRef<LoginCoreHandle>(null);
 
   //#region Handlers
   const handleOnPressForgotPassword = () =>
-    setLoginContentType('restorePassword')
+    setLoginContentType('restorePassword');
 
   const handleOnPressLogin = async (fields: ILoginFields) => {
     if (loginApiError) {
-      setLoginApiError('')
+      setLoginApiError('');
     }
 
     if (!loginCoreRef.current?.login) {
       return onLoginError?.({
         message: 'LoginCoreRef is not initialized',
-      })
+      });
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     const {
       userProfile,
       error: authorizationError,
       accessTokenData,
-    } = await loginCoreRef.current.login(fields)
+    } = await loginCoreRef.current.login(fields);
 
     if (authorizationError || !userProfile) {
-      setIsLoading(false)
-      setLoginApiError(authorizationError?.message || 'Auth error')
-      return onLoginError?.(authorizationError!)
+      setIsLoading(false);
+      setLoginApiError(authorizationError?.message || 'Auth error');
+      return onLoginError?.(authorizationError!);
     }
 
-    Keyboard.dismiss()
-    setUserProfileData(userProfile)
+    Keyboard.dismiss();
+    setUserProfileData(userProfile);
     onLoginSuccessful({
       userProfile,
       accessTokenData,
-    })
-    setIsLoading(false)
-    hideLoginDialog()
-  }
+    });
+    setIsLoading(false);
+    hideLoginDialog();
+  };
 
   const handleOnPressLogout = async () => {
     if (!loginCoreRef.current?.logout) {
-      return onLogoutError?.({ message: 'LoginCoreRef is not initialized' })
+      return onLogoutError?.({ message: 'LoginCoreRef is not initialized' });
     }
 
-    await loginCoreRef.current.logout()
+    await loginCoreRef.current.logout();
 
-    setUserProfileData(undefined)
-    onLogoutSuccess?.()
-  }
+    setUserProfileData(undefined);
+    onLogoutSuccess?.();
+  };
 
   const handleOnPressCancelRestorePasswordButton = () =>
-    setLoginContentType('login')
+    setLoginContentType('login');
 
   const handleOnPressRestorePasswordButton = async (email: string) => {
     if (!loginCoreRef.current?.restorePassword) {
       return onRestorePasswordError?.({
         message: 'LoginCoreRef is not initialized',
-      })
+      });
     }
 
-    setIsRestorePasswordLoading(true)
+    setIsRestorePasswordLoading(true);
     const { data: restorePasswordSuccessData, error: restorePassError } =
-      await loginCoreRef.current.restorePassword(email)
-    setIsRestorePasswordLoading(false)
+      await loginCoreRef.current.restorePassword(email);
+    setIsRestorePasswordLoading(false);
 
     if (restorePassError || !restorePasswordSuccessData) {
       setRestorePasswordApiError(
         restorePassError?.message || 'Restore password unknown error'
-      )
-      setIsRestorePasswordLoading(false)
-      onRestorePasswordError?.(restorePassError!)
-      return
+      );
+      setIsRestorePasswordLoading(false);
+      onRestorePasswordError?.(restorePassError!);
+      return;
     }
 
-    setLoginContentType('restorePasswordSuccess')
+    setLoginContentType('restorePasswordSuccess');
 
-    setRestorePasswordSuccessMessage(restorePasswordSuccessData.message)
-    onRestorePasswordSuccess?.()
-  }
+    setRestorePasswordSuccessMessage(restorePasswordSuccessData.message);
+    onRestorePasswordSuccess?.();
+  };
 
   const handleOnPressRestorePasswordSuccessButton = () => {
-    handleHideDialog()
-  }
+    handleHideDialog();
+  };
 
   const handleHideDialog = () => {
-    setLoginContentType('login')
-    hideLoginDialog()
-  }
+    setLoginContentType('login');
+    hideLoginDialog();
+  };
   //#endregion
 
   //#region Render Main Content
@@ -159,8 +159,8 @@ const Login: FC<ILoginProps> = ({
         }}
       />
     </LoginCore>
-  )
+  );
   //#endregion Render Main Content
-}
+};
 
-export default Login
+export default Login;

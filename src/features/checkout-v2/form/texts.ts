@@ -1,4 +1,4 @@
-import { CheckoutFormTexts } from './types'
+import { CheckoutFormTexts } from './types';
 
 export const defaultCheckoutFormTexts: Required<CheckoutFormTexts> = {
   form: {
@@ -71,7 +71,7 @@ export const defaultCheckoutFormTexts: Required<CheckoutFormTexts> = {
     viewButton: 'View',
     hideButton: 'Hide',
   },
-}
+};
 
 const mergeCustomFieldMap = (
   base: Record<string, { label?: string; placeholder?: string }>,
@@ -79,13 +79,13 @@ const mergeCustomFieldMap = (
 ): Record<string, { label?: string; placeholder?: string }> => ({
   ...base,
   ...(override ?? {}),
-})
+});
 
 export const mergeCheckoutFormTexts = (
   overrides?: CheckoutFormTexts
 ): Required<CheckoutFormTexts> => {
   if (!overrides) {
-    return defaultCheckoutFormTexts
+    return defaultCheckoutFormTexts;
   }
 
   return {
@@ -129,5 +129,5 @@ export const mergeCheckoutFormTexts = (
       ...defaultCheckoutFormTexts.conditions,
       ...overrides.conditions,
     },
-  }
-}
+  };
+};

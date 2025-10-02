@@ -3,13 +3,13 @@ import {
   useQuery,
   useQueryClient,
   UseQueryOptions,
-} from '@tanstack/react-query'
-import { AxiosError } from 'axios'
-import { useCallback } from 'react'
+} from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { useCallback } from 'react';
 
-import { ApiResponse } from '../../../api/api.types'
-import { Client } from '../../../api/ApiClient'
-import { ICheckoutBody } from '../../../api/types'
+import { ApiResponse } from '../../../api/api.types';
+import { Client } from '../../../api/ApiClient';
+import { ICheckoutBody } from '../../../api/types';
 import {
   AddonsResponse,
   AddToCartResponse,
@@ -22,7 +22,7 @@ import {
   TicketsResponse,
   UpdateCheckoutParams,
   UpdateCheckoutResponse,
-} from '../types'
+} from '../types';
 
 /**
  * Hook to fetch event information
@@ -39,8 +39,8 @@ export const useEventInfo = (
       ),
     enabled: !!eventId,
     ...options,
-  })
-}
+  });
+};
 
 /**
  * Hook to fetch available tickets
@@ -57,8 +57,8 @@ export const useTickets = (
       ).then((response) => response.data),
     enabled: !!eventId,
     ...options,
-  })
-}
+  });
+};
 
 /**
  * Hook to add items to cart
@@ -74,8 +74,8 @@ export const useAddToCart = () => {
         `v1/event/${eventId}/add-to-cart/`,
         ticketData
       ).then((response) => response.data),
-  })
-}
+  });
+};
 
 /**
  * Hook to process checkout
@@ -86,8 +86,8 @@ export const useCheckout = () => {
       Client.post<ApiResponse<CheckoutResponse>>(`v1/on-checkout/`, {
         data: checkoutData,
       }).then((response) => response.data),
-  })
-}
+  });
+};
 
 /**
  * Hook to update checkout with add-ons
@@ -102,8 +102,8 @@ export const useUpdateCheckout = () => {
       Client.post<ApiResponse<UpdateCheckoutResponse>>(`v1/checkout`, {
         data: params,
       }).then((response) => response.data),
-  })
-}
+  });
+};
 
 /**
  * Hook to get payment data
@@ -114,8 +114,8 @@ export const usePaymentData = () => {
       Client.get<ApiResponse<PaymentDataResponse>>(
         `/v1/order/${orderHash}/review`
       ).then((response) => response.data),
-  })
-}
+  });
+};
 
 /**
  * Hook to notify backend after payment success
@@ -126,8 +126,8 @@ export const usePaymentSuccess = () => {
       Client.post<ApiResponse<PaymentSuccessResponse>>(
         `/v1/order/${orderHash}/success/`
       ).then((response) => response.data),
-  })
-}
+  });
+};
 
 /**
  * Hook to fetch cart data
@@ -135,7 +135,7 @@ export const usePaymentSuccess = () => {
 export const useCart = (
   options?: UseQueryOptions<ApiResponse<CartResponse>, AxiosError>
 ) => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const query = useQuery<ApiResponse<CartResponse>, AxiosError>({
     queryKey: ['cart'],
     queryFn: () =>
@@ -143,15 +143,15 @@ export const useCart = (
         (response) => response.data
       ),
     ...options,
-  })
+  });
 
   const invalidate = useCallback(
     () => queryClient.invalidateQueries({ queryKey: ['cart'] }),
     [queryClient]
-  )
+  );
 
-  return { ...query, invalidate }
-}
+  return { ...query, invalidate };
+};
 
 /**
  * Hook to get add-ons for an event
@@ -164,8 +164,8 @@ export const useAddons = (eventId?: string | number) => {
         `v1/event/${eventId}/add-ons`
       ).then((response) => response.data),
     enabled: !!eventId,
-  })
-}
+  });
+};
 
 /**
  * Hook to get event conditions
@@ -173,12 +173,12 @@ export const useAddons = (eventId?: string | number) => {
 export interface EventConditionsResponse {
   attributes: {
     conditions: Array<{
-      id: string
-      name: string
-      content: string
-      is_required: boolean
-    }>
-  }
+      id: string;
+      name: string;
+      content: string;
+      is_required: boolean;
+    }>;
+  };
 }
 
 export const useEventConditions = (eventId?: string | number) => {
@@ -189,5 +189,5 @@ export const useEventConditions = (eventId?: string | number) => {
         `v1/event/${eventId}/conditions`
       ).then((response) => response.data),
     enabled: !!eventId,
-  })
-}
+  });
+};

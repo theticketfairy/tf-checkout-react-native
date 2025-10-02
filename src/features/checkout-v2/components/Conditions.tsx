@@ -1,40 +1,40 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-} from 'react-native'
+} from 'react-native';
 
-import { Checkbox } from '../../../components'
+import { Checkbox } from '../../../components';
 
 export interface Condition {
-  id: string
-  name: string
-  content: string
-  is_required: boolean
+  id: string;
+  name: string;
+  content: string;
+  is_required: boolean;
 }
 
 interface ConditionsProps {
-  conditions: Condition[]
-  acceptedConditions: Record<string, boolean>
-  onAcceptCondition: (conditionId: string, isAccepted: boolean) => void
+  conditions: Condition[];
+  acceptedConditions: Record<string, boolean>;
+  onAcceptCondition: (conditionId: string, isAccepted: boolean) => void;
   styles?: {
-    container?: object
-    title?: object
-    conditionButton?: object
-    conditionButtonText?: object
-    checkbox?: object
-    conditionContent?: object
-    expandedContent?: object
-  }
+    container?: object;
+    title?: object;
+    conditionButton?: object;
+    conditionButtonText?: object;
+    checkbox?: object;
+    conditionContent?: object;
+    expandedContent?: object;
+  };
   texts?: {
-    title?: string
-    viewButton?: string
-    hideButton?: string
-    acceptCheckbox?: string
-  }
+    title?: string;
+    viewButton?: string;
+    hideButton?: string;
+    acceptCheckbox?: string;
+  };
 }
 
 const Conditions: React.FC<ConditionsProps> = ({
@@ -47,18 +47,18 @@ const Conditions: React.FC<ConditionsProps> = ({
   // Track which conditions are expanded
   const [expandedConditions, setExpandedConditions] = useState<
     Record<string, boolean>
-  >({})
+  >({});
 
   if (!conditions || conditions.length === 0) {
-    return null
+    return null;
   }
 
   const toggleCondition = (conditionId: string) => {
     setExpandedConditions((prev) => ({
       ...prev,
       [conditionId]: !prev[conditionId],
-    }))
-  }
+    }));
+  };
 
   return (
     <View style={[styles.container, customStyles?.container]}>
@@ -121,8 +121,8 @@ const Conditions: React.FC<ConditionsProps> = ({
         </View>
       ))}
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -156,6 +156,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-})
+});
 
-export default Conditions
+export default Conditions;

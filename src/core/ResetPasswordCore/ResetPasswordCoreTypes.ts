@@ -1,10 +1,10 @@
 import {
   IResetPasswordRequestData,
   IResetPasswordResponse,
-} from '../../api/types'
+} from '../../api/types';
 
 export type ResetPasswordCoreHandle = {
   postResetPassword(
     data: IResetPasswordRequestData
-  ): Promise<IResetPasswordResponse>
-}
+  ): Promise<IResetPasswordResponse>;
+};

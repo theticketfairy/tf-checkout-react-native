@@ -1,10 +1,10 @@
 //@ts-nocheck
-import React from 'react'
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native'
+import React from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 
-import R from '../../res'
-import s from './styles'
-import { IButtonProps } from './types'
+import R from '../../res';
+import s from './styles';
+import { IButtonProps } from './types';
 
 const Button = React.forwardRef(
   (
@@ -18,7 +18,7 @@ const Button = React.forwardRef(
     }: IButtonProps,
     ref
   ) => {
-    const formatText = isUpperCase ? text.toUpperCase() : text
+    const formatText = isUpperCase ? text.toUpperCase() : text;
 
     return (
       <>
@@ -46,8 +46,8 @@ const Button = React.forwardRef(
           </TouchableOpacity>
         </View>
       </>
-    )
+    );
   }
-)
+);
 
-export default Button
+export default Button;

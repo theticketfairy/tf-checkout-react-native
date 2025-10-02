@@ -1,9 +1,9 @@
-import React from 'react'
-import { ActivityIndicator, Modal, Text, View } from 'react-native'
+import React from 'react';
+import { ActivityIndicator, Modal, Text, View } from 'react-native';
 
-import R from '../../res'
-import s from './styles'
-import { ILoadingProps } from './types'
+import R from '../../res';
+import s from './styles';
+import { ILoadingProps } from './types';
 
 const Loading = ({
   text = 'Loading...',
@@ -11,7 +11,7 @@ const Loading = ({
   customComponent,
 }: ILoadingProps) => {
   return (
-    <Modal presentationStyle='overFullScreen' transparent={true}>
+    <Modal presentationStyle="overFullScreen" transparent={true}>
       <View style={s.rootContainer}>
         <View style={[s.content, styles?.content]}>
           {customComponent ? (
@@ -28,7 +28,7 @@ const Loading = ({
         </View>
       </View>
     </Modal>
-  )
-}
+  );
+};
 
-export default Loading
+export default Loading;

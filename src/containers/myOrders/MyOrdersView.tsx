@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useRef } from 'react'
+import React, { FC, useCallback, useMemo, useRef } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -10,15 +10,15 @@ import {
   TextStyle,
   TouchableOpacity,
   View,
-} from 'react-native'
+} from 'react-native';
 
-import { IMyOrdersOrder } from '../../api/types'
-import { Dropdown, Loading } from '../../components'
-import { IDropdownStyles } from '../../components/dropdown/types'
-import R from '../../res'
-import OrderListItem from './components/OrderListItem'
-import { MyOrdersViewStyles as s } from './styles'
-import { IMyOrdersViewProps } from './types'
+import { IMyOrdersOrder } from '../../api/types';
+import { Dropdown, Loading } from '../../components';
+import { IDropdownStyles } from '../../components/dropdown/types';
+import R from '../../res';
+import OrderListItem from './components/OrderListItem';
+import { MyOrdersViewStyles as s } from './styles';
+import { IMyOrdersViewProps } from './types';
 
 const MyOrdersView: FC<IMyOrdersViewProps> = ({
   myEvents,
@@ -38,24 +38,24 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
   selectedTimeFilter,
   isRefreshing,
 }) => {
-  const onEndReachedCalledDuringMomentum = useRef(false)
+  const onEndReachedCalledDuringMomentum = useRef(false);
   //#region Handlers
   const handleOnSelectOrder = (order: IMyOrdersOrder) => {
     if (onSelectOrder) {
-      onSelectOrder(order)
+      onSelectOrder(order);
     }
-  }
+  };
 
   const handleOnReachEnd = () => {
     if (!onEndReachedCalledDuringMomentum.current) {
-      onFetchMoreOrders()
-      onEndReachedCalledDuringMomentum.current = true
+      onFetchMoreOrders();
+      onEndReachedCalledDuringMomentum.current = true;
     }
-  }
+  };
 
   const handleOnMomentumScrollBegin = () => {
-    onEndReachedCalledDuringMomentum.current = false
-  }
+    onEndReachedCalledDuringMomentum.current = false;
+  };
   //#endregion Handlers
 
   //#region Renders
@@ -67,9 +67,9 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
         styles={styles?.orderListItem}
       />
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [handleOnSelectOrder]
-  )
+  );
 
   const renderRefreshControl = (
     <RefreshControl
@@ -78,7 +78,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
       refreshing={!!isLoading}
       onRefresh={onRefresh}
     />
-  )
+  );
 
   const dropdownStyles = useMemo<IDropdownStyles>(
     () => ({
@@ -92,19 +92,19 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
       flatListContainer: {},
     }),
     []
-  )
+  );
 
   const onClearSelectedEvent = () =>
     onChangeEvent({
       label: texts?.selectEventPlaceholder || 'Select event',
       value: 'none',
-    })
+    });
 
   const onClearSelectedTimeFilter = () =>
     onChangeTimeFilter({
       label: texts?.selectTimeFilterPlaceholder || 'Select time filter',
       value: 'none',
-    })
+    });
 
   const eventsDropdown = (
     <View style={[s.eventsContainer, styles?.eventsContainer]}>
@@ -125,7 +125,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
         </TouchableOpacity>
       </View>
     </View>
-  )
+  );
 
   const timeFilterDropdown = (
     <View style={[s.eventsContainer, styles?.timeFilters?.container]}>
@@ -152,7 +152,7 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
         </TouchableOpacity>
       </View>
     </View>
-  )
+  );
   //#endregion Renders
 
   //#region Return
@@ -186,8 +186,8 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
         )}
       </SafeAreaView>
     </View>
-  )
+  );
   //#endregion Return
-}
+};
 
-export default MyOrdersView
+export default MyOrdersView;

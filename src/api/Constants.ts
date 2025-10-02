@@ -9,4 +9,4 @@ export default {
 
   PRIVACY_POLICY_LINK: 'https://www.ticketfairy.com/privacy-policy/',
   TIMEOUT: 60000,
-}
+};

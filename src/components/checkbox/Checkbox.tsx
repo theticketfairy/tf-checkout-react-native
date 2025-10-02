@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import {
   Image,
   StyleProp,
@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   View,
   ViewStyle,
-} from 'react-native'
+} from 'react-native';
 
-import R from '../../res'
-import s from './styles'
-import { ICheckboxProps } from './types'
+import R from '../../res';
+import s from './styles';
+import { ICheckboxProps } from './types';
 
 const Checkbox = ({
   onPress,
@@ -22,10 +22,10 @@ const Checkbox = ({
 }: ICheckboxProps) => {
   let indicatorStyles: StyleProp<ViewStyle> = isActive
     ? [s.indicatorOn, styles?.indicator]
-    : [s.indicator, styles?.indicatorDisabled]
+    : [s.indicator, styles?.indicatorDisabled];
 
   if (error) {
-    indicatorStyles = [...indicatorStyles, { borderColor: styles?.errorColor }]
+    indicatorStyles = [...indicatorStyles, { borderColor: styles?.errorColor }];
   }
 
   return (
@@ -56,7 +56,7 @@ const Checkbox = ({
         {!!error && <Text style={styles?.error}>{error}</Text>}
       </>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-export default Checkbox
+export default Checkbox;

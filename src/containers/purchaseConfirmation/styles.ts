@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 
 export default StyleSheet.create({
   rootContainer: {
@@ -76,4 +76,4 @@ export default StyleSheet.create({
     resizeMode: 'contain',
     tintColor: R.colors.white,
   },
-})
+});

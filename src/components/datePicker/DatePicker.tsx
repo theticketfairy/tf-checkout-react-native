@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import { Pressable, StyleSheet, View } from 'react-native'
-import DateTimePickerModal from 'react-native-modal-datetime-picker'
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-import Input from '../input/Input'
-import s from './styles'
-import { IDatePickerProps } from './types'
+import Input from '../input/Input';
+import s from './styles';
+import { IDatePickerProps } from './types';
 
 const DatePicker = ({
   onSelectDate,
@@ -15,34 +15,34 @@ const DatePicker = ({
   placeholder = 'Select date',
   error,
 }: IDatePickerProps) => {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
   const onButtonPress = () => {
-    setIsVisible(true)
-  }
+    setIsVisible(true);
+  };
 
   const handleOnSelectDate = (date: Date) => {
     if (onSelectDate) {
-      onSelectDate(date)
+      onSelectDate(date);
     }
-    setIsVisible(false)
-  }
+    setIsVisible(false);
+  };
 
   const handleOnCancel = () => {
     if (onCancel) {
-      onCancel()
+      onCancel();
     }
-    setIsVisible(false)
-  }
+    setIsVisible(false);
+  };
 
   // Format date in a more readable way
   const formatDate = (date: Date) => {
-    if (!date) return ''
+    if (!date) return '';
     // Format as MM/DD/YYYY
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const year = date.getFullYear()
-    return `${month}/${day}/${year}`
-  }
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  };
 
   return (
     <View style={[styles?.container, s.container]}>
@@ -50,7 +50,7 @@ const DatePicker = ({
         label={text}
         value={selectedDate ? formatDate(selectedDate) : ''}
         placeholder={placeholder}
-        pointerEvents='none'
+        pointerEvents="none"
         editable={false} // Prevent keyboard from showing
         error={error}
         styles={{
@@ -67,7 +67,7 @@ const DatePicker = ({
       />
       <DateTimePickerModal
         isVisible={isVisible}
-        mode='date'
+        mode="date"
         onConfirm={handleOnSelectDate}
         onCancel={handleOnCancel}
         date={selectedDate || new Date()}
@@ -75,7 +75,7 @@ const DatePicker = ({
         pickerComponentStyleIOS={{ height: 200 }}
       />
     </View>
-  )
-}
+  );
+};
 
-export default DatePicker
+export default DatePicker;

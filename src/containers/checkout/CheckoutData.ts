@@ -1,4 +1,4 @@
-import { IOrderItem } from './types'
+import { IOrderItem } from './types';
 
 export const orderReviewItems: IOrderItem[] = [
   {
@@ -26,4 +26,4 @@ export const orderReviewItems: IOrderItem[] = [
     title: 'TOTAL',
     value: '',
   },
-]
+];

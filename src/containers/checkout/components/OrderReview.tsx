@@ -1,9 +1,9 @@
-import _map from 'lodash/map'
-import React from 'react'
-import { Text, View } from 'react-native'
+import _map from 'lodash/map';
+import React from 'react';
+import { Text, View } from 'react-native';
 
-import { IOrderItem, IOrderReviewProps } from '../types'
-import { OrderReviewStyles as s } from './styles'
+import { IOrderItem, IOrderReviewProps } from '../types';
+import { OrderReviewStyles as s } from './styles';
 
 const OrderItem = ({ title, value, styles }: IOrderItem) => (
   <View
@@ -15,7 +15,7 @@ const OrderItem = ({ title, value, styles }: IOrderItem) => (
       {value}
     </Text>
   </View>
-)
+);
 
 const OrderReview = ({ orderItems, styles }: IOrderReviewProps) => (
   <View style={[s.rootContainer, styles?.rootContainer]}>
@@ -29,6 +29,6 @@ const OrderReview = ({ orderItems, styles }: IOrderReviewProps) => (
       />
     ))}
   </View>
-)
+);
 
-export default OrderReview
+export default OrderReview;

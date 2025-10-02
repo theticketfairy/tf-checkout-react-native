@@ -1,17 +1,17 @@
-import Clipboard from '@react-native-clipboard/clipboard'
-import _map from 'lodash/map'
-import React, { FC } from 'react'
-import { Image, SectionList, Text, TouchableOpacity, View } from 'react-native'
+import Clipboard from '@react-native-clipboard/clipboard';
+import _map from 'lodash/map';
+import React, { FC } from 'react';
+import { Image, SectionList, Text, TouchableOpacity, View } from 'react-native';
 
-import { IMyOrderDetailsItem, IMyOrderDetailsTicket } from '../../api/types'
-import { BottomSheetModal, Loading } from '../../components'
-import R from '../../res'
-import Notification from './components/Notification'
-import TicketActions from './components/TicketActions/TicketActions'
-import { TicketActionType } from './components/TicketActions/TicketActionsTypes'
-import TicketListItem from './components/TicketListItem/TicketListItem'
-import s from './styles'
-import { IMyOrderDetailsViewProps, IOrderDetailsSectionData } from './types'
+import { IMyOrderDetailsItem, IMyOrderDetailsTicket } from '../../api/types';
+import { BottomSheetModal, Loading } from '../../components';
+import R from '../../res';
+import Notification from './components/Notification';
+import TicketActions from './components/TicketActions/TicketActions';
+import { TicketActionType } from './components/TicketActions/TicketActionsTypes';
+import TicketListItem from './components/TicketListItem/TicketListItem';
+import s from './styles';
+import { IMyOrderDetailsViewProps, IOrderDetailsSectionData } from './types';
 
 const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
   data: { header, items, tickets },
@@ -36,58 +36,59 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
   //#region Handlers
   const onCopyLinkHandler = () => {
     if (isLinkCopied) {
-      return
+      return;
     }
-    Clipboard.setString(header.shareLink)
-    onPressCopyLink()
-  }
+    Clipboard.setString(header.shareLink);
+    onPressCopyLink();
+  };
 
   const handleOnTicketSelection = (ticket: IMyOrderDetailsTicket) => {
-    onTicketSelection(ticket)
-  }
+    onTicketSelection(ticket);
+  };
 
   const handleHideActionsModal = () => {
-    onTicketSelection(undefined)
-  }
+    onTicketSelection(undefined);
+  };
 
   const handleOnActionSelected = (actionType: TicketActionType) => {
-    onActionSelected(actionType)
-  }
+    onActionSelected(actionType);
+  };
   //#endregion
 
-  const copyIconTint = styles?.header?.shareLink?.copyIconTint || R.colors.black
+  const copyIconTint =
+    styles?.header?.shareLink?.copyIconTint || R.colors.black;
   const copyIconTintActive =
-    styles?.header?.shareLink?.copyIconTintActive || R.colors.validGreen
-  const title = texts?.title || 'ORDER DETAILS'
-  const subTitle = texts?.subTitle || 'ORDER SUMMARY'
+    styles?.header?.shareLink?.copyIconTintActive || R.colors.validGreen;
+  const title = texts?.title || 'ORDER DETAILS';
+  const subTitle = texts?.subTitle || 'ORDER SUMMARY';
   const referralLink =
-    texts?.referralLink || 'Your personal share link for this event is:'
-  const itemsTotal = texts?.listItem?.total || 'Total'
-  const itemsTicketType = texts?.listItem?.ticketType || 'Ticket Type: '
-  const itemsPrice = texts?.listItem?.price || 'Price: '
-  const itemsQuantity = texts?.listItem?.quantity || 'Quantity: '
+    texts?.referralLink || 'Your personal share link for this event is:';
+  const itemsTotal = texts?.listItem?.total || 'Total';
+  const itemsTicketType = texts?.listItem?.ticketType || 'Ticket Type: ';
+  const itemsPrice = texts?.listItem?.price || 'Price: ';
+  const itemsQuantity = texts?.listItem?.quantity || 'Quantity: ';
 
-  const ticketsTitle = texts?.ticketsTitle || 'Your Tickets: '
-  const ticketsId = texts?.ticketItem?.ticketId || 'Ticket ID: '
-  const ticketsType = texts?.ticketItem?.ticketType || 'Ticket Type: '
+  const ticketsTitle = texts?.ticketsTitle || 'Your Tickets: ';
+  const ticketsId = texts?.ticketItem?.ticketId || 'Ticket ID: ';
+  const ticketsType = texts?.ticketItem?.ticketType || 'Ticket Type: ';
   const ticketsHolderName =
-    texts?.ticketItem?.holderName || 'Ticket Holder Name: '
-  const ticketsStatus = texts?.ticketItem?.status || 'Status: '
-  const copyText = texts?.copyText?.copy || 'Copy'
-  const copiedText = texts?.copyText?.copied || 'Copied'
+    texts?.ticketItem?.holderName || 'Ticket Holder Name: ';
+  const ticketsStatus = texts?.ticketItem?.status || 'Status: ';
+  const copyText = texts?.copyText?.copy || 'Copy';
+  const copiedText = texts?.copyText?.copied || 'Copied';
 
-  const soFarText = texts?.referral?.soFar || `So far, you've referred`
-  const ticketsText = texts?.referral?.tickets || `tickets.`
-  const sellTicket = texts?.sellTicket || 'Sell Ticket'
+  const soFarText = texts?.referral?.soFar || `So far, you've referred`;
+  const ticketsText = texts?.referral?.tickets || `tickets.`;
+  const sellTicket = texts?.sellTicket || 'Sell Ticket';
   const removeTicketFromResale =
-    texts?.removeTicketFromResale || 'Remove from resale'
-  const download = texts?.ticketItem?.download || `Download`
+    texts?.removeTicketFromResale || 'Remove from resale';
+  const download = texts?.ticketItem?.download || `Download`;
 
   const renderShareLink = () => (
     <View style={[s.shareLinkContainer, styles?.header?.shareLink?.container]}>
       <Text
         numberOfLines={1}
-        ellipsizeMode='head'
+        ellipsizeMode="head"
         style={styles?.header?.shareLink?.link}
       >
         {header.shareLink}
@@ -111,7 +112,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
         />
       </TouchableOpacity>
     </View>
-  )
+  );
 
   const renderHeader = () => (
     <View style={styles?.header?.container}>
@@ -127,23 +128,23 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
         {ticketsText}
       </Text>
     </View>
-  )
+  );
 
   const parsedItems: IOrderDetailsSectionData[] | undefined = items
     ? _map(items, (item) => {
         return {
           id: `${item.name}.${item.price}`,
           item: item,
-        }
+        };
       })
-    : undefined
+    : undefined;
 
   const parsedTickets = _map(tickets, (item) => {
     return {
       id: `${item.hash}`,
       item: item,
-    }
-  })
+    };
+  });
 
   const itemsData = [
     {
@@ -158,7 +159,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
       renderItem: ({ item }: any) => _renderTicket(item),
       id: 1,
     },
-  ]
+  ];
 
   const renderItemComp = ({ item }: { item: IMyOrderDetailsItem }) =>
     item ? (
@@ -195,7 +196,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
           </Text>
         </View>
       </View>
-    ) : null
+    ) : null;
 
   const _renderTicket = ({ item }: { item: IMyOrderDetailsTicket }) => (
     <TicketListItem
@@ -213,7 +214,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
       onPressActionsButton={handleOnTicketSelection}
       moreButtonIcon={moreButtonIcon || R.icons.more}
     />
-  )
+  );
 
   return (
     <View style={[s.rootContainer, styles?.rootContainer]}>
@@ -224,10 +225,10 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
         renderSectionHeader={({ section }) => {
           if (section.id === 0) {
             if (!items) {
-              return null
+              return null;
             }
           }
-          return <Text style={styles?.sectionHeader}>{section.title}</Text>
+          return <Text style={styles?.sectionHeader}>{section.title}</Text>;
         }}
         renderSectionFooter={({ section }) => {
           if (section.id === 0 && parsedItems) {
@@ -244,9 +245,9 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
                   {header.total}
                 </Text>
               </View>
-            )
+            );
           }
-          return null
+          return null;
         }}
       />
       {config?.areAlertsEnabled &&
@@ -277,7 +278,7 @@ const MyOrderDetailsView: FC<IMyOrderDetailsViewProps> = ({
         />
       )}
     </View>
-  )
-}
+  );
+};
 
-export default MyOrderDetailsView
+export default MyOrderDetailsView;

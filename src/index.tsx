@@ -1,7 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as React from 'react' //Needed to render
-import { LogBox, NativeModules } from 'react-native'
-
+import { IMyOrderDetailsTicket } from './api/types';
 import {
   ICheckoutBody,
   IEventResponse,
@@ -11,7 +8,7 @@ import {
   IPurchaseConfirmationData,
   IRegisterNewUserBody,
   MyOrderRequestFromType,
-} from './api/types'
+} from './api/types';
 import {
   CartTimer,
   Dropdown,
@@ -21,10 +18,10 @@ import {
   Login,
   PromoCode,
   WaitingList,
-} from './components'
-import { IDropdownStyles } from './components/dropdown/types'
-import { ILoadingStyles } from './components/loading/types'
-import { ILoginSuccessData } from './components/login/types'
+} from './components';
+import { IDropdownStyles } from './components/dropdown/types';
+import { ILoadingStyles } from './components/loading/types';
+import { ILoginSuccessData } from './components/login/types';
 import {
   BillingInfo,
   Checkout,
@@ -34,15 +31,17 @@ import {
   ResaleTickets,
   ResetPassword,
   Tickets,
-} from './containers'
-import { IMyOrderDetailsProps } from './containers/myOrderDetails/types'
-import { IMyOrdersProps } from './containers/myOrders/types'
-import { IPurchaseConfirmationProps } from './containers/purchaseConfirmation/types'
-import { IResaleTicketsProps } from './containers/resaleTickets/types'
+} from './containers';
+import { CheckoutData } from './features/checkout-v2/hooks/use-checkout';
+import { IConfig } from './helpers/Config';
+import { IMyOrderDetailsProps } from './containers/myOrderDetails/types';
+import { IMyOrdersProps } from './containers/myOrders/types';
+import { IPurchaseConfirmationProps } from './containers/purchaseConfirmation/types';
+import { IResaleTicketsProps } from './containers/resaleTickets/types';
 import {
   IPasswordProtectedEventData,
   ITicketsProps,
-} from './containers/tickets/types'
+} from './containers/tickets/types';
 import {
   BillingCore,
   BillingCoreHandle,
@@ -64,19 +63,19 @@ import {
   TicketsCoreHandle,
   WaitingListCore,
   WaitingListCoreHandle,
-} from './core'
+} from './core';
 import {
   IBookTicketsOptions,
   IGetTicketsPayload,
   IGroupedTickets,
-} from './core/TicketsCore/TicketsCoreTypes'
-import { useRegisterUser, useUserProfile } from './features/auth/api-hooks'
+} from './core/TicketsCore/TicketsCoreTypes';
+import { useRegisterUser, useUserProfile } from './features/auth/api-hooks';
 import {
   CheckoutController as CheckoutV2,
   CheckoutProvider,
   CheckoutStyles,
-} from './features/checkout-v2'
-import { CheckoutForm, PaymentForm } from './features/checkout-v2/form'
+} from './features/checkout-v2';
+import { CheckoutForm, PaymentForm } from './features/checkout-v2/form';
 import {
   useAddons,
   useAddToCart,
@@ -88,13 +87,13 @@ import {
   usePaymentSuccess,
   useTickets,
   useUpdateCheckout,
-} from './features/checkout-v2/hooks/api-hooks'
-import { useCheckoutFlow } from './features/checkout-v2/hooks/use-checkout'
-import { CheckoutTexts } from './features/checkout-v2/types'
-import { useCountries, useStates } from './features/geo/api-hooks'
-import { setConfig } from './helpers/Config'
-import { deleteAllData, deleteUserData } from './helpers/LocalStorage'
-import { refreshAccessToken } from './helpers/RefreshAccessToken'
+} from './features/checkout-v2/hooks/api-hooks';
+import { useCheckoutFlow } from './features/checkout-v2/hooks/use-checkout';
+import { CheckoutTexts } from './features/checkout-v2/types';
+import { useCountries, useStates } from './features/geo/api-hooks';
+import { setConfig } from './helpers/Config';
+import { deleteAllData, deleteUserData } from './helpers/LocalStorage';
+import { refreshAccessToken } from './helpers/RefreshAccessToken';
 import {
   IAccountOrdersPurchasedEvent,
   IAccountOrdersTicket,
@@ -108,11 +107,12 @@ import {
   ITicket,
   ITicketsResponseData,
   IUserProfile,
-} from './types'
+} from './types';
 
-LogBox.ignoreAllLogs()
-// @ts-ignore
-console.reportErrorsAsExceptions = false
+import { LogBox, NativeModules } from 'react-native';
+
+LogBox.ignoreAllLogs();
+
 export {
   /**
    * @deprecated Use hooks like useCart(), useCheckout(), etc. imported directly from 'tf-checkout-react-native'. See core/MIGRATION.md
@@ -173,6 +173,9 @@ export {
   ITicketsProps,
   ITicketsResponseData,
   IUserProfile,
+  IConfig,
+  CheckoutData as ICheckoutData,
+  IMyOrderDetailsTicket,
   Loading,
   LoggedIn,
   Login,
@@ -220,5 +223,5 @@ export {
   WaitingList,
   WaitingListCore,
   WaitingListCoreHandle,
-}
-export default NativeModules.TFCheckoutRNModule
+};
+export default NativeModules.TFCheckoutRNModule;

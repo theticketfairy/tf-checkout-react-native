@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import jwtDecode from 'jwt-decode'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import jwtDecode from 'jwt-decode';
 
 export const LocalStorageKeys = {
   AUTH_GUEST_TOKEN: 'AUTH_GUEST_TOKEN',
@@ -13,44 +13,44 @@ export const LocalStorageKeys = {
   AUTH_SCOPE: 'AUTH_SCOPE',
   AUTH_TOKEN_TYPE: 'AUTH_TOKEN_TYPE',
   EVENT_COUNTRY: 'EVENT_COUNTRY',
-}
+};
 
 export interface IStoredUserData {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
 }
 
 export const storeData = async (key: string, value: string) => {
   try {
-    await AsyncStorage.setItem(key, value)
+    await AsyncStorage.setItem(key, value);
   } catch (ex) {
-    return undefined
+    return undefined;
   }
-}
+};
 
 export const getData = async (key: string) => {
   try {
-    const value = await AsyncStorage.getItem(key)
+    const value = await AsyncStorage.getItem(key);
     if (value !== null) {
-      return value
+      return value;
     }
   } catch (ex) {
-    return undefined
+    return undefined;
   }
-}
+};
 
 export const deleteData = async (key: string) => {
   try {
-    const value = await AsyncStorage.removeItem(key)
+    const value = await AsyncStorage.removeItem(key);
     if (value !== null) {
-      return value
+      return value;
     }
   } catch (ex) {
-    return undefined
+    return undefined;
   }
-}
+};
 
 export const deleteUserData = async () => {
   try {
@@ -64,15 +64,15 @@ export const deleteUserData = async () => {
       LocalStorageKeys.CHECKOUT_DATA,
       LocalStorageKeys.RESET_PASS_TOKEN,
       LocalStorageKeys.AUTH_SCOPE,
-    ])
+    ]);
 
     if (value !== null) {
-      return value
+      return value;
     }
   } catch (ex) {
-    return undefined
+    return undefined;
   }
-}
+};
 
 export const deleteAllData = async () => {
   try {
@@ -88,15 +88,15 @@ export const deleteAllData = async () => {
       LocalStorageKeys.SCOPE,
       LocalStorageKeys.TOKEN_TYPE,
       LocalStorageKeys.EVENT_COUNTRY,
-    ])
+    ]);
 
     if (value !== null) {
-      return value
+      return value;
     }
   } catch (ex) {
-    return undefined
+    return undefined;
   }
-}
+};
 
 export const checkStoredData = async () => {
   try {
@@ -112,24 +112,24 @@ export const checkStoredData = async () => {
       LocalStorageKeys.SCOPE,
       LocalStorageKeys.TOKEN_TYPE,
       LocalStorageKeys.EVENT_COUNTRY,
-    ])
-    return values
+    ]);
+    return values;
   } catch (ex) {
-    console.log('Local Storage GetData Error - checkStoredData')
+    console.log('Local Storage GetData Error - checkStoredData');
   }
-}
+};
 
 export const isStoredTokenValid = async () => {
-  const token = await getData(LocalStorageKeys.ACCESS_TOKEN)
+  const token = await getData(LocalStorageKeys.ACCESS_TOKEN);
   if (!token) {
-    return false
+    return false;
   }
 
-  const decodedToken = jwtDecode<{ exp: number }>(token)
+  const decodedToken = jwtDecode<{ exp: number }>(token);
   if (decodedToken && decodedToken.exp < Date.now() / 1000) {
-    await deleteData(LocalStorageKeys.ACCESS_TOKEN)
-    await deleteData(LocalStorageKeys.USER_DATA)
-    return false
+    await deleteData(LocalStorageKeys.ACCESS_TOKEN);
+    await deleteData(LocalStorageKeys.USER_DATA);
+    return false;
   }
-  return true
-}
+  return true;
+};

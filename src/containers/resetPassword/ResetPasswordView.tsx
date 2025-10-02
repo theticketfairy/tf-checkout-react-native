@@ -1,9 +1,9 @@
-import React, { FC } from 'react'
-import { Keyboard, Pressable, Text, View } from 'react-native'
+import React, { FC } from 'react';
+import { Keyboard, Pressable, Text, View } from 'react-native';
 
-import { Button, Input } from '../../components'
-import s from './styles'
-import { IResetPasswordViewProps } from './types'
+import { Button, Input } from '../../components';
+import s from './styles';
+import { IResetPasswordViewProps } from './types';
 
 const ResetPasswordView: FC<IResetPasswordViewProps> = ({
   styles,
@@ -34,7 +34,7 @@ const ResetPasswordView: FC<IResetPasswordViewProps> = ({
           label={texts?.newPasswordLabel || 'New password'}
           error={passwordError}
           value={password}
-          autoCapitalize='none'
+          autoCapitalize="none"
           secureTextEntry={true}
           isShowPasswordButtonVisible={true}
         />
@@ -45,7 +45,7 @@ const ResetPasswordView: FC<IResetPasswordViewProps> = ({
           label={texts?.confirmNewPasswordLabel || 'Confirm new password'}
           error={passwordConfirmError}
           value={passwordConfirm}
-          autoCapitalize='none'
+          autoCapitalize="none"
           secureTextEntry={true}
           isShowPasswordButtonVisible={true}
         />
@@ -81,6 +81,6 @@ const ResetPasswordView: FC<IResetPasswordViewProps> = ({
       </View>
     </View>
   </Pressable>
-)
+);
 
-export default ResetPasswordView
+export default ResetPasswordView;

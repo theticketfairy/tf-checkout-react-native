@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 
 export default StyleSheet.create({
   container: {
@@ -19,4 +19,4 @@ export default StyleSheet.create({
     fontWeight: '800',
     color: R.colors.primary,
   },
-})
+});

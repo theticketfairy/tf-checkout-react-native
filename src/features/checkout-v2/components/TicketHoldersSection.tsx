@@ -1,21 +1,21 @@
-import { FormikErrors } from 'formik'
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { FormikErrors } from 'formik';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { FormField, PhoneInput } from '../../../components'
-import { TicketHolderFormValues } from '../form/types'
+import { FormField, PhoneInput } from '../../../components';
+import { TicketHolderFormValues } from '../form/types';
 
 interface TicketHoldersSectionProps {
-  ticketHolders: TicketHolderFormValues[]
+  ticketHolders: TicketHolderFormValues[];
   onChange: (
     index: number,
     field: keyof TicketHolderFormValues,
     value: string
-  ) => void
-  errors?: FormikErrors<TicketHolderFormValues>[]
-  touched?: Array<Partial<Record<keyof TicketHolderFormValues, boolean>>>
-  onFieldBlur?: (index: number, field: keyof TicketHolderFormValues) => void
-  isPhoneHidden?: boolean
+  ) => void;
+  errors?: FormikErrors<TicketHolderFormValues>[];
+  touched?: Array<Partial<Record<keyof TicketHolderFormValues, boolean>>>;
+  onFieldBlur?: (index: number, field: keyof TicketHolderFormValues) => void;
+  isPhoneHidden?: boolean;
 }
 
 export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
@@ -28,15 +28,15 @@ export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      <FormField fieldType='title' title='Ticket Holders Information' />
+      <FormField fieldType="title" title="Ticket Holders Information" />
       <FormField
-        fieldType='text'
-        title='Please provide details for each ticket holder'
+        fieldType="text"
+        title="Please provide details for each ticket holder"
       />
 
       {ticketHolders.map((holder, index) => {
-        const errorFields = errors ? errors[index] : {}
-        const touchedFields = touched ? touched[index] : {}
+        const errorFields = errors ? errors[index] : {};
+        const touchedFields = touched ? touched[index] : {};
 
         return (
           <View
@@ -47,7 +47,7 @@ export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
 
             <View style={styles.formGroup}>
               <FormField
-                fieldType='input'
+                fieldType="input"
                 id={`firstName-${index}`}
                 error={
                   touchedFields?.firstName ? errorFields?.firstName : undefined
@@ -65,7 +65,7 @@ export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
 
             <View style={styles.formGroup}>
               <FormField
-                fieldType='input'
+                fieldType="input"
                 id={`lastName-${index}`}
                 error={
                   touchedFields?.lastName ? errorFields?.lastName : undefined
@@ -83,7 +83,7 @@ export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
 
             <View style={styles.formGroup}>
               <FormField
-                fieldType='input'
+                fieldType="input"
                 id={`email-${index}`}
                 error={touchedFields?.email ? errorFields?.email : undefined}
                 inputProps={{
@@ -103,7 +103,7 @@ export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
                 <PhoneInput
                   phoneNumber={holder.phone}
                   onChangePhoneNumber={(payload) => {
-                    onChange(index, 'phone', payload.input)
+                    onChange(index, 'phone', payload.input);
                   }}
                   error={touchedFields?.phone ? errorFields?.phone : undefined}
                   texts={{
@@ -115,11 +115,11 @@ export const TicketHoldersSection: React.FC<TicketHoldersSectionProps> = ({
 
             <View style={styles.divider} />
           </View>
-        )
+        );
       })}
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -142,6 +142,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#E1E1E1',
     marginTop: 16,
   },
-})
+});
 
-export default TicketHoldersSection
+export default TicketHoldersSection;

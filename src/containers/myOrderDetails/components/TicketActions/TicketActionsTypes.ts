@@ -4,42 +4,42 @@ import {
   StyleProp,
   TextStyle,
   ViewStyle,
-} from 'react-native'
+} from 'react-native';
 
-import { IMyOrderDetailsTicket } from '../../../../api/types'
+import { IMyOrderDetailsTicket } from '../../../../api/types';
 
 export type TicketActionType =
   | 'download-pdf'
   | 'sell'
   | 'remove-from-sale'
-  | 'refund'
+  | 'refund';
 
 export interface ITicketActionIcons {
-  downloadPdf?: ImageSourcePropType
-  sell?: ImageSourcePropType
-  removeFromSale?: ImageSourcePropType
-  refund?: ImageSourcePropType
+  downloadPdf?: ImageSourcePropType;
+  sell?: ImageSourcePropType;
+  removeFromSale?: ImageSourcePropType;
+  refund?: ImageSourcePropType;
 }
 
 export interface ITicketActionTexts {
-  downloadPdf?: string
-  sell?: string
-  removeFromSale?: string
-  refund?: string
+  downloadPdf?: string;
+  sell?: string;
+  removeFromSale?: string;
+  refund?: string;
 }
 
 export interface ITicketActionsStyles {
-  rootScrollViewContainer?: StyleProp<ViewStyle>
-  buttonContainer?: StyleProp<ViewStyle>
-  buttonContent?: StyleProp<ViewStyle>
-  icon?: StyleProp<ImageStyle>
-  text?: StyleProp<TextStyle>
+  rootScrollViewContainer?: StyleProp<ViewStyle>;
+  buttonContainer?: StyleProp<ViewStyle>;
+  buttonContent?: StyleProp<ViewStyle>;
+  icon?: StyleProp<ImageStyle>;
+  text?: StyleProp<TextStyle>;
 }
 
 export interface ITicketActionsProps {
-  onSelectAction: (action: TicketActionType) => void
-  ticket: IMyOrderDetailsTicket
-  icons?: ITicketActionIcons
-  texts?: ITicketActionTexts
-  styles?: ITicketActionsStyles
+  onSelectAction: (action: TicketActionType) => void;
+  ticket: IMyOrderDetailsTicket;
+  icons?: ITicketActionIcons;
+  texts?: ITicketActionTexts;
+  styles?: ITicketActionsStyles;
 }

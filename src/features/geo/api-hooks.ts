@@ -1,9 +1,9 @@
-import { useQuery } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
-import { ApiResponse } from '../../api/api.types'
-import { Client } from '../../api/ApiClient'
-import { CountriesResponse, StatesResponse } from './types'
+import { ApiResponse } from '../../api/api.types';
+import { Client } from '../../api/ApiClient';
+import { CountriesResponse, StatesResponse } from './types';
 
 /**
  * Hook to fetch countries list
@@ -16,8 +16,8 @@ export const useCountries = () => {
         (response) => response.data
       ),
     staleTime: 1000 * 60 * 60 * 24, // 24 hours - countries rarely change
-  })
-}
+  });
+};
 
 /**
  * Hook to fetch states for a country
@@ -35,8 +35,8 @@ export const useStates = (countryId?: string) => {
             label: String(name),
             value: id,
           })),
-        }
+        };
       }),
     enabled: !!countryId && countryId !== '-1',
-  })
-}
+  });
+};

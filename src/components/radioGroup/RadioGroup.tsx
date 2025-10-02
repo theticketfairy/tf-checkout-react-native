@@ -1,7 +1,7 @@
-import React from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
-import { IRadioGroupProps } from './types'
+import { IRadioGroupProps } from './types';
 
 const RadioGroup = ({
   options,
@@ -24,7 +24,7 @@ const RadioGroup = ({
         </Text>
       )}
       {options.map((option) => {
-        const isSelected = selectedValue === option.value
+        const isSelected = selectedValue === option.value;
         return (
           <TouchableOpacity
             key={option.value}
@@ -37,7 +37,7 @@ const RadioGroup = ({
               styles?.optionContainer,
             ]}
             onPress={() => {
-              onValueChange(option.value)
+              onValueChange(option.value);
             }}
           >
             <View
@@ -72,7 +72,7 @@ const RadioGroup = ({
             </View>
             <Text style={[{}, styles?.optionText]}>{option.label}</Text>
           </TouchableOpacity>
-        )
+        );
       })}
       {error && (
         <Text
@@ -85,7 +85,7 @@ const RadioGroup = ({
         </Text>
       )}
     </View>
-  )
-}
+  );
+};
 
-export default RadioGroup
+export default RadioGroup;

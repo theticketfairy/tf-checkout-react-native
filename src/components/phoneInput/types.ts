@@ -1,35 +1,35 @@
-import { StyleProp, ViewStyle } from 'react-native'
+import { StyleProp, ViewStyle } from 'react-native';
 
-import { IInputStyles } from '../input/types'
+import { IInputStyles } from '../input/types';
 
 export interface IOnChangePhoneNumberPayload {
-  countryCode: string
-  dialCode: string
-  e164: string
-  input: string
-  isValid: boolean
+  countryCode: string;
+  dialCode: string;
+  e164: string;
+  input: string;
+  isValid: boolean;
 }
 
 export interface IPhoneInputProps {
-  phoneNumber: string
-  onChangePhoneNumber: (payload: IOnChangePhoneNumberPayload) => void
-  onBlur?: () => void
-  styles?: IPhoneInputStyles
-  error?: string
-  texts?: IPhoneInputTexts
-  country?: string
+  phoneNumber: string;
+  onChangePhoneNumber: (payload: IOnChangePhoneNumberPayload) => void;
+  onBlur?: () => void;
+  styles?: IPhoneInputStyles;
+  error?: string;
+  texts?: IPhoneInputTexts;
+  country?: string;
 }
 
 export interface IPhoneInputTexts {
-  label?: string
-  customError?: string
+  label?: string;
+  customError?: string;
 }
 
 export interface IPhoneInputStyles {
-  rootContainer?: StyleProp<ViewStyle>
+  rootContainer?: StyleProp<ViewStyle>;
   country?: {
-    container?: StyleProp<ViewStyle>
-    button?: StyleProp<ViewStyle>
-  }
-  input?: IInputStyles
+    container?: StyleProp<ViewStyle>;
+    button?: StyleProp<ViewStyle>;
+  };
+  input?: IInputStyles;
 }

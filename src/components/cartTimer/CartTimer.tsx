@@ -1,9 +1,9 @@
-import React, { FC, useEffect, useState } from 'react'
-import { Image, Pressable, Text, View } from 'react-native'
+import React, { FC, useEffect, useState } from 'react';
+import { Image, Pressable, Text, View } from 'react-native';
 
-import R from '../../res'
-import s from './styles'
-import { ICartTimerProps } from './types'
+import R from '../../res';
+import s from './styles';
+import { ICartTimerProps } from './types';
 
 const CartTimer: FC<ICartTimerProps> = ({
   shouldNotMinimize,
@@ -11,32 +11,32 @@ const CartTimer: FC<ICartTimerProps> = ({
   styles,
   secondsLeft,
 }) => {
-  const [isOnlyTimeVisible, setIsOnlyTimeVisible] = useState(false)
+  const [isOnlyTimeVisible, setIsOnlyTimeVisible] = useState(false);
   const hideOtherData = () => {
     if (!shouldNotMinimize) {
-      setIsOnlyTimeVisible(!isOnlyTimeVisible)
+      setIsOnlyTimeVisible(!isOnlyTimeVisible);
     }
-  }
-  const [timeRemaining, setTimeRemaining] = useState('')
+  };
+  const [timeRemaining, setTimeRemaining] = useState('');
 
   const message = texts?.message
     ? texts.message
-    : 'Please complete your purchase before the timer reaches zero:'
+    : 'Please complete your purchase before the timer reaches zero:';
 
   useEffect(() => {
     const clockify = () => {
       //let hours = Math.floor(secondsLeft / 60 / 60)
-      let mins = Math.floor((secondsLeft / 60) % 60)
-      let seconds = Math.floor(secondsLeft % 60)
+      const mins = Math.floor((secondsLeft / 60) % 60);
+      const seconds = Math.floor(secondsLeft % 60);
       //let displayHours = hours < 10 ? `0${hours}` : hours
-      let displayMins = mins < 10 ? `0${mins}` : mins
-      let displaySecs = seconds < 10 ? `0${seconds}` : seconds
+      const displayMins = mins < 10 ? `0${mins}` : mins;
+      const displaySecs = seconds < 10 ? `0${seconds}` : seconds;
 
-      setTimeRemaining(`${displayMins}:${displaySecs}`)
-    }
+      setTimeRemaining(`${displayMins}:${displaySecs}`);
+    };
 
-    clockify()
-  }, [secondsLeft])
+    clockify();
+  }, [secondsLeft]);
 
   return (
     <View
@@ -68,7 +68,7 @@ const CartTimer: FC<ICartTimerProps> = ({
         </View>
       </Pressable>
     </View>
-  )
-}
+  );
+};
 
-export default CartTimer
+export default CartTimer;

@@ -1,8 +1,8 @@
-import React from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
-import { DropdownListItemStyles as s } from './styles'
-import { IDropdownListItemProps } from './types'
+import { DropdownListItemStyles as s } from './styles';
+import { IDropdownListItemProps } from './types';
 
 const DropdownListItem = ({
   item,
@@ -10,11 +10,11 @@ const DropdownListItem = ({
   selectedOption,
   styles,
 }: IDropdownListItemProps) => {
-  const handleOnSelectItem = () => onSelectItem(item)
-  const isSelected = !!selectedOption && selectedOption.value === item.value
-  const selectedStyles = [s.buttonSelected, styles?.buttonSelected]
+  const handleOnSelectItem = () => onSelectItem(item);
+  const isSelected = !!selectedOption && selectedOption.value === item.value;
+  const selectedStyles = [s.buttonSelected, styles?.buttonSelected];
 
-  const buttonStyles = [s.button, styles?.button]
+  const buttonStyles = [s.button, styles?.button];
 
   return (
     <View style={[s.rootContainer, styles?.container]}>
@@ -30,7 +30,7 @@ const DropdownListItem = ({
         </Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
-export default DropdownListItem
+export default DropdownListItem;

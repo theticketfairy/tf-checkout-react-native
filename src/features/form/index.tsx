@@ -1,6 +1,6 @@
-import { useField } from 'formik'
-import React from 'react'
-import { Text } from 'react-native'
+import { useField } from 'formik';
+import React from 'react';
+import { Text } from 'react-native';
 
 import {
   Checkbox,
@@ -9,28 +9,28 @@ import {
   Input,
   PhoneInput,
   RadioGroup,
-} from '../../components'
-import { ICheckboxStyles } from '../../components/checkbox/types'
-import { IDatePickerStyles } from '../../components/datePicker/types'
-import { IDropdownMaterialStyles } from '../../components/dropdownMaterial/types'
-import { IInputStyles } from '../../components/input/types'
-import { IPhoneInputStyles } from '../../components/phoneInput/types'
-import { IRadioGroupStyles } from '../../components/radioGroup/types'
-import { FieldConfig } from './types'
+} from '../../components';
+import { ICheckboxStyles } from '../../components/checkbox/types';
+import { IDatePickerStyles } from '../../components/datePicker/types';
+import { IDropdownMaterialStyles } from '../../components/dropdownMaterial/types';
+import { IInputStyles } from '../../components/input/types';
+import { IPhoneInputStyles } from '../../components/phoneInput/types';
+import { IRadioGroupStyles } from '../../components/radioGroup/types';
+import { FieldConfig } from './types';
 
 export interface FormikFieldComponentStyles {
-  input?: IInputStyles
-  select?: IDropdownMaterialStyles
-  selectMulti?: IDropdownMaterialStyles
-  phone?: IPhoneInputStyles
-  checkbox?: ICheckboxStyles
-  radio?: IRadioGroupStyles
-  datePicker?: IDatePickerStyles
+  input?: IInputStyles;
+  select?: IDropdownMaterialStyles;
+  selectMulti?: IDropdownMaterialStyles;
+  phone?: IPhoneInputStyles;
+  checkbox?: ICheckboxStyles;
+  radio?: IRadioGroupStyles;
+  datePicker?: IDatePickerStyles;
 }
 
 interface FormikFieldProps<TValues extends Record<string, unknown>> {
-  field: FieldConfig<TValues>
-  styles?: FormikFieldComponentStyles
+  field: FieldConfig<TValues>;
+  styles?: FormikFieldComponentStyles;
 }
 
 export const FormikField = React.memo(
@@ -38,17 +38,17 @@ export const FormikField = React.memo(
     field,
     styles: componentStyles,
   }: FormikFieldProps<TValues>) => {
-    const [formikField, meta, helpers] = useField(field.name)
+    const [formikField, meta, helpers] = useField(field.name);
 
-    const value = formikField.value
-    const error = meta.touched ? meta.error : undefined
+    const value = formikField.value;
+    const error = meta.touched ? meta.error : undefined;
 
-    if (field.hide) return null
+    if (field.hide) return null;
 
     const handleChange = (val: string | number | boolean | string[]) => {
-      field.onChange?.(val)
-      helpers.setValue(val)
-    }
+      field.onChange?.(val);
+      helpers.setValue(val);
+    };
 
     switch (field.type) {
       case 'input':
@@ -62,7 +62,7 @@ export const FormikField = React.memo(
             onTextChanged={(_, val) => handleChange(val)}
             styles={componentStyles?.input}
           />
-        )
+        );
 
       case 'textarea':
         return (
@@ -77,10 +77,10 @@ export const FormikField = React.memo(
             onTextChanged={(_, val) => handleChange(val)}
             styles={componentStyles?.input}
           />
-        )
+        );
 
       case 'select': {
-        const options = field.options ?? []
+        const options = field.options ?? [];
         return (
           <DropdownMaterial
             items={options}
@@ -97,34 +97,34 @@ export const FormikField = React.memo(
             }}
             styles={componentStyles?.select}
           />
-        )
+        );
       }
 
       case 'select_multi': {
-        const options = field.options ?? []
-        const selectedValues = (Array.isArray(value) ? value : []) as string[]
+        const options = field.options ?? [];
+        const selectedValues = (Array.isArray(value) ? value : []) as string[];
         const selectedOptions = options.filter((o) =>
           selectedValues.includes(o.value)
-        )
+        );
         const displayOption = {
           value: '',
           label:
             selectedOptions.length > 0
               ? selectedOptions.map((o) => o.label).join(', ')
               : `Select ${field.label ?? 'items'}`,
-        }
+        };
         return (
           <DropdownMaterial
             items={options}
             selectedOption={displayOption}
             onSelectItem={(item) => {
-              let newValues = [...selectedValues]
+              let newValues = [...selectedValues];
               if (newValues.includes(String(item.value))) {
-                newValues = newValues.filter((v) => v !== item.value)
+                newValues = newValues.filter((v) => v !== item.value);
               } else {
-                newValues.push(String(item.value))
+                newValues.push(String(item.value));
               }
-              handleChange(newValues)
+              handleChange(newValues);
             }}
             materialInputProps={{
               label: field.label ?? 'Select Multiple',
@@ -132,7 +132,7 @@ export const FormikField = React.memo(
             }}
             styles={componentStyles?.selectMulti ?? componentStyles?.select}
           />
-        )
+        );
       }
 
       case 'phone':
@@ -144,7 +144,7 @@ export const FormikField = React.memo(
             texts={{ label: field.label }}
             styles={componentStyles?.phone}
           />
-        )
+        );
 
       case 'checkbox':
         return (
@@ -154,7 +154,7 @@ export const FormikField = React.memo(
             onPress={() => handleChange(!value)}
             styles={componentStyles?.checkbox}
           />
-        )
+        );
 
       case 'radio':
         return (
@@ -166,7 +166,7 @@ export const FormikField = React.memo(
             error={error}
             styles={componentStyles?.radio}
           />
-        )
+        );
 
       case 'datePicker':
         return (
@@ -178,10 +178,10 @@ export const FormikField = React.memo(
             placeholder={field.placeholder}
             styles={componentStyles?.datePicker}
           />
-        )
+        );
 
       default:
-        return <Text>{field.type} is not supported</Text>
+        return <Text>{field.type} is not supported</Text>;
     }
   }
-)
+);
