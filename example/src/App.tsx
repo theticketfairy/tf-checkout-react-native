@@ -23,9 +23,9 @@ import {
   CheckoutProvider,
   CheckoutV2,
   IConfig,
+  IMyOrderDetailsTicket,
+  ICheckoutData,
 } from 'tf-checkout-react-native'
-import { IMyOrderDetailsTicket } from '../../src/api/types';
-import { CheckoutData } from '../../src/features/checkout-v2/hooks/use-checkout';
 import { checkoutStyles } from './config/styles';
 import { checkoutTexts } from './config/texts';
 import { Color, ComponentEnum } from './config/common';
@@ -38,19 +38,16 @@ interface IDeepLinkUrl {
   url: string;
 }
 
-const EVENT_ID = 1227;
+const EVENT_ID = 14299;
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
   CLIENT: 'ttf',
-  BRAND: 'rymmar',
+  BRAND: 'g-test',
   ARE_SUB_BRANDS_INCLUDED: true,
   ENV: 'STAG',
 };
 
-// BRANDS
-// mana-onetree-testing-brand
-// the-ticket-fairy
 
 const AppRaw = () => {
   // Toggle for checkout mode
@@ -148,7 +145,7 @@ const AppRaw = () => {
     }
   };
 
-  const handleOnCheckoutSuccess = (data: CheckoutData) => {
+  const handleOnCheckoutSuccess = (data: ICheckoutData) => {
     setOrderHash(data.hash);
   };
 

@@ -1,8 +1,9 @@
 {
   "extends": "../tsconfig",
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
-      "tf-checkout-react-native": ["../src/index"]
+      "tf-checkout-react-native": ["../lib/typescript/src/index"]
     }
   }
 }
