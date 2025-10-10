@@ -53,6 +53,7 @@ If you are running on bare React Native, you will need to install the following 
 
 ```sh
 yarn add \
+tf-checkout-react-native \
 @react-native-async-storage/async-storage@^2.2.0 \
 @react-native-clipboard/clipboard@^1.16.3 \
 @react-native-community/datetimepicker@^8.4.5 \
@@ -66,11 +67,10 @@ If you are running on expo, you will need to install the following dependencies:
 
 ```sh
 yarn add \
-@react-native-async-storage/async-storage@^2.2.0
-```
-
-```sh
-yarn add tf-checkout-react-native
+tf-checkout-react-native \
+@react-native-async-storage/async-storage@^2.2.0 \
+@react-native-clipboard/clipboard@^1.16.3 \
+react-native-background-timer@^2.4.1
 ```
 
 or
