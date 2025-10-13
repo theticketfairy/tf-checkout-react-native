@@ -158,6 +158,8 @@ export interface ITicketsProps {
   config?: ITicketsConfig;
 
   isCheckingCurrentSession?: boolean;
+
+  debugMode?: boolean;
 }
 
 export interface IPasswordProtectedEventData {

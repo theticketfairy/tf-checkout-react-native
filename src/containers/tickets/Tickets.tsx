@@ -32,6 +32,8 @@ import {
 } from '../../types';
 import TicketsView from './TicketsView';
 import { IPasswordProtectedEventData, ITicketsProps } from './types';
+import { Logger } from '../../utils/Logger';
+
 
 const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
   (
@@ -60,9 +62,11 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
         areTicketsSortedBySoldOut: true,
       },
       referrerId,
+      debugMode,
     },
     ref
   ) => {
+    const logger = new Logger({level: debugMode ? 'debug' : 'error'})
     const [isUserLogged, setIsUserLogged] = useState(false);
     const [isGettingTickets, setIsGettingTickets] = useState(false);
     const [isGettingEvent, setIsGettingEvent] = useState(false);
@@ -182,8 +186,13 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
 
     //#region Fetch Initial Data
     const fetchInitialData = async () => {
-      await retrieveStoredAccessToken();
-      await getEventData();
+      try {
+        logger.info('Fetching initial data');
+        await retrieveStoredAccessToken();
+        await getEventData();
+      } catch (error) {
+        logger.error('Error while fetching initial data', error);
+      }
     };
     //#endregion Fetch Initial Data
 
@@ -259,7 +268,9 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
     };
 
     const getEventData = async () => {
+      logger.info('Fetching event data: API call');
       if (isApiErrorRef.current === true) {
+        logger.info('Fetching event data: API call: Skip, error already occurred');
         return;
       }
 
@@ -268,13 +279,16 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
       setIsGettingEvent(false);
 
       if (eventError) {
+        logger.info('Fetching event data: API call: Error', eventError);
         eventErrorCodeRef.current = eventError.code || 400;
         if (eventError.code === 401) {
+          logger.info('Fetching event data: API call: Error: 401');
           setPasswordProtectedEventData({
             isPasswordProtected: true,
             message: eventError.message,
           });
         } else {
+          logger.info('Fetching event data: API call: Error: ' + eventError.message);
           showAlert(eventError.message);
         }
         return onFetchEventError?.(
@@ -285,12 +299,18 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
       eventErrorCodeRef.current = 0;
 
       if (!eventData) {
+        logger.info('Fetching event data: API call: Error: No event data');
         return onFetchEventError?.({
           message: 'There was an error while fetching event',
         });
       }
 
-      await getTickets();
+      try {
+        await getTickets();
+      } catch (error) {
+        logger.info('Fetching tickets: API call: Error: ' + error);
+        showAlert(error);
+      }
 
       onFetchEventSuccess?.(eventData);
       setEvent(eventData);

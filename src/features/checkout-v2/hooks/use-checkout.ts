@@ -353,8 +353,6 @@ export const useCheckoutFlow = ({
       });
     }
 
-    console.log(addonDefaults, 'addonDefaults');
-
     return { orderDefaults, ticketDefaults, addonDefaults };
   }, [customFieldsQuery.data]);
 

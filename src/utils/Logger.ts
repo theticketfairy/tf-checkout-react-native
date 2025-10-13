@@ -62,8 +62,8 @@ export class Logger {
   }
 
   private loggerArgs(level: LogLevel, ...args: any[]) {
-    const [message, style, ...rest] = this.formatMessage(level, ...args);
+    const [message, ...rest] = this.formatMessage(level, ...args);
 
-    return [`%c${message}`, style, ...rest];
+    return [`%c${message}`, ...rest];
   }
 }
