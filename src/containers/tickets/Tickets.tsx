@@ -208,6 +208,14 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
         isAccessCodeRequired,
         areGroupsShown,
       } = await getTicketsCore(promoCode);
+      logger.info('getTicketsCore response', {
+        error,
+        tickets: responseTickets,
+        promoCodeResult,
+        isInWaitingList,
+        isAccessCodeRequired,
+        areGroupsShown,
+      });
       setIsGettingTickets(false);
 
       if (error) {
@@ -306,9 +314,10 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
       }
 
       try {
+        logger.info('Fetching tickets: getTickets()');
         await getTickets();
       } catch (error) {
-        logger.info('Fetching tickets: API call: Error: ' + error);
+        logger.info('Fetching tickets: getTickets() Error: ' + error);
         showAlert(error);
       }
 
