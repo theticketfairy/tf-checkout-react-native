@@ -189,7 +189,9 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
       try {
         logger.info('Fetching initial data');
         await retrieveStoredAccessToken();
+        logger.info('retrieveStoredAccessToken');
         await getEventData();
+        logger.info('getEventData success');
       } catch (error) {
         logger.error('Error while fetching initial data', error);
       }
