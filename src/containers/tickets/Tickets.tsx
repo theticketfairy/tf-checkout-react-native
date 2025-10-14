@@ -286,6 +286,10 @@ const Tickets = forwardRef<SessionHandleType, ITicketsProps>(
 
       setIsGettingEvent(true);
       const { eventError, eventData } = await getEventCore();
+      logger.info('Fetching event data: API call: response', {
+        eventError,
+        eventData,
+      });
       setIsGettingEvent(false);
 
       if (eventError) {
