@@ -255,7 +255,7 @@ const LoginView: FC<ILoginViewProps> = ({
         <Modal transparent={true} presentationStyle="overFullScreen">
           <View style={s.touchableContainer}>
             <TouchableOpacity style={s.dismissibleArea} onPress={hideDialog}>
-              <TouchableOpacity activeOpacity={1}>
+              <TouchableOpacity>
                 {renderContent()}
               </TouchableOpacity>
             </TouchableOpacity>

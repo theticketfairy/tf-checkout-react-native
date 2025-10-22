@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
   Switch,
+  Pressable,
 } from 'react-native';
 import {
   IMyOrderDetailsData,
@@ -25,6 +26,7 @@ import {
   IConfig,
   IMyOrderDetailsTicket,
   ICheckoutData,
+  Login,
 } from 'tf-checkout-react-native'
 import { checkoutStyles } from './config/styles';
 import { checkoutTexts } from './config/texts';
@@ -38,18 +40,20 @@ interface IDeepLinkUrl {
   url: string;
 }
 
-const EVENT_ID = 14299;
+const EVENT_ID = 14065;
 
 const config: IConfig = {
   EVENT_ID: EVENT_ID,
   CLIENT: 'ttf',
-  BRAND: 'g-test',
+  BRAND: 'time-slot',
   ARE_SUB_BRANDS_INCLUDED: true,
   ENV: 'STAG',
+  logLevel: 'debug',
 };
 
 
 const AppRaw = () => {
+  const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false);
   // Toggle for checkout mode
   const [isSinglePageCheckout, setIsSinglePageCheckout] = useState(false);
 
@@ -203,23 +207,12 @@ const AppRaw = () => {
 
     const resetPasswordToken = url.split('token=');
 
-    console.log(
-      '%cApp.tsx line:160 resetPasswordToken',
-      'color: #007acc;',
-      resetPasswordToken
-    );
-
     if (resetPasswordToken[1]) {
       resetPasswordTokenRef.current = resetPasswordToken[1];
       setComponentToShow(ComponentEnum.ResetPassword);
     }
 
     const referrerId = url.split('ttf_r=');
-    console.log(
-      '%cApp.tsx line:160 resetPasswordToken',
-      'color: #00FFcc;',
-      referrerId
-    );
 
     if (referrerId[1]) {
       setReferredId(referrerId[1]);
@@ -1061,6 +1054,15 @@ const AppRaw = () => {
     <SafeAreaView style={styles.safeArea}>
       {componentToShow === ComponentEnum.Tickets && <RenderToggle />}
       {RenderComponent()}
+                  {/* <Login
+              onLoginSuccessful={(d) => console.log('onLoginSuccessful', d)}
+              onLoginError={(d) => console.log('onLoginError', d)}
+              onLogoutSuccess={() => console.log('onLogoutSuccess')}
+              onLogoutError={(d) => console.log('onLogoutError', d)}
+              isLoginDialogVisible={isLoginDialogVisible}
+              showLoginDialog={() => setIsLoginDialogVisible(true)}
+              hideLoginDialog={() => setIsLoginDialogVisible(false)}
+            /> */}
     </SafeAreaView>
   );
 };

@@ -4,6 +4,7 @@ import { Client } from '../api/ApiClient';
 import Constants from '../api/Constants';
 import { getDomainByClientAndEnv } from './Domains';
 import { LocalStorageKeys, storeData } from './LocalStorage';
+import { LogLevel } from '../utils/Logger';
 
 export type EnvType = 'PROD' | 'DEV' | 'STAG';
 
@@ -24,7 +25,7 @@ export interface IConfig {
   BRAND?: string;
   ARE_SUB_BRANDS_INCLUDED?: boolean;
   AUTH?: IConfigAuth;
-
+  logLevel?: LogLevel;
   [key: string]: string | number | boolean | undefined | IConfigAuth;
 }
 

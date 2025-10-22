@@ -14,18 +14,18 @@ export const checkoutStyles: CheckoutStyles = {
   login: {
     dialog: {
       title: {
-        color: Color.white,
+        color: Color.black,
       },
       message: {
-        color: Color.white,
+        color: Color.black,
       },
     },
     loggedIn: {
       message: {
-        color: Color.white,
+        color: Color.black,
       },
       placeholder: {
-        color: Color.white,
+        color: Color.black,
       },
     },
   },

@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { FormField, PhoneInput } from '../../../components';
+import { logger } from '../../../utils/Logger';
 import { TicketHolderFormValues } from '../form/types';
 
 interface TicketHoldersSectionProps {

@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 
 import { Loading } from '../../../components';
+import { logger } from '../../../utils/Logger';
 import { readableError } from '../../../utils/handlers';
 import { FormikField } from '../../form';
 import { FieldType } from '../../form/types';
@@ -128,46 +129,13 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   });
   const fieldTopRef = useRef<Record<string, number>>({});
 
-  const fieldRefs = useRef<Record<string, ComponentRef<typeof View> | null>>(
-    {}
-  );
-  // 2) helper: scroll to a field by key
+  // Helper: scroll to a field by key using onLayout-captured positions
   const scrollToField = (key: string, attempt: number = 0) => {
-    if (key === 'isCardFormComplete') return;
-
-    const targetRef = fieldRefs.current[key];
-    if (targetRef && scrollRef.current) {
-      const scrollNode =
-        (scrollRef.current as any).getScrollableNode?.() ??
-        (scrollRef.current as any).getInnerViewNode?.() ??
-        findNodeHandle(scrollRef.current);
-
-      if (scrollNode != null) {
-        try {
-          (targetRef as any).measureLayout(
-            scrollNode,
-            (x: number, y: number) => {
-              scrollRef.current?.scrollTo({
-                y: Math.max(0, y - 16),
-                animated: true,
-              });
-            },
-            () => {
-              if (attempt < 3) {
-                setTimeout(() => scrollToField(key, attempt + 1), 50);
-              }
-            }
-          );
-          return;
-        } catch (e) {
-          console.error('measureLayout failed for', key, e);
-        }
-      }
-    }
+    if (key === 'isCardFormComplete' || !scrollRef.current) return;
 
     let y = fieldTopRef.current[key];
 
-    // Fallbacks for nested ticket holder fields
+    // Fallback for nested ticket holder fields
     if (
       !(typeof y === 'number' && Number.isFinite(y)) &&
       key.startsWith('ticketHolders[')
@@ -183,17 +151,22 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
       }
     }
 
-    if (typeof y === 'number' && Number.isFinite(y) && scrollRef.current) {
-      scrollRef.current.scrollTo({ y: Math.max(0, y - 16), animated: true });
-    } else {
-      if (attempt < 3) {
-        setTimeout(() => scrollToField(key, attempt + 1), 50);
+    if (typeof y === 'number' && Number.isFinite(y)) {
+      try {
+        scrollRef.current.scrollTo({ y: Math.max(0, y - 16), animated: true });
+        logger.debug('[CheckoutForm] Scrolled to field', { key, position: y });
+      } catch (e) {
+        logger.debug('[CheckoutForm] scrollTo failed', { key, error: e instanceof Error ? e.message : String(e) });
       }
+    } else if (attempt < 3) {
+      setTimeout(() => scrollToField(key, attempt + 1), 50);
+    } else {
+      logger.warn('[CheckoutForm] Could not scroll to field - position not found', { key });
     }
   };
 
   const onPressSubmit = async () => {
-    console.log('ON PRESS SUBMIT');
+    logger.debug('[CheckoutForm] Form submission initiated');
     const allFields = Object.keys(initialValues);
 
     // Create touched fields with special handling for nested ticket holders
@@ -221,24 +194,22 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     const formErrors = typeof result === 'object' ? result : {};
     const paymentValid =
       isCardFormComplete || isTicketFree || !isSinglePageCheckout;
-    console.log('PAYMENT VALID', paymentValid);
+    logger.debug('[CheckoutForm] submitting', { paymentValid, isCardFormComplete, isTicketFree, isSinglePageCheckout });
+
     if (!paymentValid) {
       setCardFormError(texts.payment.errorRequired);
     }
 
     if (Object.keys(formErrors).length === 0 && paymentValid) {
-      console.log('PRESS SUBMIT');
+      logger.debug('[CheckoutForm] Form validation passed, submitting', { email: formik.values.email });
       formik.handleSubmit();
       return;
     }
-
-    console.log('FORM ERRORS', formErrors);
+    logger.warn('[CheckoutForm] Form validation failed', { errors: Object.keys(formErrors), paymentValid });
 
     const firstErroredKey = formFieldsOrder.find(
       (k) => (formErrors as any)[k as keyof typeof formErrors] != null
     );
-
-    console.log('FIRST ERRORED KEY', firstErroredKey);
 
     if (firstErroredKey === 'ticketHolders') {
       const thErrors = (formErrors as any).ticketHolders as Array<any>;
@@ -247,21 +218,11 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           (e) => e && Object.keys(e).length > 0
         );
         if (erroredIndex >= 0) {
-          // Try to scroll to the first specific field with an error; fallback to the ticket holder block
-          const fieldPriority = ['firstName', 'lastName', 'email', 'phone'];
-          let targetKey = `ticketHolders[${erroredIndex}]`;
-          const holderError = thErrors[erroredIndex] || {};
-          for (const f of fieldPriority) {
-            if (holderError[f]) {
-              targetKey = `ticketHolders[${erroredIndex}].${f}`;
-              break;
-            }
-          }
-          scrollToField(targetKey);
+          scrollToField(`ticketHolders[${erroredIndex}]`);
+          logger.debug('[CheckoutForm] Scrolling to errored ticket holder', { index: erroredIndex });
           return;
         }
       }
-      // Fallback to the section if we can't resolve a specific index
       scrollToField('ticketHolders');
     } else if (firstErroredKey) {
       scrollToField(firstErroredKey);
@@ -540,9 +501,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           onLayout={(e) => {
             fieldTopRef.current.ticketHolders = e.nativeEvent.layout.y;
           }}
-          ref={(el) => {
-            fieldRefs.current.ticketHolders = el;
-          }}
         >
           <Text style={styles.sectionTitle}>{texts.ticketHolders.title}</Text>
 
@@ -560,9 +518,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   const holderY = sectionY + e.nativeEvent.layout.y;
                   fieldTopRef.current[`ticketHolders[${index}]`] = holderY;
                 }}
-                ref={(el) => {
-                  fieldRefs.current[`ticketHolders[${index}]`] = el;
-                }}
               >
                 <Text style={styles.ticketHolderTitle}>{ticketLabel}</Text>
 
@@ -575,9 +530,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                       0;
                     fieldTopRef.current[`ticketHolders[${index}].firstName`] =
                       baseY + e.nativeEvent.layout.y;
-                  }}
-                  ref={(el) => {
-                    fieldRefs.current[`ticketHolders[${index}].firstName`] = el;
                   }}
                 >
                   <FormikField
@@ -601,9 +553,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     fieldTopRef.current[`ticketHolders[${index}].lastName`] =
                       baseY + e.nativeEvent.layout.y;
                   }}
-                  ref={(el) => {
-                    fieldRefs.current[`ticketHolders[${index}].lastName`] = el;
-                  }}
                 >
                   <FormikField
                     field={{
@@ -626,9 +575,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     fieldTopRef.current[`ticketHolders[${index}].email`] =
                       baseY + e.nativeEvent.layout.y;
                   }}
-                  ref={(el) => {
-                    fieldRefs.current[`ticketHolders[${index}].email`] = el;
-                  }}
                 >
                   <FormikField
                     field={{
@@ -650,9 +596,6 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
                       0;
                     fieldTopRef.current[`ticketHolders[${index}].phone`] =
                       baseY + e.nativeEvent.layout.y;
-                  }}
-                  ref={(el) => {
-                    fieldRefs.current[`ticketHolders[${index}].phone`] = el;
                   }}
                 >
                   <FormikField
@@ -742,6 +685,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
             <Payment
               orderItems={orderItems}
               onFormComplete={(details) => {
+                logger.debug('[CheckoutForm] Payment form complete', { ...details });
                 setIsCardFormComplete(details.complete);
               }}
               error={cardFormError}

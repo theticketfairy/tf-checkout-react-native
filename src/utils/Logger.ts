@@ -1,3 +1,5 @@
+import { Config } from "../helpers/Config";
+
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface LoggerOptions {
@@ -64,6 +66,10 @@ export class Logger {
   private loggerArgs(level: LogLevel, ...args: any[]) {
     const [message, ...rest] = this.formatMessage(level, ...args);
 
-    return [`%c${message}`, ...rest];
+    return [message, ...rest];
   }
 }
+
+export const logger = new Logger({
+  level: Config.logLevel || 'info',
+});

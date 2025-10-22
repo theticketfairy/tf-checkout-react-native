@@ -23,7 +23,7 @@ const LoginForm: FC<ILoginFormProps> = ({
   brandImages,
 }) => {
   const { styles, texts } = viewProps || {};
-
+console.log(texts.dialog)
   return (
     <View style={[s.dialog, styles?.dialog?.container]}>
       <Text style={[s.dialogTitle, styles?.dialog?.title]}>

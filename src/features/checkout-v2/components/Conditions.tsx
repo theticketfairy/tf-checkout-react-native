@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 
 import { Checkbox } from '../../../components';
+import { logger } from '../../../utils/Logger';
 
 export interface Condition {
   id: string;
@@ -58,6 +59,7 @@ const Conditions: React.FC<ConditionsProps> = ({
       ...prev,
       [conditionId]: !prev[conditionId],
     }));
+    logger.debug('[Conditions] Condition toggled', { conditionId, expanded: !expandedConditions[conditionId] });
   };
 
   return (

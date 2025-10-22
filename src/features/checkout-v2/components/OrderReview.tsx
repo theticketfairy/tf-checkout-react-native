@@ -8,6 +8,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { logger } from '../../../utils/Logger';
 
 export interface IOrderItem {
   id: string;
@@ -88,7 +89,8 @@ const OrderItem = ({
 const OrderReview = ({
   orderItems,
   styles: customStyles,
-}: IOrderReviewProps) => (
+}: IOrderReviewProps) => {
+  return (
   <View style={[styles.rootContainer, customStyles?.rootContainer]}>
     {_map(orderItems, (item) => (
       <OrderItem
@@ -106,6 +108,7 @@ const OrderReview = ({
       />
     ))}
   </View>
-);
+  );
+};
 
 export default OrderReview;

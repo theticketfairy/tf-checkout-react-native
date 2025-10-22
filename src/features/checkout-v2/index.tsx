@@ -18,6 +18,7 @@ import {
   ILoginViewStyles,
 } from '../../components/login/types';
 import { IError } from '../../types';
+import { logger } from '../../utils/Logger';
 import { useUserProfile } from '../auth/api-hooks';
 import { IRegisterUserResponse } from '../auth/types';
 import { CheckoutForm, PaymentForm } from './form';
@@ -139,6 +140,7 @@ export const CheckoutController = ({
 
   const onRegistrationError = useCallback(
     (error: any) => {
+      logger.error('[CheckoutController] Registration failed:', { error });
       _onRegistrationError?.(error);
       // Show login dialog
       setLoginMessage(error);
@@ -166,16 +168,19 @@ export const CheckoutController = ({
   const { secondsLeft } = checkoutFlow;
 
   const handleLoginError = (error: IError) => {
+    logger.error('[CheckoutController] Login error:', { error });
     _onLoginError?.(error);
   };
 
   const handleLogout = () => {
+    logger.debug('[CheckoutController] User logged out');
     invalidate();
     _onLogoutSuccess?.();
   };
 
   const handleLoginSuccess = useCallback(
     (data: ILoginSuccessData) => {
+      logger.debug('[CheckoutController] Login successful', { email: data?.userProfile?.email });
       invalidate();
       _onLoginSuccess?.(data);
       setIsLoginDialogVisible(false);

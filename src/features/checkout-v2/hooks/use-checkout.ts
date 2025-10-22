@@ -15,6 +15,7 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import BackgroundTimer from 'react-native-background-timer';
 
+import { logger } from '../../../utils/Logger';
 import { logError } from '../../../utils/handlers';
 import { useRegisterUser } from '../../auth/api-hooks';
 import {
@@ -135,6 +136,7 @@ export const useCheckoutFlow = ({
           errorData?.data?.message?.email ||
           (errorData?.message?.email ? errorData.message.email : null);
 
+        logger.debug('[useCheckoutFlow] Email validation error:', { emailErrors });
         if (emailErrors) {
           // Show login dialog for already registered user
           const emailAlreadyRegisteredText =
@@ -183,8 +185,10 @@ export const useCheckoutFlow = ({
       try {
         // User is already registered or logged in, skip registration
         if (customerProfile) {
+          logger.debug('[useCheckoutFlow] User already logged in, skipping registration');
           return true;
         }
+        logger.debug('[useCheckoutFlow] Starting user registration', { email: values.email });
         // Create and submit registration data
         const registerUserData = createRegistrationData(values, isAgeRequired);
         const result = await registerUserMutation.mutateAsync(registerUserData);
@@ -192,10 +196,12 @@ export const useCheckoutFlow = ({
         // Store tokens and extract user data
         await storeAuthTokens(result.data.attributes);
 
+        logger.debug('[useCheckoutFlow] User registration successful', { email: values.email });
         // Registration successful
         onRegistrationSuccess?.(result.data);
         return true;
       } catch (registerError: any) {
+        logger.error('[useCheckoutFlow] User registration failed', { error: registerError?.message, email: values.email });
         return !handleRegistrationError(registerError);
       }
     },
@@ -396,22 +402,22 @@ export const useCheckoutFlow = ({
     });
 
     const base: CheckoutFormValues = {
-      firstName: '',
-      lastName: '',
-      email: '',
-      emailConfirmation: '',
+      firstName: 'G',
+      lastName: 'B',
+      email: 'garik+123@theticketfairy.com',
+      emailConfirmation: 'garik+123@theticketfairy.com',
       phone: '',
       dateOfBirth: undefined,
-      street: '',
-      city: '',
-      postalCode: '',
-      password: '',
-      passwordConfirmation: '',
+      street: 'Test',
+      city: 'Test',
+      postalCode: '12345',
+      password: '12345678?',
+      passwordConfirmation: '12345678?',
       isSubToTicketFairy: false,
       isSubToBrand: false,
       isCardFormComplete: false,
       country: '1',
-      state: '-1',
+      state: '1',
       addons: addonDefaults,
       acceptedConditions: {},
       customFields: { ...defaultCustomFieldValues.orderDefaults },
@@ -438,10 +444,10 @@ export const useCheckoutFlow = ({
       if (base.ticketHolders.length > 0) {
         base.ticketHolders[0] = {
           ...base.ticketHolders[0],
-          firstName: profile.firstName || '',
-          lastName: profile.lastName || '',
-          email: profile.email || '',
-          phone: profile.phone || '',
+          firstName: 'G',
+          lastName: 'B',
+          email: 'garik+123@theticketfairy.com',
+          phone: '123456789',
         };
       }
     }
@@ -482,6 +488,7 @@ export const useCheckoutFlow = ({
     async (input: CheckoutData) => {
       try {
         setIsSubmitting(true);
+        logger.debug('[useCheckoutFlow] Starting payment process', { hash: input.hash, total: input.total });
 
         // Get payment data
         const paymentResponse = await paymentDataMutation.mutateAsync(
@@ -494,6 +501,7 @@ export const useCheckoutFlow = ({
           Number(input.total) === 0 || Number(order_details.pay_now) === 0;
 
         if (isFreeTicket) {
+          logger.debug('[useCheckoutFlow] Processing free ticket order', { hash: input.hash });
           // For free tickets, just confirm the order
           await paymentSuccessMutation.mutateAsync(String(input.hash));
 
@@ -504,8 +512,10 @@ export const useCheckoutFlow = ({
             email: input.values.email,
           };
 
+          logger.debug('[useCheckoutFlow] Free ticket order confirmed', { hash: input.hash, email: input.values.email });
           onPaymentSuccess?.(result);
         } else {
+          logger.debug('[useCheckoutFlow] Processing paid ticket with Stripe', { hash: input.hash, amount: order_details.pay_now });
           // For paid tickets, handle Stripe payment
           // Initialize Stripe with payment method details
           const stripeConfig = {
@@ -539,9 +549,11 @@ export const useCheckoutFlow = ({
           );
 
           if (confirmError || paymentIntent?.status !== 'Succeeded') {
+            logger.error('[useCheckoutFlow] Stripe payment failed', { error: confirmError?.message, paymentIntentStatus: paymentIntent?.status });
             throw new Error(confirmError?.message || 'Payment failed');
           }
 
+          logger.debug('[useCheckoutFlow] Stripe payment succeeded', { paymentIntentId: paymentIntent.id });
           // Notify backend of successful payment
           await paymentSuccessMutation.mutateAsync(String(input.hash));
 
@@ -555,9 +567,11 @@ export const useCheckoutFlow = ({
           };
 
           setIsSubmitting(false);
+          logger.debug('[useCheckoutFlow] Payment process completed successfully', { hash: input.hash, email: input.values.email });
           onPaymentSuccess?.(result);
         }
       } catch (error) {
+        logger.error('[useCheckoutFlow] Payment process failed', { error: error instanceof Error ? error.message : String(error) });
         logError(error, 'Checkout: handlePayment');
         onPaymentError?.(error);
         throw error;
@@ -575,16 +589,19 @@ export const useCheckoutFlow = ({
   const handleCheckout = useCallback(
     async (values: CheckoutFormValues) => {
       try {
+        logger.debug('[useCheckoutFlow] Starting checkout process', { email: values.email, ticketHoldersCount: values.ticketHolders.length });
         const checkoutBody = createCheckoutBody(values, isAgeRequired);
         const checkoutResponse =
           await checkoutMutation.mutateAsync(checkoutBody);
 
         const hash = checkoutResponse.data.attributes.hash;
         const total = checkoutResponse.data.attributes.total;
+        logger.debug('[useCheckoutFlow] Checkout created successfully', { hash, total, email: values.email });
         onCheckoutSuccess?.({ hash, total, values });
 
         return { hash, total };
       } catch (error) {
+        logger.error('[useCheckoutFlow] Checkout process failed', { error: error instanceof Error ? error.message : String(error), email: values.email });
         logError(error, 'Checkout: handleCheckout');
         onCheckoutError?.(error);
         throw error;

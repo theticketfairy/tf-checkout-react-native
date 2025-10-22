@@ -1,5 +1,5 @@
 import InputPhone from '@sesamsolutions/phone-input';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Platform, View } from 'react-native';
 
 import Input from '../input/Input';
@@ -16,23 +16,28 @@ const PhoneInput: FC<IPhoneInputProps> = ({
   country = 'US',
 }) => {
   const [localValue, setLocalValue] = useState('');
-  const setLocalValueCallback = useCallback(() => {
-    setLocalValue(phoneNumber);
-  }, [phoneNumber]);
+  const isUserInitiatedRef = useRef(false);
 
   useEffect(() => {
-    setLocalValueCallback();
-  }, [phoneNumber, setLocalValueCallback]);
+    if (!isUserInitiatedRef.current) {
+      setLocalValue(phoneNumber);
+    }
+    isUserInitiatedRef.current = false;
+  }, [phoneNumber]);
 
-  const handleOnChangeInputPhone = (payload: IOnChangePhoneNumberPayload) => {
+  const handleOnChangeInputPhone = useCallback((payload: IOnChangePhoneNumberPayload) => {
+    isUserInitiatedRef.current = true;
     setLocalValue(payload.input);
     onChangePhoneNumber(payload);
-  };
+  }, [onChangePhoneNumber]);
 
   return (
     <View style={[s.rootContainer, styles?.rootContainer]}>
       <Input
-        onChangeText={setLocalValue}
+        onChangeText={(text) => {
+          isUserInitiatedRef.current = true;
+          setLocalValue(text);
+        }}
         onBlur={onBlur}
         label={texts?.label || 'Phone number'}
         keyboardType="phone-pad"

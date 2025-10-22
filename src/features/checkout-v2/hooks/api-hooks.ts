@@ -9,6 +9,7 @@ import { useCallback } from 'react';
 
 import { ApiResponse } from '../../../api/api.types';
 import { Client } from '../../../api/ApiClient';
+import { logger } from '../../../utils/Logger';
 import { ICheckoutBody } from '../../../api/types';
 import {
   AddonsResponse,
@@ -33,10 +34,18 @@ export const useEventInfo = (
 ) => {
   return useQuery<ApiResponse<EventResponse>, AxiosError>({
     queryKey: ['eventInfo', eventId],
-    queryFn: () =>
-      Client.get<ApiResponse<EventResponse>>(`v1/event/${eventId}`).then(
-        (response) => response.data
-      ),
+    queryFn: () => {
+      logger.debug('[api-hooks] Fetching event info', { eventId });
+      return Client.get<ApiResponse<EventResponse>>(`v1/event/${eventId}`).then(
+        (response) => {
+          logger.debug('[api-hooks] Event info fetched successfully', { eventId, eventName: response.data.data?.attributes?.name });
+          return response.data;
+        }
+      ).catch((error) => {
+        logger.error('[api-hooks] Failed to fetch event info', { eventId, error: error?.message });
+        throw error;
+      });
+    },
     enabled: !!eventId,
     ...options,
   });
@@ -51,10 +60,19 @@ export const useTickets = (
 ) => {
   return useQuery<ApiResponse<TicketsResponse>, AxiosError>({
     queryKey: ['tickets', eventId],
-    queryFn: () =>
-      Client.get<ApiResponse<TicketsResponse>>(
+    queryFn: () => {
+      logger.debug('[api-hooks] Fetching tickets', { eventId });
+      return Client.get<ApiResponse<TicketsResponse>>(
         `v1/event/${eventId}/tickets/`
-      ).then((response) => response.data),
+      ).then((response) => {
+        const ticketCount = Object.keys(response.data.data?.data?.attributes?.tickets || {}).length;
+        logger.debug('[api-hooks] Tickets fetched successfully', { eventId, ticketCount });
+        return response.data;
+      }).catch((error) => {
+        logger.error('[api-hooks] Failed to fetch tickets', { eventId, error: error?.message });
+        throw error;
+      });
+    },
     enabled: !!eventId,
     ...options,
   });
@@ -69,11 +87,19 @@ export const useAddToCart = () => {
     AxiosError,
     { eventId: string | number; ticketData: IAddToCartParams }
   >({
-    mutationFn: ({ eventId, ticketData }) =>
-      Client.post<ApiResponse<AddToCartResponse>>(
+    mutationFn: ({ eventId, ticketData }) => {
+      logger.debug('[api-hooks] Adding items to cart', { eventId, quantity: ticketData.attributes.product_cart_quantity });
+      return Client.post<ApiResponse<AddToCartResponse>>(
         `v1/event/${eventId}/add-to-cart/`,
         ticketData
-      ).then((response) => response.data),
+      ).then((response) => {
+        logger.debug('[api-hooks] Items added to cart successfully', { eventId });
+        return response.data;
+      }).catch((error) => {
+        logger.error('[api-hooks] Failed to add items to cart', { eventId, error: error?.message });
+        throw error;
+      });
+    },
   });
 };
 
@@ -82,10 +108,18 @@ export const useAddToCart = () => {
  */
 export const useCheckout = () => {
   return useMutation<ApiResponse<CheckoutResponse>, AxiosError, ICheckoutBody>({
-    mutationFn: (checkoutData) =>
-      Client.post<ApiResponse<CheckoutResponse>>(`v1/on-checkout/`, {
+    mutationFn: (checkoutData) => {
+      logger.debug('[api-hooks] Processing checkout', { email: checkoutData.attributes.email });
+      return Client.post<ApiResponse<CheckoutResponse>>(`v1/on-checkout/`, {
         data: checkoutData,
-      }).then((response) => response.data),
+      }).then((response) => {
+        logger.debug('[api-hooks] Checkout processed successfully', { hash: response.data.data?.attributes?.hash });
+        return response.data;
+      }).catch((error) => {
+        logger.error('[api-hooks] Checkout failed', { error: error?.message });
+        throw error;
+      });
+    },
   });
 };
 
@@ -98,10 +132,18 @@ export const useUpdateCheckout = () => {
     AxiosError,
     UpdateCheckoutParams
   >({
-    mutationFn: (params) =>
-      Client.post<ApiResponse<UpdateCheckoutResponse>>(`v1/checkout`, {
+    mutationFn: (params) => {
+      logger.debug('[api-hooks] Updating checkout with add-ons', { eventId: params.attributes.event_id });
+      return Client.post<ApiResponse<UpdateCheckoutResponse>>(`v1/checkout`, {
         data: params,
-      }).then((response) => response.data),
+      }).then((response) => {
+        logger.debug('[api-hooks] Checkout updated successfully');
+        return response.data;
+      }).catch((error) => {
+        logger.error('[api-hooks] Failed to update checkout', { error: error?.message });
+        throw error;
+      });
+    },
   });
 };
 
@@ -110,10 +152,18 @@ export const useUpdateCheckout = () => {
  */
 export const usePaymentData = () => {
   return useMutation<ApiResponse<PaymentDataResponse>, AxiosError, string>({
-    mutationFn: (orderHash) =>
-      Client.get<ApiResponse<PaymentDataResponse>>(
+    mutationFn: (orderHash) => {
+      logger.debug('[api-hooks] Fetching payment data', { orderHash });
+      return Client.get<ApiResponse<PaymentDataResponse>>(
         `/v1/order/${orderHash}/review`
-      ).then((response) => response.data),
+      ).then((response) => {
+        logger.debug('[api-hooks] Payment data fetched successfully', { orderHash });
+        return response.data;
+      }).catch((error) => {
+        logger.error('[api-hooks] Failed to fetch payment data', { orderHash, error: error?.message });
+        throw error;
+      });
+    },
   });
 };
 
@@ -122,10 +172,18 @@ export const usePaymentData = () => {
  */
 export const usePaymentSuccess = () => {
   return useMutation<ApiResponse<PaymentSuccessResponse>, AxiosError, string>({
-    mutationFn: (orderHash) =>
-      Client.post<ApiResponse<PaymentSuccessResponse>>(
+    mutationFn: (orderHash) => {
+      logger.debug('[api-hooks] Confirming payment success', { orderHash });
+      return Client.post<ApiResponse<PaymentSuccessResponse>>(
         `/v1/order/${orderHash}/success/`
-      ).then((response) => response.data),
+      ).then((response) => {
+        logger.debug('[api-hooks] Payment success confirmed', { orderHash });
+        return response.data;
+      }).catch((error) => {
+        logger.error('[api-hooks] Failed to confirm payment success', { orderHash, error: error?.message });
+        throw error;
+      });
+    },
   });
 };
 
@@ -138,10 +196,19 @@ export const useCart = (
   const queryClient = useQueryClient();
   const query = useQuery<ApiResponse<CartResponse>, AxiosError>({
     queryKey: ['cart'],
-    queryFn: () =>
-      Client.get<ApiResponse<CartResponse>>('v1/cart/').then(
-        (response) => response.data
-      ),
+    queryFn: () => {
+      logger.debug('[api-hooks] Fetching cart data');
+      return Client.get<ApiResponse<CartResponse>>('v1/cart/').then(
+        (response) => {
+          const cartItems = response.data.data?.attributes?.cart?.length || 0;
+          logger.debug('[api-hooks] Cart data fetched successfully', { cartItems });
+          return response.data;
+        }
+      ).catch((error) => {
+        logger.error('[api-hooks] Failed to fetch cart', { error: error?.message });
+        throw error;
+      });
+    },
     ...options,
   });
 
@@ -159,10 +226,19 @@ export const useCart = (
 export const useAddons = (eventId?: string | number) => {
   return useQuery<ApiResponse<AddonsResponse>, AxiosError>({
     queryKey: ['addons', eventId],
-    queryFn: () =>
-      Client.get<ApiResponse<AddonsResponse>>(
+    queryFn: () => {
+      logger.debug('[api-hooks] Fetching add-ons', { eventId });
+      return Client.get<ApiResponse<AddonsResponse>>(
         `v1/event/${eventId}/add-ons`
-      ).then((response) => response.data),
+      ).then((response) => {
+        const addonCount = response.data.data?.attributes?.add_ons?.length || 0;
+        logger.debug('[api-hooks] Add-ons fetched successfully', { eventId, addonCount });
+        return response.data;
+      }).catch((error) => {
+        logger.error('[api-hooks] Failed to fetch add-ons', { eventId, error: error?.message });
+        throw error;
+      });
+    },
     enabled: !!eventId,
   });
 };
@@ -184,10 +260,19 @@ export interface EventConditionsResponse {
 export const useEventConditions = (eventId?: string | number) => {
   return useQuery<ApiResponse<EventConditionsResponse>, AxiosError>({
     queryKey: ['eventConditions', eventId],
-    queryFn: () =>
-      Client.get<ApiResponse<EventConditionsResponse>>(
+    queryFn: () => {
+      logger.debug('[api-hooks] Fetching event conditions', { eventId });
+      return Client.get<ApiResponse<EventConditionsResponse>>(
         `v1/event/${eventId}/conditions`
-      ).then((response) => response.data),
+      ).then((response) => {
+        const conditionCount = response.data.data?.attributes?.conditions?.length || 0;
+        logger.debug('[api-hooks] Event conditions fetched successfully', { eventId, conditionCount });
+        return response.data;
+      }).catch((error) => {
+        logger.error('[api-hooks] Failed to fetch event conditions', { eventId, error: error?.message });
+        throw error;
+      });
+    },
     enabled: !!eventId,
   });
 };
