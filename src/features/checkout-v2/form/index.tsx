@@ -686,6 +686,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
               orderItems={orderItems}
               onFormComplete={(details) => {
                 logger.debug('[CheckoutForm] Payment form complete', { ...details });
+                if (details.complete) {
+                  setCardFormError(undefined);
+                }
                 setIsCardFormComplete(details.complete);
               }}
               error={cardFormError}
@@ -758,10 +761,16 @@ export const Payment = ({
         <Text style={styles.sectionTitle}>{texts.payment.sectionTitle}</Text>
         <View style={styles.paymentContainer}>
           <CardForm
-            onFormComplete={onFormComplete}
+            onFormComplete={(details) => {
+              logger.warn('[PaymentForm] CardForm onFormComplete triggered', { 
+                complete: details.complete,
+                details: JSON.stringify(details)
+              });
+              
+              onFormComplete(details);
+            }}
             style={styles.cardContainer}
             cardStyle={styles.cardStyle}
-            dangerouslyGetFullCardDetails={true}
             autofocus={false}
           />
 
@@ -793,7 +802,7 @@ export const PaymentForm = ({
   );
 
   const onFormComplete = (details: CardFormView.Details) => {
-    logger.debug('[PaymentForm] CardForm onFormComplete triggered', { 
+    logger.warn('[PaymentForm] CardForm onFormComplete triggered', { 
       complete: details.complete,
       details: JSON.stringify(details)
     });

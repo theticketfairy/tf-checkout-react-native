@@ -3703,9 +3703,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stripe/stripe-react-native@npm:^0.39.0":
-  version: 0.39.0
-  resolution: "@stripe/stripe-react-native@npm:0.39.0"
+"@stripe/stripe-react-native@npm:^0.54.0":
+  version: 0.54.1
+  resolution: "@stripe/stripe-react-native@npm:0.54.1"
   peerDependencies:
     expo: ">=46.0.9"
     react: "*"
@@ -3713,7 +3713,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 62b77dc55e7c2a56a976dc7b4302b401828ef20be54af3ddb76ddcda530e6f1896399667377ce6bd18ec4442cf20d319d5c7a146a05dd460250a53e615497354
+  checksum: 5c98c829c3e541a265dd52a889eabd563c7bbdd228cf9b73dc1a008bae1d049597a8c03f17bd2110ffd80d66aa545eba3478a09f08a8161f10bf9753847d0cf6
   languageName: node
   linkType: hard
 
@@ -6626,7 +6626,7 @@ __metadata:
     "@react-native-clipboard/clipboard": ^1.14.0
     "@react-native-community/datetimepicker": ^8.0.0
     "@sesamsolutions/phone-input": "*"
-    "@stripe/stripe-react-native": ^0.39.0
+    "@stripe/stripe-react-native": ^0.54.0
     expo: ~54.0.10
     expo-status-bar: ~3.0.8
     react: 19.1.0
@@ -12957,7 +12957,7 @@ __metadata:
     "@react-native/babel-preset": 0.81.1
     "@release-it/conventional-changelog": ^10.0.1
     "@sesamsolutions/phone-input": jorgtz/react-native-phone-input
-    "@stripe/stripe-react-native": ^0.39.0
+    "@stripe/stripe-react-native": ^0.54.0
     "@tanstack/react-query": ^5.89.0
     "@types/jest": ^29.5.14
     "@types/lodash": ^4.17.20
@@ -12996,7 +12996,7 @@ __metadata:
     typescript-eslint: ^8.45.0
     yup: ^1.4.0
   peerDependencies:
-    "@stripe/stripe-react-native": ^0.39.0
+    "@stripe/stripe-react-native": ^0.54.0
     react: "*"
     react-native: "*"
   languageName: unknown

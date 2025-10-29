@@ -12,7 +12,7 @@
     "@react-native-clipboard/clipboard": "^1.14.0",
     "@react-native-community/datetimepicker": "^8.0.0",
     "@sesamsolutions/phone-input": "*",
-    "@stripe/stripe-react-native": "^0.39.0",
+    "@stripe/stripe-react-native": "^0.54.0",
     "expo": "~54.0.10",
     "expo-status-bar": "~3.0.8",
     "react": "19.1.0",

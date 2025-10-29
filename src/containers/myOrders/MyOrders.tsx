@@ -24,6 +24,7 @@ import { SessionHandleType } from '../../core/Session/SessionCoreTypes';
 import { IError } from '../../types';
 import MyOrdersView from './MyOrdersView';
 import { IMyOrdersProps } from './types';
+import { logger } from '../../utils/Logger';
 
 const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
   (
@@ -184,7 +185,11 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
       async refreshAccessToken(
         refreshToken: string
       ): Promise<IFetchAccessTokenResponse> {
+        logger.debug('MyOrders', 'refreshAccessToken', { refreshToken });
         if (!sessionHandleRef.current) {
+          logger.debug('MyOrders', 'refreshAccessToken', {
+            message: 'Session Handle ref is not initialized',
+          });
           return {
             accessTokenError: {
               message: 'Session Handle ref is not initialized',
@@ -194,7 +199,14 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
 
         const { accessTokenError, accessTokenData } =
           await sessionHandleRef.current!.refreshAccessToken(refreshToken);
+        logger.debug('MyOrders', 'refreshAccessToken', {
+          accessTokenError,
+          accessTokenData,
+        });
         if (!accessTokenError && accessTokenData?.accessToken) {
+          logger.debug('MyOrders', 'refreshAccessToken', {
+            message: 'Access token refreshed successfully',
+          });
           await getOrders();
         }
         return {
@@ -204,6 +216,7 @@ const MyOrders = forwardRef<SessionHandleType, IMyOrdersProps>(
       },
 
       async reloadData() {
+        logger.debug('MyOrders', 'reloadData');
         await getOrders();
       },
     }));
