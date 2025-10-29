@@ -211,10 +211,68 @@ export interface CartPriceBreakdown {
 
 export interface UpdateCheckoutResponse {
   attributes: {
-    cart_price_breakdown: CartPriceBreakdown;
+    cart_price_breakdown?: {
+    total: number;
+    debt: number;
+    guest_count: number;
+    guest_revenue: number;
+    currency: {
+      currency: string;
+      decimal_places: number;
+      symbol: string;
+    };
+    insurance_amount: number;
+    goods_tax: number;
+    goods_tax_name: string;
+    total_add_ons: number;
+    payment_option_additional_fees: number;
+    tickets_price_breakdown: [
+      {
+        fees_breakdown: Array<{
+          name: string;
+          amount: number;
+        }>;
+        is_table: boolean;
+        ticket_type_name: string;
+        ticket_type_id: string;
+        quantity: number;
+        fees_per_ticket: number;
+        discount: number;
+        description: string;
+        refund_on_checkin: boolean;
+        price_per_ticket: string;
+        cost_per_ticket: string;
+        total_price: number;
+      }
+    ];
+    add_ons_price_breakdown: [];
+    insurance_items_breakdown: [];
+    event_name: string;
   };
+  additional_payment_information?: {
+    basic_config: {
+      apiKey: string;
+      accountId: string;
+    };
+    elements_config: {
+      amount: number;
+      currency: string;
+      mode: 'payment' | 'setup';
+      paymentMethodTypes: string[];
+      setupFutureUsage: null | string | boolean;
+    };
+    additional_config: {
+      decimalMultiplier: number;
+      canChangeCaptureMode: boolean;
+    };
+    stripe_wallets: {
+      applePay?: 'auto' | 'never';
+      googlePay?: 'auto' | 'never';
+    };
+    payment_plan_available: boolean;
+  };
+  }
 }
-
 export interface UpdateCheckoutParams {
   attributes: {
     event_id: number | string;

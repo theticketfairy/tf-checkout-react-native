@@ -25,7 +25,7 @@ import {
   CheckoutV2,
   IConfig,
   IMyOrderDetailsTicket,
-  ICheckoutData,
+  ICheckoutSuccessData,
   Login,
 } from 'tf-checkout-react-native'
 import { checkoutStyles } from './config/styles';
@@ -43,7 +43,7 @@ interface IDeepLinkUrl {
 const EVENT_ID = 14065;
 
 const config: IConfig = {
-  EVENT_ID: EVENT_ID,
+  EVENT_ID: EVENT_ID, 
   CLIENT: 'ttf',
   BRAND: 'time-slot',
   ARE_SUB_BRANDS_INCLUDED: true,
@@ -149,7 +149,7 @@ const AppRaw = () => {
     }
   };
 
-  const handleOnCheckoutSuccess = (data: ICheckoutData) => {
+  const handleOnCheckoutSuccess = (data: ICheckoutSuccessData) => {
     setOrderHash(data.hash);
   };
 

@@ -11,6 +11,7 @@ import {
   BillingDetails,
   initStripe,
   useConfirmPayment,
+  createPaymentMethod,
 } from '@stripe/stripe-react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import BackgroundTimer from 'react-native-background-timer';
@@ -31,7 +32,7 @@ import {
 } from '../../event/types';
 import { useCountries, useStates } from '../../geo/api-hooks';
 import { CheckoutFormProps, CheckoutFormValues } from '../form/types';
-import { IOrderItem, OrderResult } from '../types';
+import { IOrderItem, OrderResult, UpdateCheckoutResponse } from '../types';
 import {
   createCheckoutBody,
   createRegistrationData,
@@ -57,7 +58,7 @@ export interface UseCheckoutFlowProps {
   isPhoneHidden?: boolean;
   minimumAge?: number;
   customerProfile?: CustomerProfileResponse;
-  onCheckoutSuccess?: (data: CheckoutData) => void;
+  onCheckoutSuccess?: (data: ICheckoutSuccessData) => void;
   onCheckoutError?: (error: any) => void;
   onPaymentSuccess?: (data: OrderResult) => void;
   onPaymentError?: (error: any) => void;
@@ -75,10 +76,11 @@ export interface UseCheckoutFlowReturn
   isLoggedIn: boolean;
   setSecondsLeft: React.Dispatch<React.SetStateAction<number | undefined>>;
   setSelectedCountry: React.Dispatch<React.SetStateAction<string>>;
-  handlePayment: (input: CheckoutData) => Promise<void>;
+  checkoutData: UpdateCheckoutResponse | null;
+  handlePayment: (input: ICheckoutSuccessData) => Promise<void>;
 }
 
-export interface CheckoutData {
+export interface ICheckoutSuccessData {
   hash: string;
   total: string | number;
   values: CheckoutFormValues;
@@ -105,6 +107,7 @@ export const useCheckoutFlow = ({
   const [orderItems, setOrderItems] = useState<IOrderItem[]>([]);
   const [secondsLeft, setSecondsLeft] = useState<number | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [checkoutData, setCheckoutData] = useState<UpdateCheckoutResponse | null>(null);
 
   const [selectedCountry, setSelectedCountry] = useState<string>('1');
   const [addons, setAddons] = useState<Record<string, number>>({});
@@ -402,17 +405,17 @@ export const useCheckoutFlow = ({
     });
 
     const base: CheckoutFormValues = {
-      firstName: 'G',
-      lastName: 'B',
-      email: 'garik+123@theticketfairy.com',
-      emailConfirmation: 'garik+123@theticketfairy.com',
+      firstName: '',
+      lastName: '',
+      email: '',
+      emailConfirmation: '',
       phone: '',
       dateOfBirth: undefined,
-      street: 'Test',
-      city: 'Test',
-      postalCode: '12345',
-      password: '12345678?',
-      passwordConfirmation: '12345678?',
+      street: '',
+      city: '',
+      postalCode: '',
+      password: '',
+      passwordConfirmation: '',
       isSubToTicketFairy: false,
       isSubToBrand: false,
       isCardFormComplete: false,
@@ -444,10 +447,10 @@ export const useCheckoutFlow = ({
       if (base.ticketHolders.length > 0) {
         base.ticketHolders[0] = {
           ...base.ticketHolders[0],
-          firstName: 'G',
-          lastName: 'B',
-          email: 'garik+123@theticketfairy.com',
-          phone: '123456789',
+          firstName: profile.firstName || '',
+          lastName: profile.lastName || '',
+          email: profile.email || '',
+          phone: profile.phone || '',
         };
       }
     }
@@ -485,7 +488,7 @@ export const useCheckoutFlow = ({
 
   // Handle payment processing
   const handlePayment = useCallback(
-    async (input: CheckoutData) => {
+    async (input: ICheckoutSuccessData) => {
       try {
         setIsSubmitting(true);
         logger.debug('[useCheckoutFlow] Starting payment process', { hash: input.hash, total: input.total });
@@ -516,19 +519,7 @@ export const useCheckoutFlow = ({
           onPaymentSuccess?.(result);
         } else {
           logger.debug('[useCheckoutFlow] Processing paid ticket with Stripe', { hash: input.hash, amount: order_details.pay_now });
-          // For paid tickets, handle Stripe payment
-          // Initialize Stripe with payment method details
-          const stripeConfig = {
-            publishableKey: payment_method.stripe_publishable_key!,
-            ...(payment_method.stripe_connected_account &&
-            payment_method.stripe_connected_account !== ''
-              ? { stripeAccountId: payment_method.stripe_connected_account }
-              : {}),
-          };
 
-          await initStripe(stripeConfig);
-
-          // Create comprehensive billing details for payment
           const billingDetails: BillingDetails = {
             email: input.values.email,
             name: `${input.values.firstName} ${input.values.lastName}`,
@@ -542,15 +533,25 @@ export const useCheckoutFlow = ({
             },
           };
 
-          // Confirm payment with Stripe
+          logger.debug('[useCheckoutFlow] Confirming payment with Stripe');
           const { error: confirmError, paymentIntent } = await confirmPayment(
             payment_method.stripe_client_secret!,
             { paymentMethodType: 'Card', paymentMethodData: { billingDetails } }
           );
 
           if (confirmError || paymentIntent?.status !== 'Succeeded') {
-            logger.error('[useCheckoutFlow] Stripe payment failed', { error: confirmError?.message, paymentIntentStatus: paymentIntent?.status });
-            throw new Error(confirmError?.message || 'Payment failed');
+            const errorMessage = confirmError?.message || 'Payment failed';
+            logger.error('[useCheckoutFlow] Stripe payment failed', { 
+              error: errorMessage, 
+              errorCode: confirmError?.code,
+              paymentIntentStatus: paymentIntent?.status 
+            });
+            
+            // Provide user-friendly error messages
+            if (errorMessage.includes('incomplete') || errorMessage.includes('not complete')) {
+              throw new Error('Please complete all card details before submitting');
+            }
+            throw new Error(errorMessage);
           }
 
           logger.debug('[useCheckoutFlow] Stripe payment succeeded', { paymentIntentId: paymentIntent.id });
@@ -635,7 +636,7 @@ export const useCheckoutFlow = ({
   );
 
   const updateOrderItemsFromCheckoutData = useCallback(
-    (cartPriceBreakdown: any) => {
+    (cartPriceBreakdown: UpdateCheckoutResponse['attributes']['cart_price_breakdown']) => {
       if (!cartPriceBreakdown) return;
 
       // Update order items with the latest pricing information
@@ -742,7 +743,7 @@ export const useCheckoutFlow = ({
 
         if (response.data?.attributes) {
           const cartPriceBreakdown =
-            response.data.attributes.cart_price_breakdown || {};
+            response.data.attributes.cart_price_breakdown;
 
           setAddons(mergedAddons);
           updateOrderItemsFromCheckoutData(cartPriceBreakdown);
@@ -835,6 +836,38 @@ export const useCheckoutFlow = ({
   }, [cartQuery.data, eventInfoQuery.data]);
 
   useEffect(() => {
+    if (!eventId) return;
+
+    (async () => {
+      const response = await updateCheckoutMutation.mutateAsync({
+        attributes: {
+          event_id: eventId,
+          add_ons: addons,
+          is_from_resale: false,
+        },
+      });
+      const cartPriceBreakdown = response.data?.attributes?.cart_price_breakdown;
+      const additionalPaymentInformation = response.data?.attributes?.additional_payment_information;
+
+      const stripeConfig = {
+        publishableKey: additionalPaymentInformation?.basic_config.apiKey,
+        accountId: additionalPaymentInformation?.basic_config.accountId,
+      };
+
+      // await initStripe(stripeConfig);
+      // setTimeout(() => {
+      //   setStripeInitialized(true);
+      // }, 100);
+
+      if (cartPriceBreakdown) {
+        updateOrderItemsFromCheckoutData(cartPriceBreakdown);
+      }
+
+      setCheckoutData(response.data);
+    })();
+  }, [eventInfoQuery.data]);
+
+  useEffect(() => {
     if (customerProfile) {
       const profile = customerProfile;
       if (profile.countryId) {
@@ -876,5 +909,6 @@ export const useCheckoutFlow = ({
     orderCustomFields,
     ticketCustomFields,
     addonCustomFields,
+    checkoutData,
   };
 };

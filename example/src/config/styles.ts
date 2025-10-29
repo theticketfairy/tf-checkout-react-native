@@ -91,6 +91,9 @@ export const checkoutStyles: CheckoutStyles = {
       borderRadius: 12,
       padding: 16,
     },
+    cardContainer: {
+      height: 250,
+    },
     orderReviewItem: {
       container: {
         backgroundColor: Color.backgroundMain,

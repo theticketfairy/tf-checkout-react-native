@@ -23,13 +23,14 @@ import { useUserProfile } from '../auth/api-hooks';
 import { IRegisterUserResponse } from '../auth/types';
 import { CheckoutForm, PaymentForm } from './form';
 import { CheckoutFormStyles } from './form/styles';
-import { CheckoutData, useCheckoutFlow } from './hooks/use-checkout';
+import { ICheckoutSuccessData, useCheckoutFlow } from './hooks/use-checkout';
 import { CheckoutTexts, OrderResult } from './types';
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 export interface CheckoutV2Props {
   isSinglePageCheckout?: boolean;
   onCartExpired?: () => void;
-  onCheckoutSuccess?: (data: CheckoutData) => void;
+  onCheckoutSuccess?: (data: ICheckoutSuccessData) => void;
   onCheckoutError?: (error: any) => void;
   onPaymentSuccess?: (data: OrderResult) => void;
   onPaymentError?: (error: any) => void;
@@ -96,7 +97,7 @@ export const CheckoutController = ({
   const scrollRef = useRef<{
     scrollTo: (options: ScrollViewScrollToOptions) => void;
   }>(null);
-  const [checkoutData, setCheckoutData] = useState<CheckoutData>();
+  const [checkoutSuccessData, setCheckoutSuccessData] = useState<ICheckoutSuccessData>();
   const [loginMessage, setLoginMessage] = useState('');
   const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false);
   const formTexts = textsProp?.form;
@@ -123,8 +124,8 @@ export const CheckoutController = ({
   const { data: userProfile, invalidate } = useUserProfile();
 
   const onCheckoutSuccess = useCallback(
-    (data: CheckoutData) => {
-      setCheckoutData(data);
+    (data: ICheckoutSuccessData) => {
+      setCheckoutSuccessData(data);
       _onCheckoutSuccess?.(data);
     },
     [_onCheckoutSuccess]
@@ -236,24 +237,29 @@ export const CheckoutController = ({
         />
 
         {/* Use our new CheckoutForm component */}
-        {isSinglePageCheckout || !checkoutData ? (
-          <CheckoutForm
-            scrollRef={scrollRef}
-            styles={stylesProp?.form}
-            texts={formTexts}
-            {...checkoutFlow}
-          />
-        ) : (
-          <PaymentForm
-            scrollRef={scrollRef}
-            styles={stylesProp?.paymentForm ?? stylesProp?.form}
-            texts={formTexts}
-            onSubmit={async () =>
-              await checkoutFlow.handlePayment(checkoutData)
-            }
-            orderItems={checkoutFlow.orderItems}
-          />
-        )}
+        {checkoutFlow.checkoutData?.attributes?.additional_payment_information?.basic_config?.apiKey ? (
+        <StripeProvider publishableKey={checkoutFlow.checkoutData.attributes.additional_payment_information.basic_config.apiKey}>
+          {isSinglePageCheckout || !checkoutSuccessData ? (
+            <CheckoutForm
+              scrollRef={scrollRef}
+              styles={stylesProp?.form}
+              texts={formTexts}
+              {...checkoutFlow}
+            />
+          ) : (
+
+            <PaymentForm
+              scrollRef={scrollRef}
+              styles={stylesProp?.paymentForm ?? stylesProp?.form}
+              texts={formTexts}
+              onSubmit={async () =>
+                await checkoutFlow.handlePayment(checkoutSuccessData)
+              }
+              orderItems={checkoutFlow.orderItems}
+            />
+          )}
+        </StripeProvider>
+        ) : null}
       </KeyboardAwareScrollView>
 
       {/* Cart Timer */}

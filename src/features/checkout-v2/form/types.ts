@@ -6,7 +6,7 @@ import type {
 
 import { CustomField } from '../../event/types';
 import { IOrderItem } from '../components/OrderReview';
-import { AddonItem } from '../types';
+import { AddonItem, UpdateCheckoutResponse } from '../types';
 import { CheckoutFormStyles } from './styles';
 
 export interface TicketHolderFormValues {
@@ -210,6 +210,9 @@ export interface PaymentFormProps {
   } | null>;
   styles?: CheckoutFormStyles;
   texts?: CheckoutFormTexts;
+
+  // Stripe required data
+  paymentInformation?: UpdateCheckoutResponse['attributes']['additional_payment_information']
 }
 
 export interface CreateFormFieldsOptions {

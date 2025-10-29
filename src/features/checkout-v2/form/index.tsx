@@ -761,6 +761,8 @@ export const Payment = ({
             onFormComplete={onFormComplete}
             style={styles.cardContainer}
             cardStyle={styles.cardStyle}
+            dangerouslyGetFullCardDetails={true}
+            autofocus={false}
           />
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -791,23 +793,33 @@ export const PaymentForm = ({
   );
 
   const onFormComplete = (details: CardFormView.Details) => {
+    logger.debug('[PaymentForm] CardForm onFormComplete triggered', { 
+      complete: details.complete,
+      details: JSON.stringify(details)
+    });
     setIsCardFormComplete(details.complete);
 
     if (details.complete) {
       setError(undefined);
+      logger.debug('[PaymentForm] Card form marked as complete');
+    } else {
+      logger.debug('[PaymentForm] Card form incomplete');
     }
   };
 
   const onPressSubmit = async () => {
     try {
       setIsSubmitting(true);
-      if (!isCardFormComplete) {
-        throw new Error(texts.payment.errorRequired);
-      }
-
+      
+      // Don't validate isCardFormComplete here - onFormComplete doesn't trigger on Android v40+
+      // Let Stripe's confirmPayment handle validation instead
+      logger.debug('[PaymentForm] Submitting payment', { isCardFormComplete });
+      
       await onSubmit();
     } catch (e) {
-      setError(readableError(e));
+      const errorMsg = readableError(e);
+      logger.error('[PaymentForm] Payment submission failed', { error: errorMsg });
+      setError(errorMsg);
     } finally {
       setIsSubmitting(false);
     }

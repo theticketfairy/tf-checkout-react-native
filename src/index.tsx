@@ -32,7 +32,7 @@ import {
   ResetPassword,
   Tickets,
 } from './containers';
-import { CheckoutData } from './features/checkout-v2/hooks/use-checkout';
+import { ICheckoutSuccessData } from './features/checkout-v2/hooks/use-checkout';
 import { IConfig } from './helpers/Config';
 import { IMyOrderDetailsProps } from './containers/myOrderDetails/types';
 import { IMyOrdersProps } from './containers/myOrders/types';
@@ -174,7 +174,7 @@ export {
   ITicketsResponseData,
   IUserProfile,
   IConfig,
-  CheckoutData as ICheckoutData,
+  ICheckoutSuccessData,
   IMyOrderDetailsTicket,
   Loading,
   LoggedIn,
