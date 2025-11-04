@@ -86,7 +86,8 @@ const MyOrdersView: FC<IMyOrdersViewProps> = ({
       button: s.eventsDropdownButton,
       label: {
         maxWidth: '100%',
-      } as StyleProp<TextStyle>,
+        ...styles?.eventsDropdown?.label,
+      },
       icon: {},
       dialog: {},
       flatListContainer: {},

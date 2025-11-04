@@ -392,6 +392,9 @@ const AppRaw = () => {
               onSelectOrder={handleOnSelectOrder}
               styles={{
                 timeFilters: {
+                  label: {
+                    color: Color.textMain,
+                  },
                   container: {
                     paddingHorizontal: 16,
                   },

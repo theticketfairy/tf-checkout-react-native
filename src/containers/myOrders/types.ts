@@ -37,6 +37,7 @@ export interface IMyOrdersStyles {
   eventsSelectionContainer?: StyleProp<ViewStyle>;
   clearEventSelectionIcon?: StyleProp<ImageStyle>;
   timeFilters?: {
+    label?: StyleProp<TextStyle>;
     container?: StyleProp<ViewStyle>;
     dropdown?: IDropdownStyles;
     selectionContainer?: StyleProp<ViewStyle>;
