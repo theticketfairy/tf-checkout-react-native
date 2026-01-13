@@ -71,7 +71,7 @@ const DatePicker = ({
         onConfirm={handleOnSelectDate}
         onCancel={handleOnCancel}
         date={selectedDate || new Date()}
-        maximumDate={new Date()} // Prevent future dates for birth dates
+        maximumDate={new Date()}
         pickerComponentStyleIOS={{ height: 200 }}
       />
     </View>
