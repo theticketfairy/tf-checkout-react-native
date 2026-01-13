@@ -419,8 +419,8 @@ export const useCheckoutFlow = ({
       isSubToTicketFairy: false,
       isSubToBrand: false,
       isCardFormComplete: false,
-      country: '1',
-      state: '1',
+      country: '-1',
+      state: '-1',
       addons: addonDefaults,
       acceptedConditions: {},
       customFields: { ...defaultCustomFieldValues.orderDefaults },
@@ -520,16 +520,24 @@ export const useCheckoutFlow = ({
         } else {
           logger.debug('[useCheckoutFlow] Processing paid ticket with Stripe', { hash: input.hash, amount: order_details.pay_now });
 
+          // Lookup country ISO-2 code from the countries list
+          const selectedCountry = countries.find(c => c.id === input.values.country);
+          const countryCode = selectedCountry?.code || undefined;
+
+          // Lookup state code from the states list
+          const selectedState = states.find(s => s.value === input.values.state);
+          const stateCode = selectedState?.code || undefined;
+
           const billingDetails: BillingDetails = {
             email: input.values.email,
             name: `${input.values.firstName} ${input.values.lastName}`,
             phone: input.values.phone || undefined,
             address: {
               city: input.values.city || undefined,
-              country: input.values.country || undefined,
+              country: countryCode,
               line1: input.values.street || undefined,
               postalCode: input.values.postalCode || undefined,
-              state: input.values.state || undefined,
+              state: stateCode,
             },
           };
 
@@ -567,7 +575,6 @@ export const useCheckoutFlow = ({
             paymentIntentId: paymentIntent.id,
           };
 
-          setIsSubmitting(false);
           logger.debug('[useCheckoutFlow] Payment process completed successfully', { hash: input.hash, email: input.values.email });
           onPaymentSuccess?.(result);
         }
@@ -576,6 +583,8 @@ export const useCheckoutFlow = ({
         logError(error, 'Checkout: handlePayment');
         onPaymentError?.(error);
         throw error;
+      } finally {
+        setIsSubmitting(false);
       }
     },
     [

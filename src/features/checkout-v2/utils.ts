@@ -15,13 +15,15 @@ import { ICheckoutBody } from './types';
  * @param currency Currency code
  * @returns Formatted price with currency symbol
  */
-export const priceWithCurrency = (value = '', currency = 'US$'): string =>
-  currency +
-  ' ' +
-  parseFloat(value).toLocaleString('en-US', {
+export const priceWithCurrency = (value = '', currency = 'US$'): string => {
+  const num = parseFloat(value);
+  const safe = Number.isFinite(num) ? num : 0;
+  const formatted = safe.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+  return `${currency} ${formatted}`;
+};
 
 export const createRegistrationData = (
   values: CheckoutFormValues,

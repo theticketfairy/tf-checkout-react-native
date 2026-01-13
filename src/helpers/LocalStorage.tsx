@@ -125,11 +125,28 @@ export const isStoredTokenValid = async () => {
     return false;
   }
 
-  const decodedToken = jwtDecode<{ exp: number }>(token);
-  if (decodedToken && decodedToken.exp < Date.now() / 1000) {
+  try {
+    const decodedToken = jwtDecode<{ exp?: number }>(token);
+
+    // Check if exp is missing or invalid
+    if (!decodedToken || typeof decodedToken.exp !== 'number') {
+      await deleteData(LocalStorageKeys.ACCESS_TOKEN);
+      await deleteData(LocalStorageKeys.USER_DATA);
+      return false;
+    }
+
+    // Check if token is expired
+    if (decodedToken.exp < Date.now() / 1000) {
+      await deleteData(LocalStorageKeys.ACCESS_TOKEN);
+      await deleteData(LocalStorageKeys.USER_DATA);
+      return false;
+    }
+
+    return true;
+  } catch {
+    // Token is malformed or cannot be decoded
     await deleteData(LocalStorageKeys.ACCESS_TOKEN);
     await deleteData(LocalStorageKeys.USER_DATA);
     return false;
   }
-  return true;
 };

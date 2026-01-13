@@ -34,6 +34,7 @@ export const useStates = (countryId?: string) => {
           data: Object.entries(response.data.data || {}).map(([id, name]) => ({
             label: String(name),
             value: id,
+            code: id, // Use the key as the state code (ISO-2/state code)
           })),
         };
       }),

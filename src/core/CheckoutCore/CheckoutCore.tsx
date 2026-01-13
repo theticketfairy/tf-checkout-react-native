@@ -1,6 +1,7 @@
 /**
  * @deprecated This component is deprecated and will be removed in a future release.
- * Please use the hooks from 'src/features/checkout-v2/hooks' instead.
+ * Please use the hooks from 'tf-checkout-react-native' instead.
+ * Example: import { useCheckoutFlow } from 'tf-checkout-react-native'
  * See README.md in this directory for migration guide.
  */
 import React, { useCallback, useEffect, useState } from 'react';
@@ -24,7 +25,8 @@ import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/Ref
 import { CheckoutCoreHandle, ICheckoutCoreProps } from './CheckoutCoreTypes';
 
 /**
- * @deprecated Use the hooks from 'src/features/checkout-v2/hooks' instead
+ * @deprecated Use the hooks from 'tf-checkout-react-native' instead.
+ * Example: import { useCheckoutFlow } from 'tf-checkout-react-native'
  */
 const CheckoutCore = forwardRef<CheckoutCoreHandle, ICheckoutCoreProps>(
   (props, ref) => {
