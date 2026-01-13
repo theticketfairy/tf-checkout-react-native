@@ -1,10 +1,10 @@
-import React, { FC } from 'react'
-import { Text, View } from 'react-native'
+import React, { FC } from 'react';
+import { Text, View } from 'react-native';
 
-import Button from '../../button/Button'
-import Input from '../../input/Input'
-import s from '../styles'
-import { ILoginFormProps } from './types'
+import Button from '../../button/Button';
+import Input from '../../input/Input';
+import s from '../styles';
+import { ILoginFormProps } from './types';
 
 const LoginForm: FC<ILoginFormProps> = ({
   viewProps,
@@ -22,7 +22,7 @@ const LoginForm: FC<ILoginFormProps> = ({
   onPressLoginButton,
   brandImages,
 }) => {
-  const { styles, texts } = viewProps || {}
+  const { styles, texts } = viewProps || {};
 
   return (
     <View style={[s.dialog, styles?.dialog?.container]}>
@@ -41,19 +41,19 @@ const LoginForm: FC<ILoginFormProps> = ({
       <Input
         label={texts?.dialog?.emailLabel || 'Email'}
         error={emailError}
-        keyboardType='email-address'
+        keyboardType="email-address"
         value={email}
         onChangeText={onEmailChanged}
-        autoCapitalize='none'
+        autoCapitalize="none"
         styles={styles?.dialog?.input}
       />
       <Input
         label={texts?.dialog?.passwordLabel || 'Password'}
         error={passwordError}
-        keyboardType='default'
+        keyboardType="default"
         value={password}
         onChangeText={onPasswordChanged}
-        autoCapitalize='none'
+        autoCapitalize="none"
         secureTextEntry={true}
         isShowPasswordButtonVisible={isShowPasswordButtonVisible}
         styles={styles?.dialog?.input}
@@ -88,7 +88,7 @@ const LoginForm: FC<ILoginFormProps> = ({
         isDisabled={isLoginButtonDisabled}
       />
     </View>
-  )
-}
+  );
+};
 
-export default LoginForm
+export default LoginForm;

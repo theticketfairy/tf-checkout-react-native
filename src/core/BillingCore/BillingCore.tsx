@@ -1,6 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { forwardRef, useImperativeHandle } from 'react'
-import BackgroundTimer from 'react-native-background-timer'
+/**
+ * @deprecated This component is deprecated and will be removed in a future release.
+ * Please use the hooks from 'src/features/checkout-v2/hooks' instead.
+ * See README.md in this directory for migration guide.
+ */
+import React, { useCallback, useEffect, useState } from 'react';
+import { forwardRef, useImperativeHandle } from 'react';
 
 import {
   checkoutOrder,
@@ -9,7 +13,7 @@ import {
   fetchStates,
   fetchUserProfile,
   registerNewUser,
-} from '../../api/ApiClient'
+} from '../../api/ApiClient';
 import {
   ICartResponse,
   ICheckoutBody,
@@ -18,109 +22,112 @@ import {
   IRegisterNewUserResponse,
   IStatesResponse,
   IUserProfileResponse,
-} from '../../api/types'
-import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken'
+} from '../../api/types';
+import { refreshAccessToken as refreshAccessTokenAsync } from '../../helpers/RefreshAccessToken';
 import {
   BillingCoreHandle,
   IBillingCoreProps,
   ICheckoutResponse,
-} from './BillingCoreTypes'
+} from './BillingCoreTypes';
+import BackgroundTimer from 'react-native-background-timer';
 
+/**
+ * @deprecated Use the hooks from 'src/features/checkout-v2/hooks' instead
+ */
 const BillingCore = forwardRef<BillingCoreHandle, IBillingCoreProps>(
   (props, ref) => {
-    const [secondsLeft, setSecondsLeft] = useState(420)
-    const [timerOn, setTimerOn] = useState(false)
+    const [secondsLeft, setSecondsLeft] = useState(420);
+    const [timerOn, setTimerOn] = useState(false);
 
     const handleStopTimer = useCallback(() => {
-      BackgroundTimer.stop()
-      BackgroundTimer.stopBackgroundTimer()
-    }, [])
+      BackgroundTimer.stop();
+      BackgroundTimer.stopBackgroundTimer();
+    }, []);
 
     const handleStartTimer = useCallback(() => {
       BackgroundTimer.runBackgroundTimer(() => {
         setSecondsLeft((secs) => {
           if (secs > 0) {
-            return secs - 1
+            return secs - 1;
           } else {
-            return 0
+            return 0;
           }
-        })
-      }, 1000)
-    }, [])
+        });
+      }, 1000);
+    }, []);
 
     const handleTimeIsUp = () => {
-      BackgroundTimer.stopBackgroundTimer()
-      props.onCartExpired?.()
-    }
+      BackgroundTimer.stopBackgroundTimer();
+      props.onCartExpired?.();
+    };
 
     useEffect(() => {
       if (secondsLeft === 0) {
-        handleTimeIsUp()
+        handleTimeIsUp();
       }
-      props.onSecondsLeftChange?.(secondsLeft)
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [secondsLeft])
+      props.onSecondsLeftChange?.(secondsLeft);
+    }, [secondsLeft]);
 
     useEffect(() => {
       if (timerOn) {
-        handleStartTimer()
+        handleStartTimer();
       } else {
-        BackgroundTimer.stopBackgroundTimer()
+        BackgroundTimer.stopBackgroundTimer();
       }
       return () => {
-        BackgroundTimer.stopBackgroundTimer()
-      }
-    }, [handleStartTimer, timerOn])
+        BackgroundTimer.stopBackgroundTimer();
+      };
+    }, [handleStartTimer, timerOn]);
 
     useImperativeHandle(ref, () => ({
       async checkoutOrder(body: ICheckoutBody): Promise<ICheckoutResponse> {
-        const checkout = await checkoutOrder(body)
+        const checkout = await checkoutOrder(body);
         if (!checkout.error) {
-          BackgroundTimer.stopBackgroundTimer()
+          BackgroundTimer.stopBackgroundTimer();
         }
-        return checkout
+        return checkout;
       },
 
       async getCart(): Promise<ICartResponse> {
-        const cart = await fetchCart()
+        const cart = await fetchCart();
 
         if (cart.cartData?.expiresAt) {
-          setSecondsLeft(cart.cartData.expiresAt)
-          setTimerOn(true)
+          setSecondsLeft(cart.cartData.expiresAt);
+          setTimerOn(true);
         }
 
-        return cart
+        return cart;
       },
 
       async getCountries(): Promise<ICountriesResponse> {
-        return await fetchCountries()
+        return await fetchCountries();
       },
 
       async getStates(countryId: string): Promise<IStatesResponse> {
-        return await fetchStates(countryId)
+        return await fetchStates(countryId);
       },
 
       async getUserProfile(): Promise<IUserProfileResponse> {
-        return await fetchUserProfile()
+        return await fetchUserProfile();
       },
 
       async registerNewUser(data: FormData): Promise<IRegisterNewUserResponse> {
-        return await registerNewUser(data)
+        return await registerNewUser(data);
       },
 
       async refreshAccessToken(
         refreshToken?: string
       ): Promise<IFetchAccessTokenResponse> {
-        return await refreshAccessTokenAsync(refreshToken)
+        return await refreshAccessTokenAsync(refreshToken);
       },
 
       stopCartTimer() {
-        return handleStopTimer()
+        return handleStopTimer();
       },
-    }))
+    }));
 
-    return <>{props.children}</>
+    return <>{props.children}</>;
   }
-)
+);
 
-export default BillingCore
+export default BillingCore;

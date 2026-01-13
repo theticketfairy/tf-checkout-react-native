@@ -1,12 +1,12 @@
 //@ts-nocheck
 
-import React from 'react'
-import { Image, TouchableOpacity, View } from 'react-native'
-import { OutlinedTextField as TextField } from 'rn-material-ui-textfield'
+import React from 'react';
+import { Image, TouchableOpacity, View } from 'react-native';
 
-import R from '../../res'
-import s from './styles'
-import { IInputProps } from './types'
+import R from '../../res';
+import s from './styles';
+import { IInputProps } from './types';
+import { OutlinedTextField } from '../../packages/rn-material-ui-textfield';
 
 const Input = (props: IInputProps) => {
   const {
@@ -20,18 +20,18 @@ const Input = (props: IInputProps) => {
     isShowPasswordButtonVisible,
     showPasswordImages,
     secureTextEntry,
-  } = props
+  } = props;
   const mainColor = styles?.baseColor
     ? styles.baseColor
-    : styles?.color || R.colors.black
+    : styles?.color || R.colors.black;
 
-  const showPasswordImage = showPasswordImages?.show || R.icons.eye
-  const hidePasswordImage = showPasswordImages?.hide || R.icons.eyeOff
-  const [isShowingPassword, setIsShowingPassword] = React.useState(false)
+  const showPasswordImage = showPasswordImages?.show || R.icons.eye;
+  const hidePasswordImage = showPasswordImages?.hide || R.icons.eyeOff;
+  const [isShowingPassword, setIsShowingPassword] = React.useState(false);
 
   const handleOnPressShowPassword = () => {
-    setIsShowingPassword(!isShowingPassword)
-  }
+    setIsShowingPassword(!isShowingPassword);
+  };
 
   const showPasswordButton = () => {
     return (
@@ -47,13 +47,14 @@ const Input = (props: IInputProps) => {
           />
         </TouchableOpacity>
       )
-    )
-  }
+    );
+  };
 
   return (
     <View style={[s.container, styles?.container]}>
-      <TextField
-        inputRef={reference}
+      <OutlinedTextField
+        placeholderTextColor={styles?.placeholderColor}
+        // inputRef={reference}
         value={value}
         onChangeText={(text: string) =>
           id && onTextChanged ? onTextChanged(id, text) : onChangeText
@@ -70,10 +71,12 @@ const Input = (props: IInputProps) => {
         errorColor={styles?.errorColor}
         secureTextEntry={secureTextEntry && !isShowingPassword}
         renderRightAccessory={showPasswordButton}
+        // // 👇 ADDED/MODIFIED LINE: Explicitly set contentInset to ensure alignment
+        // // contentInset={{ left: 12, top: 10, label: 4, input: 8, right: 12 }}
         {...props}
       />
     </View>
-  )
-}
+  );
+};
 
-export default Input
+export default Input;

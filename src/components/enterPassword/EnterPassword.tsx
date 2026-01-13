@@ -1,10 +1,10 @@
-import React, { FC, useState } from 'react'
-import { Modal, Text, View } from 'react-native'
+import React, { FC, useState } from 'react';
+import { Modal, Text, View } from 'react-native';
 
-import Button from '../button/Button'
-import Input from '../input/Input'
-import s from './styles'
-import { IEnterPasswordProps } from './types'
+import Button from '../button/Button';
+import Input from '../input/Input';
+import s from './styles';
+import { IEnterPasswordProps } from './types';
 
 const EnterPassword: FC<IEnterPasswordProps> = ({
   styles,
@@ -13,14 +13,14 @@ const EnterPassword: FC<IEnterPasswordProps> = ({
   isLoading,
   apiError,
 }) => {
-  const [password, setPassword] = useState('')
+  const [password, setPassword] = useState('');
 
   const handleOnSubmit = () => {
-    if (password.length > 0) onSubmit?.(password)
-  }
+    if (password.length > 0) onSubmit?.(password);
+  };
 
   return (
-    <Modal presentationStyle='overFullScreen' transparent={false}>
+    <Modal presentationStyle="overFullScreen" transparent={false}>
       <View style={styles?.rootContainer || s.rootContainer}>
         <View style={styles?.contentContainer || s.contentContainer}>
           <Text style={styles?.title || s.title}>
@@ -31,7 +31,7 @@ const EnterPassword: FC<IEnterPasswordProps> = ({
             value={password}
             onChangeText={setPassword}
             styles={styles?.input}
-            autoCapitalize='none'
+            autoCapitalize="none"
           />
           {!!apiError && (
             <Text style={s.errorText || styles?.error}>{apiError}</Text>
@@ -46,7 +46,7 @@ const EnterPassword: FC<IEnterPasswordProps> = ({
         </View>
       </View>
     </Modal>
-  )
-}
+  );
+};
 
-export default EnterPassword
+export default EnterPassword;

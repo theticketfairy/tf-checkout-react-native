@@ -1,11 +1,11 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 
-const RADIO_SIZE = 20
-const RADIO_RADIUS = RADIO_SIZE / 2
-const INDICATOR_SIZE = RADIO_SIZE * 0.6
-const INDICATOR_RADIUS = INDICATOR_SIZE / 2
+const RADIO_SIZE = 20;
+const RADIO_RADIUS = RADIO_SIZE / 2;
+const INDICATOR_SIZE = RADIO_SIZE * 0.6;
+const INDICATOR_RADIUS = INDICATOR_SIZE / 2;
 
 export default StyleSheet.create({
   rootContainer: {
@@ -29,4 +29,4 @@ export default StyleSheet.create({
     borderRadius: INDICATOR_RADIUS,
     backgroundColor: R.colors.black,
   },
-})
+});

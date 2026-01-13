@@ -5,18 +5,18 @@ import React, {
   useImperativeHandle,
   useRef,
   useState,
-} from 'react'
-import { Alert } from 'react-native'
+} from 'react';
+import { Alert } from 'react-native';
 
-import { IFetchAccessTokenResponse } from '../../api/types'
+import { IFetchAccessTokenResponse } from '../../api/types';
 import {
   PurchaseConfirmationCore,
   PurchaseConfirmationCoreHandle,
   SessionHandle,
-} from '../../core'
-import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
-import PurchaseConfirmationView from './PurchaseConfirmationView'
-import { IPurchaseConfirmationProps } from './types'
+} from '../../core';
+import { SessionHandleType } from '../../core/Session/SessionCoreTypes';
+import PurchaseConfirmationView from './PurchaseConfirmationView';
+import { IPurchaseConfirmationProps } from './types';
 
 const PurchaseConfirmation = forwardRef<
   SessionHandleType,
@@ -37,60 +37,60 @@ const PurchaseConfirmation = forwardRef<
     ref
   ) => {
     //#region State
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
     //#endregion State
 
     const showAlert = (text: string) => {
-      areAlertsEnabled && Alert.alert(text)
-    }
+      areAlertsEnabled && Alert.alert(text);
+    };
 
     const isPurchaseConfirmationCoreRefReady = (): boolean => {
       if (!purchaseConfirmationCoreRef.current) {
         onFetchPurchaseConfirmationError?.({
           message: 'PurchaseConfirmationCore is not initialized',
-        })
-        showAlert('PurchaseConfirmationCore is not initialized')
-        return false
+        });
+        showAlert('PurchaseConfirmationCore is not initialized');
+        return false;
       }
 
-      return true
-    }
+      return true;
+    };
 
     //#region Fetch data
     const getInitialData = async () => {
       if (!isPurchaseConfirmationCoreRefReady()) {
-        return
+        return;
       }
 
-      purchaseConfirmationCoreRef.current?.stopCartTimer()
-      setIsLoading(true)
+      purchaseConfirmationCoreRef.current?.stopCartTimer();
+      setIsLoading(true);
       const { purchaseConfirmationError } =
         await purchaseConfirmationCoreRef.current!.getPurchaseConfirmation(
           orderHash
-        )
-      setIsLoading(false)
+        );
+      setIsLoading(false);
 
       if (purchaseConfirmationError) {
-        onFetchPurchaseConfirmationError?.(purchaseConfirmationError)
-        return showAlert(purchaseConfirmationError.message)
+        onFetchPurchaseConfirmationError?.(purchaseConfirmationError);
+        return showAlert(purchaseConfirmationError.message);
       }
 
-      onFetchPurchaseConfirmationSuccess?.()
-    }
+      onFetchPurchaseConfirmationSuccess?.();
+    };
     //#endregion Fetch data
 
     //#region Ref
     const purchaseConfirmationCoreRef =
-      useRef<PurchaseConfirmationCoreHandle>(null)
-    const sessionHandleRef = useRef<SessionHandleType>(null)
+      useRef<PurchaseConfirmationCoreHandle>(null);
+    const sessionHandleRef = useRef<SessionHandleType>(null);
     //#endregion Ref
 
     const handleOnLoadingChange = useCallback(
       (loading: boolean) => {
-        onLoadingChange?.(loading)
+        onLoadingChange?.(loading);
       },
       [onLoadingChange]
-    )
+    );
 
     //#region Imperative Handler
     useImperativeHandle(ref, () => ({
@@ -102,35 +102,34 @@ const PurchaseConfirmation = forwardRef<
             accessTokenError: {
               message: 'Session Handle ref is not initialized',
             },
-          }
+          };
         }
 
         const { accessTokenError, accessTokenData } =
-          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+          await sessionHandleRef.current!.refreshAccessToken(refreshToken);
         if (!accessTokenError && accessTokenData?.accessToken) {
-          await getInitialData()
+          await getInitialData();
         }
         return {
           accessTokenData,
           accessTokenError,
-        }
+        };
       },
 
       async reloadData() {
-        await getInitialData()
+        await getInitialData();
       },
-    }))
+    }));
     //#endregion Imperative Handler
 
     //#region useEffect
     useEffect(() => {
-      handleOnLoadingChange(isLoading)
-    }, [handleOnLoadingChange, isLoading])
+      handleOnLoadingChange(isLoading);
+    }, [handleOnLoadingChange, isLoading]);
 
     useEffect(() => {
-      getInitialData()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+      getInitialData();
+    }, []);
     //#endregion useEffect
 
     //#region RENDER
@@ -146,9 +145,9 @@ const PurchaseConfirmation = forwardRef<
           />
         </SessionHandle>
       </PurchaseConfirmationCore>
-    )
+    );
     //#endregion RENDER
   }
-)
+);
 
-export default PurchaseConfirmation
+export default PurchaseConfirmation;

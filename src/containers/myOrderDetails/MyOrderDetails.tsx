@@ -1,5 +1,5 @@
-import _find from 'lodash/find'
-import _forEach from 'lodash/forEach'
+import _find from 'lodash/find';
+import _forEach from 'lodash/forEach';
 import React, {
   forwardRef,
   useCallback,
@@ -7,28 +7,28 @@ import React, {
   useImperativeHandle,
   useRef,
   useState,
-} from 'react'
-import { Alert, PermissionsAndroid, Platform } from 'react-native'
+} from 'react';
+import { Alert, PermissionsAndroid, Platform } from 'react-native';
 import {
   DocumentDirectoryPath,
   DownloadDirectoryPath,
   downloadFile,
   DownloadFileOptions,
-} from 'react-native-fs'
+} from 'react-native-fs';
 
 import {
   IFetchAccessTokenResponse,
   IMyOrderDetailsData,
   IMyOrderDetailsTicket,
-} from '../../api/types'
-import { BottomSheetHandle } from '../../components/bottomSheetModal/BottomSheetModal'
-import { OrderDetailsCore, SessionHandle, SessionHandleType } from '../../core'
-import { OrderDetailsCoreHandle } from '../../core/OrderDetailsCore/OrderDetailsCoreTypes'
-import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
-import { TicketActionType } from './components/TicketActions/TicketActionsTypes'
-import { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem'
-import MyOrderDetailsView from './MyOrderDetailsView'
-import { DownloadStatus, IMyOrderDetailsProps } from './types'
+} from '../../api/types';
+import { BottomSheetHandle } from '../../components/bottomSheetModal/BottomSheetModal';
+import { OrderDetailsCore, SessionHandle, SessionHandleType } from '../../core';
+import { OrderDetailsCoreHandle } from '../../core/OrderDetailsCore/OrderDetailsCoreTypes';
+import { getData, LocalStorageKeys } from '../../helpers/LocalStorage';
+import { TicketActionType } from './components/TicketActions/TicketActionsTypes';
+import { IOnPressTicketDownload } from './components/TicketListItem/TicketListItem';
+import MyOrderDetailsView from './MyOrderDetailsView';
+import { DownloadStatus, IMyOrderDetailsProps } from './types';
 
 const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
   (
@@ -53,31 +53,31 @@ const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
     //#region State
     const [isWriteStorageEnabled, setIsWriteStorageEnabled] = useState<
       boolean | undefined
-    >(undefined)
-    const [isLinkCopied, setIsLinkCopied] = useState(false)
+    >(undefined);
+    const [isLinkCopied, setIsLinkCopied] = useState(false);
     const [downloadStatus, setDownloadStatus] = useState<
       DownloadStatus | undefined
-    >(undefined)
-    const [orderInfo, setOrderInfo] = useState<IMyOrderDetailsData>(data)
-    const [isLoading, setIsLoading] = useState(false)
+    >(undefined);
+    const [orderInfo, setOrderInfo] = useState<IMyOrderDetailsData>(data);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [selectedTicket, setSelectedTicket] = useState<
       IMyOrderDetailsTicket | undefined
-    >(undefined)
+    >(undefined);
     //#endregion State
 
     //#region refs
-    const sessionHandleRef = useRef<SessionHandleType>(null)
-    const myOrderDetailsCoreRef = useRef<OrderDetailsCoreHandle>(null)
-    const bottomSheetModalRef = useRef<BottomSheetHandle>(null)
+    const sessionHandleRef = useRef<SessionHandleType>(null);
+    const myOrderDetailsCoreRef = useRef<OrderDetailsCoreHandle>(null);
+    const bottomSheetModalRef = useRef<BottomSheetHandle>(null);
     //#endregion
 
     const handleOnDownloadStatusChange = useCallback(
       (status?: DownloadStatus) => {
-        onDownloadStatusChange?.(status)
+        onDownloadStatusChange?.(status);
       },
       [onDownloadStatusChange]
-    )
+    );
 
     //#region Imperative Handler
     useImperativeHandle(ref, () => ({
@@ -89,22 +89,22 @@ const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
             accessTokenError: {
               message: 'Session Handle ref is not initialized',
             },
-          }
+          };
         }
 
         const { accessTokenError, accessTokenData } =
-          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+          await sessionHandleRef.current!.refreshAccessToken(refreshToken);
 
         return {
           accessTokenData,
           accessTokenError,
-        }
+        };
       },
 
       async reloadData() {},
       async removeTicketFromResale() {},
       async resaleTicket() {},
-    }))
+    }));
     //#endregion Imperative Handler
 
     //#region Handlers
@@ -112,75 +112,75 @@ const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
       hash,
       pdfLink,
     }: IOnPressTicketDownload) => {
-      const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
+      const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN);
       if (!accessToken) {
-        return setDownloadStatus(undefined)
+        return setDownloadStatus(undefined);
       }
       if (!pdfLink) {
-        return setDownloadStatus('failed')
+        return setDownloadStatus('failed');
       }
 
       //Define path to store file along with the extension
       const path =
         Platform.OS === 'ios'
           ? `${DocumentDirectoryPath}/${hash}.pdf`
-          : `${DownloadDirectoryPath}/${hash}.pdf`
+          : `${DownloadDirectoryPath}/${hash}.pdf`;
 
       const headers = {
-        Accept: 'application/pdf',
+        'Accept': 'application/pdf',
         'Content-Type': 'application/pdf',
-        Authorization: `Bearer ${accessToken}`,
-      }
+        'Authorization': `Bearer ${accessToken}`,
+      };
       //Define options
       const options: DownloadFileOptions = {
         fromUrl: pdfLink,
         toFile: path,
         headers: headers,
-      }
-      setDownloadStatus('downloading')
-      const response = await downloadFile(options).promise
+      };
+      setDownloadStatus('downloading');
+      const response = await downloadFile(options).promise;
 
       if (response.statusCode === 200) {
-        setDownloadStatus('downloaded')
+        setDownloadStatus('downloaded');
       } else {
-        setDownloadStatus('failed')
+        setDownloadStatus('failed');
       }
 
       setTimeout(() => {
-        setDownloadStatus(undefined)
-      }, 5000)
-    }
+        setDownloadStatus(undefined);
+      }, 5000);
+    };
 
     const handleRemoveTicketFromResale = async (
       ticket: IMyOrderDetailsTicket
     ) => {
       if (!myOrderDetailsCoreRef.current) {
-        return Alert.alert('MyOrderDetailsCoreRef is not initialized')
+        return Alert.alert('MyOrderDetailsCoreRef is not initialized');
       }
 
-      setIsLoading(true)
+      setIsLoading(true);
       const { removeTicketFromResaleData, removeTicketFromResaleError } =
-        await myOrderDetailsCoreRef.current.removeTicketFromResale(ticket.hash)
-      setIsLoading(false)
+        await myOrderDetailsCoreRef.current.removeTicketFromResale(ticket.hash);
+      setIsLoading(false);
 
       if (removeTicketFromResaleError || !removeTicketFromResaleData) {
-        onRemoveTicketFromResaleError?.(removeTicketFromResaleError!)
-        return Alert.alert('', removeTicketFromResaleError?.message)
+        onRemoveTicketFromResaleError?.(removeTicketFromResaleError!);
+        return Alert.alert('', removeTicketFromResaleError?.message);
       }
 
-      const updatedOrderInfo = { ...orderInfo }
+      const updatedOrderInfo = { ...orderInfo };
       _forEach(updatedOrderInfo.tickets, (item) => {
         if (item.hash === ticket.hash) {
-          item.isSellable = true
-          item.isOnSale = false
+          item.isSellable = true;
+          item.isOnSale = false;
         }
-      })
+      });
 
-      Alert.alert('', removeTicketFromResaleData.message)
+      Alert.alert('', removeTicketFromResaleData.message);
 
-      setOrderInfo(updatedOrderInfo)
-      onRemoveTicketFromResaleSuccess?.(removeTicketFromResaleData.message)
-    }
+      setOrderInfo(updatedOrderInfo);
+      onRemoveTicketFromResaleSuccess?.(removeTicketFromResaleData.message);
+    };
 
     const askToRemoveTicketFromResale = (ticket: IMyOrderDetailsTicket) => {
       Alert.alert(
@@ -195,28 +195,28 @@ const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
             onPress: () => handleRemoveTicketFromResale(ticket),
           },
         ]
-      )
-    }
+      );
+    };
 
     const handleOnPressResaleTicket = (ticket: IMyOrderDetailsTicket) => {
       const activeTicketType = _find(
         data.items,
         (ticketType) => ticketType.hash === ticket.ticketTypeHash
-      )
+      );
 
-      return onPressResaleTicket(ticket, activeTicketType!.isActive)
-    }
+      return onPressResaleTicket(ticket, activeTicketType!.isActive);
+    };
 
     const handleCloseBottomSheet = () => {
       if (bottomSheetModalRef.current) {
-        bottomSheetModalRef.current.close()
+        bottomSheetModalRef.current.close();
       }
-      setSelectedTicket(undefined)
-    }
+      setSelectedTicket(undefined);
+    };
 
     const handleOnActionSelected = async (action: TicketActionType) => {
       if (!selectedTicket) {
-        return
+        return;
       }
 
       switch (action) {
@@ -224,69 +224,68 @@ const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
           handleOnPressTicketDownload({
             hash: selectedTicket.hash,
             pdfLink: selectedTicket.pdfLink,
-          })
-          handleCloseBottomSheet()
-          break
+          });
+          handleCloseBottomSheet();
+          break;
 
         case 'refund':
-          break
+          break;
 
         case 'sell':
-          handleOnPressResaleTicket(selectedTicket)
-          handleCloseBottomSheet()
-          break
+          handleOnPressResaleTicket(selectedTicket);
+          handleCloseBottomSheet();
+          break;
 
         case 'remove-from-sale':
-          await handleRemoveTicketFromResale(selectedTicket)
-          handleCloseBottomSheet()
-          break
+          await handleRemoveTicketFromResale(selectedTicket);
+          handleCloseBottomSheet();
+          break;
 
         default:
-          console.log('Nothing is selected')
+          console.log('Nothing is selected');
       }
-    }
+    };
 
     const handleOnPressCopyLink = () => {
-      setIsLinkCopied(true)
-      onLinkCopied?.(true)
+      setIsLinkCopied(true);
+      onLinkCopied?.(true);
       setTimeout(() => {
-        setIsLinkCopied(false)
-        onLinkCopied?.(false)
-      }, 3000)
-    }
+        setIsLinkCopied(false);
+        onLinkCopied?.(false);
+      }, 3000);
+    };
     //#endregion Handlers
 
     //#region Effects
     useEffect(() => {
-      handleOnDownloadStatusChange(downloadStatus)
-    }, [downloadStatus, handleOnDownloadStatusChange])
+      handleOnDownloadStatusChange(downloadStatus);
+    }, [downloadStatus, handleOnDownloadStatusChange]);
 
     useEffect(() => {
       if (Platform.OS === 'ios') {
-        return
+        return;
       }
 
       PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
       ).then((result) => {
-        setIsWriteStorageEnabled(result)
-      })
-    }, [])
+        setIsWriteStorageEnabled(result);
+      });
+    }, []);
 
     useEffect(() => {
       if (Platform.OS === 'android') {
-        onAndroidWritePermission?.(isWriteStorageEnabled)
+        onAndroidWritePermission?.(isWriteStorageEnabled);
       }
 
       if (isWriteStorageEnabled === false && Platform.OS === 'android') {
         PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
         ).then((result) => {
-          setIsWriteStorageEnabled(result === 'granted')
-        })
+          setIsWriteStorageEnabled(result === 'granted');
+        });
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isWriteStorageEnabled])
+    }, [isWriteStorageEnabled]);
     //#endregion Effects
 
     //#region RENDER
@@ -315,9 +314,9 @@ const MyOrderDetails = forwardRef<SessionHandleType, IMyOrderDetailsProps>(
           />
         </SessionHandle>
       </OrderDetailsCore>
-    )
+    );
     //#endregion RENDER
   }
-)
+);
 
-export default MyOrderDetails
+export default MyOrderDetails;

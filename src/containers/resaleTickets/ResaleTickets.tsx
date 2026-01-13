@@ -1,21 +1,26 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
-import { Alert } from 'react-native'
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import { Alert } from 'react-native';
 
-import { IFetchAccessTokenResponse } from '../../api/types'
+import { IFetchAccessTokenResponse } from '../../api/types';
 import {
   OrderDetailsCore,
   OrderDetailsCoreHandle,
   SessionHandle,
-} from '../../core'
-import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
-import { useDebounced } from '../../helpers/Debounced'
-import { validateEmail, validateEmpty } from '../../helpers/Validators'
-import ResaleTicketsView from './ResaleTicketsView'
+} from '../../core';
+import { SessionHandleType } from '../../core/Session/SessionCoreTypes';
+import { useDebounced } from '../../helpers/Debounced';
+import { validateEmail, validateEmpty } from '../../helpers/Validators';
+import ResaleTicketsView from './ResaleTicketsView';
 import {
   IResaleTicketsProps,
   IResaleToWhomData,
   ResaleToWhomFieldIdEnum,
-} from './types'
+} from './types';
 
 const sellToWhomInitialData: IResaleToWhomData = {
   toWhom: undefined,
@@ -26,7 +31,7 @@ const sellToWhomInitialData: IResaleToWhomData = {
     emailConfirm: '',
   },
   isTermsAgreed: false,
-}
+};
 
 const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
   (
@@ -44,37 +49,37 @@ const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
     ref
   ) => {
     //#region refs
-    const orderDetailsCoreRef = useRef<OrderDetailsCoreHandle>(null)
-    const sessionHandleRef = useRef<SessionHandleType>(null)
+    const orderDetailsCoreRef = useRef<OrderDetailsCoreHandle>(null);
+    const sessionHandleRef = useRef<SessionHandleType>(null);
     //#endregion
 
     //#region state
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
     const [sellToWhomData, setSellToWhomData] = useState<IResaleToWhomData>(
       sellToWhomInitialData
-    )
+    );
 
     const {
       someoneData: { firstName, lastName, email, emailConfirm },
       isTermsAgreed,
       toWhom,
-    } = sellToWhomData
+    } = sellToWhomData;
 
-    const firstNameError = useDebounced(firstName, validateEmpty)
-    const lastNameError = useDebounced(lastName, validateEmpty)
+    const firstNameError = useDebounced(firstName, validateEmpty);
+    const lastNameError = useDebounced(lastName, validateEmpty);
     const emailError = useDebounced(email, () =>
       validateEmail(email, emailConfirm)
-    )
+    );
     const emailConfirmError = useDebounced(emailConfirm, () =>
       validateEmail(emailConfirm, email)
-    )
+    );
     //#endregion
 
     const showAlert = (message: string) => {
       if (config?.areAlertsEnabled) {
-        Alert.alert('', message)
+        Alert.alert('', message);
       }
-    }
+    };
 
     //#region Imperative Handler
     useImperativeHandle(ref, () => ({
@@ -86,55 +91,55 @@ const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
             accessTokenError: {
               message: 'Session Handle ref is not initialized',
             },
-          }
+          };
         }
 
         const { accessTokenError, accessTokenData } =
-          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+          await sessionHandleRef.current!.refreshAccessToken(refreshToken);
 
         return {
           accessTokenData,
           accessTokenError,
-        }
+        };
       },
 
       async reloadData() {},
-    }))
+    }));
     //#endregion Imperative Handler
 
     //#region handlers
     const handleOnPressSellTickets = async () => {
       if (!orderDetailsCoreRef.current) {
-        showAlert('ResaleTicketsCoreRef is not initialized')
+        showAlert('ResaleTicketsCoreRef is not initialized');
       }
 
-      setIsLoading(true)
-      const formData = new FormData()
-      formData.append('to', toWhom)
-      formData.append('first_name', firstName)
-      formData.append('last_name', lastName)
-      formData.append('email', email)
-      formData.append('confirm_email', emailConfirm)
-      formData.append('confirm', String(isTermsAgreed))
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append('to', toWhom);
+      formData.append('first_name', firstName);
+      formData.append('last_name', lastName);
+      formData.append('email', email);
+      formData.append('confirm_email', emailConfirm);
+      formData.append('confirm', String(isTermsAgreed));
 
       const { resaleTicketData, resaleTicketError } =
-        await orderDetailsCoreRef.current!.resaleTicket(formData, ticket.hash)
+        await orderDetailsCoreRef.current!.resaleTicket(formData, ticket.hash);
 
-      setIsLoading(false)
+      setIsLoading(false);
 
       if (resaleTicketError || !resaleTicketData) {
-        onResaleTicketsError?.(resaleTicketError!)
-        return showAlert(resaleTicketError!.message)
+        onResaleTicketsError?.(resaleTicketError!);
+        return showAlert(resaleTicketError!.message);
       }
 
-      showAlert(resaleTicketData.message)
+      showAlert(resaleTicketData.message);
 
       return onResaleTicketsSuccess(resaleTicketData, {
         ...ticket,
         isOnSale: true,
         isSellable: false,
-      })
-    }
+      });
+    };
 
     const handleSellToWhomDataChange = (
       id: ResaleToWhomFieldIdEnum,
@@ -145,14 +150,14 @@ const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
           setSellToWhomData({
             ...sellToWhomData,
             isTermsAgreed: !isTermsAgreed,
-          })
-          break
+          });
+          break;
         case ResaleToWhomFieldIdEnum.radioIndex:
           setSellToWhomData({
             ...sellToWhomData,
             toWhom: value === 0 ? 'friend' : 'anyone',
-          })
-          break
+          });
+          break;
         case ResaleToWhomFieldIdEnum.firstName:
           setSellToWhomData({
             ...sellToWhomData,
@@ -160,8 +165,8 @@ const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
               ...sellToWhomData.someoneData,
               firstName: value as string,
             },
-          })
-          break
+          });
+          break;
         case ResaleToWhomFieldIdEnum.lastName:
           setSellToWhomData({
             ...sellToWhomData,
@@ -169,8 +174,8 @@ const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
               ...sellToWhomData.someoneData,
               lastName: value as string,
             },
-          })
-          break
+          });
+          break;
         case ResaleToWhomFieldIdEnum.email:
           setSellToWhomData({
             ...sellToWhomData,
@@ -178,8 +183,8 @@ const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
               ...sellToWhomData.someoneData,
               email: value as string,
             },
-          })
-          break
+          });
+          break;
         case ResaleToWhomFieldIdEnum.emailConfirm:
           setSellToWhomData({
             ...sellToWhomData,
@@ -187,16 +192,16 @@ const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
               ...sellToWhomData.someoneData,
               emailConfirm: value as string,
             },
-          })
-          break
+          });
+          break;
       }
-    }
+    };
     //#endregion
 
     //#region data validation
     const isDataValid = () => {
       if (toWhom === 'anyone' && isTermsAgreed) {
-        return true
+        return true;
       }
       if (
         toWhom === 'friend' &&
@@ -210,11 +215,11 @@ const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
         !lastNameError &&
         isTermsAgreed
       ) {
-        return true
+        return true;
       }
 
-      return false
-    }
+      return false;
+    };
     //#endregion
 
     //#region render
@@ -239,9 +244,9 @@ const ResaleTickets = forwardRef<SessionHandleType, IResaleTicketsProps>(
           />
         </SessionHandle>
       </OrderDetailsCore>
-    )
+    );
     //#endregion
   }
-)
+);
 
-export default ResaleTickets
+export default ResaleTickets;

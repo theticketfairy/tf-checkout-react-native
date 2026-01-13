@@ -1,12 +1,12 @@
-import React, { FC, useState } from 'react'
-import { Text, View } from 'react-native'
+import React, { FC, useState } from 'react';
+import { Text, View } from 'react-native';
 
-import { useDebounced } from '../../helpers/Debounced'
-import { validateEmail } from '../../helpers/Validators'
-import Button from '../button/Button'
-import Input from '../input/Input'
-import { restorePasswordStyles as s } from './styles'
-import { IRestorePasswordProps } from './types'
+import { useDebounced } from '../../helpers/Debounced';
+import { validateEmail } from '../../helpers/Validators';
+import Button from '../button/Button';
+import Input from '../input/Input';
+import { restorePasswordStyles as s } from './styles';
+import { IRestorePasswordProps } from './types';
 
 const RestorePassword: FC<IRestorePasswordProps> = ({
   styles,
@@ -16,12 +16,12 @@ const RestorePassword: FC<IRestorePasswordProps> = ({
   onPressCancelButton,
   apiError,
 }) => {
-  const [email, setEmail] = useState('')
-  const emailError = useDebounced(email, validateEmail)
+  const [email, setEmail] = useState('');
+  const emailError = useDebounced(email, validateEmail);
 
   const handleOnPressRestoreButton = () => {
-    onPressRestorePasswordButton(email)
-  }
+    onPressRestorePasswordButton(email);
+  };
 
   return (
     <View style={[s.rootContainer, styles?.rootContainer]}>
@@ -32,10 +32,10 @@ const RestorePassword: FC<IRestorePasswordProps> = ({
       <Input
         label={texts?.inputLabel || 'Email'}
         error={emailError}
-        keyboardType='email-address'
+        keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
-        autoCapitalize='none'
+        autoCapitalize="none"
         styles={styles?.input}
       />
 
@@ -57,7 +57,7 @@ const RestorePassword: FC<IRestorePasswordProps> = ({
         />
       )}
     </View>
-  )
-}
+  );
+};
 
-export default RestorePassword
+export default RestorePassword;

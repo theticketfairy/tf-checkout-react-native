@@ -1,14 +1,14 @@
-import { Dimensions, StyleSheet } from 'react-native'
+import { Dimensions, StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 
-const { width: sWidth, height: sHeight } = Dimensions.get('window')
+const { width: sWidth, height: sHeight } = Dimensions.get('window');
 
 const DIALOG = {
   width: sWidth * 0.8,
   maxHeight: sHeight * 0.5,
   minHeight: sHeight * 0.2,
-}
+};
 
 export const DropdownMaterialStyles = StyleSheet.create({
   rootContainer: {
@@ -47,7 +47,6 @@ export const DropdownMaterialStyles = StyleSheet.create({
     justifyContent: 'center',
     width: DIALOG.width,
     maxHeight: DIALOG.maxHeight,
-    minHeight: DIALOG.minHeight,
     shadowColor: R.colors.black,
     shadowOffset: {
       width: 3,
@@ -59,7 +58,7 @@ export const DropdownMaterialStyles = StyleSheet.create({
   flatListContainer: {
     width: DIALOG.width,
   },
-})
+});
 
 export const DropdownListItemStyles = StyleSheet.create({
   rootContainer: {
@@ -89,4 +88,4 @@ export const DropdownListItemStyles = StyleSheet.create({
     textAlign: 'center',
     color: R.colors.black,
   },
-})
+});

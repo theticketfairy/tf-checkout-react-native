@@ -1,53 +1,53 @@
-import InputPhone from '@sesamsolutions/phone-input'
-import React, { FC, useCallback, useEffect, useState } from 'react'
-import { Platform, View } from 'react-native'
+import InputPhone from '@sesamsolutions/phone-input';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { Platform, View } from 'react-native';
 
-import Input from '../input/Input'
-import s from './/styles'
-import { IOnChangePhoneNumberPayload, IPhoneInputProps } from './types'
+import Input from '../input/Input';
+import s from './/styles';
+import { IOnChangePhoneNumberPayload, IPhoneInputProps } from './types';
 
 const PhoneInput: FC<IPhoneInputProps> = ({
   phoneNumber,
   onChangePhoneNumber,
+  onBlur,
   styles,
   error,
   texts,
   country = 'US',
 }) => {
-  const [localValue, setLocalValue] = useState('')
-  const setLocalValueCallback = useCallback(() => {
-    setLocalValue(phoneNumber)
-  }, [phoneNumber])
+  const [localValue, setLocalValue] = useState('');
+  const isUserInitiatedRef = useRef(false);
 
   useEffect(() => {
-    setLocalValueCallback()
-  }, [phoneNumber, setLocalValueCallback])
+    if (!isUserInitiatedRef.current) {
+      setLocalValue(phoneNumber);
+    }
+    isUserInitiatedRef.current = false;
+  }, [phoneNumber]);
 
-  const handleOnChangeInputPhone = (payload: IOnChangePhoneNumberPayload) => {
-    setLocalValue(payload.input)
-    onChangePhoneNumber(payload)
-  }
+  const handleOnChangeInputPhone = useCallback((payload: IOnChangePhoneNumberPayload) => {
+    isUserInitiatedRef.current = true;
+    setLocalValue(payload.input);
+    onChangePhoneNumber(payload);
+  }, [onChangePhoneNumber]);
 
   return (
     <View style={[s.rootContainer, styles?.rootContainer]}>
       <Input
-        onChangeText={setLocalValue}
-        label={texts?.label || 'Phone number'}
-        keyboardType='phone-pad'
-        value={localValue}
-        labelOffset={{
-          x1: Platform.OS === 'ios' ? -40 : -40,
+        onChangeText={(text) => {
+          isUserInitiatedRef.current = true;
+          setLocalValue(text);
         }}
-        style={
-          error
-            ? { color: styles?.input?.errorColor }
-            : { color: styles?.input?.baseColor }
-        }
+        onBlur={onBlur}
+        label={texts?.label || 'Phone number'}
+        keyboardType="phone-pad"
+        value={localValue}
         styles={{
           container: s.phoneInputContainer,
           ...styles?.input,
-          color: styles?.input?.color,
+          color: error ? styles?.input?.errorColor : styles?.input?.baseColor,
         }}
+        labelOffset={{ x1: -32 }}
         renderLeftAccessory={() => (
           <View style={(s.countryContainer, styles?.country?.container)}>
             <InputPhone
@@ -63,7 +63,7 @@ const PhoneInput: FC<IPhoneInputProps> = ({
         error={error}
       />
     </View>
-  )
-}
+  );
+};
 
-export default PhoneInput
+export default PhoneInput;

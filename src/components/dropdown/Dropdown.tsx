@@ -6,7 +6,7 @@ import React, {
   useEffect,
   useRef,
   useState,
-} from 'react'
+} from 'react';
 import {
   FlatList,
   Image,
@@ -15,13 +15,13 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-} from 'react-native'
+} from 'react-native';
 
-import R from '../../res'
-import Separator from '../separator/Separator'
-import DropdownListItem from './DropdownListItem'
-import { DropdownStyles as s } from './styles'
-import { IDropdownItem, IDropdownProps } from './types'
+import R from '../../res';
+import Separator from '../separator/Separator';
+import DropdownListItem from './DropdownListItem';
+import { DropdownStyles as s } from './styles';
+import { IDropdownItem, IDropdownProps } from './types';
 
 const Dropdown = ({
   items,
@@ -29,30 +29,30 @@ const Dropdown = ({
   onSelectItem,
   styles,
 }: IDropdownProps) => {
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const flatListRef: MutableRefObject<FlatList> = useRef()
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const flatListRef: MutableRefObject<FlatList> = useRef();
 
   const showModal = () => {
     requestAnimationFrame(() => {
-      setIsModalVisible(true)
-    })
-  }
+      setIsModalVisible(true);
+    });
+  };
   const hideModal = () => {
     requestAnimationFrame(() => {
-      setIsModalVisible(false)
-    })
-  }
+      setIsModalVisible(false);
+    });
+  };
 
   const handleOnSelectItem = (item: IDropdownItem) => {
-    onSelectItem(item)
-    hideModal()
-  }
+    onSelectItem(item);
+    hideModal();
+  };
 
   useEffect(() => {
     if (flatListRef?.current) {
-      flatListRef.current.flashScrollIndicators()
+      flatListRef.current.flashScrollIndicators();
     }
-  }, [isModalVisible])
+  }, [isModalVisible]);
 
   const renderItem = useCallback(
     ({ item }) => (
@@ -63,16 +63,16 @@ const Dropdown = ({
         styles={styles?.listItem}
       />
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [handleOnSelectItem, selectedOption]
-  )
+  );
 
   const keyExtractor = useCallback(
     (item: IDropdownItem) => item.value.toString(),
     []
-  )
+  );
 
-  const renderSeparator = useCallback(() => <Separator />, [])
+  const renderSeparator = useCallback(() => <Separator />, []);
 
   const getItemLayout = useCallback(
     (data, index) => ({
@@ -81,7 +81,7 @@ const Dropdown = ({
       index,
     }),
     []
-  )
+  );
 
   return (
     <View style={[s.rootContainer, styles?.container]}>
@@ -90,7 +90,7 @@ const Dropdown = ({
         <Image source={R.icons.dropdown} style={[s.icon, styles?.icon]} />
       </TouchableOpacity>
       {isModalVisible && items.length > 0 && (
-        <Modal presentationStyle='overFullScreen' transparent={true}>
+        <Modal presentationStyle="overFullScreen" transparent={true}>
           <View style={s.modalContainer}>
             <TouchableOpacity
               activeOpacity={1}
@@ -102,7 +102,7 @@ const Dropdown = ({
                   <FlatList
                     keyExtractor={keyExtractor}
                     ref={flatListRef}
-                    indicatorStyle='black'
+                    indicatorStyle="black"
                     data={items}
                     extraData={items}
                     maxToRenderPerBatch={6}
@@ -119,7 +119,7 @@ const Dropdown = ({
         </Modal>
       )}
     </View>
-  )
-}
+  );
+};
 
-export default Dropdown
+export default Dropdown;

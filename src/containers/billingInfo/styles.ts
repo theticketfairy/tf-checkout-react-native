@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 
 export default StyleSheet.create({
   container: {
@@ -61,4 +61,4 @@ export default StyleSheet.create({
     color: R.colors.danger,
     marginTop: 8,
   },
-})
+});

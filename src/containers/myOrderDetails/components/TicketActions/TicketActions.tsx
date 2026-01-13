@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC } from 'react';
 import {
   Image,
   ImageSourcePropType,
@@ -6,9 +6,9 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native'
+} from 'react-native';
 
-import { ITicketActionsProps } from './TicketActionsTypes'
+import { ITicketActionsProps } from './TicketActionsTypes';
 
 const TicketActions: FC<ITicketActionsProps> = ({
   onSelectAction,
@@ -17,9 +17,9 @@ const TicketActions: FC<ITicketActionsProps> = ({
   texts,
   styles,
 }) => {
-  const handleOnPressDownload = () => onSelectAction('download-pdf')
-  const handleOnPressSell = () => onSelectAction('sell')
-  const handleOnPressRemoveFromSale = () => onSelectAction('remove-from-sale')
+  const handleOnPressDownload = () => onSelectAction('download-pdf');
+  const handleOnPressSell = () => onSelectAction('sell');
+  const handleOnPressRemoveFromSale = () => onSelectAction('remove-from-sale');
 
   const renderButton = (
     onPress: () => void,
@@ -32,7 +32,7 @@ const TicketActions: FC<ITicketActionsProps> = ({
         <Text style={styles?.text}>{text}</Text>
       </View>
     </TouchableOpacity>
-  )
+  );
 
   const downloadPdf =
     ticket.pdfLink &&
@@ -40,12 +40,12 @@ const TicketActions: FC<ITicketActionsProps> = ({
       handleOnPressDownload,
       texts?.downloadPdf || 'Download PDF',
       icons?.downloadPdf
-    )
+    );
 
   const sellTicket =
     ticket.isSellable &&
     !ticket.isOnSale &&
-    renderButton(handleOnPressSell, texts?.sell || 'Sell Ticket', icons?.sell)
+    renderButton(handleOnPressSell, texts?.sell || 'Sell Ticket', icons?.sell);
 
   const removeFromResale =
     !ticket.isSellable &&
@@ -54,7 +54,7 @@ const TicketActions: FC<ITicketActionsProps> = ({
       handleOnPressRemoveFromSale,
       texts?.removeFromSale || 'Remove from resale',
       icons?.removeFromSale
-    )
+    );
 
   return (
     <ScrollView style={[styles?.rootScrollViewContainer]}>
@@ -62,7 +62,7 @@ const TicketActions: FC<ITicketActionsProps> = ({
       {sellTicket}
       {removeFromResale}
     </ScrollView>
-  )
-}
+  );
+};
 
-export default TicketActions
+export default TicketActions;

@@ -1,5 +1,5 @@
-import React from 'react'
-import { FlatList, SectionList, Text, View } from 'react-native'
+import React from 'react';
+import { FlatList, SectionList, Text, View } from 'react-native';
 
 import {
   EnterPassword,
@@ -7,13 +7,13 @@ import {
   LoggedIn,
   PromoCode,
   WaitingList,
-} from '../../components'
-import Button from '../../components/button/Button'
-import Separator from '../../components/separator/Separator'
-import TicketGroupListHeader from './components/TicketGroupListHeader'
-import CartListItem from './components/TicketListItem'
-import s from './styles'
-import { ITicketsViewProps } from './types'
+} from '../../components';
+import Button from '../../components/button/Button';
+import Separator from '../../components/separator/Separator';
+import TicketGroupListHeader from './components/TicketGroupListHeader';
+import CartListItem from './components/TicketListItem';
+import s from './styles';
+import { ITicketsViewProps } from './types';
 
 const TicketsView = ({
   isGettingTickets,
@@ -47,13 +47,13 @@ const TicketsView = ({
   onPressSubmitEventPassword,
 }: ITicketsViewProps) => {
   const isButtonDisabled =
-    !selectedTicket || selectedTicket.selectedOption?.value === 0
+    !selectedTicket || selectedTicket.selectedOption?.value === 0;
   const buttonText = texts?.getTicketsButton
     ? texts.getTicketsButton
     : isButtonDisabled
-    ? 'Get tickets'
-    : `Get ${selectedTicket?.selectedOption?.value} tickets`
-  const title = texts?.title ? texts.title : 'GET TICKETS'
+      ? 'Get tickets'
+      : `Get ${selectedTicket?.selectedOption?.value} tickets`;
+  const title = texts?.title ? texts.title : 'GET TICKETS';
 
   return passwordProtectedEventData?.isPasswordProtected ? (
     <EnterPassword
@@ -158,7 +158,7 @@ const TicketsView = ({
           areLoadingIndicatorsEnabled && <Loading />}
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default TicketsView
+export default TicketsView;

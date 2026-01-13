@@ -1,8 +1,8 @@
-import { Dimensions, StyleSheet } from 'react-native'
+import { Dimensions, StyleSheet } from 'react-native';
 
-import R from '../../res'
+import R from '../../res';
 
-const { width: sWidth } = Dimensions.get('window')
+const { width: sWidth } = Dimensions.get('window');
 
 export default StyleSheet.create({
   rootContainer: {
@@ -41,4 +41,4 @@ export default StyleSheet.create({
   timeOnlyVisible: {
     alignSelf: 'center',
   },
-})
+});

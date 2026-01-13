@@ -1,7 +1,7 @@
-import _every from 'lodash/every'
-import _find from 'lodash/find'
-import _forEach from 'lodash/forEach'
-import _map from 'lodash/map'
+import _every from 'lodash/every';
+import _find from 'lodash/find';
+import _forEach from 'lodash/forEach';
+import _map from 'lodash/map';
 import React, {
   forwardRef,
   useCallback,
@@ -10,7 +10,7 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from 'react'
+} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -18,17 +18,17 @@ import {
   Linking,
   Text,
   View,
-} from 'react-native'
-import DeviceCountry, { TYPE_ANY } from 'react-native-device-country'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+} from 'react-native';
+import DeviceCountry, { TYPE_ANY } from 'react-native-device-country';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import Constants from '../../api/Constants'
+import Constants from '../../api/Constants';
 import {
   ICheckoutBody,
   ICheckoutTicketHolder,
   IFetchAccessTokenResponse,
   IRegisterNewUserBody,
-} from '../../api/types'
+} from '../../api/types';
 import {
   Button,
   CartTimer,
@@ -39,17 +39,17 @@ import {
   Loading,
   Login,
   PhoneInput,
-} from '../../components'
-import { IDropdownItem } from '../../components/dropdown/types'
-import { ILoginSuccessData } from '../../components/login/types'
-import { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types'
-import { BillingCore, BillingCoreHandle, SessionHandle } from '../../core'
-import { SessionHandleType } from '../../core/Session/SessionCoreTypes'
-import { Config } from '../../helpers/Config'
-import { getCountryDialCode } from '../../helpers/CountryCodes'
-import { useDebounced } from '../../helpers/Debounced'
-import { getData, LocalStorageKeys } from '../../helpers/LocalStorage'
-import { emptyPhone } from '../../helpers/StringsHelper'
+} from '../../components';
+import { IDropdownItem } from '../../components/dropdown/types';
+import { ILoginSuccessData } from '../../components/login/types';
+import { IOnChangePhoneNumberPayload } from '../../components/phoneInput/types';
+import { BillingCore, BillingCoreHandle, SessionHandle } from '../../core';
+import { SessionHandleType } from '../../core/Session/SessionCoreTypes';
+import { Config } from '../../helpers/Config';
+import { getCountryDialCode } from '../../helpers/CountryCodes';
+import { useDebounced } from '../../helpers/Debounced';
+import { getData, LocalStorageKeys } from '../../helpers/LocalStorage';
+import { emptyPhone } from '../../helpers/StringsHelper';
 import {
   validateAge,
   validateDropDownEmpty,
@@ -57,16 +57,16 @@ import {
   validateEmpty,
   validatePasswords,
   validatePhoneNumber,
-} from '../../helpers/Validators'
-import R from '../../res'
-import { IError, IUserProfile, IUserProfilePublic } from '../../types'
-import s from './styles'
+} from '../../helpers/Validators';
+import R from '../../res';
+import { IError, IUserProfile, IUserProfilePublic } from '../../types';
+import s from './styles';
 import {
   IBillingFormFieldsData,
   IBillingProps,
   ITicketHolderField,
   SkippingStatusType,
-} from './types'
+} from './types';
 
 /*
   Fields to hide when ticket is free
@@ -123,47 +123,47 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
     ref
   ) => {
     //#region State
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [isSubmittingData, setIsSubmittingData] = useState<boolean>(false)
-    const [loggedUserFirstName, setLoggedUserFirstName] = useState<string>('')
-    const [loginMessage, setLoginMessage] = useState('')
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
-    const [email, setEmail] = useState('')
-    const [emailConfirmation, setEmailConfirmation] = useState('')
-    const [password, setPassword] = useState('')
-    const [passwordConfirmation, setPasswordConfirmation] = useState('')
-    const [isSubToTicketFairy, setIsSubToTicketFairy] = useState(false)
-    const [isSubToBrand, setIsSubToBrand] = useState(false)
-    const [phone, setPhone] = useState('')
-    const [street, setStreet] = useState('')
-    const [city, setCity] = useState('')
-    const [countryId, setCountryId] = useState('')
-    const [stateId, setStateId] = useState('')
-    const [postalCode, setPostalCode] = useState('')
-    const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined)
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isSubmittingData, setIsSubmittingData] = useState<boolean>(false);
+    const [loggedUserFirstName, setLoggedUserFirstName] = useState<string>('');
+    const [loginMessage, setLoginMessage] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [emailConfirmation, setEmailConfirmation] = useState('');
+    const [password, setPassword] = useState('');
+    const [passwordConfirmation, setPasswordConfirmation] = useState('');
+    const [isSubToTicketFairy, setIsSubToTicketFairy] = useState(false);
+    const [isSubToBrand, setIsSubToBrand] = useState(false);
+    const [phone, setPhone] = useState('');
+    const [street, setStreet] = useState('');
+    const [city, setCity] = useState('');
+    const [countryId, setCountryId] = useState('');
+    const [stateId, setStateId] = useState('');
+    const [postalCode, setPostalCode] = useState('');
+    const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined);
     const [selectedCountry, setSelectedCountry] = useState<
       IDropdownItem | undefined
-    >(undefined)
+    >(undefined);
     const [selectedState, setSelectedState] = useState<
       IDropdownItem | undefined
-    >(undefined)
+    >(undefined);
 
     const [ticketHoldersData, setTicketHoldersData] = useState<
       ITicketHolderField[]
-    >([])
+    >([]);
 
     const [numberOfTicketHolders, setNumberOfTicketHolders] = useState<
       number | undefined
-    >(0)
+    >(0);
 
-    const [states, setStates] = useState<IDropdownItem[]>([])
-    const [countries, setCountries] = useState<IDropdownItem[]>([])
+    const [states, setStates] = useState<IDropdownItem[]>([]);
+    const [countries, setCountries] = useState<IDropdownItem[]>([]);
 
-    const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false)
+    const [isLoginDialogVisible, setIsLoginDialogVisible] = useState(false);
     const [skippingStatus, setSkippingStatus] =
-      useState<SkippingStatusType>(undefined)
-    const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false)
+      useState<SkippingStatusType>(undefined);
+    const [isTtfCheckboxHidden, setIsTtfCheckboxHidden] = useState(false);
     //#endregion State
 
     //#region Labels
@@ -172,12 +172,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         numberOfTicketHolders === 1 &&
         config.shouldHideTicketHolderSectionOnSingleTicket
       ) {
-        return null
+        return null;
       }
 
       const optional = isNameRequired
         ? ''
-        : texts?.form?.optional || '(optional)'
+        : texts?.form?.optional || '(optional)';
       return {
         firstName: texts?.form?.holderFirstName
           ? `${texts.form.holderFirstName} ${optional}`
@@ -191,74 +191,73 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         phone: texts?.form?.holderPhone
           ? `${texts.form.holderPhone} ${texts?.form?.optional || '(optional)'}`
           : `Phone ${optional}`,
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isNameRequired, texts, numberOfTicketHolders])
+      };
+    }, [isNameRequired, texts, numberOfTicketHolders]);
 
     const brandCheckBoxText =
       texts?.form?.isSubToBrand ||
-      'I would like to be updated on news, events and offers.'
+      'I would like to be updated on news, events and offers.';
 
     const phoneLabel = useMemo(() => {
       const optionalPhone = isPhoneRequired
         ? ''
-        : texts?.form?.optional || ' (optional)'
+        : texts?.form?.optional || ' (optional)';
       return texts?.form?.phone
         ? `${texts?.form?.phone} ${optionalPhone}`
-        : `Phone ${optionalPhone}`
-    }, [isPhoneRequired, texts])
+        : `Phone ${optionalPhone}`;
+    }, [isPhoneRequired, texts]);
 
     const addressLabel = useMemo(() => {
       const optionalAddress = Config.IS_BILLING_STREET_NAME_REQUIRED
         ? ''
-        : texts?.form?.optional || ' (optional)'
+        : texts?.form?.optional || ' (optional)';
 
       return texts?.form?.street
         ? `${texts.form.street} ${optionalAddress}`
-        : `Street ${optionalAddress}`
-    }, [texts])
+        : `Street ${optionalAddress}`;
+    }, [texts]);
     //#endregion Labels
 
     // Cart expiration timer
-    const [secondsLeft, setSecondsLeft] = React.useState(420)
+    const [secondsLeft, setSecondsLeft] = React.useState(420);
 
     //#region Errors state
-    const firstNameError = useDebounced(firstName, validateEmpty)
-    const lastNameError = useDebounced(lastName, validateEmpty)
+    const firstNameError = useDebounced(firstName, validateEmpty);
+    const lastNameError = useDebounced(lastName, validateEmpty);
     const emailError = useDebounced(email, () =>
       validateEmail(email, emailConfirmation)
-    )
+    );
     const confirmEmailError = useDebounced(emailConfirmation, () =>
       validateEmail(emailConfirmation, email)
-    )
+    );
     const passwordError = useDebounced(password, () =>
       validatePasswords(password, passwordConfirmation)
-    )
+    );
     const confirmPasswordError = useDebounced(passwordConfirmation, () =>
       validatePasswords(passwordConfirmation, password)
-    )
-    const [phoneError, setPhoneError] = useState('')
-    const streetError = useDebounced(street, validateEmpty)
-    const cityError = useDebounced(city, validateEmpty)
-    const postalCodeError = useDebounced(postalCode, validateEmpty)
-    const [ttfPrivacyPolicyError, setTtfPrivacyPolicyError] = useState('')
+    );
+    const [phoneError, setPhoneError] = useState('');
+    const streetError = useDebounced(street, validateEmpty);
+    const cityError = useDebounced(city, validateEmpty);
+    const postalCodeError = useDebounced(postalCode, validateEmpty);
+    const [ttfPrivacyPolicyError, setTtfPrivacyPolicyError] = useState('');
 
-    const [firstNameErrorState, setFirstNameErrorState] = useState('')
-    const [lastNameErrorState, setLastNameErrorState] = useState('')
-    const [streetErrorState, setStreetErrorState] = useState('')
-    const [dateOfBirthError, setDateOfBirthError] = useState('')
-    const [emailErrorState, setEmailErrorState] = useState('')
+    const [firstNameErrorState, setFirstNameErrorState] = useState('');
+    const [lastNameErrorState, setLastNameErrorState] = useState('');
+    const [streetErrorState, setStreetErrorState] = useState('');
+    const [dateOfBirthError, setDateOfBirthError] = useState('');
+    const [emailErrorState, setEmailErrorState] = useState('');
     const [emailConfirmationErrorState, setEmailConfirmationErrorState] =
-      useState('')
-    const [cityErrorState, setCityErrorState] = useState('')
-    const [postalCodeErrorState, setPostalCodeErrorState] = useState('')
-    const [countryErrorState, setCountryErrorState] = useState('')
-    const [stateErrorState, setStateErrorState] = useState('')
-    const [passwordErrorState, setPasswordErrorState] = useState('')
+      useState('');
+    const [cityErrorState, setCityErrorState] = useState('');
+    const [postalCodeErrorState, setPostalCodeErrorState] = useState('');
+    const [countryErrorState, setCountryErrorState] = useState('');
+    const [stateErrorState, setStateErrorState] = useState('');
+    const [passwordErrorState, setPasswordErrorState] = useState('');
     const [confirmPasswordErrorState, setConfirmPasswordErrorState] =
-      useState('')
+      useState('');
 
-    const requiredText = texts?.required || 'Required'
+    const requiredText = texts?.required || 'Required';
 
     //#endregion Errors state
     //#endregion
@@ -271,23 +270,23 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       // * phone_required is turned on and customer does not have a phone number.
 
       if (isBillingRequired || skippingStatus === 'fail') {
-        return 'false'
+        return 'false';
       }
 
       if ((isNameRequired && numOfTickets > 1) || isAgeRequired) {
-        return 'false'
+        return 'false';
       } else {
-        return 'skipping'
+        return 'skipping';
       }
-    }
+    };
 
     //#region Refs
-    const storedToken = useRef('')
-    const storedProfileData = useRef({} as IUserProfilePublic)
-    const phoneErrorCounter = useRef(0)
-    const billingCoreRef = useRef<BillingCoreHandle>(null)
-    const sessionHandleRef = useRef<SessionHandleType>(null)
-    const phoneCountryCode = useRef('')
+    const storedToken = useRef('');
+    const storedProfileData = useRef({} as IUserProfilePublic);
+    const phoneErrorCounter = useRef(0);
+    const billingCoreRef = useRef<BillingCoreHandle>(null);
+    const sessionHandleRef = useRef<SessionHandleType>(null);
+    const phoneCountryCode = useRef('');
     const errorsRef = useRef({
       firstName: '',
       lastName: '',
@@ -303,7 +302,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       zipCode: '',
       state: '',
       privacy: '',
-    })
+    });
 
     //#endregion
 
@@ -317,152 +316,152 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             accessTokenError: {
               message: 'Session Handle ref is not initialized',
             },
-          }
+          };
         }
 
         const { accessTokenError, accessTokenData } =
-          await sessionHandleRef.current!.refreshAccessToken(refreshToken)
+          await sessionHandleRef.current!.refreshAccessToken(refreshToken);
         if (!accessTokenError && accessTokenData?.accessToken) {
-          await fetchData()
+          await fetchData();
         }
         return {
           accessTokenData,
           accessTokenError,
-        }
+        };
       },
 
       async reloadData() {
-        await fetchData()
+        await fetchData();
       },
-    }))
+    }));
     //#endregion Imperative Handler
 
     //#region Handlers
     const handleSetPhoneError = useCallback(
       (error: string) => {
         if (isPhoneRequired && phone.length > 0) {
-          setPhoneError(error)
+          setPhoneError(error);
         }
       },
       [isPhoneRequired, phone.length]
-    )
+    );
 
     const handleOnChangePhoneNumber = (
       payload: IOnChangePhoneNumberPayload
     ) => {
-      setPhone(payload.input)
+      setPhone(payload.input);
 
       if (payload.isValid) {
-        errorsRef.current.phone = ''
-        setPhoneError('')
+        errorsRef.current.phone = '';
+        setPhoneError('');
 
-        return
+        return;
       }
 
       if (!payload.isValid && phoneErrorCounter.current > 0) {
         errorsRef.current.phone =
-          texts?.form?.phoneInput?.customError || 'Invalid phone number'
+          texts?.form?.phoneInput?.customError || 'Invalid phone number';
 
         return handleSetPhoneError(
           texts?.form?.phoneInput?.customError || 'Invalid phone number'
-        )
+        );
       }
 
-      phoneErrorCounter.current = phoneErrorCounter.current + 1
-    }
+      phoneErrorCounter.current = phoneErrorCounter.current + 1;
+    };
 
     const handleOnLoadingChange = useCallback(
       (loading: boolean) => {
         if (onLoadingChange) {
-          onLoadingChange(loading)
+          onLoadingChange(loading);
         }
       },
       [onLoadingChange]
-    )
+    );
 
     const handleOnSkippingStatusChange = useCallback(
       (status: SkippingStatusType) => {
-        onSkippingStatusChange?.(status)
+        onSkippingStatusChange?.(status);
       },
       [onSkippingStatusChange]
-    )
+    );
 
     const showAlert = (text: string) => {
       if (areAlertsEnabled) {
-        Alert.alert('', text)
+        Alert.alert('', text);
       }
-    }
+    };
 
-    const showLoginDialog = () => setIsLoginDialogVisible(true)
-    const hideLoginDialog = () => setIsLoginDialogVisible(false)
+    const showLoginDialog = () => setIsLoginDialogVisible(true);
+    const hideLoginDialog = () => setIsLoginDialogVisible(false);
 
     const handleIsSubToBrandToggle = () => {
-      setIsSubToBrand(!isSubToBrand)
-    }
+      setIsSubToBrand(!isSubToBrand);
+    };
 
     const handleIsSubToTicketFairyToggle = () => {
-      const newValue = !isSubToTicketFairy
+      const newValue = !isSubToTicketFairy;
 
       if (newValue) {
-        errorsRef.current.privacy = ''
-        setTtfPrivacyPolicyError('')
+        errorsRef.current.privacy = '';
+        setTtfPrivacyPolicyError('');
       } else {
-        errorsRef.current.privacy = requiredText
-        setTtfPrivacyPolicyError(requiredText)
+        errorsRef.current.privacy = requiredText;
+        setTtfPrivacyPolicyError(requiredText);
       }
 
-      setIsSubToTicketFairy(newValue)
-    }
+      setIsSubToTicketFairy(newValue);
+    };
 
     const handleOpenPrivacyLink = async () => {
       const canOpenLink = await Linking.canOpenURL(
         Constants.PRIVACY_POLICY_LINK
-      )
+      );
       if (canOpenLink) {
-        await Linking.openURL(Constants.PRIVACY_POLICY_LINK)
+        await Linking.openURL(Constants.PRIVACY_POLICY_LINK);
       }
-    }
+    };
 
     const handleSetFormDataFromUserProfile = (
       userProfile: IUserProfilePublic,
       accessToken?: string
     ) => {
-      storedProfileData.current = userProfile
-      setFirstName(userProfile.firstName)
-      setLastName(userProfile.lastName)
-      setEmail(userProfile.email)
-      setEmailConfirmation(userProfile.email)
-      setPhone(userProfile.phone)
-      setStreet(userProfile.streetAddress)
-      setCity(userProfile.city)
-      setPostalCode(userProfile.zipCode)
-      setCountryId(userProfile.countryId)
-      setStateId(userProfile.stateId)
-      setLoggedUserFirstName(userProfile.firstName)
+      storedProfileData.current = userProfile;
+      setFirstName(userProfile.firstName);
+      setLastName(userProfile.lastName);
+      setEmail(userProfile.email);
+      setEmailConfirmation(userProfile.email);
+      setPhone(userProfile.phone);
+      setStreet(userProfile.streetAddress);
+      setCity(userProfile.city);
+      setPostalCode(userProfile.zipCode);
+      setCountryId(userProfile.countryId);
+      setStateId(userProfile.stateId);
+      setLoggedUserFirstName(userProfile.firstName);
 
-      let dob: Date | undefined
+      let dob: Date | undefined;
 
       if (userProfile.dateOfBirth) {
-        const dobSplitted = userProfile.dateOfBirth.split('-')
+        const dobSplitted = userProfile.dateOfBirth.split('-');
         dob = new Date(
           parseInt(dobSplitted[0]!, 10),
           parseInt(dobSplitted[1]!, 10) - 1,
           parseInt(dobSplitted[2]!, 10)
-        )
-        handleOnSelectDate(dob)
+        );
+        handleOnSelectDate(dob);
       }
 
-      const thData = [...ticketHoldersData]
+      const thData = [...ticketHoldersData];
       thData.forEach((th, index) => {
-        th.firstName = index === 0 ? userProfile.firstName : ''
-        th.lastName = index === 0 ? userProfile.lastName : ''
-        th.email = index === 0 ? userProfile.email : ''
-        th.phone = index === 0 ? userProfile.phone : ''
-      })
-      setTicketHoldersData(thData)
+        th.firstName = index === 0 ? userProfile.firstName : '';
+        th.lastName = index === 0 ? userProfile.lastName : '';
+        th.email = index === 0 ? userProfile.email : '';
+        th.phone = index === 0 ? userProfile.phone : '';
+      });
+      setTicketHoldersData(thData);
 
       if (accessToken) {
-        storedToken.current = accessToken
+        storedToken.current = accessToken;
       }
 
       showErrorMessages({
@@ -489,22 +488,22 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         phoneNumber: userProfile.phone,
         isRegistering: !loggedUserFirstName && !storedToken.current,
         ticketHolderData: ticketHoldersData,
-      })
-    }
+      });
+    };
 
     const clearFormErrors = () => {
-      setFirstNameErrorState('')
-      setLastNameErrorState('')
-      setEmailErrorState('')
-      setEmailConfirmationErrorState('')
-      setDateOfBirthError('')
-      setPhoneError('')
-      setStreetErrorState('')
-      setCityErrorState('')
-      setCountryErrorState('')
-      setPostalCodeErrorState('')
-      setStateErrorState('')
-      setTtfPrivacyPolicyError('')
+      setFirstNameErrorState('');
+      setLastNameErrorState('');
+      setEmailErrorState('');
+      setEmailConfirmationErrorState('');
+      setDateOfBirthError('');
+      setPhoneError('');
+      setStreetErrorState('');
+      setCityErrorState('');
+      setCountryErrorState('');
+      setPostalCodeErrorState('');
+      setStateErrorState('');
+      setTtfPrivacyPolicyError('');
       errorsRef.current = {
         firstName: '',
         lastName: '',
@@ -520,55 +519,55 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         zipCode: '',
         state: '',
         privacy: '',
-      }
-    }
+      };
+    };
 
     const handleOnLoginSuccess = async ({
       userProfile,
       accessTokenData,
     }: ILoginSuccessData) => {
-      clearFormErrors()
+      clearFormErrors();
 
-      let countryCode = 'US'
-      const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN)
-      const usrProfile = { ...userProfile }
+      let countryCode = 'US';
+      const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN);
+      const usrProfile = { ...userProfile };
 
       onLoginSuccess?.({
         userProfile,
         accessTokenData,
-      })
+      });
 
       try {
-        const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY)
-        countryCode = deviceCountry.code.toUpperCase()
+        const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY);
+        countryCode = deviceCountry.code.toUpperCase();
       } catch (err) {
-        countryCode = 'US'
+        countryCode = 'US';
       }
 
       if (!userProfile.phone) {
-        usrProfile.phone = ''
+        usrProfile.phone = '';
       } else {
         if (!usrProfile.phone?.includes('+')) {
           usrProfile.phone = `${getCountryDialCode(countryCode)}${
             usrProfile.phone
-          }`
+          }`;
         }
       }
 
       if (!isBillingRequired && skippingStatus === 'fail') {
-        setSkippingStatus('skipping')
+        setSkippingStatus('skipping');
 
         const phoneValidError = validatePhoneNumber({
           phoneNumber: userProfile.phone,
           customError: texts?.form?.phoneInput?.customError,
-        })
+        });
 
         if (phoneValidError && isPhoneRequired) {
-          setIsLoading(false)
+          setIsLoading(false);
           handleSetPhoneError(
             texts?.invalidPhoneNumberError ||
               'Please enter a valid phone number'
-          )
+          );
         }
 
         await performCheckout(
@@ -576,157 +575,157 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             userProfile: usrProfile,
             ticketsQuantity: numberOfTicketHolders || 1,
           })
-        )
+        );
       }
-      handleSetFormDataFromUserProfile(usrProfile, accessToken)
-    }
+      handleSetFormDataFromUserProfile(usrProfile, accessToken);
+    };
 
     const handleOnLoginError = (error: IError) => {
-      onLoginError?.(error)
-    }
+      onLoginError?.(error);
+    };
 
     const handleOnLogoutSuccess = async () => {
-      setFirstName('')
-      setLastName('')
-      setEmail('')
-      setEmailConfirmation('')
-      setPhone('')
-      setStreet('')
-      setCity('')
-      setPostalCode('')
-      setPassword('')
-      setPasswordConfirmation('')
-      setCountryId('')
-      setStateId('')
-      handleOnSelectDate(undefined)
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setEmailConfirmation('');
+      setPhone('');
+      setStreet('');
+      setCity('');
+      setPostalCode('');
+      setPassword('');
+      setPasswordConfirmation('');
+      setCountryId('');
+      setStateId('');
+      handleOnSelectDate(undefined);
 
       setSelectedCountry({
         value: '-1',
         label: texts?.form?.country || 'Country',
         code: '__',
-      })
+      });
       setStates([
         {
           value: '-1',
           label: texts?.form?.state || 'State/County',
         },
-      ])
-      setIsSubToTicketFairy(false)
-      setIsSubToBrand(false)
-      storedToken.current = ''
-      setLoggedUserFirstName('')
+      ]);
+      setIsSubToTicketFairy(false);
+      setIsSubToBrand(false);
+      storedToken.current = '';
+      setLoggedUserFirstName('');
 
-      const thData = [...ticketHoldersData]
+      const thData = [...ticketHoldersData];
       thData.forEach((th) => {
-        th.firstName = ''
-        th.lastName = ''
-        th.email = ''
-        th.phone = ''
-        th.firstNameError = ''
-        th.lastNameError = ''
-      })
-      setTicketHoldersData(thData)
-      onLogoutSuccess?.()
-    }
+        th.firstName = '';
+        th.lastName = '';
+        th.email = '';
+        th.phone = '';
+        th.firstNameError = '';
+        th.lastNameError = '';
+      });
+      setTicketHoldersData(thData);
+      onLogoutSuccess?.();
+    };
 
     //#region Handlers input changed
     const handleOnSelectDate = (newDate: Date | undefined) => {
-      setDateOfBirth(newDate)
+      setDateOfBirth(newDate);
 
       if (dateOfBirthError.length > 0 && newDate) {
-        setDateOfBirthError('')
+        setDateOfBirthError('');
       }
 
       if (minimumAge) {
-        const ageError = validateAge(newDate, minimumAge)
-        setDateOfBirthError(ageError)
+        const ageError = validateAge(newDate, minimumAge);
+        setDateOfBirthError(ageError);
       } else {
         if (!newDate) {
-          setDateOfBirthError(requiredText)
+          setDateOfBirthError(requiredText);
         }
       }
-    }
+    };
 
     const handleOnStreetChanged = (text: string) => {
       if (streetErrorState.length > 0 && text.length > 0) {
-        setStreetErrorState('')
+        setStreetErrorState('');
       }
-      setStreet(text)
-    }
+      setStreet(text);
+    };
 
     const handleOnCityChanged = (text: string) => {
       if (cityErrorState.length > 0 && text.length > 0) {
-        setCityErrorState('')
+        setCityErrorState('');
       }
-      setCity(text)
-    }
+      setCity(text);
+    };
 
     const handleOnFirstNameChanged = (text: string) => {
       if (firstNameErrorState.length > 0 && text.length > 0) {
-        setFirstNameErrorState('')
+        setFirstNameErrorState('');
       }
-      setFirstName(text)
-    }
+      setFirstName(text);
+    };
 
     const handleOnLastNameChanged = (text: string) => {
       if (lastNameErrorState.length > 0 && text.length > 0) {
-        setLastNameErrorState('')
+        setLastNameErrorState('');
       }
-      setLastName(text)
-    }
+      setLastName(text);
+    };
 
     const handleOnEmailChanged = (text: string) => {
       if (emailErrorState.length > 0 && text.length > 0) {
-        setEmailErrorState('')
+        setEmailErrorState('');
       }
-      setEmail(text)
-    }
+      setEmail(text);
+    };
 
     const handleOnEmailConfirmationChanged = (text: string) => {
       if (emailConfirmationErrorState.length > 0 && text.length > 0) {
-        setEmailConfirmationErrorState('')
+        setEmailConfirmationErrorState('');
       }
-      setEmailConfirmation(text)
-    }
+      setEmailConfirmation(text);
+    };
 
     const handleOnPostalCodeChanged = (text: string) => {
       if (postalCodeErrorState.length > 0 && text.length > 0) {
-        setPostalCodeErrorState('')
+        setPostalCodeErrorState('');
       }
-      setPostalCode(text)
-    }
+      setPostalCode(text);
+    };
 
     const handleOnStateChanged = (itm: IDropdownItem) => {
       if (stateErrorState.length > 0 && itm.value !== '-1') {
-        setStateErrorState('')
+        setStateErrorState('');
       } else if (itm.value === '-1') {
-        setStateErrorState(requiredText)
+        setStateErrorState(requiredText);
       }
-      setSelectedState(itm)
-    }
+      setSelectedState(itm);
+    };
 
     const handleOnCountryChanged = (itm: IDropdownItem) => {
       if (countryErrorState.length > 0 && itm.value !== '-1') {
-        setCountryErrorState('')
+        setCountryErrorState('');
       } else if (itm.value === '-1') {
-        setCountryErrorState(requiredText)
+        setCountryErrorState(requiredText);
       }
-      setSelectedCountry(itm)
-    }
+      setSelectedCountry(itm);
+    };
 
     const handleOnPasswordChanged = (text: string) => {
       if (passwordErrorState.length > 0 && text.length > 0) {
-        setPasswordErrorState('')
+        setPasswordErrorState('');
       }
-      setPassword(text)
-    }
+      setPassword(text);
+    };
 
     const handleOnConfirmPasswordChanged = (text: string) => {
       if (confirmPasswordErrorState.length > 0 && text.length > 0) {
-        setConfirmPasswordErrorState('')
+        setConfirmPasswordErrorState('');
       }
-      setPasswordConfirmation(text)
-    }
+      setPasswordConfirmation(text);
+    };
     //#endregion Handlers input changed
 
     //#endregion
@@ -736,69 +735,74 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
       if (!storedPhoneNumber) {
         handleSetPhoneError(
           texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
-        )
-        return false
+        );
+        return false;
       }
 
       if (!storedPhoneNumber.includes('+')) {
         handleSetPhoneError(
           texts?.invalidPhoneNumberError || 'Please enter a valid phone number'
-        )
-        return false
+        );
+        return false;
       }
-      return true
-    }
+      return true;
+    };
 
     const showErrorMessages = (data: IBillingFormFieldsData) => {
       if (secondsLeft === 0) {
-        return false
+        return false;
       }
 
-      const validateFirstName = validateEmpty(data.firstName)
-      const validateLastName = validateEmpty(data.lastName)
+      const validateFirstName = validateEmpty(data.firstName);
+      const validateLastName = validateEmpty(data.lastName);
 
-      const validateEmails = validateEmail(data.email, data.confirmEmail)
+      const validateEmails = validateEmail(data.email, data.confirmEmail);
       const validateEmailsConfirmation = validateEmail(
         data.confirmEmail,
         data.email
-      )
+      );
 
       if (isTicketFree) {
-        setFirstNameErrorState(validateFirstName)
-        setLastNameErrorState(validateLastName)
-        errorsRef.current.firstName = validateFirstName
-        errorsRef.current.lastName = validateLastName
+        setFirstNameErrorState(validateFirstName);
+        setLastNameErrorState(validateLastName);
+        errorsRef.current.firstName = validateFirstName;
+        errorsRef.current.lastName = validateLastName;
 
-        setEmailErrorState(validateEmails)
-        setEmailConfirmationErrorState(validateEmailsConfirmation)
-        errorsRef.current.email = validateEmails
-        errorsRef.current.confirmEmail = validateEmailsConfirmation
+        setEmailErrorState(validateEmails);
+        setEmailConfirmationErrorState(validateEmailsConfirmation);
+        errorsRef.current.email = validateEmails;
+        errorsRef.current.confirmEmail = validateEmailsConfirmation;
 
         if (data.isRegistering) {
           const validatePassword = validatePasswords(
             data.password,
             data.confirmPassword
-          )
+          );
           const validatePasswordConfirmation = validatePasswords(
             data.confirmPassword,
             data.password
-          )
+          );
 
-          setPasswordErrorState(validatePassword)
-          setConfirmPasswordErrorState(validatePasswordConfirmation)
+          setPasswordErrorState(validatePassword);
+          setConfirmPasswordErrorState(validatePasswordConfirmation);
 
-          errorsRef.current.password = validatePassword
-          errorsRef.current.confirmPassword = validatePasswordConfirmation
+          errorsRef.current.password = validatePassword;
+          errorsRef.current.confirmPassword = validatePasswordConfirmation;
         }
 
         if (isAgeRequired) {
           if (minimumAge) {
-            const birthdayValidation = validateAge(data.dateOfBirth, minimumAge)
-            setDateOfBirthError(birthdayValidation)
-            errorsRef.current.dateOfBirth = birthdayValidation
+            const birthdayValidation = validateAge(
+              data.dateOfBirth,
+              minimumAge
+            );
+            setDateOfBirthError(birthdayValidation);
+            errorsRef.current.dateOfBirth = birthdayValidation;
           } else {
-            setDateOfBirthError(data.dateOfBirth ? '' : requiredText)
-            errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : requiredText
+            setDateOfBirthError(data.dateOfBirth ? '' : requiredText);
+            errorsRef.current.dateOfBirth = data.dateOfBirth
+              ? ''
+              : requiredText;
           }
         }
 
@@ -807,126 +811,126 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             phoneNumber: data.phoneNumber,
             customError: texts?.form?.phoneInput?.customError,
             countryCode: phoneCountryCode.current,
-          })
-          setPhoneError(validatePhone)
-          errorsRef.current.phone = validatePhone
+          });
+          setPhoneError(validatePhone);
+          errorsRef.current.phone = validatePhone;
         }
 
-        errorsRef.current.privacy = isSubToTicketFairy ? '' : requiredText
+        errorsRef.current.privacy = isSubToTicketFairy ? '' : requiredText;
 
         if (isNameRequired) {
-          const ticketHoldersDataCopy = [...data.ticketHolderData]
+          const ticketHoldersDataCopy = [...data.ticketHolderData];
           _map(data.ticketHolderData, (th, index) => {
             if (isNameRequired) {
               ticketHoldersDataCopy[index].firstNameError = validateEmpty(
                 th.firstName
-              )
+              );
               ticketHoldersDataCopy[index].lastNameError = validateEmpty(
                 th.lastName
-              )
+              );
             }
-          })
+          });
 
-          setTicketHoldersData(ticketHoldersDataCopy)
+          setTicketHoldersData(ticketHoldersDataCopy);
         }
 
-        return
+        return;
       } // end of Ticket Free
 
-      const validateStreet = validateEmpty(data.street)
-      const validateCity = validateEmpty(data.city)
-      const validatePostalCode = validateEmpty(data.postalCode)
+      const validateStreet = validateEmpty(data.street);
+      const validateCity = validateEmpty(data.city);
+      const validatePostalCode = validateEmpty(data.postalCode);
 
-      setStreetErrorState(validateStreet)
-      setCityErrorState(validateCity)
-      setPostalCodeErrorState(validatePostalCode)
-      setFirstNameErrorState(validateFirstName)
-      setLastNameErrorState(validateLastName)
-      setEmailErrorState(validateEmails)
-      setEmailConfirmationErrorState(validateEmailsConfirmation)
+      setStreetErrorState(validateStreet);
+      setCityErrorState(validateCity);
+      setPostalCodeErrorState(validatePostalCode);
+      setFirstNameErrorState(validateFirstName);
+      setLastNameErrorState(validateLastName);
+      setEmailErrorState(validateEmails);
+      setEmailConfirmationErrorState(validateEmailsConfirmation);
 
-      errorsRef.current.street = validateStreet
-      errorsRef.current.city = validateCity
-      errorsRef.current.zipCode = validatePostalCode
-      errorsRef.current.firstName = validateFirstName
-      errorsRef.current.lastName = validateLastName
-      errorsRef.current.email = validateEmails
-      errorsRef.current.confirmEmail = validateEmailsConfirmation
+      errorsRef.current.street = validateStreet;
+      errorsRef.current.city = validateCity;
+      errorsRef.current.zipCode = validatePostalCode;
+      errorsRef.current.firstName = validateFirstName;
+      errorsRef.current.lastName = validateLastName;
+      errorsRef.current.email = validateEmails;
+      errorsRef.current.confirmEmail = validateEmailsConfirmation;
 
       if (data.isRegistering) {
         const validatePassword = validatePasswords(
           data.password,
           data.confirmPassword
-        )
+        );
         const validatePasswordConfirmation = validatePasswords(
           data.confirmPassword,
           data.password
-        )
+        );
 
-        setPasswordErrorState(validatePassword)
-        setConfirmPasswordErrorState(validatePasswordConfirmation)
+        setPasswordErrorState(validatePassword);
+        setConfirmPasswordErrorState(validatePasswordConfirmation);
 
-        errorsRef.current.password = validatePassword
-        errorsRef.current.confirmPassword = validatePasswordConfirmation
+        errorsRef.current.password = validatePassword;
+        errorsRef.current.confirmPassword = validatePasswordConfirmation;
       }
 
       const countryValidation = validateDropDownEmpty(
         data.selectedCountry?.value
-      )
+      );
 
-      setCountryErrorState(countryValidation)
-      errorsRef.current.country = countryValidation
+      setCountryErrorState(countryValidation);
+      errorsRef.current.country = countryValidation;
 
       if (isAgeRequired) {
         if (minimumAge) {
-          const birthdayValidation = validateAge(data.dateOfBirth, minimumAge)
-          setDateOfBirthError(birthdayValidation)
-          errorsRef.current.dateOfBirth = birthdayValidation
+          const birthdayValidation = validateAge(data.dateOfBirth, minimumAge);
+          setDateOfBirthError(birthdayValidation);
+          errorsRef.current.dateOfBirth = birthdayValidation;
         } else {
-          setDateOfBirthError(data.dateOfBirth ? '' : requiredText)
-          errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : requiredText
+          setDateOfBirthError(data.dateOfBirth ? '' : requiredText);
+          errorsRef.current.dateOfBirth = data.dateOfBirth ? '' : requiredText;
         }
       }
 
-      const validateState = validateDropDownEmpty(data.selectedState?.value)
+      const validateState = validateDropDownEmpty(data.selectedState?.value);
 
-      setStateErrorState(validateState)
-      errorsRef.current.state = validateState
+      setStateErrorState(validateState);
+      errorsRef.current.state = validateState;
 
       if (isPhoneRequired && !isPhoneHidden) {
         const validatePhone = validatePhoneNumber({
           phoneNumber: data.phoneNumber,
           customError: texts?.form?.phoneInput?.customError,
           countryCode: phoneCountryCode.current,
-        })
+        });
 
-        setPhoneError(validatePhone)
-        errorsRef.current.phone = validatePhone
+        setPhoneError(validatePhone);
+        errorsRef.current.phone = validatePhone;
       }
 
       //setTtfPrivacyPolicyError(isSubToTicketFairy ? '' : requiredText)
-      errorsRef.current.privacy = isSubToTicketFairy ? '' : requiredText
+      errorsRef.current.privacy = isSubToTicketFairy ? '' : requiredText;
 
       if (isNameRequired) {
-        const ticketHoldersDataCopy = [...data.ticketHolderData]
+        const ticketHoldersDataCopy = [...data.ticketHolderData];
         _map(data.ticketHolderData, (th, index) => {
           if (isNameRequired) {
             ticketHoldersDataCopy[index].firstNameError = validateEmpty(
               th.firstName
-            )
+            );
             ticketHoldersDataCopy[index].lastNameError = validateEmpty(
               th.lastName
-            )
+            );
           }
-        })
+        });
 
-        setTicketHoldersData(ticketHoldersDataCopy)
+        setTicketHoldersData(ticketHoldersDataCopy);
       }
-    }
+    };
 
     const checkBasicDataValid = (): boolean => {
       if (secondsLeft === 0) {
-        return false
+        return false;
       }
 
       if (isTicketFree) {
@@ -936,7 +940,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           errorsRef.current.email ||
           errorsRef.current.confirmEmail
         ) {
-          return false
+          return false;
         }
       } else {
         if (
@@ -950,57 +954,57 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           errorsRef.current.country ||
           errorsRef.current.street
         ) {
-          return false
+          return false;
         }
       }
 
       if (isPhoneRequired && !isPhoneHidden && errorsRef.current.phone) {
         if (isLoading) {
-          setIsLoading(false)
+          setIsLoading(false);
         }
 
-        return false
+        return false;
       }
 
-      return true
-    }
+      return true;
+    };
 
     const fillAllRequiredFieldsAlert =
       texts?.form?.fillAllRequiredFieldsAlert ||
-      'You must fill all Ticket Holder required fields'
+      'You must fill all Ticket Holder required fields';
 
     const checkExtraDataValid = (): string => {
       if (!isTtfCheckboxHidden && !isSubToTicketFairy) {
         setTtfPrivacyPolicyError(
           texts?.form?.ttfPrivacyPolicyRequiredError || requiredText
-        )
-        return 'Please review the errors'
+        );
+        return 'Please review the errors';
       }
 
       if (isAgeRequired) {
         if (!dateOfBirth) {
-          setDateOfBirthError(requiredText)
-          return 'Please enter your date of birth'
+          setDateOfBirthError(requiredText);
+          return 'Please enter your date of birth';
         }
 
         if (minimumAge) {
-          const ageValidationMessage = validateAge(dateOfBirth, minimumAge)
+          const ageValidationMessage = validateAge(dateOfBirth, minimumAge);
           if (ageValidationMessage) {
-            setDateOfBirthError(ageValidationMessage)
-            return ageValidationMessage
+            setDateOfBirthError(ageValidationMessage);
+            return ageValidationMessage;
           }
         }
       }
 
       if (!isNameRequired) {
-        return ''
+        return '';
       }
 
       if (
         ticketHoldersData.length === 1 &&
         config.shouldHideTicketHolderSectionOnSingleTicket
       ) {
-        return ''
+        return '';
       }
 
       return _every(
@@ -1011,96 +1015,96 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         (itm) => itm === ''
       )
         ? ''
-        : fillAllRequiredFieldsAlert
-    }
+        : fillAllRequiredFieldsAlert;
+    };
     //#endregion
 
     //#region Submit form
     const handleOnRegisterFail = (rawError: any) => {
-      onRegisterError?.(rawError)
-    }
+      onRegisterError?.(rawError);
+    };
 
     const performCheckout = async (
       checkoutBodyWhenSkipping?: ICheckoutBody
     ) => {
       if (!billingCoreRef.current) {
-        return onCheckoutError?.({ message: 'BillingCore is not ready' })
+        return onCheckoutError?.({ message: 'BillingCore is not ready' });
       }
 
-      const checkoutBody = checkoutBodyWhenSkipping || getCheckoutBody()
+      const checkoutBody = checkoutBodyWhenSkipping || getCheckoutBody();
 
-      setIsSubmittingData(true)
+      setIsSubmittingData(true);
       const { error: checkoutError, data: checkoutData } =
-        await billingCoreRef.current.checkoutOrder(checkoutBody)
-      setIsLoading(false)
-      setIsSubmittingData(false)
+        await billingCoreRef.current.checkoutOrder(checkoutBody);
+      setIsLoading(false);
+      setIsSubmittingData(false);
 
       if (checkoutError) {
-        onCheckoutError?.(checkoutError)
-        setSkippingStatus('false')
-        return showAlert(checkoutError.message)
+        onCheckoutError?.(checkoutError);
+        setSkippingStatus('false');
+        return showAlert(checkoutError.message);
       }
 
       if (!checkoutData) {
-        onCheckoutError?.({ message: 'Checkout returned not data' })
-        setSkippingStatus('false')
-        return showAlert('Checkout returned not data')
+        onCheckoutError?.({ message: 'Checkout returned not data' });
+        setSkippingStatus('false');
+        return showAlert('Checkout returned not data');
       }
 
-      setSkippingStatus('success')
-      billingCoreRef.current.stopCartTimer()
-      onCheckoutSuccess(checkoutData)
-    }
+      setSkippingStatus('success');
+      billingCoreRef.current.stopCartTimer();
+      onCheckoutSuccess(checkoutData);
+    };
 
     const getRegisterFormData = (data: IRegisterNewUserBody): FormData => {
-      const bodyFormData = new FormData()
+      const bodyFormData = new FormData();
       _forEach(data.attributes, (item: any, key: string) => {
-        bodyFormData.append(key, item)
-      })
-      return bodyFormData
-    }
+        bodyFormData.append(key, item);
+      });
+      return bodyFormData;
+    };
 
     const performNewUserRegister = async () => {
       if (!billingCoreRef.current) {
-        showAlert('BillingCore is not ready')
-        return onRegisterError?.({ message: 'BillingCore is not initialized' })
+        showAlert('BillingCore is not ready');
+        return onRegisterError?.({ message: 'BillingCore is not initialized' });
       }
 
-      setIsSubmittingData(true)
+      setIsSubmittingData(true);
 
-      const registerUserBody = getRegisterNewUserBody()
-      const registerForm = getRegisterFormData(registerUserBody)
+      const registerUserBody = getRegisterNewUserBody();
+      const registerForm = getRegisterFormData(registerUserBody);
 
       const { registerNewUserResponseData, registerNewUserResponseError } =
-        await billingCoreRef.current.registerNewUser(registerForm)
+        await billingCoreRef.current.registerNewUser(registerForm);
 
       if (registerNewUserResponseError) {
-        setIsSubmittingData(false)
+        setIsSubmittingData(false);
         if (registerNewUserResponseError.isAlreadyRegistered) {
-          setLoginMessage(registerNewUserResponseError.message!)
-          showLoginDialog()
-          return handleOnRegisterFail(registerNewUserResponseError.raw)
+          setLoginMessage(registerNewUserResponseError.message!);
+          showLoginDialog();
+          return handleOnRegisterFail(registerNewUserResponseError.raw);
         }
-        handleOnRegisterFail(registerNewUserResponseError.raw)
-        return showAlert(registerNewUserResponseError.message!)
+        handleOnRegisterFail(registerNewUserResponseError.raw);
+        return showAlert(registerNewUserResponseError.message!);
       }
 
       if (!registerNewUserResponseData) {
-        setIsSubmittingData(false)
-        handleOnRegisterFail('Register user returned no data')
-        return showAlert('Register user returned no data')
+        setIsSubmittingData(false);
+        handleOnRegisterFail('Register user returned no data');
+        return showAlert('Register user returned no data');
       }
 
       storedToken.current =
-        registerNewUserResponseData.accessTokenData.accessToken
+        registerNewUserResponseData.accessTokenData.accessToken;
 
-      onRegisterSuccess?.(registerNewUserResponseData)
+      onRegisterSuccess?.(registerNewUserResponseData);
 
-      await performCheckout()
-    }
+      await performCheckout();
+    };
 
     const getRegisterNewUserBody = (): IRegisterNewUserBody => {
-      const phoneNumber = isPhoneRequired ? phone : emptyPhone(phone)
+      const phoneNumber = isPhoneRequired ? phone : emptyPhone(phone);
 
       const body: IRegisterNewUserBody = isTicketFree
         ? {
@@ -1133,23 +1137,23 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               client_secret: Config.CLIENT_SECRET!,
               check_cart_expiration: true,
             },
-          }
+          };
 
       if (body.attributes.phone === undefined) {
-        delete body.attributes.phone
+        delete body.attributes.phone;
       }
 
       if (isAgeRequired && dateOfBirth) {
-        body.attributes.dob_day = dateOfBirth.getDate()
-        body.attributes.dob_month = dateOfBirth.getMonth() + 1
-        body.attributes.dob_year = dateOfBirth.getFullYear()
+        body.attributes.dob_day = dateOfBirth.getDate();
+        body.attributes.dob_month = dateOfBirth.getMonth() + 1;
+        body.attributes.dob_year = dateOfBirth.getFullYear();
       }
 
-      return body
-    }
+      return body;
+    };
 
     const getCheckoutBody = (): ICheckoutBody => {
-      let parsedTicketHolders: ICheckoutTicketHolder[] = []
+      const parsedTicketHolders: ICheckoutTicketHolder[] = [];
 
       if (
         config.shouldHideTicketHolderSectionOnSingleTicket &&
@@ -1160,20 +1164,20 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           last_name: lastName,
           phone: phone,
           email: email,
-        })
+        });
       } else {
         for (let i = 0; i <= numberOfTicketHolders! - 1; i++) {
           const individualHolder = {
-            first_name: ticketHoldersData[i].firstName || '',
-            last_name: ticketHoldersData[i].lastName || '',
-            phone: ticketHoldersData[i].phone || '',
-            email: ticketHoldersData[i].email || '',
-          }
-          parsedTicketHolders.push(individualHolder)
+            first_name: ticketHoldersData[i]?.firstName || '',
+            last_name: ticketHoldersData[i]?.lastName || '',
+            phone: ticketHoldersData[i]?.phone || '',
+            email: ticketHoldersData[i]?.email || '',
+          };
+          parsedTicketHolders.push(individualHolder);
         }
       }
 
-      const formattedPhone = isPhoneRequired ? phone : emptyPhone(phone)
+      const formattedPhone = isPhoneRequired ? phone : emptyPhone(phone);
 
       const checkoutBody: ICheckoutBody = isTicketFree
         ? {
@@ -1206,33 +1210,33 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               ttf_opt_in: isSubToTicketFairy,
               brand_opt_in: isSubToBrand,
             },
-          }
+          };
 
       if (isAgeRequired && dateOfBirth) {
-        checkoutBody.attributes.dob_day = dateOfBirth.getDate()
-        checkoutBody.attributes.dob_month = dateOfBirth.getMonth() + 1
-        checkoutBody.attributes.dob_year = dateOfBirth.getFullYear()
+        checkoutBody.attributes.dob_day = dateOfBirth.getDate();
+        checkoutBody.attributes.dob_month = dateOfBirth.getMonth() + 1;
+        checkoutBody.attributes.dob_year = dateOfBirth.getFullYear();
       }
 
       if (checkoutBody.attributes.phone === undefined) {
-        delete checkoutBody.attributes.phone
+        delete checkoutBody.attributes.phone;
       }
 
-      return checkoutBody
-    }
+      return checkoutBody;
+    };
 
     const getCheckoutBodyWhenSkipping = ({
       userProfile,
       ticketsQuantity,
     }: {
-      userProfile: IUserProfilePublic
-      ticketsQuantity: number
+      userProfile: IUserProfilePublic;
+      ticketsQuantity: number;
     }): ICheckoutBody => {
-      let parsedTicketHolders: ICheckoutTicketHolder[] = []
-      const hFirstName = userProfile.firstName
-      const hLastName = userProfile.lastName
-      const hPhone = userProfile.phone
-      const hEmail = userProfile.email
+      const parsedTicketHolders: ICheckoutTicketHolder[] = [];
+      const hFirstName = userProfile.firstName;
+      const hLastName = userProfile.lastName;
+      const hPhone = userProfile.phone;
+      const hEmail = userProfile.email;
 
       for (let i = 0; i <= ticketsQuantity - 1; i++) {
         const individualHolder = i
@@ -1247,9 +1251,9 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               last_name: hLastName,
               phone: hPhone,
               email: hEmail,
-            }
+            };
 
-        parsedTicketHolders.push(individualHolder)
+        parsedTicketHolders.push(individualHolder);
       }
 
       const checkoutBody: ICheckoutBody = isTicketFree
@@ -1283,14 +1287,14 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               brand_opt_in: isSubToBrand,
               password: password,
             },
-          }
+          };
 
       if (checkoutBody.attributes.phone === undefined) {
-        delete checkoutBody.attributes.phone
+        delete checkoutBody.attributes.phone;
       }
 
-      return checkoutBody
-    }
+      return checkoutBody;
+    };
 
     const onSubmit = async () => {
       showErrorMessages({
@@ -1309,130 +1313,130 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         phoneNumber: phone,
         isRegistering: !loggedUserFirstName && !storedToken.current,
         ticketHolderData: ticketHoldersData,
-      })
+      });
 
-      const isBasicDataValid = checkBasicDataValid()
-      const isExtraDataValidErrors = checkExtraDataValid()
+      const isBasicDataValid = checkBasicDataValid();
+      const isExtraDataValidErrors = checkExtraDataValid();
 
       if (isExtraDataValidErrors || !isBasicDataValid) {
-        return
+        return;
       }
 
       if (loggedUserFirstName && storedToken.current) {
-        await performCheckout()
+        await performCheckout();
       } else {
-        await performNewUserRegister()
+        await performNewUserRegister();
       }
-    }
+    };
     //#endregion
 
     const setCountryByEvent = async () => {
-      const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
+      const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY);
 
       if (!eventCountry) {
-        return
+        return;
       }
 
       if (countries.length > 1 && eventCountry) {
         const selectedCountryItem = _find(countries, (item) => {
-          const stringValue = item.code as string
-          return stringValue.toUpperCase() === eventCountry?.toUpperCase()
-        })
-        setSelectedCountry(selectedCountryItem)
+          const stringValue = item.code as string;
+          return stringValue.toUpperCase() === eventCountry?.toUpperCase();
+        });
+        setSelectedCountry(selectedCountryItem);
       }
-    }
+    };
 
     //#region Fetch Initial Data
     const fetchData = async () => {
       if (!billingCoreRef.current) {
-        onFetchCartError?.({ message: 'BillingCoreRef not initialized' })
-        return showAlert('BillingCoreRef not initialized')
+        onFetchCartError?.({ message: 'BillingCoreRef not initialized' });
+        return showAlert('BillingCoreRef not initialized');
       }
 
-      setIsLoading(true)
+      setIsLoading(true);
 
-      let usrPrfl: IUserProfile | undefined
-      const usrTkn = await getData(LocalStorageKeys.ACCESS_TOKEN)
-      let skippingStatusInner: SkippingStatusType
+      let usrPrfl: IUserProfile | undefined;
+      const usrTkn = await getData(LocalStorageKeys.ACCESS_TOKEN);
+      let skippingStatusInner: SkippingStatusType;
 
       const { countriesData, countriesError } =
-        await billingCoreRef.current.getCountries()
+        await billingCoreRef.current.getCountries();
 
       if (countriesError) {
-        setSkippingStatus('fail')
-        setIsLoading(false)
-        onFetchCountriesError?.(countriesError)
-        return showAlert(countriesError.message || 'Error fetching countries')
+        setSkippingStatus('fail');
+        setIsLoading(false);
+        onFetchCountriesError?.(countriesError);
+        return showAlert(countriesError.message || 'Error fetching countries');
       }
 
-      onFetchCountriesSuccess?.(countriesData!)
+      onFetchCountriesSuccess?.(countriesData!);
 
       const parsedCountries: IDropdownItem[] = _map(countriesData, (item) => {
-        return { label: item.name, value: item.id, code: item.code }
-      })
+        return { label: item.name, value: item.id, code: item.code };
+      });
 
       if (usrTkn) {
-        storedToken.current = usrTkn
+        storedToken.current = usrTkn;
         const { userProfileError, userProfileData } =
-          await billingCoreRef.current.getUserProfile()
+          await billingCoreRef.current.getUserProfile();
 
         if (userProfileError || !userProfileData) {
-          setSkippingStatus('fail')
-          setIsLoading(false)
-          onFetchUserProfileError?.(userProfileError!)
+          setSkippingStatus('fail');
+          setIsLoading(false);
+          onFetchUserProfileError?.(userProfileError!);
 
           return showAlert(
             userProfileError?.message || 'Error fetching user profile'
-          )
+          );
         }
 
         onFetchUserProfileSuccess?.({
           firstName: userProfileData.firstName,
           lastName: userProfileData.lastName,
-        })
+        });
 
-        usrPrfl = userProfileData
+        usrPrfl = userProfileData;
       } else {
-        skippingStatusInner = 'fail'
+        skippingStatusInner = 'fail';
         parsedCountries.unshift({
           value: '-1',
           label: texts?.form?.country || 'Country',
           code: '__',
-        })
+        });
         setSelectedCountry({
           value: '-1',
           label: texts?.form?.country || 'Country',
           code: '__',
-        })
+        });
       }
 
-      const { cartData, cartError } = await billingCoreRef.current.getCart()
+      const { cartData, cartError } = await billingCoreRef.current.getCart();
 
       if (cartError || !cartData) {
-        setSkippingStatus('fail')
-        setIsLoading(false)
-        onFetchCartError?.(cartError || { message: 'Error fetching cart' })
-        return showAlert(cartError?.message || 'Error fetching cart')
+        setSkippingStatus('fail');
+        setIsLoading(false);
+        onFetchCartError?.(cartError || { message: 'Error fetching cart' });
+        return showAlert(cartError?.message || 'Error fetching cart');
       }
 
-      onFetchCartSuccess?.()
+      onFetchCartSuccess?.();
 
       if (skippingStatusInner === 'fail') {
-        setSkippingStatus('fail')
+        setSkippingStatus('fail');
       } else {
-        setSkippingStatus(getSkippingStatus(cartData.quantity))
+        setSkippingStatus(getSkippingStatus(cartData.quantity));
       }
 
-      setNumberOfTicketHolders(cartData.quantity)
-      setIsSubToBrand(cartData.isMarketingOptedIn)
-      setIsSubToTicketFairy(cartData.isTfOptIn || false)
-      setIsTtfCheckboxHidden(cartData.isTfOptInHidden || false)
+      setNumberOfTicketHolders(cartData.quantity);
+      setIsSubToBrand(cartData.isMarketingOptedIn);
+      setIsSubToTicketFairy(cartData.isTfOptIn || false);
+      setIsTtfCheckboxHidden(cartData.isTfOptInHidden || false);
 
       if (cartData.expiresAt) {
-        setSecondsLeft(cartData.expiresAt)
+        setSecondsLeft(cartData.expiresAt);
       }
 
-      const tHolders: ITicketHolderField[] = []
+      const tHolders: ITicketHolderField[] = [];
       for (let i = 0; i < cartData.quantity; i++) {
         tHolders.push({
           firstName: i === 0 && usrPrfl ? usrPrfl.firstName : '',
@@ -1441,23 +1445,23 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           phone: i === 0 && usrPrfl ? usrPrfl.phone : '',
           firstNameError: '',
           lastNameError: '',
-        })
+        });
       }
 
-      let phoneCountry = 'US'
-      let phoneCountryDialCode = '+1'
-      const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY)
+      let phoneCountry = 'US';
+      let phoneCountryDialCode = '+1';
+      const eventCountry = await getData(LocalStorageKeys.EVENT_COUNTRY);
 
       if (eventCountry) {
-        phoneCountry = eventCountry.toUpperCase()
-        phoneCountryDialCode = getCountryDialCode(phoneCountry)
+        phoneCountry = eventCountry.toUpperCase();
+        phoneCountryDialCode = getCountryDialCode(phoneCountry);
       } else {
         try {
-          const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY)
-          phoneCountry = deviceCountry.code.toUpperCase()
-          phoneCountryDialCode = getCountryDialCode(phoneCountry)
+          const deviceCountry = await DeviceCountry.getCountryCode(TYPE_ANY);
+          phoneCountry = deviceCountry.code.toUpperCase();
+          phoneCountryDialCode = getCountryDialCode(phoneCountry);
         } catch (err) {
-          phoneCountry = 'US'
+          phoneCountry = 'US';
         }
       }
 
@@ -1467,21 +1471,21 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             setPhoneError(
               texts?.invalidPhoneNumberError ||
                 'Please enter a valid phone number'
-            )
-            skippingStatusInner = 'fail'
-            setSkippingStatus('fail')
-            setIsLoading(false)
+            );
+            skippingStatusInner = 'fail';
+            setSkippingStatus('fail');
+            setIsLoading(false);
           } else {
             // We can perform Checkout process since phone is valid
             if (!isBillingRequired && usrTkn && cartData) {
               const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
                 userProfile: usrPrfl,
                 ticketsQuantity: cartData.quantity,
-              })
-              return await performCheckout(checkoutBody)
+              });
+              return await performCheckout(checkoutBody);
             } else {
               if (skippingStatusInner === 'skipping') {
-                setSkippingStatus('fail')
+                setSkippingStatus('fail');
               }
             }
           }
@@ -1491,47 +1495,47 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             const checkoutBody: ICheckoutBody = getCheckoutBodyWhenSkipping({
               userProfile: usrPrfl,
               ticketsQuantity: cartData.quantity,
-            })
-            return await performCheckout(checkoutBody)
+            });
+            return await performCheckout(checkoutBody);
           } else {
             if (skippingStatusInner === 'skipping') {
-              setSkippingStatus('fail')
+              setSkippingStatus('fail');
             }
           }
         }
 
         const userPhone =
-          usrPrfl.phone === null ? phoneCountryDialCode : usrPrfl.phone
+          usrPrfl.phone === null ? phoneCountryDialCode : usrPrfl.phone;
 
         if (userPhone.length <= 5) {
-          phoneCountryCode.current = userPhone
+          phoneCountryCode.current = userPhone;
         }
 
         handleSetFormDataFromUserProfile({
           ...usrPrfl,
           phone: userPhone,
-        })
+        });
       } else {
         // There is no user profile data
-        phoneCountryCode.current = phoneCountryDialCode
-        setPhone(phoneCountryDialCode)
+        phoneCountryCode.current = phoneCountryDialCode;
+        setPhone(phoneCountryDialCode);
       }
 
-      setCountries(parsedCountries)
-      setTicketHoldersData(tHolders)
-      setIsSubmittingData(false)
-      setIsLoading(false)
-    }
+      setCountries(parsedCountries);
+      setTicketHoldersData(tHolders);
+      setIsSubmittingData(false);
+      setIsLoading(false);
+    };
     //#endregion Fetch Initial Data
 
     //#region Effects
     useEffect(() => {
-      handleOnLoadingChange(isLoading)
-    }, [isLoading, handleOnLoadingChange])
+      handleOnLoadingChange(isLoading);
+    }, [isLoading, handleOnLoadingChange]);
 
     useEffect(() => {
-      handleOnSkippingStatusChange(skippingStatus)
-    }, [handleOnSkippingStatusChange, skippingStatus])
+      handleOnSkippingStatusChange(skippingStatus);
+    }, [handleOnSkippingStatusChange, skippingStatus]);
 
     useEffect(() => {
       if (countryId) {
@@ -1539,74 +1543,71 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           const selectedCountryItem = _find(
             countries,
             (item) => item.value === countryId
-          )
-          setSelectedCountry(selectedCountryItem)
+          );
+          setSelectedCountry(selectedCountryItem);
         }
       } else {
-        setCountryByEvent()
+        setCountryByEvent();
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [countries, countryId])
+    }, [countries, countryId]);
 
     useEffect(() => {
       const getStates = async () => {
         if (!selectedCountry) {
-          return
+          return;
         }
 
         if (!billingCoreRef.current) {
-          onFetchCartError?.({ message: 'BillingCoreRef not initialized' })
-          return showAlert('BillingCoreRef not initialized')
+          onFetchCartError?.({ message: 'BillingCoreRef not initialized' });
+          return showAlert('BillingCoreRef not initialized');
         }
 
         const { statesData, statesError } =
           await billingCoreRef.current.getStates(
             selectedCountry.value.toString()
-          )
+          );
 
         if (statesError) {
-          onFetchStatesError?.(statesError!)
-          return showAlert(statesError?.message || 'Error fetching states')
+          onFetchStatesError?.(statesError!);
+          return showAlert(statesError?.message || 'Error fetching states');
         }
 
         const parsedStates: IDropdownItem[] = _map(
           statesData,
           (item, index) => {
-            return { label: item, value: index }
+            return { label: item, value: index };
           }
-        )
+        );
 
-        onFetchStatesSuccess?.()
-        setStates(parsedStates)
-      }
+        onFetchStatesSuccess?.();
+        setStates(parsedStates);
+      };
 
       if (selectedCountry && selectedCountry.value !== '-1') {
-        getStates()
+        getStates();
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedCountry])
+    }, [selectedCountry]);
 
     useEffect(() => {
       if (states.length > 1 && stateId) {
         const selectedStateItem = _find(
           states,
           (item) => item.value === stateId
-        )
+        );
         if (!selectedStateItem) {
           return setSelectedState({
             value: '-1',
             label: texts?.form?.state || 'State/County',
-          })
+          });
         }
-        setSelectedState(selectedStateItem)
+        setSelectedState(selectedStateItem);
       } else {
         setSelectedState({
           value: '-1',
           label: texts?.form?.state || 'State/County',
-        })
+        });
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [stateId, states])
+    }, [stateId, states]);
 
     useEffect(() => {
       setCountries([
@@ -1614,23 +1615,22 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           value: '-1',
           label: texts?.form?.country || 'Country',
         },
-      ])
+      ]);
       setStates([
         {
           value: '-1',
           label: texts?.form?.state || 'State/County',
         },
-      ])
-      fetchData()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+      ]);
+      fetchData();
+    }, []);
     //#endregion
 
-    const isDataValid = checkBasicDataValid()
+    const isDataValid = checkBasicDataValid();
 
     const isButtonDisabled = config.isCheckoutAlwaysButtonEnabled
       ? false
-      : !isDataValid
+      : !isDataValid;
 
     //#region RENDER
     const renderTicketHolders = () => {
@@ -1639,12 +1639,12 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
         !holderLabels ||
         ticketHoldersData.length === 0
       ) {
-        return null
+        return null;
       }
 
-      let tHolders = []
+      const tHolders = [];
       for (let i = 0; i < numberOfTicketHolders; i++) {
-        const thItemTitle = texts?.form?.ticketHolderItem || 'Ticket Holder'
+        const thItemTitle = texts?.form?.ticketHolderItem || 'Ticket Holder';
         tHolders.push(
           <View key={`ticketHolder.${i}`}>
             <Text style={styles?.ticketHolderItemHeader}>
@@ -1654,11 +1654,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               label={holderLabels.firstName}
               value={ticketHoldersData[i].firstName}
               onChangeText={(text) => {
-                const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i].firstName = text
-                copyTicketHolders[i].firstNameError = validateEmpty(text)
+                const copyTicketHolders = [...ticketHoldersData];
+                copyTicketHolders[i].firstName = text;
+                copyTicketHolders[i].firstNameError = validateEmpty(text);
 
-                setTicketHoldersData(copyTicketHolders)
+                setTicketHoldersData(copyTicketHolders);
               }}
               error={ticketHoldersData[i].firstNameError}
               styles={styles?.inputStyles}
@@ -1667,11 +1667,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               label={holderLabels.lastName}
               value={ticketHoldersData[i].lastName}
               onChangeText={(text) => {
-                const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i].lastName = text
-                copyTicketHolders[i].lastNameError = validateEmpty(text)
+                const copyTicketHolders = [...ticketHoldersData];
+                copyTicketHolders[i].lastName = text;
+                copyTicketHolders[i].lastNameError = validateEmpty(text);
 
-                setTicketHoldersData(copyTicketHolders)
+                setTicketHoldersData(copyTicketHolders);
               }}
               error={ticketHoldersData[i].lastNameError}
               styles={styles?.inputStyles}
@@ -1680,27 +1680,27 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               label={holderLabels.email}
               value={ticketHoldersData[i].email}
               onChangeText={(text) => {
-                const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i].email = text
-                setTicketHoldersData(copyTicketHolders)
+                const copyTicketHolders = [...ticketHoldersData];
+                copyTicketHolders[i].email = text;
+                setTicketHoldersData(copyTicketHolders);
               }}
-              keyboardType='email-address'
+              keyboardType="email-address"
               styles={styles?.inputStyles}
-              autoCapitalize='none'
+              autoCapitalize="none"
             />
             <Input
               label={holderLabels.phone}
               value={ticketHoldersData[i].phone}
               onChangeText={(text) => {
-                const copyTicketHolders = [...ticketHoldersData]
-                copyTicketHolders[i].phone = text
-                setTicketHoldersData(copyTicketHolders)
+                const copyTicketHolders = [...ticketHoldersData];
+                copyTicketHolders[i].phone = text;
+                setTicketHoldersData(copyTicketHolders);
               }}
-              keyboardType='phone-pad'
+              keyboardType="phone-pad"
               styles={styles?.inputStyles}
             />
           </View>
-        )
+        );
       }
 
       return (
@@ -1710,11 +1710,11 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           </Text>
           {tHolders}
         </>
-      )
-    }
+      );
+    };
 
     const renderCheckingOut = () => {
-      const skippingStyles = skipBillingConfig?.styles
+      const skippingStyles = skipBillingConfig?.styles;
       return (
         <View style={[s.skippingRootContainer, skippingStyles?.rootContainer]}>
           <View
@@ -1737,8 +1737,8 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             )}
           </View>
         </View>
-      )
-    }
+      );
+    };
 
     const renderContent = () => (
       <>
@@ -1785,19 +1785,19 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               label={texts?.form?.email || 'Email'}
               value={email}
               onChangeText={handleOnEmailChanged}
-              keyboardType='email-address'
+              keyboardType="email-address"
               error={emailError || emailErrorState}
               styles={styles?.inputStyles}
-              autoCapitalize='none'
+              autoCapitalize="none"
             />
             <Input
               label={texts?.form?.confirmEmail || 'Confirm email'}
               value={emailConfirmation}
               onChangeText={handleOnEmailConfirmationChanged}
-              keyboardType='email-address'
+              keyboardType="email-address"
               error={confirmEmailError || emailConfirmationErrorState}
               styles={styles?.inputStyles}
-              autoCapitalize='none'
+              autoCapitalize="none"
             />
             {isAgeRequired && (
               <DatePicker
@@ -1820,9 +1820,9 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                   onChangeText={handleOnPasswordChanged}
                   error={passwordError || passwordErrorState}
                   styles={styles?.inputStyles}
-                  autoCapitalize='none'
+                  autoCapitalize="none"
                   secureTextEntry={true}
-                  textContentType='oneTimeCode'
+                  textContentType="oneTimeCode"
                 />
                 <Input
                   label={texts?.form?.confirmPassword || 'Confirm password'}
@@ -1830,9 +1830,9 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
                   onChangeText={handleOnConfirmPasswordChanged}
                   error={confirmPasswordError || confirmPasswordErrorState}
                   styles={styles?.inputStyles}
-                  autoCapitalize='none'
+                  autoCapitalize="none"
                   secureTextEntry={true}
-                  textContentType='oneTimeCode'
+                  textContentType="oneTimeCode"
                 />
               </>
             )}
@@ -1841,7 +1841,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
               <PhoneInput
                 phoneNumber={phone}
                 onChangePhoneNumber={handleOnChangePhoneNumber}
-                styles={styles?.phoneInput}
+                styles={styles?.phoneInputStyles}
                 error={phoneError}
                 texts={{
                   label: phoneLabel,
@@ -1964,7 +1964,7 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
           shouldNotMinimize={shouldCartTimerNotMinimizeOnTap}
         />
       </>
-    )
+    );
 
     return (
       <BillingCore
@@ -1978,9 +1978,9 @@ const Billing = forwardRef<SessionHandleType, IBillingProps>(
             : renderContent()}
         </SessionHandle>
       </BillingCore>
-    )
+    );
     //#endregion
   }
-)
+);
 
-export default Billing
+export default Billing;

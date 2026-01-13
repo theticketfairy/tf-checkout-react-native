@@ -4,44 +4,44 @@ import {
   InitStripeParams,
   PaymentIntent,
   useConfirmPayment,
-} from '@stripe/stripe-react-native'
+} from '@stripe/stripe-react-native';
 import React, {
   forwardRef,
   useCallback,
   useEffect,
   useImperativeHandle,
-} from 'react'
+} from 'react';
 
-import styles from './styles'
-import { IStripePaymentProps, StripePaymentHandle } from './types'
+import styles from './styles';
+import { IStripePaymentProps, StripePaymentHandle } from './types';
 
 const StripePayment = forwardRef<StripePaymentHandle, IStripePaymentProps>(
   (props, ref) => {
-    const { confirmPayment, loading } = useConfirmPayment()
+    const { confirmPayment, loading } = useConfirmPayment();
 
     const handleOnChangeConfirmPaymentLoading = useCallback(
       (isLoading: boolean) => {
-        props.onChangeConfirmPaymentLoading?.(isLoading)
+        props.onChangeConfirmPaymentLoading?.(isLoading);
       },
       [props]
-    )
+    );
 
     useEffect(() => {
-      handleOnChangeConfirmPaymentLoading(loading)
-    }, [handleOnChangeConfirmPaymentLoading, loading])
+      handleOnChangeConfirmPaymentLoading(loading);
+    }, [handleOnChangeConfirmPaymentLoading, loading]);
 
     useImperativeHandle(ref, () => ({
       async initStripe(params: InitStripeParams): Promise<any> {
-        return await initStripe(params)
+        return await initStripe(params);
       },
 
       async confirmPayment(
         stripeClientSecret: string,
         params: PaymentIntent.ConfirmParams
       ): Promise<any> {
-        return await confirmPayment(stripeClientSecret, params)
+        return await confirmPayment(stripeClientSecret, params);
       },
-    }))
+    }));
 
     return (
       <CardForm
@@ -49,8 +49,8 @@ const StripePayment = forwardRef<StripePaymentHandle, IStripePaymentProps>(
         style={[styles.cardForm, props.style]}
         cardStyle={props.cardStyle}
       />
-    )
+    );
   }
-)
+);
 
-export default StripePayment
+export default StripePayment;

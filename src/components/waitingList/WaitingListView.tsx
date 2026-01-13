@@ -1,9 +1,9 @@
-import React, { FC } from 'react'
-import { Text, View } from 'react-native'
+import React, { FC } from 'react';
+import { Text, View } from 'react-native';
 
-import { Button, Input } from '..'
-import s from './styles'
-import { IWaitingListViewProps } from './types'
+import { Button, Input } from '..';
+import s from './styles';
+import { IWaitingListViewProps } from './types';
 
 const WaitingListView: FC<IWaitingListViewProps> = ({
   styles,
@@ -23,7 +23,7 @@ const WaitingListView: FC<IWaitingListViewProps> = ({
     onChangeEmail,
     onChangeFirstName,
     onChangeLastName,
-  } = data
+  } = data;
 
   const getIsDataValid = () =>
     firstName.length > 0 &&
@@ -31,15 +31,15 @@ const WaitingListView: FC<IWaitingListViewProps> = ({
     email.length > 0 &&
     !emailError &&
     !lastNameError &&
-    !firstNameError
+    !firstNameError;
 
-  const isDataValid = getIsDataValid()
+  const isDataValid = getIsDataValid();
 
   const buttonStyle = isDataValid
     ? styles?.button
     : styles?.buttonDisabled
-    ? styles?.buttonDisabled
-    : styles?.button
+      ? styles?.buttonDisabled
+      : styles?.button;
 
   return (
     <View style={styles?.rootContainer}>
@@ -74,8 +74,8 @@ const WaitingListView: FC<IWaitingListViewProps> = ({
           />
           <Input
             label={texts?.email || 'Email'}
-            keyboardType='email-address'
-            autoCapitalize='none'
+            keyboardType="email-address"
+            autoCapitalize="none"
             value={email}
             onChangeText={onChangeEmail}
             error={emailError}
@@ -91,7 +91,7 @@ const WaitingListView: FC<IWaitingListViewProps> = ({
         </>
       )}
     </View>
-  )
-}
+  );
+};
 
-export default WaitingListView
+export default WaitingListView;

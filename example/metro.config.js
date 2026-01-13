@@ -1,37 +1,30 @@
+// const env = process.env.SDK_MODE || 'dev';
+
+// if (env === 'release') {
+//   console.log('[Expo Metro] Using RELEASE config');
+//   module.exports = require('./metro.release');
+// } else {
+//   console.log('[Expo Metro] Using DEV config');
+//   module.exports = require('./metro.dev');
+// }
+
+const path = require('path');
+const { getDefaultConfig } = require('@expo/metro-config');
+const { withMetroConfig } = require('react-native-monorepo-config');
+
+const root = path.resolve(__dirname, '..');
+
 /**
- * Metro configuration for React Native
- * https://github.com/facebook/react-native
+ * Metro configuration
+ * https://facebook.github.io/metro/docs/configuration
  *
- * @format
+ * @type {import('metro-config').MetroConfig}
  */
+const config = withMetroConfig(getDefaultConfig(__dirname), {
+  root,
+  dirname: __dirname,
+});
 
-const path = require('path')
-const exclusionList = require('metro-config/src/defaults/exclusionList')
+config.resolver.unstable_enablePackageExports = true;
 
-const moduleRoot = path.resolve(__dirname, '..')
-
-module.exports = {
-  watchFolders: [moduleRoot],
-  resolver: {
-    sourceExts: ['jsx', 'js', 'ts', 'tsx'],
-    extraNodeModules: {
-      react: path.resolve(__dirname, 'node_modules/react'),
-      'react-native': path.resolve(__dirname, 'node_modules/react-native'),
-    },
-    blockList: exclusionList([
-      new RegExp(`${moduleRoot}/node_modules/react/.*`),
-      new RegExp(`${moduleRoot}/node_modules/react-native/.*`),
-    ]),
-  },
-  transformer: {
-    getTransformOptions: async () => ({
-      transform: {
-        experimentalImportSupport: false,
-        inlineRequires: true,
-      },
-    }),
-  },
-  // resolver: {
-  //   sourceExts: ['jsx', 'js', 'ts', 'tsx'],
-  // },
-}
+module.exports = config;

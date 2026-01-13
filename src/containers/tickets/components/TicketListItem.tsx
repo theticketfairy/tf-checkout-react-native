@@ -1,12 +1,12 @@
-import _maxBy from 'lodash/maxBy'
-import React from 'react'
-import { Text, View } from 'react-native'
+import _maxBy from 'lodash/maxBy';
+import React from 'react';
+import { Text, View } from 'react-native';
 
-import { Dropdown } from '../../../components'
-import { IDropdownItem } from '../../../components/dropdown/types'
-import { priceWithCurrency } from '../../../helpers/StringsHelper'
-import { CartListItemStyles as s } from './styles'
-import { ITicketListItemProps } from './types'
+import { Dropdown } from '../../../components';
+import { IDropdownItem } from '../../../components/dropdown/types';
+import { priceWithCurrency } from '../../../helpers/StringsHelper';
+import { CartListItemStyles as s } from './styles';
+import { ITicketListItemProps } from './types';
 
 const TicketListItem = ({
   ticket,
@@ -16,68 +16,71 @@ const TicketListItem = ({
   styles,
   texts,
 }: ITicketListItemProps) => {
-  const soldOutText = texts?.soldOut || 'SOLD OUT'
-  const salesNotStartedText = texts?.salesNotStarted || 'Sales not started'
-  const salesEnded = texts?.salesEnded || 'Sales ended'
-  const feesIncludedText = texts?.inclFees || '(incl. Fees)'
-  const feesExcludedText = texts?.exclFees || '(excl. Fees)'
-  const freeText = texts?.free || 'Free'
-  const ticketText = texts?.ticket || 'Ticket'
-  const isSoldOut = ticket.sold_out || !ticket.displayTicket || ticket.soldOut
-  const isSalesClosed = !ticket.salesStarted || ticket.salesEnded
-  const customSoldOutMessage = texts?.soldOut || 'SOLD OUT'
+  const soldOutText = texts?.soldOut || 'SOLD OUT';
+  const salesNotStartedText = texts?.salesNotStarted || 'Sales not started';
+  const salesEnded = texts?.salesEnded || 'Sales ended';
+  const feesIncludedText = texts?.inclFees || '(incl. Fees)';
+  const feesExcludedText = texts?.exclFees || '(excl. Fees)';
+  const freeText = texts?.free || 'Free';
+  const ticketText = texts?.ticket || 'Ticket';
+  const isSoldOut = ticket.sold_out || !ticket.displayTicket || ticket.soldOut;
+  const isSalesClosed = !ticket.salesStarted || ticket.salesEnded;
+  const customSoldOutMessage = texts?.soldOut || 'SOLD OUT';
   const soldOutMessage = ticket.soldOutMessage
     ? `${ticket.soldOutMessage}`.toUpperCase()
-    : customSoldOutMessage
+    : customSoldOutMessage;
 
   const ticketsClosedMessage = !ticket.salesStarted
     ? salesNotStartedText
-    : salesEnded
+    : salesEnded;
 
   const getSelectOptions = (
     maxCount: number = 10,
     minCount: number = 1,
     multiplier: number = 1
   ) => {
-    const options = [{ label: '0', value: 0 }]
+    const options = [{ label: '0', value: 0 }];
     for (let i = minCount; i <= Math.min(50, maxCount); i += multiplier) {
-      options.push({ label: i.toString(), value: i })
+      options.push({ label: i.toString(), value: i });
     }
-    return options
-  }
+    return options;
+  };
 
   const dropdownOptions = getSelectOptions(
     ticket.maxQuantity,
     ticket.minQuantity,
     ticket.multiplier
-  )
+  );
 
   const handleOnSelectItem = (item: IDropdownItem) => {
-    onSelectTicketItem({ ...ticket, selectedOption: item })
-  }
+    onSelectTicketItem({ ...ticket, selectedOption: item });
+  };
 
   const selectedOption: IDropdownItem =
     selectedTicket &&
     ticket.id === selectedTicket.id &&
     selectedTicket.selectedOption
       ? selectedTicket.selectedOption
-      : { label: '0', value: 0 }
+      : { label: '0', value: 0 };
 
-  const feesIncluded = ticket.feeIncluded ? feesIncludedText : feesExcludedText
-  const showOldPrice = ticket.price !== ticket.oldPrice
-  const isTicketFree = +ticket.price === 0
+  const feesIncluded = ticket.feeIncluded ? feesIncludedText : feesExcludedText;
+  const showOldPrice = ticket.price !== ticket.oldPrice;
+  const isTicketFree = +ticket.price === 0;
   const ticketPrice = isSoldOut
     ? soldOutText
     : isTicketFree
-    ? freeText
-    : priceWithCurrency(ticket.price.toFixed(2).toString(), ticket.priceSymbol)
+      ? freeText
+      : priceWithCurrency(
+          ticket.price.toFixed(2).toString(),
+          ticket.priceSymbol
+        );
 
-  const maximumOption = _maxBy(dropdownOptions, (o) => o.value)?.value
+  const maximumOption = _maxBy(dropdownOptions, (o) => o.value)?.value;
 
-  let rightContent = <></>
+  let rightContent = <></>;
 
   if (ticket.soldOut || ticket.sold_out || !ticket.displayTicket) {
-    rightContent = <Text>{soldOutMessage}</Text>
+    rightContent = <Text>{soldOutMessage}</Text>;
   }
   if (ticket.displayTicket) {
     rightContent = isSalesClosed ? (
@@ -91,7 +94,7 @@ const TicketListItem = ({
       />
     ) : (
       <></>
-    )
+    );
   }
 
   return (
@@ -129,7 +132,7 @@ const TicketListItem = ({
         <View style={s.rightContainer}>{rightContent}</View>
       )}
     </View>
-  )
-}
+  );
+};
 
-export default TicketListItem
+export default TicketListItem;
