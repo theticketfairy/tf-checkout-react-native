@@ -1,4 +1,8 @@
-import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import Axios, {
+  AxiosError,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import axiosRetry from 'axios-retry';
 import _filter from 'lodash/filter';
 import _forEach from 'lodash/forEach';
@@ -76,6 +80,23 @@ import {
   IUserProfileResponse,
 } from './types';
 
+// Type for error response data from API
+interface ErrorResponseData {
+  message?: string | { email?: string; [key: string]: any };
+  error_description?: string;
+  status?: number | string;
+  [key: string]: any;
+}
+
+// Helper function to safely extract message from error response
+const getErrorMessage = (
+  data: ErrorResponseData | undefined,
+  fallback: string
+): string => {
+  if (!data?.message) return fallback;
+  return typeof data.message === 'string' ? data.message : fallback;
+};
+
 const HEADERS: { [key: string]: any } = {
   'Accept': 'application/vnd.api+json',
   'Content-Type': 'application/vnd.api+json',
@@ -90,48 +111,38 @@ export const Client: IClientRequest = Axios.create({
 
 axiosRetry(Client, { retries: 3 });
 
-Client.interceptors.request.use(async (config: AxiosRequestConfig) => {
-  const guestToken = await getData(LocalStorageKeys.AUTH_GUEST_TOKEN);
-  const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN);
-  const storedTokenType = await getData(LocalStorageKeys.AUTH_TOKEN_TYPE);
-  const tokenType = storedTokenType || 'Bearer';
+Client.interceptors.request.use(
+  async (config: InternalAxiosRequestConfig) => {
+    const guestToken = await getData(LocalStorageKeys.AUTH_GUEST_TOKEN);
+    const accessToken = await getData(LocalStorageKeys.ACCESS_TOKEN);
+    const storedTokenType = await getData(LocalStorageKeys.AUTH_TOKEN_TYPE);
+    const tokenType = storedTokenType || 'Bearer';
 
-  if (accessToken) {
-    const updatedHeaders = {
-      ...config.headers,
-      Authorization: `${tokenType} ${accessToken}`,
-    };
-    config.headers = updatedHeaders;
+    if (accessToken) {
+      config.headers['Authorization'] = `${tokenType} ${accessToken}`;
+    }
+
+    if (guestToken) {
+      Client.setGuestToken(guestToken);
+      config.headers['Authorization-Guest'] = guestToken;
+    }
+
+    if (Config.CLIENT) {
+      config.headers['origin'] = getDomainByClientAndEnv(Config.CLIENT, Config.ENV);
+    }
+
+    return config;
   }
-
-  if (guestToken) {
-    Client.setGuestToken(guestToken);
-    const updatedHeaders = {
-      ...config.headers,
-      'Authorization-Guest': guestToken,
-    };
-    config.headers = updatedHeaders;
-  }
-
-  if (Config.CLIENT) {
-    const updatedHeaders = {
-      ...config.headers,
-      origin: getDomainByClientAndEnv(Config.CLIENT, Config.ENV),
-    };
-    config.headers = updatedHeaders;
-  }
-
-  return config;
-});
+);
 
 Client.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
   },
-  async (error: AxiosError) => {
+  async (error: AxiosError<ErrorResponseData>) => {
     if (error?.response?.status === 401) {
       error.code = error.code;
-      error.message = error.response.data.error_description;
+      error.message = error.response.data?.error_description || error.message;
     } else if (error.message) {
       error.message = error.message;
     }
@@ -156,12 +167,9 @@ Client.setBaseUrl = (baseUrl: string) => (Client.defaults.baseURL = baseUrl);
 
 Client.setTimeOut = (timeOut: number) => (Client.defaults.timeout = timeOut);
 
-Client.setDomain = (domain: string) =>
-  (Client.defaults.headers = {
-    ...Client.defaults.headers,
-    //@ts-ignore
-    origin: domain,
-  });
+Client.setDomain = (domain: string) => {
+  Client.defaults.headers.common['origin'] = domain;
+};
 
 Client.setContentType = (contentType: string) =>
   (Client.defaults.headers.common['Content-Type'] = contentType);
@@ -203,9 +211,9 @@ export const authorize = async (
       data
     );
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError?.response?.data.message || 'Authorization failed',
+      message: getErrorMessage(axiosError?.response?.data, 'Authorization failed'),
       code: axiosError?.response?.status,
     };
   }
@@ -225,9 +233,9 @@ export const fetchAccessToken = async (
   try {
     response = await Client.post('/v1/oauth/access_token', data);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError.response?.data.message,
+      message: getErrorMessage(axiosError.response?.data, "Error occurred"),
       code: axiosError.response?.status,
     };
   }
@@ -278,9 +286,9 @@ export const fetchUserProfile = async (): Promise<IUserProfileResponse> => {
       },
     });
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError?.response?.data?.message,
+      message: getErrorMessage(axiosError?.response?.data, 'Error occurred'),
       code: axiosError.response?.status!,
     };
   }
@@ -313,7 +321,7 @@ export const registerNewUser = async (
       },
     });
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     const messageObject = axiosError.response?.data.message;
     let errorMessage = '';
 
@@ -322,7 +330,11 @@ export const registerNewUser = async (
         message: 'Error registering user',
       };
     } else {
-      if (axiosError.response?.data.message.email) {
+      if (
+        typeof messageObject === 'object' &&
+        'email' in messageObject &&
+        messageObject.email
+      ) {
         resultData.registerNewUserResponseError = {
           isAlreadyRegistered: true,
           message:
@@ -330,13 +342,15 @@ export const registerNewUser = async (
           raw: axiosError.response,
         };
       } else {
-        _mapKeys(messageObject, (value) => {
-          _forEach(value, (eachVal) => {
-            errorMessage += `- ${eachVal} \n`;
+        if (typeof messageObject === 'object') {
+          _mapKeys(messageObject, (value) => {
+            _forEach(value, (eachVal) => {
+              errorMessage += `- ${eachVal} \n`;
+            });
           });
-        });
+        }
         resultData.registerNewUserResponseError = {
-          message: errorMessage,
+          message: errorMessage || 'Error registering user',
         };
       }
     }
@@ -405,9 +419,9 @@ export const addToWaitingList = async (
       requestData
     );
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError.response?.data.message,
+      message: getErrorMessage(axiosError.response?.data, "Error occurred"),
       code: axiosError.response?.status!,
     };
   }
@@ -451,7 +465,7 @@ export const fetchMyOrders = async ({
   try {
     response = await Client.get(endpoint);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = getApiError(axiosError, 'Error fetching My Orders');
   }
 
@@ -487,11 +501,9 @@ export const fetchOrderDetails = async (
   try {
     response = await Client.get(`/v1/account/order/${orderId}`);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message:
-        axiosError.response?.data.message ||
-        'Error while fetching order details',
+      message: getErrorMessage(axiosError.response?.data, 'Error while fetching order details'),
       code: axiosError.response?.status,
     };
   }
@@ -634,7 +646,7 @@ export const fetchTickets = async ({
       headers: headers,
     });
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     if (axiosError.response) {
       responseError = {
         code: axiosError.response.status!,
@@ -696,10 +708,10 @@ export const addToCart = async (
       data,
     });
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
       code: axiosError.response?.status!,
-      message: axiosError.response?.data.message,
+      message: getErrorMessage(axiosError.response?.data, "Error occurred"),
     };
   }
 
@@ -742,10 +754,16 @@ export const fetchEvent = async (): Promise<IEventResponse> => {
       headers: HEADERS,
     });
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      code: axiosError?.response?.data.status,
-      message: axiosError.response?.data.message,
+      code:
+        typeof axiosError?.response?.data.status === 'number'
+          ? axiosError.response.data.status
+          : undefined,
+      message:
+        typeof axiosError.response?.data.message === 'string'
+          ? axiosError.response.data.message
+          : undefined,
     };
   }
 
@@ -785,7 +803,7 @@ export const postReferralVisit = async (
       referrer: referralIdNumber,
     });
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     if (
       axiosError.response?.data.errors &&
       axiosError.response?.data.errors.length > 0
@@ -796,7 +814,7 @@ export const postReferralVisit = async (
       };
     } else {
       responseError = {
-        message: axiosError.response?.data.message,
+        message: getErrorMessage(axiosError.response?.data, "Error occurred"),
         code: axiosError.response?.status!,
       };
     }
@@ -849,10 +867,9 @@ export const unlockPasswordProtectedEvent = async (
   try {
     response = await Client.post(`v1/event/${eventId}/authenticate`, body);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message:
-        axiosError.response?.data.message || 'Error while unlocking Event',
+      message: getErrorMessage(axiosError.response?.data, 'Error while unlocking Event'),
       code: axiosError?.response?.status,
     };
   }
@@ -884,9 +901,9 @@ export const fetchCountries = async (): Promise<ICountriesResponse> => {
   try {
     response = await Client.get('/countries/list');
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError.response?.data.message,
+      message: getErrorMessage(axiosError.response?.data, "Error occurred"),
       code: axiosError.response?.status!,
     };
   }
@@ -910,10 +927,10 @@ export const fetchStates = async (
   try {
     response = await Client.get(`/countries/${countryId}/states/`);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
       code: axiosError.response?.status!,
-      message: axiosError.response?.data.message,
+      message: getErrorMessage(axiosError.response?.data, "Error occurred"),
     };
   }
 
@@ -935,10 +952,10 @@ export const fetchCart = async (): Promise<ICartResponse> => {
   try {
     res = await Client.get('v1/cart/');
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
       code: axiosError.response?.status!,
-      message: axiosError.response?.data.message,
+      message: getErrorMessage(axiosError.response?.data, "Error occurred"),
     };
   }
 
@@ -1007,10 +1024,10 @@ export const checkoutOrder = async (
       }
     );
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
       code: axiosError.response?.status!,
-      message: axiosError.response?.data.message,
+      message: getErrorMessage(axiosError.response?.data, "Error occurred"),
     };
   }
 
@@ -1047,10 +1064,13 @@ export const fetchEventConditions = async () => {
   try {
     response = await Client.get(`v1/event/${Config.EVENT_ID}/conditions`);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError.response?.data,
-      code: axiosError.response?.status!,
+      message:
+        typeof axiosError.response?.data.message === 'string'
+          ? axiosError.response.data.message
+          : 'Error fetching event conditions',
+      code: axiosError.response?.status,
     };
   }
 
@@ -1069,9 +1089,9 @@ export const fetchOrderReview = async (
   try {
     response = await Client.get(`v1/order/${hash}/review/`);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError.response?.data.message,
+      message: getErrorMessage(axiosError.response?.data, "Error occurred"),
       code: axiosError.response?.status!,
     };
   }
@@ -1170,9 +1190,9 @@ export const updateCheckout = async (
       data,
     });
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError.response?.data.message || 'Error updating checkout',
+      message: getErrorMessage(axiosError.response?.data, 'Error updating checkout'),
       code: axiosError.response?.status,
     };
   }
@@ -1197,9 +1217,9 @@ export const getAddons = async (eventId: string): Promise<any> => {
   try {
     response = await Client.get(`v1/event/${eventId}/add-ons`);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError.response?.data.message || 'Error fetching add-ons',
+      message: getErrorMessage(axiosError.response?.data, 'Error fetching add-ons'),
       code: axiosError.response?.status,
     };
   }
@@ -1224,10 +1244,9 @@ export const getPaymentData = async (hash: string): Promise<any> => {
   try {
     response = await Client.get(`v1/order/${hash}/review`);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message:
-        axiosError.response?.data.message || 'Error fetching payment data',
+      message: getErrorMessage(axiosError.response?.data, 'Error fetching payment data'),
       code: axiosError.response?.status,
     };
   }
@@ -1250,11 +1269,9 @@ export const postOnPaymentSuccess = async (orderHash: string) => {
   try {
     response = await Client.post(`v1/order/${orderHash}/success`);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message:
-        axiosError.response?.data.message ||
-        'Error while notifying Payment Success',
+      message: getErrorMessage(axiosError.response?.data, 'Error while notifying Payment Success'),
       code: axiosError.response?.status,
     };
   }
@@ -1275,9 +1292,9 @@ export const postOnFreeRegistration = async (
   try {
     res = await Client.post(`v1/order/${orderHash}/complete_free_registration`);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError.response?.data.message,
+      message: getErrorMessage(axiosError.response?.data, "Error occurred"),
       code: axiosError.response?.status,
     };
   }
@@ -1310,9 +1327,9 @@ export const fetchPurchaseConfirmation = async (
   try {
     response = await Client.get(`/v1/order/${orderHash}/payment/complete`);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError.response?.data.message,
+      message: getErrorMessage(axiosError.response?.data, "Error occurred"),
       code: axiosError.response?.status,
     };
   }
@@ -1359,10 +1376,9 @@ export const resaleTicket = async (
   try {
     response = await Client.post(`v1/ticket/${orderHash}/sell`, data);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message:
-        axiosError.response?.data.message || 'Error while re-sale ticket',
+      message: getErrorMessage(axiosError.response?.data, 'Error while re-sale ticket'),
     };
   }
 
@@ -1388,9 +1404,13 @@ export const removeTicketFromResale = async (
   try {
     response = await Client.delete(`v1/ticket/${orderHash}/sell`);
   } catch (error) {
-    const axiosError = error as AxiosError;
-    responseError =
-      axiosError.response?.data.message || 'Error removing ticket from resale';
+    const axiosError = error as AxiosError<ErrorResponseData>;
+    responseError = {
+      message:
+        typeof axiosError.response?.data.message === 'string'
+          ? axiosError.response.data.message
+          : 'Error removing ticket from resale',
+    };
   }
 
   if (response?.data.message && response.data.status === 200) {
@@ -1415,9 +1435,13 @@ export const closeSession = async (): Promise<ICloseSessionResponse> => {
   try {
     response = await Client.delete('/auth');
   } catch (error) {
-    const axiosError = error as AxiosError;
-    responseError =
-      axiosError.response?.data.message || 'Error while closing session';
+    const axiosError = error as AxiosError<ErrorResponseData>;
+    responseError = {
+      message:
+        typeof axiosError.response?.data.message === 'string'
+          ? axiosError.response.data.message
+          : 'Error while closing session',
+    };
   }
 
   if (response?.data && response.data.status && response.data.status === 200) {
@@ -1451,10 +1475,9 @@ export const requestRestorePassword = async (
       email: email,
     });
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message:
-        axiosError.response?.data.message || 'Error while restoring password',
+      message: getErrorMessage(axiosError.response?.data, 'Error while restoring password'),
       code: axiosError.response?.status,
     };
   }
@@ -1484,10 +1507,16 @@ export const requestResetPassword = async (
   try {
     response = await Client.post(`/auth/reset-password`, data);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = {
-      message: axiosError.response?.data.message || 'Reset password error',
-      code: axiosError.response?.data.status,
+      message:
+        typeof axiosError.response?.data.message === 'string'
+          ? axiosError.response.data.message
+          : 'Reset password error',
+      code:
+        typeof axiosError.response?.data.status === 'number'
+          ? axiosError.response.data.status
+          : undefined,
     };
   }
 
@@ -1527,7 +1556,7 @@ export const fetchAccountTickets = async ({
   try {
     response = await Client.get(endpoint);
   } catch (error) {
-    const axiosError = error as AxiosError;
+    const axiosError = error as AxiosError<ErrorResponseData>;
     responseError = getApiError(axiosError);
   }
 

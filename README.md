@@ -10,8 +10,8 @@ Configure [ReactNative environment](https://reactnative.dev/docs/environment-set
 
 ### React Native
 
-- Suggested ReactNative version `0.72.9`
-- React version `18.1.0`
+- React Native version `0.81.4`
+- React version `19.1.0`
 - Node version `20.18.3` or later
 
 ### Android
@@ -52,31 +52,57 @@ This package relies on several React Native native modules. You need to install 
 If you are running on bare React Native, you will need to install the following dependencies:
 
 ```sh
-yarn add \
-tf-checkout-react-native \
-@react-native-async-storage/async-storage@^2.2.0 \
-@react-native-clipboard/clipboard@^1.16.3 \
-@react-native-community/datetimepicker@^8.4.5 \
-react-native-background-timer@^2.4.1 \
-react-native-device-country@^1.1.1 \
-react-native-fs@^2.20.0 \
-@stripe/stripe-react-native@^0.54.0
+# Using pnpm (recommended)
+pnpm add tf-checkout-react-native \
+  @react-native-async-storage/async-storage@^2.0.0 \
+  @react-native-clipboard/clipboard@^1.14.0 \
+  @react-native-community/datetimepicker@^8.0.0 \
+  react-native-background-timer@^2.4.1 \
+  react-native-device-country@^1.1.1 \
+  react-native-fs@^2.18.0 \
+  @stripe/stripe-react-native@^0.54.0
+
+# Using yarn
+yarn add tf-checkout-react-native \
+  @react-native-async-storage/async-storage@^2.0.0 \
+  @react-native-clipboard/clipboard@^1.14.0 \
+  @react-native-community/datetimepicker@^8.0.0 \
+  react-native-background-timer@^2.4.1 \
+  react-native-device-country@^1.1.1 \
+  react-native-fs@^2.18.0 \
+  @stripe/stripe-react-native@^0.54.0
+
+# Using npm
+npm install tf-checkout-react-native \
+  @react-native-async-storage/async-storage@^2.0.0 \
+  @react-native-clipboard/clipboard@^1.14.0 \
+  @react-native-community/datetimepicker@^8.0.0 \
+  react-native-background-timer@^2.4.1 \
+  react-native-device-country@^1.1.1 \
+  react-native-fs@^2.18.0 \
+  @stripe/stripe-react-native@^0.54.0
 ```
 
 If you are running on expo, you will need to install the following dependencies:
 
 ```sh
-yarn add \
-tf-checkout-react-native \
-@react-native-async-storage/async-storage@^2.2.0 \
-@react-native-clipboard/clipboard@^1.16.3 \
-react-native-background-timer@^2.4.1
-```
+# Using pnpm (recommended)
+pnpm add tf-checkout-react-native \
+  @react-native-async-storage/async-storage@^2.0.0 \
+  @react-native-clipboard/clipboard@^1.14.0 \
+  react-native-background-timer@^2.4.1
 
-or
+# Using yarn
+yarn add tf-checkout-react-native \
+  @react-native-async-storage/async-storage@^2.0.0 \
+  @react-native-clipboard/clipboard@^1.14.0 \
+  react-native-background-timer@^2.4.1
 
-```sh
-npm install tf-checkout-react-native
+# Using npm
+npm install tf-checkout-react-native \
+  @react-native-async-storage/async-storage@^2.0.0 \
+  @react-native-clipboard/clipboard@^1.14.0 \
+  react-native-background-timer@^2.4.1
 ```
 
 Make sure to install all the required dependencies in your project.

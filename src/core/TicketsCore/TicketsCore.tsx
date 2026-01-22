@@ -1,4 +1,4 @@
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import _find from 'lodash/find';
 import _groupBy from 'lodash/groupBy';
 import _map from 'lodash/map';

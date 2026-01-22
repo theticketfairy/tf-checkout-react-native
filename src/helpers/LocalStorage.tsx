@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 export const LocalStorageKeys = {
   AUTH_GUEST_TOKEN: 'AUTH_GUEST_TOKEN',

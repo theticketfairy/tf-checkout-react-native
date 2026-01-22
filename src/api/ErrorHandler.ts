@@ -4,15 +4,22 @@ import { IError } from '../types';
 
 const ERROR = 'Something went wrong!';
 
+interface ErrorResponseData {
+  message?: string | { email?: string; [key: string]: any };
+  [key: string]: any;
+}
+
 export const getApiError = (
-  error: AxiosError,
+  error: AxiosError<ErrorResponseData>,
   defaultMessage?: string
 ): IError => {
   const errorJSON = error.toJSON();
 
   if (error.response) {
+    const message = error.response?.data?.message;
     return {
-      message: error.response?.data.message || defaultMessage,
+      message:
+        typeof message === 'string' ? message : defaultMessage || ERROR,
       code: error.response?.status,
     };
   } else {
