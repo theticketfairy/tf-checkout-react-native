@@ -97,11 +97,6 @@
       "<rootDir>/lib/"
     ]
   },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
   "release-it": {
     "git": {
       "commitMessage": "chore: release ${version}",
@@ -111,7 +106,8 @@
       "publish": true
     },
     "github": {
-      "release": true
+      "release": true,
+      "releaseName": "v${version}"
     },
     "plugins": {
       "@release-it/conventional-changelog": {
@@ -120,13 +116,6 @@
         }
       }
     }
-  },
-  "prettier": {
-    "quoteProps": "consistent",
-    "singleQuote": true,
-    "tabWidth": 2,
-    "trailingComma": "es5",
-    "useTabs": false
   },
   "react-native-builder-bob": {
     "source": "src",

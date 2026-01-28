@@ -3,12 +3,13 @@ pre-commit:
   commands:
     lint:
       glob: '*.{js,ts,jsx,tsx}'
-      run: npx eslint {staged_files}
+      run: pnpm exec eslint {staged_files}
+      stage_fixed: true
     types:
       glob: '*.{js,ts,jsx,tsx}'
-      run: npx tsc
+      run: pnpm exec tsc --noEmit
+
 commit-msg:
-  parallel: true
   commands:
     commitlint:
-      run: npx commitlint --edit
+      run: pnpm exec commitlint --edit {1}

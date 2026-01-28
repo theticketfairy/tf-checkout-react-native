@@ -1,34 +1,39 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    // React Native specific
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
       "tf-checkout-react-native": ["./src/index"]
     },
     "types": ["react", "react-native"],
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "customConditions": ["react-native-strict-api"],
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
     "lib": ["ESNext"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "noEmit": true,
-    "noFallthroughCasesInSwitch": true,
+    "target": "ES2018",
+    "customConditions": ["react-native-strict-api"],
+
+    // Temporarily override strict settings (keep loose for now)
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false,
     "noImplicitReturns": false,
-    "noImplicitUseStrict": false,
-    "strictFunctionTypes": false,
-    "noStrictGenericChecks": false,
-    "noUncheckedIndexedAccess": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": false,
-    "target": "ES2018",
+
+    // Keep existing loose settings
+    "noUncheckedIndexedAccess": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noImplicitUseStrict": false,
+    "noStrictGenericChecks": false,
     "verbatimModuleSyntax": false,
-    "noImplicitAny": false
+    "isolatedModules": false,
+
+    // Build
+    "noEmit": true
   }
 }
