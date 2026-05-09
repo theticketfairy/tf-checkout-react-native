@@ -185,6 +185,8 @@ sourceExts: ['jsx', 'js', 'ts', 'tsx']
 
 Call `setConfig` once at app startup, before rendering any library component. It is async — wait for it to finish before showing ticketing UI. If you don't use SSO you don't need to pass the AUTH config, we don't support SSO for all brands, if you think you might require contact support
 
+Note that if you only have access to https://manage.ticketfairy.com you only will use "ENV: PROD" in the config, if you think you might require access to staging contact support.
+
 ```tsx
 import React, { useEffect, useState } from 'react'
 import { setConfig } from 'tf-checkout-react-native'
@@ -196,7 +198,7 @@ export default function App() {
     setConfig({
       EVENT_ID: '19939',         // from Step 1
       CLIENT: 'your-client',    // your brand's short name
-      ENV: 'STAG',              // 'PROD' | 'STAG' | 'DEV'
+      ENV: 'PROD',              // 'PROD' | 'STAG' | 'DEV'
       CLIENT_ID: 'YOUR_CLIENT_ID',
       CLIENT_SECRET: 'YOUR_CLIENT_SECRET',
     }).then(() => setReady(true))
