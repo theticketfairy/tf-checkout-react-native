@@ -24,14 +24,18 @@ From your server, fetch the current list whenever your app needs it:
 
 ```bash
 curl -H "Authorization: Bearer YOUR_API_KEY_HERE" \
-  "https://www.ticketfairy.com/api/events?section_type=next_events&page=1&limit=20"
+     -H "Accept: application/vnd.api+json" \
+     -H "Content-Type: application/json" \
+     "https://www.theticketfairy.com/api/events?section_type=next_events&page=1&limit=20"
 ```
 
 To narrow results to a specific brand, add `brands=<brandId>`:
 
 ```bash
 curl -H "Authorization: Bearer YOUR_API_KEY_HERE" \
-  "https://www.ticketfairy.com/api/events?brands=6282&section_type=next_events&page=1&limit=20"
+     -H "Accept: application/vnd.api+json" \
+     -H "Content-Type: application/json" \
+     "https://www.theticketfairy.com/api/events?brands=6282&section_type=next_events&page=1&limit=20"
 ```
 
 Server-side JavaScript example (call this from your API layer, not from the app):
@@ -43,8 +47,12 @@ async function fetchUpcomingEvents(brandId) {
     section_type: 'next_events',
     order: 'ASC',
   })
-  const response = await fetch(`https://www.ticketfairy.com/api/events?${params}`, {
-    headers: { Authorization: 'Bearer YOUR_API_KEY_HERE' },
+  const response = await fetch(`https://www.theticketfairy.com/api/events?${params}`, {
+    headers: { 
+      Authorization: 'Bearer YOUR_API_KEY_HERE',
+      Accept: 'application/vnd.api+json',
+      'Content-Type': 'application/json'
+    },
   })
   const { data } = await response.json()
   // Return the list to your app — each item's `id` is the EVENT_ID
@@ -70,7 +78,7 @@ async function fetchUpcomingEvents(brandId) {
         "startDate": "2025-06-15T22:00:00.000Z",
         "endDate": "2025-06-16T05:00:00.000Z",
         "status": "published",
-        "url": "https://www.ticketfairy.com/event/summer-festival"
+        "url": "https://www.theticketfairy.com/event/summer-festival"
       }
     }
   ],
