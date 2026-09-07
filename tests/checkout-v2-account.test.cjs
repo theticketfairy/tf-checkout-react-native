@@ -111,9 +111,10 @@ test('the actual provider receives each connected account with its publishable k
   }
 });
 
-test('null and absent accounts preserve the platform-account default', () => {
+test('empty, null and absent accounts preserve the platform-account default', () => {
   const view = controller();
   for (const config of [
+    { apiKey: 'pk_test_synthetic', accountId: '' },
     { apiKey: 'pk_test_synthetic', accountId: null },
     { apiKey: 'pk_test_synthetic' },
   ]) {

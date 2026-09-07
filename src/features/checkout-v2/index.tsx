@@ -245,7 +245,7 @@ export const CheckoutController = ({
             }
             stripeAccountId={
               checkoutFlow.checkoutData.attributes
-                .additional_payment_information.basic_config.accountId ??
+                .additional_payment_information.basic_config.accountId ||
               undefined
             }
           >
