@@ -31,6 +31,9 @@ jobs:
       - name: Typecheck files
         run: yarn typecheck
 
+      - name: Check checkout account propagation
+        run: node --test tests/checkout-v2-account.test.cjs
+
   build-library:
     runs-on: ubuntu-latest
 

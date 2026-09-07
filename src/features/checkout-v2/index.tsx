@@ -238,7 +238,17 @@ export const CheckoutController = ({
 
         {/* Use our new CheckoutForm component */}
         {checkoutFlow.checkoutData?.attributes?.additional_payment_information?.basic_config?.apiKey ? (
-        <StripeProvider publishableKey={checkoutFlow.checkoutData.attributes.additional_payment_information.basic_config.apiKey}>
+          <StripeProvider
+            publishableKey={
+              checkoutFlow.checkoutData.attributes
+                .additional_payment_information.basic_config.apiKey
+            }
+            stripeAccountId={
+              checkoutFlow.checkoutData.attributes
+                .additional_payment_information.basic_config.accountId ||
+              undefined
+            }
+          >
           {isSinglePageCheckout || !checkoutSuccessData ? (
             <CheckoutForm
               scrollRef={scrollRef}
