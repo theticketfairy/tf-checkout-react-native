@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-ticket-fairy-linux
 
     steps:
       - name: Checkout
@@ -35,7 +35,7 @@ jobs:
         run: node --test tests/checkout-v2-account.test.cjs
 
   build-library:
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-ticket-fairy-linux
 
     steps:
       - name: Checkout
