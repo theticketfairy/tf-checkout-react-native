@@ -3,6 +3,8 @@
 Application source stays in this repository. Shared end-to-end tests belong in
 [automated-testing](https://github.com/theticketfairy/automated-testing).
 
+The central repository is private; its policy links require authorised GitHub access.
+
 ## E2E user journeys must be agent-driven
 
 All application E2E journeys must use TesterArmy agents in
@@ -36,11 +38,13 @@ journeys on web, iOS, Android and macOS, including event pages and checkout.
 
 See the central [E2E policy](https://github.com/theticketfairy/automated-testing/blob/main/docs/E2E_POLICY.md).
 
-## Merge central tests after local passes
+## Merge central tests after source merge
 
-Push executable tests to `automated-testing`. Run affected real-agent journeys locally on current PR code;
-record passes, commands, artifacts, app/suite revisions and fixture/model/device scope. Open and merge the
-central PR automatically: no separate approval or unrelated CI wait. Use normal merge; queue GitHub
-auto-merge for enforced gates, never bypass protections. Failed, unrun, skipped, stale or harness-only UI
-results do not qualify. Docs/infra-only PRs need justified focused local checks. Application PR merge rules
-stay separate.
+For app changes, push executable central tests and link all source PRs. They must be merged into
+`master`/`main` before merging or enabling auto-merge. For tests of code already there, record its revision;
+no new source PR is needed. Run affected real-agent journeys locally on current central PR code; record
+passing commands/results/artifacts, app/suite revisions and fixture/model/device scope. Only then merge
+automatically (normal merge or auto-merge), with no separate permission request. GitHub-required
+reviews/checks still apply; never bypass protections. Failed, skipped, unrun, stale or harness-only UI
+results do not qualify. Docs/infra-only PRs need justified focused local checks, no source PR or new UI test.
+App PR merge rules stay separate.
