@@ -35,3 +35,12 @@ journeys on web, iOS, Android and macOS, including event pages and checkout.
   and run artifacts. Local results alone do not meet this rule.
 
 See the central [E2E policy](https://github.com/theticketfairy/automated-testing/blob/main/docs/E2E_POLICY.md).
+
+## Merge central tests after local passes
+
+Push executable tests to `automated-testing`. Run affected real-agent journeys locally on current PR code;
+record passes, commands, artifacts, app/suite revisions and fixture/model/device scope. Open and merge the
+central PR automatically: no separate approval or unrelated CI wait. Use normal merge; queue GitHub
+auto-merge for enforced gates, never bypass protections. Failed, unrun, skipped, stale or harness-only UI
+results do not qualify. Docs/infra-only PRs need justified focused local checks. Application PR merge rules
+stay separate.
