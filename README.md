@@ -1,8 +1,35 @@
 # tf-checkout-react-native
 
-React Native library for Ticket Fairy checkout.
+Ticket Fairy’s native checkout SDK has two source lines.
 
-For Single Sign-On (SSO) Please be aware that this is the first version of the implementation, we are working to release a V2, that will cover other use cases, in the near future.
+The **2.x implementation** is maintained in
+[`tf-shared-libraries/packages/tf-checkout-react-native`](https://github.com/theticketfairy/tf-shared-libraries/tree/main/packages/tf-checkout-react-native).
+It bundles the private shared core also used by the React SDK. Portable checkout,
+account and validation behavior belongs in that core; platform rendering, payment
+bindings and storage adapters remain in their platform packages.
+
+Both SDKs are published as matching `2.0.0-beta.9` prereleases from shared source
+`0f7bc64`; the stable `latest` line remains 1.x. Read the shared
+[setup](https://github.com/theticketfairy/tf-shared-libraries/tree/main/packages/tf-checkout-react-native#readme),
+[integration audit](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/app-sdk.md),
+[parity matrix](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/parity-matrix.md)
+and [registry acceptance](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.9.registry.json).
+Final app, deployed checkout/provider and store acceptance remain open.
+
+```sh
+npm view tf-checkout-react-native dist-tags --json
+npm view tf-checkout-react-native version
+```
+
+The **1.x implementation** remains in this repository. The requirements and usage
+below describe that standalone source, not the 2.x customer app. Check a 1.x fix
+against the common core when it affects the customer site, embedded checkout or
+app. Never publish this standalone source as 2.x or substitute its build for a
+missing shared feature. Matching 2.x releases use the monorepo’s
+[release procedure](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/RELEASING.md).
+Customer subscriptions stay hidden initially; refund protection is deferred.
+
+## Legacy 1.x guide
 
 # Requirements
 
