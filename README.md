@@ -21,6 +21,16 @@ npm view tf-checkout-react-native dist-tags --json
 npm view tf-checkout-react-native version
 ```
 
+The next paired `2.0.0-beta.10` is an **unpublished release candidate**.
+[Shared SDK PR59](https://github.com/theticketfairy/tf-shared-libraries/pull/59)
+reviews [exact source `006c00fdd073638efbcbe3dbaa401269beae55b1`](https://github.com/theticketfairy/tf-shared-libraries/tree/006c00fdd073638efbcbe3dbaa401269beae55b1);
+[customer App PR30](https://github.com/theticketfairy/tf-consumer-app/pull/30)
+tracks the matching app. First-release scope is core discovery/event pages,
+checkout, tickets, account and comments. Local packs and scoped UI checks do not
+establish publication or final deployed/provider/store acceptance. The published
+beta9 state above remains current until both beta10 packages are published and
+verified together.
+
 The **1.x implementation** remains in this repository. The requirements and usage
 below describe that standalone source, not the 2.x customer app. Check a 1.x fix
 against the common core when it affects the customer site, embedded checkout or
