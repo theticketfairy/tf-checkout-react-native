@@ -1,3 +1,6 @@
+> This guide describes the standalone 1.x SDK. For the current shared 2.x
+> implementation, setup and verified release, start with [README.md](README.md).
+
 # Getting Started with tf-checkout-react-native
 
 This guide walks you through setting up the library and running your first checkout flow, from fetching your events to completing a test purchase.

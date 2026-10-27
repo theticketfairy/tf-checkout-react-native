@@ -1,5 +1,14 @@
 # Contributing
 
+This guide describes the standalone **1.x** source in this repository. The 2.x
+SDK and portable core live in `theticketfairy/tf-shared-libraries`; read
+[the current source/release guidance](README.md) before choosing an implementation.
+Matching 2.x packages are released from that monorepo using protected CircleCI
+cloud trusted publishing, not this standalone build or local version scripts.
+Follow the shared [release procedure](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/RELEASING.md)
+and [OIDC/recovery contract](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/TRUSTED_PUBLISHING.md).
+Never put npm tokens in repository files or print credentials into logs.
+
 Contributions are always welcome, no matter how large or small!
 
 We want this community to be friendly and respectful to each other. Please follow it in all your interactions with the project. Before contributing, please read the [code of conduct](./CODE_OF_CONDUCT.md).
