@@ -1,6 +1,8 @@
 # tf-checkout-react-native — development rules
 
-Application source stays in this repository. Shared end-to-end tests belong in
+Standalone 1.x application source stays in this repository. The 2.x platform
+package and portable core are maintained in `theticketfairy/tf-shared-libraries`;
+read README.md before choosing a source line. Shared end-to-end tests belong in
 [automated-testing](https://github.com/theticketfairy/automated-testing).
 
 The central repository is private; its policy links require authorised GitHub access.
