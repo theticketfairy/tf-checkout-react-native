@@ -21,6 +21,21 @@ npm view tf-checkout-react-native dist-tags --json
 npm view tf-checkout-react-native version
 ```
 
+The next paired `2.0.0-beta.10` is an **unpublished release candidate**.
+[Shared SDK PR61](https://github.com/theticketfairy/tf-shared-libraries/pull/61)
+tracks the current phone-first and payment-recovery source;
+[customer app PR31](https://github.com/theticketfairy/tf-consumer-app/pull/31)
+and [legacy PR13272](https://github.com/theticketfairy/legacy/pull/13272)
+track its matching app and backend. First-release scope is core discovery/event
+pages, checkout, tickets and account, including phone-first registration with
+email sign-in retained. Phone registration defaults enabled; the device region
+prefills its country code, and international phone input can override it.
+Comments, expanded social features, music connections and subscriptions are
+excluded from the first app release. Local packages and tests do not establish
+publication, live SMS/payment acceptance or store delivery. The published
+beta.9 state above remains current until both beta.10 packages are published
+and verified together.
+
 The **1.x implementation** remains in this repository. The requirements and usage
 below describe that standalone source, not the 2.x customer app. Check a 1.x fix
 against the common core when it affects the customer site, embedded checkout or
