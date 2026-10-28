@@ -8,27 +8,28 @@ It bundles the private shared core also used by the React SDK. Portable checkout
 account and validation behavior belongs in that core; platform rendering, payment
 bindings and storage adapters remain in their platform packages.
 
-Both SDKs are published as matching `2.0.0-beta.11` prereleases from reviewed
-shared source `16e8d3e5307ae47cd09f589e9ee3bc32552ed0fe`
-([merged PR66](https://github.com/theticketfairy/tf-shared-libraries/pull/66)).
+Both SDKs are published as matching `2.0.0-beta.12` prereleases from reviewed
+shared source `e5659fe72499eb032d661ef17996b942e8c629ca`
+([merged PR69](https://github.com/theticketfairy/tf-shared-libraries/pull/69)).
 Read the shared
 [setup](https://github.com/theticketfairy/tf-shared-libraries/tree/main/packages/tf-checkout-react-native#readme),
 [integration audit](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/app-sdk.md),
 [parity matrix](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/parity-matrix.md),
-[beta.11 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.11.md)
-and [registry receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.11.registry.json).
-The previous [beta.10 receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.10.registry.json)
-remains historical. On 27 October 2026 both npm `beta` tags identify beta.11;
+[beta.12 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.12.md)
+and [registry receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.12.registry.json).
+The previous [beta.11 receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.11.registry.json)
+remains historical. On 28 October 2026 both npm `beta` tags identify beta.12;
 stable `latest` remains native `1.0.47` and web `1.7.31`. Verify the registry
 before choosing an exact version:
 
 ```sh
 npm view tf-checkout-react-native dist-tags --json
-npm view tf-checkout-react-native@2.0.0-beta.11 dist.integrity
+npm view tf-checkout-react-native@2.0.0-beta.12 dist.integrity
 ```
 
 The [customer app integration](https://github.com/theticketfairy/tf-consumer-app/pull/38)
-tracks the published beta.11 account-recovery and Trips fixes. The app's phone-first
+tracks the SDK integration; beta12 adds request-owned cart continuity and native header-only
+admission. The app's phone-first
 flow retains permanent email sign-in for existing customers. Website account entry
 remains email-first with an explicit phone alternative. In the app, device region supplies
 an initial country hint and international phone input can override it without
@@ -43,7 +44,13 @@ package upload. Namespace verifies packages; it does not publish to npm. Paired
 tags select the same reviewed shared source, and publishing consumes immutable
 same-workflow artifacts without rebuilding or a token fallback. Read the
 [trusted-publisher contract](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/TRUSTED_PUBLISHING.md).
-This standalone manifest is not the source of beta.11.
+This standalone manifest is not the source of beta.12.
+
+Beta12 cart continuity is qualified by actual native and first-party React cookie/header
+journeys with canonical PHP/Redis session owners and declared catalog/pricing.
+Foreign embedded grant admission, real stock, SQL checkout and provider settlement
+remain separate acceptance. Wallet account/country/intent-amount and web Elements
+synchronization are later work. SDK publication does not certify app/store delivery.
 
 The **1.x implementation** remains in this repository. The requirements and usage
 below describe that standalone source, not the 2.x customer app. Check a 1.x fix
