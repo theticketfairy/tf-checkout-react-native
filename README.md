@@ -8,25 +8,29 @@ It bundles the private shared core also used by the React SDK. Portable checkout
 account and validation behavior belongs in that core; platform rendering, payment
 bindings and storage adapters remain in their platform packages.
 
-Both current 2.x SDK prereleases are **`2.0.0-beta.18`**, published from reviewed
-shared main source `c5e66d537cf439665d4a2cf64ef0036fb2831215`.
-Protected paired Circle pipeline12 succeeded. The 88-member native and 265-member
+Both current 2.x SDK prereleases are **`2.0.0-beta.19`**, published from reviewed
+shared main source `9aa25ffba3966fa8e3cc6fc76441b14046df5e28`.
+Protected paired Circle pipeline13 succeeded. The 88-member native and 265-member
 web registry archives match the reviewed normal local packs and this workflow's
 cloud artifacts byte for byte, including every member's content and mode. Both
-npm `beta` tags identify18; stable `latest` remains native `1.0.47` and web `1.7.31`.
+npm `beta` tags identify19; stable `latest` remains native `1.0.47` and web `1.7.31`.
 Read the shared
 [setup](https://github.com/theticketfairy/tf-shared-libraries/tree/main/packages/tf-checkout-react-native#readme),
 [integration audit](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/app-sdk.md),
 [parity matrix](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/parity-matrix.md),
-[beta.18 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/13d4f4057f12e1728547464fb08c8adb38ad2808/docs/releases/2.0.0-beta.18.md)
-and [canonical paired registry receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/13d4f4057f12e1728547464fb08c8adb38ad2808/docs/releases/2.0.0-beta.18.registry.json).
+[beta.19 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/ed4d6c10b12528fecefaead4da513016e216124a/docs/releases/2.0.0-beta.19.md)
+and [canonical paired registry receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/ed4d6c10b12528fecefaead4da513016e216124a/docs/releases/2.0.0-beta.19.registry.json).
 The actual native archive SHA-256 is
-`b5b5c9241acaad4f9e9d4d2cd1db69393e036396da1c64887e5242eb2c36e664`.
+`efd1e1dcb36dd71ac44cb629df0f5fb2e05d4e6c870276d626671fc9c4c616bf`.
+Beta.19 publishes the shared mixed-calendar ticket selection and promo/date
+refresh corrections. The canonical API marker rollout and actual HTTP/cart/hold/
+quote/primary outcomes remain HOLD; missing markers fail closed. Publication
+does not update an installed app or certify calendar parity.
 Verify the registry before choosing an exact version:
 
 ```sh
 npm view tf-checkout-react-native dist-tags --json
-npm view tf-checkout-react-native@2.0.0-beta.18 dist.integrity
+npm view tf-checkout-react-native@2.0.0-beta.19 dist.integrity
 ```
 
 Native beta.18 adds the **`react-native-render-html >=6.3.4 <7` peer**; development
@@ -46,9 +50,12 @@ device/provider/financial acceptance remain separate. C0 pre-order cancellation 
 excluded. Earlier beta.17/native-only and beta.13 receipts retain their historical
 scope.
 
-The [current customer app integration](https://github.com/theticketfairy/tf-consumer-app/pull/118)
-tracks the beta.18 pin; beta12 adds request-owned cart continuity and native header-only
-admission. The app's phone-first
+Merged [app PR118](https://github.com/theticketfairy/tf-consumer-app/pull/118)
+pinned native18, delivered in internal app2.0.0 (1000155); the
+[actual delivery receipt](https://github.com/theticketfairy/tf-consumer-app/blob/a6f5a571c502d8121b3f7b7b1e31d7f9e5e1e258/docs/validation/internal-testflight-1000155-20261030.json)
+retains its production/fixture=false scope. A beta19 app pin and new signed
+delivery remain separate gates;155 does not contain the calendar corrections.
+Beta12 added request-owned cart continuity and native header-only admission. The app's phone-first
 flow retains permanent email sign-in for existing customers. Website account entry
 remains email-first with an explicit phone alternative. In the app, device region supplies
 an initial country hint and international phone input can override it without
@@ -64,7 +71,7 @@ releases select matching tags; native-only releases select only their exact nati
 tag and preserve the published web archive. Publishing consumes immutable
 same-workflow artifacts without rebuilding or a token fallback. Read the
 [trusted-publisher contract](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/TRUSTED_PUBLISHING.md).
-This standalone manifest is not the source of native beta.18.
+This standalone manifest is not the source of native beta.19.
 
 Historical supporting evidence: beta12 cart continuity was qualified by actual native and first-party React cookie/header
 journeys with canonical PHP/Redis session owners and declared catalog/pricing.
