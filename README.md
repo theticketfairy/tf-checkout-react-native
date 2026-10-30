@@ -8,24 +8,24 @@ It bundles the private shared core also used by the React SDK. Portable checkout
 account and validation behavior belongs in that core; platform rendering, payment
 bindings and storage adapters remain in their platform packages.
 
-The current native prerelease is **`2.0.0-beta.16`**, published from reviewed
-shared source `0fe2c5a818bab31f00e90d1dfb98ecabdff46ba1`.
+The current native prerelease is **`2.0.0-beta.17`**, published from reviewed
+shared source `fc65bb1f684d3288e444be5dff105fd94a83600e`.
 The web SDK remains **`2.0.0-beta.13`**. The native-only release preserved the
 web archive and its tags; stable `latest` remains native `1.0.47` and web `1.7.31`.
 Read the shared
 [setup](https://github.com/theticketfairy/tf-shared-libraries/tree/main/packages/tf-checkout-react-native#readme),
 [integration audit](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/app-sdk.md),
 [parity matrix](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/parity-matrix.md),
-[beta.16 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.16.md)
-and [canonical native registry receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/655db90d39464e5e5a6a24d4f2366bcc4279dff3/docs/releases/2.0.0-beta.16.registry.json).
+[beta.17 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.17.md)
+and [canonical native registry receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/2594e65deeab076506a19daf06a2790f814053ed/docs/releases/2.0.0-beta.17.registry.json).
 The actual native archive SHA-256 is
-`e62fcd238af167dd29a93c946d7bfb295ef1e4f099d1ad74b2ee6ffcc8d26c1e`.
-The registry archive equals the reviewed beta.16 candidate byte for byte.
+`90cc2a75300caee45ad16e8e911aad46a49742a41f7c080b62a8d0a425451187`.
+The registry archive equals the reviewed beta.17 candidate byte for byte.
 Verify the registry before choosing an exact version:
 
 ```sh
 npm view tf-checkout-react-native dist-tags --json
-npm view tf-checkout-react-native@2.0.0-beta.16 dist.integrity
+npm view tf-checkout-react-native@2.0.0-beta.17 dist.integrity
 ```
 
 The [customer app integration](https://github.com/theticketfairy/tf-consumer-app/pull/38)
@@ -46,7 +46,7 @@ releases select matching tags; native-only releases select only their exact nati
 tag and preserve the published web archive. Publishing consumes immutable
 same-workflow artifacts without rebuilding or a token fallback. Read the
 [trusted-publisher contract](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/TRUSTED_PUBLISHING.md).
-This standalone manifest is not the source of native beta.16.
+This standalone manifest is not the source of native beta.17.
 
 Beta12 cart continuity is qualified by actual native and first-party React cookie/header
 journeys with canonical PHP/Redis session owners and declared catalog/pricing.
@@ -54,13 +54,15 @@ Foreign embedded grant admission, real stock, SQL checkout and provider settleme
 remain separate acceptance. Beta13 includes authoritative wallet/Elements context, artwork, URI and spacing
 source changes. Actual device wallet, receiving-account/certificate/payment and
 visual qualification remain open. SDK publication does not certify app/store delivery.
-Beta.16 retains opt-in native PaymentSheet with original intent/amount/currency
-and card-only intent admission, and allows Stripe to display card-mode Link when
-the original receiving account/session supports it. Explicit non-card intent methods
-remain outside this path. Financial mismatch stays blocked; unavailable methods
-retain deliberate same-order native CardField recovery. Full native method,
-Link/autofill, device, callback, receiving-account and financial acceptance remain
-separate; publication does not enable app opt-in.
+Beta.17 extends the opt-in native PaymentSheet to exact unordered USD
+`card`/`cashapp` intents, preserving original intent/account/amount/currency and
+lease checks. Stripe may still display card-mode Link when the original receiving
+account/session permits it. Unknown/duplicate/other mixed methods and non-USD
+Cash App stay outside this path. Financial mismatch stays blocked; deliberate
+same-order CardField recovery remains guarded. Device saved-card AutoFill is
+unresolved; actual native Cash App authorization/return, receiving-account and
+financial acceptance remain unrun. Publication alone does not update an app.
+The separate pre-order browser handoff is not included in17.
 
 The **1.x implementation** remains in this repository. The requirements and usage
 below describe that standalone source, not the 2.x customer app. Check a 1.x fix
