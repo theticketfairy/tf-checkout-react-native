@@ -8,29 +8,41 @@ It bundles the private shared core also used by the React SDK. Portable checkout
 account and validation behavior belongs in that core; platform rendering, payment
 bindings and storage adapters remain in their platform packages.
 
-Both current 2.x SDK prereleases are **`2.0.0-beta.19`**, published from reviewed
-shared main source `9aa25ffba3966fa8e3cc6fc76441b14046df5e28`.
-Protected paired Circle pipeline13 succeeded. The 88-member native and 265-member
+Both current 2.x SDK prereleases are **`2.0.0-beta.21`**, published from reviewed
+shared main source `d7de6a71058cc293e6d521d52b42d9911768d1c2`.
+Protected paired Circle pipeline15 succeeded. The 88-member native and 265-member
 web registry archives match the reviewed normal local packs and this workflow's
 cloud artifacts byte for byte, including every member's content and mode. Both
-npm `beta` tags identify19; stable `latest` remains native `1.0.47` and web `1.7.31`.
+npm `beta` tags identify21; stable `latest` remains native `1.0.47` and web `1.7.31`.
 Read the shared
 [setup](https://github.com/theticketfairy/tf-shared-libraries/tree/main/packages/tf-checkout-react-native#readme),
 [integration audit](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/app-sdk.md),
 [parity matrix](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/parity-matrix.md),
-[beta.19 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/ed4d6c10b12528fecefaead4da513016e216124a/docs/releases/2.0.0-beta.19.md)
-and [canonical paired registry receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/ed4d6c10b12528fecefaead4da513016e216124a/docs/releases/2.0.0-beta.19.registry.json).
+[beta.21 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/7ed8c49d9dea2042f67ff3951602070742e0c6d7/docs/releases/2.0.0-beta.21.md)
+and [canonical paired registry receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/c547ab6713739f38d889e3c3b5d247eafa1ff982/docs/releases/2.0.0-beta.21.registry.json).
 The actual native archive SHA-256 is
-`efd1e1dcb36dd71ac44cb629df0f5fb2e05d4e6c870276d626671fc9c4c616bf`.
-Beta.19 publishes the shared mixed-calendar ticket selection and promo/date
-refresh corrections. The canonical API marker rollout and actual HTTP/cart/hold/
-quote/primary outcomes remain HOLD; missing markers fail closed. Publication
-does not update an installed app or certify calendar parity.
+`1ff6dd5c864bebcfd160e0bbbbc85800fc29d3908f38436418ca8efe71d9260e`.
+Beta.21 retains the mixed-calendar cohort and adds stable canonical selection
+keys across rotating encrypted dispatch IDs, canonical dated numeric/currency/
+option fields and strict malformed upgrade-waitlist receiver validation. Required
+API producer deployment/readback and actual HTTP/cart/hold/quote/primary outcomes
+remain HOLD; older-backend compatibility does not establish calendar parity.
+Publication does not update an installed app or certify device/provider outcomes.
+The [single failed beta.20 attempt](https://github.com/theticketfairy/tf-shared-libraries/blob/c547ab6713739f38d889e3c3b5d247eafa1ff982/docs/releases/2.0.0-beta.20.attempt.json)
+stopped before publication; its original tags and failed pipeline14 are preserved.
+
+The post-purchase upgrade waitlist is separate from the initial version1 event
+form. Its server-supplied change options alone grant choices; malformed target
+IDs, labels and existing entries do not become Join actions. The organizer-enabled
+upgrade producer in [legacy11844](https://github.com/theticketfairy/legacy/pull/11844)
+is unmerged/undeployed. Actual joins and the [central280](https://github.com/theticketfairy/automated-testing/pull/280)
+account/globalguard/auth/artifact/primary/inventory/model journeys remain HOLD.
+
 Verify the registry before choosing an exact version:
 
 ```sh
 npm view tf-checkout-react-native dist-tags --json
-npm view tf-checkout-react-native@2.0.0-beta.19 dist.integrity
+npm view tf-checkout-react-native@2.0.0-beta.21 dist.integrity
 ```
 
 Native beta.18 adds the **`react-native-render-html >=6.3.4 <7` peer**; development
@@ -53,8 +65,9 @@ scope.
 Merged [app PR118](https://github.com/theticketfairy/tf-consumer-app/pull/118)
 pinned native18, delivered in internal app2.0.0 (1000155); the
 [actual delivery receipt](https://github.com/theticketfairy/tf-consumer-app/blob/a6f5a571c502d8121b3f7b7b1e31d7f9e5e1e258/docs/validation/internal-testflight-1000155-20261030.json)
-retains its production/fixture=false scope. A beta19 app pin and new signed
-delivery remain separate gates;155 does not contain the calendar corrections.
+retains its production/fixture=false scope. The canceled beta19 source build
+was not delivery. An exact accepted21 app pin and new signed delivery are separate
+gates;155 does not contain these calendar/receiver corrections.
 Beta12 added request-owned cart continuity and native header-only admission. The app's phone-first
 flow retains permanent email sign-in for existing customers. Website account entry
 remains email-first with an explicit phone alternative. In the app, device region supplies
