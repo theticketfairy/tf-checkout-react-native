@@ -7,29 +7,48 @@ The **2.x implementation** is maintained in
 It bundles the private shared core also used by the React SDK. Portable checkout,
 account and validation behavior belongs in that core; platform rendering, payment
 bindings and storage adapters remain in their platform packages.
-
-Both current 2.x SDK prereleases are **`2.0.0-beta.21`**, published from reviewed
-shared main source `d7de6a71058cc293e6d521d52b42d9911768d1c2`.
-Protected paired Circle pipeline15 succeeded. The 88-member native and 265-member
-web registry archives match the reviewed normal local packs and this workflow's
-cloud artifacts byte for byte, including every member's content and mode. Both
-npm `beta` tags identify21; stable `latest` remains native `1.0.47` and web `1.7.31`.
 Read the shared
 [setup](https://github.com/theticketfairy/tf-shared-libraries/tree/main/packages/tf-checkout-react-native#readme),
-[integration audit](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/app-sdk.md),
-[parity matrix](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/parity-matrix.md),
-[beta.21 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/7ed8c49d9dea2042f67ff3951602070742e0c6d7/docs/releases/2.0.0-beta.21.md)
-and [canonical paired registry receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/c547ab6713739f38d889e3c3b5d247eafa1ff982/docs/releases/2.0.0-beta.21.registry.json).
-The actual native archive SHA-256 is
-`1ff6dd5c864bebcfd160e0bbbbc85800fc29d3908f38436418ca8efe71d9260e`.
-Beta.21 retains the mixed-calendar cohort and adds stable canonical selection
-keys across rotating encrypted dispatch IDs, canonical dated numeric/currency/
-option fields and strict malformed upgrade-waitlist receiver validation. Required
-API producer deployment/readback and actual HTTP/cart/hold/quote/primary outcomes
-remain HOLD; older-backend compatibility does not establish calendar parity.
+[integration audit](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/app-sdk.md)
+and [parity matrix](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/parity-matrix.md).
+
+Both current 2.x SDK prereleases are **`2.0.0-beta.22`**, published from reviewed
+shared main source `c7beebef926888629c74174d2269fff5322c3c65`.
+Protected paired Circle pipeline16 succeeded. Both registry archives match the
+reviewed normal local packs and the same workflow's cloud artifacts byte for byte,
+including every member's content and mode. The
+[canonical beta.22 registry receipt](https://github.com/theticketfairy/tf-shared-libraries/blob/036097f2f37a7a69437f5e2c0c504b257ecd3208/docs/releases/2.0.0-beta.22.registry.json)
+records the exact source, tags and archive checks;
+[release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/036097f2f37a7a69437f5e2c0c504b257ecd3208/docs/releases/2.0.0-beta.22.md)
+explain migration and remaining acceptance gates. Both npm `beta` tags identify22;
+stable `latest` remains web `1.7.31` and native `1.0.47`.
+The 87-member native archive SHA-256 is
+`79a53e18e54f5a6670930f828a105d30a45b727fcc37e5a1f7a8d6dc57537cdc`.
+
+Beta.22 adds a native storage migration and optional captured push-registration
+context on the shared SDK's existing owned sign-out request. Omitting that context
+retains the existing web logout contract; the SDK does not register a device or
+send a push by itself. Web checkout, storage and HTTP cache defaults are unchanged.
+Native private API requests now send `Cache-Control: no-store, no-cache`;
+this does not erase old cache files or certify deployed response headers.
 Publication does not update an installed app or certify device/provider outcomes.
-The [single failed beta.20 attempt](https://github.com/theticketfairy/tf-shared-libraries/blob/c547ab6713739f38d889e3c3b5d247eafa1ff982/docs/releases/2.0.0-beta.20.attempt.json)
-stopped before publication; its original tags and failed pipeline14 are preserved.
+Actual storage migration/restoration, private-cache and basic-push journeys remain
+separate gates in [tracker283](https://github.com/theticketfairy/automated-testing/pull/283)
+and [tracker284](https://github.com/theticketfairy/automated-testing/pull/284).
+
+**Native beta.22 requires a host-owned OS-protected storage adapter.** Pass
+`NativeCheckoutConfig.storage` to `configureCheckout` or the native root `configure`
+alias. The eager MMKV default, `createMmkvStorage`, `mmkvStorageAdapter` and SDK
+MMKV dependency/peer are removed. The SDK adds no Expo storage dependency or peer.
+Bare React Native hosts may use their own Keychain/Keystore integration.
+
+The adapter reads and updates synchronously. For async persistence, hydrate a
+synchronous memory mirror before SDK setup or mounting hooks, queue ordered secure
+writes, and await `flush()` before reporting credential changes as durable. Built-in
+auth completion does not automatically await that final flush. Migrate old
+credentials successfully before removing old keys, or require fresh sign-in with
+explicit old-key cleanup. Removing an unused host MMKV native module requires a
+binary rebuild. See the exact [native storage contract and migration](https://github.com/theticketfairy/tf-shared-libraries/blob/036097f2f37a7a69437f5e2c0c504b257ecd3208/docs/integration/native-session-storage.md).
 
 The post-purchase upgrade waitlist is separate from the initial version1 event
 form. Its server-supplied change options alone grant choices; malformed target
@@ -42,7 +61,7 @@ Verify the registry before choosing an exact version:
 
 ```sh
 npm view tf-checkout-react-native dist-tags --json
-npm view tf-checkout-react-native@2.0.0-beta.21 dist.integrity
+npm view tf-checkout-react-native@2.0.0-beta.22 dist.integrity
 ```
 
 Native beta.18 adds the **`react-native-render-html >=6.3.4 <7` peer**; development
@@ -66,8 +85,8 @@ Merged [app PR118](https://github.com/theticketfairy/tf-consumer-app/pull/118)
 pinned native18, delivered in internal app2.0.0 (1000155); the
 [actual delivery receipt](https://github.com/theticketfairy/tf-consumer-app/blob/a6f5a571c502d8121b3f7b7b1e31d7f9e5e1e258/docs/validation/internal-testflight-1000155-20261030.json)
 retains its production/fixture=false scope. The canceled beta19 source build
-was not delivery. An exact accepted21 app pin and new signed delivery are separate
-gates;155 does not contain these calendar/receiver corrections.
+was not delivery. An exact beta.22 app pin and rebuilt signed delivery are separate
+gates;155 predates these storage, cache and sign-out changes.
 Beta12 added request-owned cart continuity and native header-only admission. The app's phone-first
 flow retains permanent email sign-in for existing customers. Website account entry
 remains email-first with an explicit phone alternative. In the app, device region supplies
@@ -84,7 +103,7 @@ releases select matching tags; native-only releases select only their exact nati
 tag and preserve the published web archive. Publishing consumes immutable
 same-workflow artifacts without rebuilding or a token fallback. Read the
 [trusted-publisher contract](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/TRUSTED_PUBLISHING.md).
-This standalone manifest is not the source of native beta.19.
+This standalone manifest is not the source of native beta.22.
 
 Historical supporting evidence: beta12 cart continuity was qualified by actual native and first-party React cookie/header
 journeys with canonical PHP/Redis session owners and declared catalog/pricing.
