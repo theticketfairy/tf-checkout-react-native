@@ -50,3 +50,13 @@ automatically (normal merge or auto-merge), with no separate permission request.
 reviews/checks still apply; never bypass protections. Failed, skipped, unrun, stale or harness-only UI
 results do not qualify. Docs/infra-only PRs need justified focused local checks, no source PR or new UI test.
 App PR merge rules stay separate.
+
+## Hard rule: audit every caller before changing a shared contract
+
+Before changing a shared framework or API signature, default, or behavior,
+identify and audit **all** callers and overrides, including indirect, dynamic,
+and cross-repository consumers. Test every affected caller and override against
+the proposed contract; reflection, unit and focused harness tests alone do not
+establish compatibility. Never change a contract merely to make an E2E test
+pass. If any caller or override cannot be identified or assessed, do not change
+the contract; surface the gap and its impact.
