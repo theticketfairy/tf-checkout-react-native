@@ -55,7 +55,8 @@ App PR merge rules stay separate.
 
 Before changing a shared framework or API signature, default, or behavior,
 identify and audit **all** callers and overrides, including indirect, dynamic,
-and cross-repository consumers. Test every affected caller against the proposed
-contract; reflection and unit tests alone do not establish compatibility. Never
-change a contract merely to make a test pass. If any caller cannot be identified
-or assessed, do not change the contract; surface the gap and its impact.
+and cross-repository consumers. Test every affected caller and override against
+the proposed contract; reflection, unit and focused harness tests alone do not
+establish compatibility. Never change a contract merely to make an E2E test
+pass. If any caller or override cannot be identified or assessed, do not change
+the contract; surface the gap and its impact.
