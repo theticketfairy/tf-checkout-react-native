@@ -1,0 +1,15 @@
+---
+description: tf-checkout-react-native rules — mandatory for all code and all reviews
+alwaysApply: true
+---
+
+# tf-checkout-react-native — project rules
+
+**Read [`AGENTS.md`](mdc:AGENTS.md) at the repository root before writing or reviewing code.**
+It is the canonical rule set for every coding agent in this repo and it is mandatory, not
+advisory. This file is only a pointer — never add a rule here.
+
+Open the module covering your change before writing code in that area:
+
+- [`docs/rules/10-process-and-verification.md`](mdc:docs/rules/10-process-and-verification.md) — planning questions, fresh-context review, caller audits, E2E coverage, PR descriptions, worktree cleanup
+- [`docs/rules/70-security.md`](mdc:docs/rules/70-security.md) — secrets, external content, dependencies
