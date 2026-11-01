@@ -152,9 +152,10 @@ remove that worktree and its local branch. Do this in the same session that sees
    upstream (then `git log @{u}..` fails), stop and keep the worktree.
 2. From another checkout, run `git worktree remove <path>`. Do not add `--force`: it discards
    uncommitted work.
-3. Delete the local branch with `git branch -d <branch>`. A squash or rebase merge makes
-   `-d` refuse. Use `git branch -D <branch>` only after you confirm that the pull request is
-   merged and the branch has no commits after the merged head.
+3. Confirm on GitHub that the pull request is merged. A successful `git branch -d` does not
+   prove this. Then delete the local branch with `git branch -d <branch>`. A squash or rebase
+   merge makes `-d` refuse. Use `git branch -D <branch>` only when the branch has no commits
+   after the head commit of the merged pull request.
 4. Run `git worktree prune` to remove records of worktree folders that were already deleted.
 
 Do not remove the main checkout. Do not remove a worktree that another session or person still
