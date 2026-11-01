@@ -148,8 +148,8 @@ When the work in a local git worktree is pushed to GitHub and its pull request i
 remove that worktree and its local branch. Do this in the same session that sees the merge.
 
 1. Make sure that nothing is lost. `git status` must show no uncommitted changes, and
-   `git log @{u}..` must show no unpushed commits. If you find either, stop and keep the
-   worktree.
+   `git log @{u}..` must show no unpushed commits. If you find either, or the branch has no
+   upstream (then `git log @{u}..` fails), stop and keep the worktree.
 2. From another checkout, run `git worktree remove <path>`. Do not add `--force`: it discards
    uncommitted work.
 3. Delete the local branch with `git branch -d <branch>`. A squash or rebase merge makes
