@@ -18,7 +18,7 @@ export const getApiError = (
   } else {
     if (error.code === 'ECONNABORTED') {
       return {
-        // @ts-ignore
+        // @ts-ignore
         message: errorJSON.message || 'Connection time out',
       };
     }
