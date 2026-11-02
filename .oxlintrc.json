@@ -15,12 +15,7 @@
     "node_modules/**",
     "dist/**",
     "build/**",
-    "lib/**",
-    "**/*.cjs",
-    "**/*.mjs",
-    "**/*.mts",
-    "**/*.cts",
-    "**/*.jsx"
+    "lib/**"
   ],
   "rules": {
     "constructor-super": "error",
@@ -59,7 +54,12 @@
     "no-nonoctal-decimal-escape": "error",
     "no-obj-calls": "error",
     "no-prototype-builtins": "off",
-    "no-redeclare": "error",
+    "no-redeclare": [
+      "error",
+      {
+        "builtinGlobals": false
+      }
+    ],
     "no-regex-spaces": "error",
     "no-self-assign": "off",
     "no-setter-return": "error",
