@@ -3,26 +3,25 @@
 ## Choose your SDK version
 
 The **2.x SDK** is maintained in the shared-libraries monorepo. Start with the
-[2.x integration and layout guide](https://github.com/theticketfairy/tf-shared-libraries/blob/41931f8b5b14d299d42c4e5a08c0ee5d1655d39b/packages/tf-checkout-react-native/README.md#choose-a-ready-made-layout);
+[published 2.x integration and layout guide](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.28/docs/GUIDE.html#choose-a-ready-made-layout);
 it identifies the ready-made screens, composition options and migration gaps.
 The shared core is included in the platform package.
 
-As of 3 November 2026 UTC, npm's `beta` tag points to `2.0.0-beta.27` for
+As of 3 November 2026 UTC, npm's `beta` tag points to `2.0.0-beta.28` for
 both platform SDKs. The `tf-checkout-react-native` `latest` tag points to **1.0.47**
 (1.x). Check the tags before installing and pin the version you intend to use:
 
 ```sh
 npm view tf-checkout-react-native dist-tags --json
-npm install tf-checkout-react-native@2.0.0-beta.27
+npm install tf-checkout-react-native@2.0.0-beta.28
 ```
 
-This command pins the SDK package only. Follow the [installation requirements](https://github.com/theticketfairy/tf-shared-libraries/blob/41931f8b5b14d299d42c4e5a08c0ee5d1655d39b/packages/tf-checkout-react-native/README.md#requirements-and-installation)
+This command pins the SDK package only. Follow the [installation requirements](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.28/docs/GUIDE.html#requirements-and-installation)
 for its peer dependencies, native configuration and a rebuilt app binary.
 
-The [published beta.27 guide](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.27/docs/GUIDE.html)
-is bundled with that package. The expanded layout guidance linked above is in
-the repository and needs a later package release to appear on npm. Publication
-does not establish device, provider or payment acceptance.
+The [beta.28 API reference](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.28/docs/API.html)
+is also included in the published package. Publication does not establish
+device, provider or payment acceptance.
 
 This repository retains the **1.x source and guide** below. Fixes affecting
 both lines must also be evaluated against the shared core.
