@@ -16,6 +16,9 @@ npm view tf-checkout-react-native dist-tags --json
 npm install tf-checkout-react-native@2.0.0-beta.27
 ```
 
+This command pins the SDK package only. Follow the [installation requirements](https://github.com/theticketfairy/tf-shared-libraries/blob/41931f8b5b14d299d42c4e5a08c0ee5d1655d39b/packages/tf-checkout-react-native/README.md#requirements-and-installation)
+for its peer dependencies, native configuration and a rebuilt app binary.
+
 The [published beta.27 guide](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.27/docs/GUIDE.html)
 is bundled with that package. The expanded layout guidance linked above is in
 the repository and needs a later package release to appear on npm. Publication
