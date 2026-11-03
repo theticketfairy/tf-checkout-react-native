@@ -1,5 +1,38 @@
 # tf-checkout-react-native
 
+## Choose your SDK version
+
+The **2.x SDK** is maintained in the shared-libraries monorepo. Start with the
+[published 2.x integration and layout guide](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.28/docs/GUIDE.html#choose-a-ready-made-layout);
+it identifies the ready-made screens, composition options and migration gaps.
+The shared core is included in the platform package.
+
+As of 3 November 2026 UTC, npm's `beta` tag points to `2.0.0-beta.28` for
+both platform SDKs. The `tf-checkout-react-native` `latest` tag points to **1.0.47**
+(1.x). Check the tags before installing and pin the version you intend to use:
+
+```sh
+npm view tf-checkout-react-native dist-tags --json
+npm install tf-checkout-react-native@2.0.0-beta.28
+```
+
+This command pins the SDK package only. Follow the [installation requirements](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.28/docs/GUIDE.html#requirements-and-installation)
+for its peer dependencies, native configuration and a rebuilt app binary.
+
+The [beta.28 API reference](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.28/docs/API.html)
+is also included in the published package. Publication does not establish
+device, provider or payment acceptance.
+
+This repository retains the **1.x source and guide** below. Fixes affecting
+both lines must also be evaluated against the shared core.
+
+<details>
+<summary>Historical release checkpoint through beta.22</summary>
+
+The following notes record an earlier checkpoint; their release status and
+outstanding-work statements are historical. Use the current integration guide
+and registry tags above for a new integration.
+
 Ticket Fairy’s native checkout SDK has two source lines.
 
 The **2.x implementation** is maintained in
@@ -12,7 +45,7 @@ Read the shared
 [integration audit](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/app-sdk.md)
 and [parity matrix](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/integration/parity-matrix.md).
 
-Both current 2.x SDK prereleases are **`2.0.0-beta.22`**, published from reviewed
+At this historical checkpoint, both 2.x SDK prereleases were **`2.0.0-beta.22`**, published from reviewed
 shared main source `c7beebef926888629c74174d2269fff5322c3c65`.
 Protected paired Circle pipeline16 succeeded. Both registry archives match the
 reviewed normal local packs and the same workflow's cloud artifacts byte for byte,
@@ -128,6 +161,9 @@ app. Never publish this standalone source as 2.x or substitute its build for a
 missing shared feature. 2.x releases use the monorepo’s
 [release procedure](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/RELEASING.md).
 Customer subscriptions stay hidden initially; refund protection is deferred.
+
+
+</details>
 
 ## Legacy 1.x guide
 
