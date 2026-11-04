@@ -235,9 +235,12 @@ contains that incomplete snippet; do not paste it as a complete configuration.
 Use the [Metro configuration guide](https://metrobundler.dev/docs/configuration/)
 and your app's React Native version to determine whether changes are needed.
 
-### Required for Android
+### Historical Android setup example
 
-Add below dependency to your `app/build.gradle` file with specified version (in our example we are using `1.4.0`).
+The following came from the standalone source guide and has not been verified
+for 1.0.47. Check the published package and your app's Android setup before
+using it. The original guide described adding a Material Components dependency;
+replace `<version>` with a compatible version only after verifying it is needed.
 
 ```java
 implementation 'com.google.android.material:material:<version>'
