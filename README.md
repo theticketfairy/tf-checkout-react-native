@@ -17,10 +17,12 @@ npm install --save-exact tf-checkout-react-native@2.0.0-beta.31
 
 For 2.x setup, see the [published guide](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.31/docs/GUIDE.html),
 [API reference](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.31/docs/API.html)
-and the [beta.31 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.31.md).
+and the [npm package page](https://www.npmjs.com/package/tf-checkout-react-native/v/2.0.0-beta.31).
 Install the peers and complete the host setup described there. Do not embed
 confidential client secrets in a browser or mobile app.
 
+Beta.31 updates the documentation while retaining beta.30's runtime. The guide
+identifies the layouts currently available and their integration limits.
 Publishing a package does not by itself establish device or payment acceptance.
 
 <details>
