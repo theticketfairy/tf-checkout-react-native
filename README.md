@@ -6,26 +6,21 @@ The **2.x SDK** is developed in the [shared-libraries monorepo](https://github.c
 The native package includes the private shared core; do not install the core
 separately. This repository retains the **1.x source and guide** below.
 
-As of 12 November 2026, npm's `beta` tag is `2.0.0-beta.30` for both SDKs.
+As of 12 November 2026, npm's `beta` tag is `2.0.0-beta.31` for both SDKs.
 The `latest` tag for `tf-checkout-react-native` is the stable 1.x release `1.0.47`.
 Check the tags, then pin the version you intend to use:
 
 ```sh
 npm view tf-checkout-react-native dist-tags --json
-npm install --save-exact tf-checkout-react-native@2.0.0-beta.30
+npm install --save-exact tf-checkout-react-native@2.0.0-beta.31
 ```
 
-For 2.x setup, see the [package source guide](https://github.com/theticketfairy/tf-shared-libraries/tree/main/packages/tf-checkout-react-native#readme)
-and the [beta.30 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.30.md).
+For 2.x setup, see the [published guide](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.31/docs/GUIDE.html),
+[API reference](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.31/docs/API.html)
+and the [beta.31 release notes](https://github.com/theticketfairy/tf-shared-libraries/blob/main/docs/releases/2.0.0-beta.31.md).
 Install the peers and complete the host setup described there. Do not embed
 confidential client secrets in a browser or mobile app.
 
-The [published beta.30 README](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.30/README.md)
-and [API reference](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.30/docs/API.md)
-still contain beta.28 labels and links. The beta.30 archive does not include
-its own rendered HTML guides. Check the
-installed declarations and release notes for beta.30-specific APIs while the
-documentation is corrected.
 Publishing a package does not by itself establish device or payment acceptance.
 
 <details>
