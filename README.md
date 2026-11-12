@@ -2,29 +2,28 @@
 
 ## Choose your SDK version
 
-The **2.x SDK** is maintained in the shared-libraries monorepo. Start with the
-[published 2.x integration and layout guide](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.28/docs/GUIDE.html#choose-a-ready-made-layout);
-it identifies the ready-made screens, composition options and migration gaps.
-The shared core is included in the platform package.
+The **2.x SDK** is developed in the [shared-libraries monorepo](https://github.com/theticketfairy/tf-shared-libraries/tree/main/packages/tf-checkout-react-native).
+The native package includes the private shared core; do not install the core
+separately. This repository retains the **1.x source and guide** below.
 
-As of 3 November 2026 UTC, npm's `beta` tag points to `2.0.0-beta.28` for
-both platform SDKs. The `tf-checkout-react-native` `latest` tag points to **1.0.47**
-(1.x). Check the tags before installing and pin the version you intend to use:
+As of 12 November 2026, npm's `beta` tag is `2.0.0-beta.31` for both SDKs.
+The `latest` tag for `tf-checkout-react-native` is the stable 1.x release `1.0.47`.
+Check the tags, then pin the version you intend to use:
 
 ```sh
 npm view tf-checkout-react-native dist-tags --json
-npm install tf-checkout-react-native@2.0.0-beta.28
+npm install --save-exact tf-checkout-react-native@2.0.0-beta.31
 ```
 
-This command pins the SDK package only. Follow the [installation requirements](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.28/docs/GUIDE.html#requirements-and-installation)
-for its peer dependencies, native configuration and a rebuilt app binary.
+For 2.x setup, see the [published guide](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.31/docs/GUIDE.html),
+[API reference](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.31/docs/API.html)
+and the [npm package page](https://www.npmjs.com/package/tf-checkout-react-native/v/2.0.0-beta.31).
+Install the peers and complete the host setup described there. Do not embed
+confidential client secrets in a browser or mobile app.
 
-The [beta.28 API reference](https://unpkg.com/tf-checkout-react-native@2.0.0-beta.28/docs/API.html)
-is also included in the published package. Publication does not establish
-device, provider or payment acceptance.
-
-This repository retains the **1.x source and guide** below. Fixes affecting
-both lines must also be evaluated against the shared core.
+Beta.31 updates the documentation while retaining beta.30's runtime. The guide
+identifies the layouts currently available and their integration limits.
+Publishing a package does not by itself establish device or payment acceptance.
 
 <details>
 <summary>Historical release checkpoint through beta.22</summary>
